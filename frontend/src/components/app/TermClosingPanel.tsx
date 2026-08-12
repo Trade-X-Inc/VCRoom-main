@@ -11,18 +11,18 @@ import {
 } from "@/lib/agreement-fn";
 import { regenerateSummary } from "@/lib/summary-fn";
 import { downloadAgreement } from "@/lib/closing-fn";
+import { V2Button, StatusLabel, type StatusTone } from "@/components/v2";
 
 // R15B — post-lock closing panel: summary (Gate 2) + agreement upload/review
 // (Gate 3) + re-open flow. Rendered inside the deal room for founder, investor,
 // and lawyer. R15A term-negotiation history is NOT shown here (lawyer-blocked).
 
-const BORDER = "#E4E4E7", INK = "#0A0A0B", INK2 = "#52525B", INK3 = "#71717A", BRAND = "#7C3AED";
-
-const AGR_CHIP: Record<string, { bg: string; fg: string; label: string }> = {
-  pending:            { bg: "#EDE9FE", fg: "#6D28D9", label: "Awaiting review" },
-  changes_requested:  { bg: "#FEF3C7", fg: "#92400E", label: "Changes requested" },
-  accepted:           { bg: "#DCFCE7", fg: "#166534", label: "Accepted" },
-  superseded:         { bg: "#F4F4F5", fg: "#52525B", label: "Superseded" },
+// §7.2 closed 4-tone vocabulary.
+const AGR_CHIP: Record<string, { tone: StatusTone; label: string }> = {
+  pending:            { tone: "attention", label: "Awaiting review" },
+  changes_requested:  { tone: "attention", label: "Changes requested" },
+  accepted:           { tone: "satisfied", label: "Accepted" },
+  superseded:         { tone: "neutral",   label: "Superseded" },
 };
 
 async function token() {
@@ -263,81 +263,80 @@ export function TermClosingPanel({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-v2-ui">
       {/* ── Gate 2: Summary ─────────────────────────────────────────────── */}
       {content ? (
-        <div className="border bg-white" style={{ borderColor: BORDER, borderRadius: 0 }}>
-          <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: BORDER }}>
+        <div className="border border-v2-rule bg-v2-panel">
+          <div className="flex items-center justify-between border-b border-v2-rule px-5 py-4">
             <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4" style={{ color: BRAND }} />
-              <h2 className="text-sm font-semibold" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>
+              <FileText className="h-4 w-4 text-v2-accent" />
+              <h2 className="text-v2-ink font-semibold text-sm">
                 Agreed terms summary — {content.instrument_label}
               </h2>
             </div>
-            <span className="text-[12px]" style={{ color: INK3 }}>
+            <span className="text-v2-ink-muted" style={{ fontSize: "12px" }}>
               Generated {summary?.generated_at ? formatDistanceToNow(new Date(summary.generated_at), { addSuffix: true }) : ""}
             </span>
           </div>
 
           <div className="grid gap-x-8 gap-y-4 px-5 py-4 sm:grid-cols-2">
             <div>
-              <div className="text-[11px] uppercase tracking-wide" style={{ color: INK3 }}>Founder</div>
-              <div className="text-[13px]" style={{ color: INK }}>{content.parties?.founder?.name}{content.parties?.founder?.entity ? ` · ${content.parties.founder.entity}` : ""}</div>
+              <div className="text-v2-ink-muted uppercase" style={{ fontSize: "11px", letterSpacing: "0.07em" }}>Founder</div>
+              <div className="text-v2-ink" style={{ fontSize: "13px" }}>{content.parties?.founder?.name}{content.parties?.founder?.entity ? ` · ${content.parties.founder.entity}` : ""}</div>
             </div>
             <div>
-              <div className="text-[11px] uppercase tracking-wide" style={{ color: INK3 }}>Investor</div>
-              <div className="text-[13px]" style={{ color: INK }}>{content.parties?.investor?.name}</div>
+              <div className="text-v2-ink-muted uppercase" style={{ fontSize: "11px", letterSpacing: "0.07em" }}>Investor</div>
+              <div className="text-v2-ink" style={{ fontSize: "13px" }}>{content.parties?.investor?.name}</div>
             </div>
           </div>
 
-          <div className="border-t" style={{ borderColor: BORDER }}>
+          <div className="border-t border-v2-rule">
             {(content.terms ?? []).map((t: any) => (
-              <div key={t.term_key} className="flex items-center justify-between border-b px-5 last:border-b-0" style={{ borderColor: BORDER, minHeight: 44 }}>
-                <span className="text-[13px]" style={{ color: INK2 }}>{t.term_label}{t.is_custom ? <span className="ml-2 text-[10px] uppercase" style={{ color: INK3 }}>Custom</span> : null}</span>
-                <span className="text-[13px] font-medium tabular-nums" style={{ color: INK }}>{formatTermValue(t.value, t.value_type as TermValueType)}</span>
+              <div key={t.term_key} className="flex items-center justify-between border-b border-v2-rule-light px-5 last:border-b-0" style={{ minHeight: 44 }}>
+                <span className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>{t.term_label}{t.is_custom ? <span className="ml-2 text-v2-ink-muted uppercase" style={{ fontSize: "10px" }}>Custom</span> : null}</span>
+                <span className="text-v2-ink font-medium font-v2-data" style={{ fontSize: "13px" }}>{formatTermValue(t.value, t.value_type as TermValueType)}</span>
               </div>
             ))}
           </div>
 
-          <div className="border-t px-5 py-3" style={{ borderColor: BORDER, background: "#FAFAFA" }}>
-            <p className="text-[12px] leading-relaxed" style={{ color: INK2 }}>
-              <strong style={{ color: INK }}>Disclaimer.</strong> {content.disclaimer}
+          <div className="border-t border-v2-rule px-5 py-3 bg-v2-surface">
+            <p className="text-v2-ink-secondary leading-relaxed" style={{ fontSize: "12px" }}>
+              <strong className="text-v2-ink">Disclaimer.</strong> {content.disclaimer}
             </p>
           </div>
         </div>
       ) : summaryFailed ? (
-        <div className="border bg-white px-5 py-5" style={{ borderColor: "#DC2626", borderRadius: 0 }}>
-          <div className="text-sm font-semibold" style={{ color: "#991B1B" }}>Summary generation failed</div>
-          <div className="mt-1 text-[13px]" style={{ color: INK2 }}>
+        <div className="border border-v2-adverse bg-v2-panel px-5 py-5">
+          <div className="text-v2-adverse font-semibold text-sm">Summary generation failed</div>
+          <div className="mt-1 text-v2-ink-secondary" style={{ fontSize: "13px" }}>
             The terms are locked, but the agreed-terms summary could not be generated. This does not affect the locked terms.
             {isPrincipal ? " Retry below, or contact support if it keeps failing." : " A deal party can retry, or contact support."}
           </div>
           {isPrincipal && (
-            <button onClick={doRetrySummary} disabled={busy === "retry-summary"}
-              className="mt-3 inline-flex items-center gap-1.5 px-3 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+            <V2Button variant="primary" className="mt-3" onClick={doRetrySummary} disabled={busy === "retry-summary"}>
               {busy === "retry-summary" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />} Retry generation
-            </button>
+            </V2Button>
           )}
         </div>
       ) : (
-        <div className="flex items-center gap-2 border bg-white px-5 py-6 text-sm" style={{ borderColor: BORDER, borderRadius: 0, color: INK2 }}>
-          <Loader2 className="h-4 w-4 animate-spin" style={{ color: INK3 }} />
+        <div className="flex items-center gap-2 border border-v2-rule bg-v2-panel px-5 py-6 text-v2-ink-secondary text-sm">
+          <Loader2 className="h-4 w-4 animate-spin text-v2-ink-muted" />
           Generating the agreed-terms summary from the locked terms…
         </div>
       )}
 
       {/* Re-open request banner (pending) */}
       {reopenReq && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border px-4 py-3" style={{ borderColor: "#F59E0B", background: "#FFFBEB", borderRadius: 0 }}>
-          <div className="text-sm" style={{ color: "#92400E" }}>
+        <div className="flex flex-wrap items-center justify-between gap-3 border border-v2-attention bg-v2-attention-wash px-4 py-3">
+          <div className="text-v2-attention text-sm">
             {reopenReq.requested_by === userId
               ? <>You requested to re-open the terms — awaiting counterparty approval.{reopenReq.reason ? ` Reason: "${reopenReq.reason}"` : ""}</>
               : <><strong className="capitalize">{reopenReq.requested_role}</strong> requested to re-open the terms for renegotiation.{reopenReq.reason ? ` Reason: "${reopenReq.reason}"` : ""} Approving unlocks the terms and archives this summary.</>}
           </div>
           {!isClosed && isPrincipal && reopenReq.requested_by !== userId && (
             <div className="flex items-center gap-2">
-              <button onClick={() => doResolveReopen(reopenReq.id, false)} disabled={busy === "reopen-resolve"} className="border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>Decline</button>
-              <button onClick={() => doResolveReopen(reopenReq.id, true)} disabled={busy === "reopen-resolve"} className="px-3 text-xs font-medium text-white" style={{ background: "#D97706", height: 32, borderRadius: 2 }}>Approve re-open</button>
+              <V2Button variant="secondary" onClick={() => doResolveReopen(reopenReq.id, false)} disabled={busy === "reopen-resolve"}>Decline</V2Button>
+              <V2Button variant="primary" onClick={() => doResolveReopen(reopenReq.id, true)} disabled={busy === "reopen-resolve"}>Approve re-open</V2Button>
             </div>
           )}
         </div>
@@ -345,27 +344,30 @@ export function TermClosingPanel({
 
       {/* ── Gate 3: Agreement upload + review ────────────────────────────── */}
       {content && (
-        <div className="border bg-white" style={{ borderColor: BORDER, borderRadius: 0 }}>
-          <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: BORDER }}>
-            <h2 className="text-sm font-semibold" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>Agreement</h2>
+        <div className="border border-v2-rule bg-v2-panel">
+          <div className="flex items-center justify-between border-b border-v2-rule px-5 py-4">
+            <h2 className="text-v2-ink font-semibold text-sm">Agreement</h2>
             {finalized ? (
-              <span className="inline-flex items-center gap-1.5 text-[12px] font-medium" style={{ color: "#166534" }}><Lock className="h-3.5 w-3.5" /> Finalized</span>
+              <span className="inline-flex items-center gap-1.5 text-v2-satisfied font-medium" style={{ fontSize: "12px" }}><Lock className="h-3.5 w-3.5" /> Finalized</span>
             ) : !isClosed && role === uploaderRole && !reopenReq ? (
-              <label className="inline-flex cursor-pointer items-center gap-1.5 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+              <label
+                className="inline-flex cursor-pointer items-center gap-1.5 bg-v2-accent text-white font-v2-ui font-medium hover:brightness-110"
+                style={{ height: "32px", paddingInline: "12px", fontSize: "13px", borderRadius: "var(--v2-radius)" }}
+              >
                 {busy === "upload" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                 Upload {allAgreements.length > 0 ? "new version" : "agreement"}
                 <input type="file" className="sr-only" accept=".pdf,.docx,.doc" disabled={busy === "upload"}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }} />
               </label>
             ) : (
-              <span className="text-[12px]" style={{ color: INK3 }}>
+              <span className="text-v2-ink-muted" style={{ fontSize: "12px" }}>
                 {role === "founder" ? `Awaiting ${uploaderRole} to upload` : "Awaiting upload"}
               </span>
             )}
           </div>
 
           {allAgreements.length === 0 ? (
-            <div className="px-5 py-6 text-sm" style={{ color: INK2 }}>
+            <div className="px-5 py-6 text-v2-ink-secondary text-sm">
               No agreement uploaded yet. The {uploaderRole} prepares the agreement from the summary above and uploads it here for review.
             </div>
           ) : (
@@ -377,57 +379,58 @@ export function TermClosingPanel({
                 const canReview = !isClosed && isPrincipal && isCurrent && a.status !== "accepted" && a.status !== "superseded" && a.uploaded_by !== userId;
                 const cs = commentsFor(a.id);
                 return (
-                  <div key={a.id} className="border-b last:border-b-0" style={{ borderColor: BORDER }}>
+                  <div key={a.id} className="border-b border-v2-rule-light last:border-b-0">
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
                       <div className="min-w-[220px] flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-medium" style={{ color: INK }}>v{a.version} · {a.file_name}</span>
-                          <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium" style={{ background: chip.bg, color: chip.fg, borderRadius: 2 }}>{chip.label}</span>
+                          <span className="text-v2-ink font-medium" style={{ fontSize: "13px" }}>v{a.version} · {a.file_name}</span>
+                          <StatusLabel tone={chip.tone}>{chip.label}</StatusLabel>
                         </div>
-                        <div className="mt-0.5 text-[12px]" style={{ color: INK3 }}>
+                        <div className="mt-0.5 text-v2-ink-muted" style={{ fontSize: "12px" }}>
                           Uploaded by {a.uploader_role} · {formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}
                           {a.accepted_by_founder ? " · founder accepted" : ""}{a.accepted_by_investor ? " · investor accepted" : ""}
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <button onClick={() => download(a.id)} className="inline-flex items-center gap-1 border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>
+                        <V2Button variant="secondary" onClick={() => download(a.id)}>
                           <Download className="h-3 w-3" /> Download
-                        </button>
+                        </V2Button>
                         {canReview && !mineAccepted && (
                           <>
-                            <button onClick={() => doAccept(a.id)} disabled={busy === a.id} className="inline-flex items-center gap-1 px-3 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+                            <V2Button variant="primary" onClick={() => doAccept(a.id)} disabled={busy === a.id}>
                               {busy === a.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Accept
-                            </button>
-                            <button onClick={() => { setChangesFor(a.id); setChangeText(""); }} className="border px-3 text-xs font-medium" style={{ borderColor: "#FCD34D", color: "#92400E", height: 32, borderRadius: 2 }}>
+                            </V2Button>
+                            <V2Button variant="secondary" onClick={() => { setChangesFor(a.id); setChangeText(""); }}>
                               Request changes
-                            </button>
+                            </V2Button>
                           </>
                         )}
-                        {canReview && mineAccepted && <span className="text-[12px]" style={{ color: INK3 }}>You accepted · awaiting counterparty</span>}
+                        {canReview && mineAccepted && <span className="text-v2-ink-muted" style={{ fontSize: "12px" }}>You accepted · awaiting counterparty</span>}
                       </div>
                     </div>
 
                     {changesFor === a.id && (
-                      <div className="border-t bg-[#FAFAFA] px-5 py-3" style={{ borderColor: BORDER }}>
-                        <label className="block text-[12px] font-medium" style={{ color: INK2 }}>Describe the changes needed (required)</label>
+                      <div className="border-t border-v2-rule-light bg-v2-surface px-5 py-3">
+                        <label className="block text-v2-ink-secondary font-medium" style={{ fontSize: "12px" }}>Describe the changes needed (required)</label>
                         <div className="mt-1.5 flex flex-wrap items-center gap-2">
                           <input value={changeText} onChange={(e) => setChangeText(e.target.value)} autoFocus placeholder="What needs to change in this agreement?"
-                            className="min-w-[260px] flex-1 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }} />
-                          <button onClick={() => doRequestChanges(a.id)} disabled={!changeText.trim() || busy === a.id} className="px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: "#D97706", height: 36, borderRadius: 2 }}>Send request</button>
-                          <button onClick={() => { setChangesFor(null); setChangeText(""); }} className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
+                            className="min-w-[260px] flex-1 border border-v2-rule bg-v2-panel px-3 text-sm text-v2-ink outline-none focus:border-v2-accent"
+                            style={{ height: 36, borderRadius: "var(--v2-radius)" }} />
+                          <V2Button variant="primary" onClick={() => doRequestChanges(a.id)} disabled={!changeText.trim() || busy === a.id}>Send request</V2Button>
+                          <V2Button variant="secondary" onClick={() => { setChangesFor(null); setChangeText(""); }}>Cancel</V2Button>
                         </div>
                       </div>
                     )}
 
                     {cs.length > 0 && (
-                      <div className="border-t bg-[#FAFAFA] px-5 py-3" style={{ borderColor: BORDER }}>
-                        <div className="mb-1.5 flex items-center gap-1.5 text-[11px] uppercase tracking-wide" style={{ color: INK3 }}><MessageSquare className="h-3 w-3" /> Change requests</div>
+                      <div className="border-t border-v2-rule-light bg-v2-surface px-5 py-3">
+                        <div className="mb-1.5 flex items-center gap-1.5 text-v2-ink-muted uppercase" style={{ fontSize: "11px", letterSpacing: "0.07em" }}><MessageSquare className="h-3 w-3" /> Change requests</div>
                         <div className="space-y-1.5">
                           {cs.map((c) => (
-                            <div key={c.id} className="flex items-baseline gap-2 text-[12px]" style={{ color: INK2 }}>
-                              <span className="font-medium capitalize" style={{ color: INK }}>{c.author_role}</span>
+                            <div key={c.id} className="flex items-baseline gap-2 text-v2-ink-secondary" style={{ fontSize: "12px" }}>
+                              <span className="font-medium capitalize text-v2-ink">{c.author_role}</span>
                               <span>{c.comment}</span>
-                              <span className="ml-auto shrink-0" style={{ color: INK3 }}>{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</span>
+                              <span className="ml-auto shrink-0 text-v2-ink-muted">{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</span>
                             </div>
                           ))}
                         </div>
@@ -445,19 +448,21 @@ export function TermClosingPanel({
       {!isClosed && content && isPrincipal && !reopenReq && !finalized && (
         <div>
           {reopenOpen ? (
-            <div className="border bg-white p-4" style={{ borderColor: BORDER, borderRadius: 0 }}>
-              <label className="block text-[12px] font-medium" style={{ color: INK2 }}>Re-open terms for renegotiation — reason (optional)</label>
+            <div className="border border-v2-rule bg-v2-panel p-4">
+              <label className="block text-v2-ink-secondary font-medium" style={{ fontSize: "12px" }}>Re-open terms for renegotiation — reason (optional)</label>
               <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                <input value={reopenReason} onChange={(e) => setReopenReason(e.target.value)} placeholder="Why re-open?" className="min-w-[260px] flex-1 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }} />
-                <button onClick={doRequestReopen} disabled={busy === "reopen"} className="px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>Request re-open</button>
-                <button onClick={() => setReopenOpen(false)} className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
+                <input value={reopenReason} onChange={(e) => setReopenReason(e.target.value)} placeholder="Why re-open?"
+                  className="min-w-[260px] flex-1 border border-v2-rule bg-v2-surface px-3 text-sm text-v2-ink outline-none focus:border-v2-accent"
+                  style={{ height: 36, borderRadius: "var(--v2-radius)" }} />
+                <V2Button variant="primary" onClick={doRequestReopen} disabled={busy === "reopen"}>Request re-open</V2Button>
+                <V2Button variant="secondary" onClick={() => setReopenOpen(false)}>Cancel</V2Button>
               </div>
-              <p className="mt-2 text-[11px]" style={{ color: INK3 }}>Re-opening requires counterparty approval. It unlocks the terms, archives this summary, and cancels any in-progress agreement review.</p>
+              <p className="mt-2 text-v2-ink-muted" style={{ fontSize: "11px" }}>Re-opening requires counterparty approval. It unlocks the terms, archives this summary, and cancels any in-progress agreement review.</p>
             </div>
           ) : (
-            <button onClick={() => setReopenOpen(true)} className="inline-flex items-center gap-1.5 border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>
+            <V2Button variant="secondary" onClick={() => setReopenOpen(true)}>
               <RotateCcw className="h-3.5 w-3.5" /> Re-open terms
-            </button>
+            </V2Button>
           )}
         </div>
       )}

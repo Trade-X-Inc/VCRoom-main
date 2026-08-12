@@ -15,6 +15,7 @@ import {
   requestInstrumentReset, resolveInstrumentReset,
 } from "@/lib/term-negotiation-fn";
 import { TermClosingPanel } from "@/components/app/TermClosingPanel";
+import { V2Button, V2PageHeader, StatusLabel, type StatusTone } from "@/components/v2";
 
 // R15A — Term negotiation engine. Sole content of /deal-rooms/:id/term-sheets
 // (the old investor-only blob builder was fully replaced here; see git history).
@@ -25,19 +26,15 @@ export const Route = createFileRoute("/app/deal-rooms/$id/term-sheets")({
   component: TermNegotiationPage,
 });
 
-const BORDER = "#E4E4E7";
-const INK = "#0A0A0B";
-const INK2 = "#52525B";
-const INK3 = "#71717A";
-const BRAND = "#7C3AED";
-
-const STATUS_CHIP: Record<string, { bg: string; fg: string; label: string }> = {
-  unset:    { bg: "#F4F4F5", fg: "#52525B", label: "Not started" },
-  proposed: { bg: "#EDE9FE", fg: "#6D28D9", label: "Proposed" },
-  counter:  { bg: "#FEF3C7", fg: "#92400E", label: "Counter-proposed" },
-  accepted: { bg: "#DBEAFE", fg: "#1E40AF", label: "Accepted (one side)" },
-  rejected: { bg: "#FEE2E2", fg: "#991B1B", label: "Rejected" },
-  locked:   { bg: "#DCFCE7", fg: "#166534", label: "Finalized" },
+// §7.2 closed 4-tone vocabulary — "counter"/"accepted (one side)" are both
+// in-progress states, mapped to the nearest tone rather than invented ones.
+const STATUS_CHIP: Record<string, { tone: StatusTone; label: string }> = {
+  unset:    { tone: "neutral",   label: "Not started" },
+  proposed: { tone: "attention", label: "Proposed" },
+  counter:  { tone: "attention", label: "Counter-proposed" },
+  accepted: { tone: "attention", label: "Accepted (one side)" },
+  rejected: { tone: "adverse",   label: "Rejected" },
+  locked:   { tone: "satisfied", label: "Finalized" },
 };
 
 async function token() {
@@ -227,11 +224,11 @@ function TermNegotiationPage() {
   // ── Instrument not yet chosen — selector ───────────────────────────────────
   if (!config?.instrument_type) {
     return (
-      <div className="mx-auto max-w-[1360px] px-8 py-8">
+      <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui text-v2-ink">
         <Header locked={false} acceptedCount={0} total={0} />
-        <div className="mt-6 border bg-white p-8" style={{ borderColor: BORDER }}>
-          <h2 className="text-base font-semibold" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>Choose the instrument type</h2>
-          <p className="mt-1 text-sm" style={{ color: INK2 }}>
+        <div className="mt-6 border border-v2-rule bg-v2-panel p-8">
+          <h2 className="text-v2-ink font-semibold" style={{ fontSize: "15px" }}>Choose the instrument type</h2>
+          <p className="mt-1 text-v2-ink-secondary text-sm">
             This sets the standard terms both parties will negotiate. It locks once the first term is proposed.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -239,11 +236,10 @@ function TermNegotiationPage() {
               const tmpl = INSTRUMENT_TEMPLATES[t];
               return (
                 <button key={t} onClick={() => doSelectInstrument(t)} disabled={busy === "instrument"}
-                  className="border bg-white p-4 text-left transition-colors hover:bg-[#FAFAFA] disabled:opacity-50"
-                  style={{ borderColor: BORDER, borderRadius: 0 }}>
-                  <div className="text-sm font-semibold" style={{ color: INK }}>{tmpl.label}</div>
-                  <div className="mt-1 text-xs leading-relaxed" style={{ color: INK2 }}>{tmpl.description}</div>
-                  <div className="mt-2 text-[11px]" style={{ color: INK3 }}>{tmpl.terms.length} standard terms</div>
+                  className="border border-v2-rule bg-v2-panel p-4 text-left transition-colors hover:bg-v2-accent-wash disabled:opacity-50">
+                  <div className="text-v2-ink font-semibold text-sm">{tmpl.label}</div>
+                  <div className="mt-1 text-v2-ink-secondary text-xs leading-relaxed">{tmpl.description}</div>
+                  <div className="mt-2 text-v2-ink-muted" style={{ fontSize: "11px" }}>{tmpl.terms.length} standard terms</div>
                 </button>
               );
             })}
@@ -256,17 +252,17 @@ function TermNegotiationPage() {
   const tmpl = INSTRUMENT_TEMPLATES[config.instrument_type as InstrumentType];
 
   return (
-    <div className="mx-auto max-w-[1360px] px-8 py-8">
+    <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui text-v2-ink">
       <Header locked={locked} acceptedCount={acceptedCount} total={allTerms.length} instrumentLabel={tmpl?.label} />
 
       {locked && (
-        <div className="mt-6 flex items-center gap-3 border p-4" style={{ borderColor: "#166534", background: "#F0FDF4", borderRadius: 0 }}>
-          <Lock className="h-5 w-5 shrink-0" style={{ color: "#166534" }} />
+        <div className="mt-6 flex items-center gap-3 border border-v2-satisfied bg-v2-satisfied-wash p-4">
+          <Lock className="h-5 w-5 shrink-0 text-v2-satisfied" />
           <div>
-            <div className="text-sm font-semibold" style={{ color: "#166534" }}>
-              Terms Finalized — {config.locked_at ? new Date(config.locked_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}
+            <div className="text-v2-satisfied font-semibold text-sm">
+              Terms finalized — {config.locked_at ? new Date(config.locked_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}
             </div>
-            <div className="text-xs" style={{ color: INK2 }}>Every term is accepted by both parties. The term set is locked.</div>
+            <div className="text-v2-ink-secondary text-xs">Every term is accepted by both parties. The term set is locked.</div>
           </div>
         </div>
       )}
@@ -282,17 +278,15 @@ function TermNegotiationPage() {
 
       {/* Instrument bar — change is a mutual reset (escape hatch) */}
       {!locked && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border bg-white px-4 py-3" style={{ borderColor: BORDER, borderRadius: 0 }}>
-          <div className="flex items-center gap-2 text-sm" style={{ color: INK }}>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-v2-rule bg-v2-panel px-4 py-3">
+          <div className="flex items-center gap-2 text-v2-ink text-sm">
             <span className="font-semibold">Instrument:</span> {tmpl?.label}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {INSTRUMENT_ORDER.filter((t) => t !== config.instrument_type).map((t) => (
-              <button key={t} onClick={() => setResetConfirm(t)} disabled={!!busy}
-                className="inline-flex items-center gap-1.5 border px-3 text-xs font-medium disabled:opacity-50"
-                style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>
+              <V2Button key={t} variant="secondary" onClick={() => setResetConfirm(t)} disabled={!!busy}>
                 <RotateCcw className="h-3 w-3" /> Switch to {INSTRUMENT_TEMPLATES[t].label}
-              </button>
+              </V2Button>
             ))}
           </div>
         </div>
@@ -300,25 +294,27 @@ function TermNegotiationPage() {
 
       {/* Pending mutual-reset request — counterparty approves, requester waits */}
       {!locked && resetRequest && (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border px-4 py-3" style={{ borderColor: "#F59E0B", background: "#FFFBEB", borderRadius: 0 }}>
-          <div className="text-sm" style={{ color: "#92400E" }}>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border border-v2-attention bg-v2-attention-wash px-4 py-3">
+          <div className="text-v2-attention text-sm">
             {resetRequest.requested_by === userId
               ? <>You requested a reset to <strong>{INSTRUMENT_TEMPLATES[resetRequest.target_instrument as InstrumentType]?.label}</strong> — awaiting counterparty approval. All terms will be cleared if approved.</>
               : <><strong className="capitalize">{resetRequest.requested_role}</strong> requested a reset to <strong>{INSTRUMENT_TEMPLATES[resetRequest.target_instrument as InstrumentType]?.label}</strong>. Approving clears every term and its history.</>}
           </div>
           {resetRequest.requested_by !== userId && (
             <div className="flex items-center gap-2">
-              <button onClick={() => doResolveReset(resetRequest.id, false)} disabled={busy === "reset-resolve"}
-                className="border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>Decline</button>
-              <button onClick={() => doResolveReset(resetRequest.id, true)} disabled={busy === "reset-resolve"}
-                className="px-3 text-xs font-medium text-white" style={{ background: "#D97706", height: 32, borderRadius: 2 }}>Approve reset</button>
+              <V2Button variant="secondary" onClick={() => doResolveReset(resetRequest.id, false)} disabled={busy === "reset-resolve"}>Decline</V2Button>
+              <V2Button variant="primary" onClick={() => doResolveReset(resetRequest.id, true)} disabled={busy === "reset-resolve"}>Approve reset</V2Button>
             </div>
           )}
         </div>
       )}
 
-      {/* Terms table */}
-      <div className="mt-6 border bg-white" style={{ borderColor: BORDER, borderRadius: 0 }}>
+      {/* Terms table — inline expansion (edit/history) rows make this a
+          bordered list, not a LedgerTable: LedgerTable rows can't expand
+          into a form or history block, so forcing it there would lose
+          real functionality. Same call as the founder room list's
+          expand-to-team-row pattern (surface 1). */}
+      <div className="mt-6 border border-v2-rule bg-v2-panel">
         {allTerms.map((term) => {
           const chip = STATUS_CHIP[term.status] ?? STATUS_CHIP.unset;
           const mineAccepted = role === "founder" ? term.accepted_by_founder : term.accepted_by_investor;
@@ -326,26 +322,24 @@ function TermNegotiationPage() {
           const isMyMove = !locked && term.status !== "locked" && (term.awaiting_role === role || term.status === "unset");
           const history = proposalsByTerm[term.id] ?? [];
           return (
-            <div key={term.id} data-testid={`term-row-${term.term_key}`} data-term-status={term.status} className="border-b last:border-b-0" style={{ borderColor: BORDER }}>
+            <div key={term.id} data-testid={`term-row-${term.term_key}`} data-term-status={term.status} className="border-b border-v2-rule-light last:border-b-0">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5" style={{ minHeight: 44 }}>
                 <div className="min-w-[180px] flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-medium" style={{ color: INK }}>{term.term_label}</span>
-                    {term.is_custom && <span className="text-[10px] uppercase tracking-wide" style={{ color: INK3 }}>Custom</span>}
+                    <span className="text-v2-ink font-medium" style={{ fontSize: "13px" }}>{term.term_label}</span>
+                    {term.is_custom && <span className="text-v2-ink-muted uppercase" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Custom</span>}
                   </div>
-                  <div className="mt-0.5 text-[13px]" style={{ color: term.current_value ? INK : INK3 }}>
+                  <div className="mt-0.5 font-v2-data" style={{ fontSize: "13px", color: term.current_value ? "var(--v2-ink)" : "var(--v2-ink-muted)" }}>
                     {formatTermValue(term.current_value, term.value_type as TermValueType)}
                   </div>
                 </div>
 
-                <span className="inline-flex items-center px-2 py-0.5 text-[12px] font-medium" style={{ background: chip.bg, color: chip.fg, borderRadius: 2 }}>
-                  {chip.label}
-                </span>
+                <StatusLabel tone={chip.tone}>{chip.label}</StatusLabel>
 
                 {/* Whose move */}
-                <div className="min-w-[90px] text-[12px]" style={{ color: INK3 }}>
-                  {term.status === "locked" ? <span style={{ color: "#166534" }}>Done</span>
-                    : isMyMove ? <span style={{ color: BRAND, fontWeight: 600 }}>Your move</span>
+                <div className="min-w-[90px] text-v2-ink-muted" style={{ fontSize: "12px" }}>
+                  {term.status === "locked" ? <span className="text-v2-satisfied">Done</span>
+                    : isMyMove ? <span className="text-v2-accent font-semibold">Your move</span>
                     : term.awaiting_role ? `Awaiting ${term.awaiting_role}` : "—"}
                 </div>
 
@@ -355,99 +349,89 @@ function TermNegotiationPage() {
                     <>
                       {/* Accept — only when the OTHER side proposed a value awaiting me */}
                       {term.current_value && term.awaiting_role === role && !mineAccepted && (
-                        <button onClick={() => doAccept(term.id)} disabled={busy === term.id}
-                          className="inline-flex items-center gap-1 px-3 text-xs font-medium text-white disabled:opacity-50"
-                          style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+                        <V2Button variant="primary" onClick={() => doAccept(term.id)} disabled={busy === term.id}>
                           {busy === term.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Accept
-                        </button>
+                        </V2Button>
                       )}
                       {/* Reject / counter — when there's a value awaiting me */}
                       {term.current_value && term.awaiting_role === role && (
                         <>
-                          <button onClick={() => { setProposeOpen(term.id); setProposeValue(term.current_value ?? ""); setCounterMode(true); }}
-                            className="border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 32, borderRadius: 2 }}>
+                          <V2Button variant="secondary" onClick={() => { setProposeOpen(term.id); setProposeValue(term.current_value ?? ""); setCounterMode(true); }}>
                             Counter
-                          </button>
-                          <button onClick={() => { setRejectOpen(term.id); setRejectText(""); }}
-                            className="border px-3 text-xs font-medium" style={{ borderColor: "#FCA5A5", color: "#991B1B", height: 32, borderRadius: 2 }}>
+                          </V2Button>
+                          <V2Button variant="adverse" onClick={() => { setRejectOpen(term.id); setRejectText(""); }}>
                             Reject
-                          </button>
+                          </V2Button>
                         </>
                       )}
                       {/* Propose — unset / rejected / my turn to (re)propose */}
                       {(term.status === "unset" || term.status === "rejected" || (!term.current_value)) && (
-                        <button onClick={() => { setProposeOpen(term.id); setProposeValue(""); setCounterMode(false); }}
-                          className="inline-flex items-center gap-1 px-3 text-xs font-medium text-white"
-                          style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+                        <V2Button variant="primary" onClick={() => { setProposeOpen(term.id); setProposeValue(""); setCounterMode(false); }}>
                           <Plus className="h-3 w-3" /> Propose
-                        </button>
+                        </V2Button>
                       )}
                       {/* I proposed and I've accepted my own value; waiting on them */}
                       {mineAccepted && !theirsAccepted && (
-                        <span className="text-[12px]" style={{ color: INK3 }}>You accepted · awaiting counterparty</span>
+                        <span className="text-v2-ink-muted" style={{ fontSize: "12px" }}>You accepted · awaiting counterparty</span>
                       )}
                     </>
                   )}
                   {history.length > 0 && (
-                    <button onClick={() => setHistoryOpen(historyOpen === term.id ? null : term.id)}
-                      className="inline-flex items-center gap-1 px-2 text-[11px]" style={{ color: INK3, height: 32 }}>
+                    <V2Button variant="quiet" onClick={() => setHistoryOpen(historyOpen === term.id ? null : term.id)}>
                       {historyOpen === term.id ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                       History ({history.length})
-                    </button>
+                    </V2Button>
                   )}
                 </div>
               </div>
 
               {/* Inline propose/counter editor */}
               {proposeOpen === term.id && (
-                <div className="border-t bg-[#FAFAFA] px-4 py-3" style={{ borderColor: BORDER }}>
-                  <label className="block text-[12px] font-medium" style={{ color: INK2 }}>
+                <div className="border-t border-v2-rule-light bg-v2-surface px-4 py-3">
+                  <label className="block text-v2-ink-secondary font-medium" style={{ fontSize: "12px" }}>
                     {counterMode ? "Counter-propose a value" : "Propose a value"}
                   </label>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <input value={proposeValue} onChange={(e) => setProposeValue(e.target.value)} autoFocus
                       placeholder={term.value_type === "boolean" ? "true or false" : `Enter ${term.term_label.toLowerCase()}`}
-                      className="min-w-[220px] flex-1 border px-3 text-sm outline-none"
-                      style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }} />
-                    <button onClick={() => doPropose(term.id, counterMode)} disabled={!proposeValue.trim() || busy === term.id}
-                      className="px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>
+                      className="min-w-[220px] flex-1 border border-v2-rule bg-v2-panel px-3 text-sm text-v2-ink outline-none focus:border-v2-accent"
+                      style={{ height: 36, borderRadius: "var(--v2-radius)" }} />
+                    <V2Button variant="primary" onClick={() => doPropose(term.id, counterMode)} disabled={!proposeValue.trim() || busy === term.id}>
                       {busy === term.id ? <Loader2 className="h-3 w-3 animate-spin" /> : counterMode ? "Send counter" : "Send proposal"}
-                    </button>
-                    <button onClick={() => { setProposeOpen(null); setProposeValue(""); }}
-                      className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
+                    </V2Button>
+                    <V2Button variant="secondary" onClick={() => { setProposeOpen(null); setProposeValue(""); }}>Cancel</V2Button>
                   </div>
                 </div>
               )}
 
               {/* Inline reject editor */}
               {rejectOpen === term.id && (
-                <div className="border-t bg-[#FAFAFA] px-4 py-3" style={{ borderColor: BORDER }}>
-                  <label className="block text-[12px] font-medium" style={{ color: INK2 }}>Reject — suggest an alternative (optional)</label>
+                <div className="border-t border-v2-rule-light bg-v2-surface px-4 py-3">
+                  <label className="block text-v2-ink-secondary font-medium" style={{ fontSize: "12px" }}>Reject — suggest an alternative (optional)</label>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <input value={rejectText} onChange={(e) => setRejectText(e.target.value)} autoFocus
                       placeholder="What would you accept instead?"
-                      className="min-w-[220px] flex-1 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }} />
-                    <button onClick={() => doReject(term.id)} disabled={busy === term.id}
-                      className="px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: "#DC2626", height: 36, borderRadius: 2 }}>
+                      className="min-w-[220px] flex-1 border border-v2-rule bg-v2-panel px-3 text-sm text-v2-ink outline-none focus:border-v2-accent"
+                      style={{ height: 36, borderRadius: "var(--v2-radius)" }} />
+                    <V2Button variant="adverse" onClick={() => doReject(term.id)} disabled={busy === term.id}>
                       Reject term
-                    </button>
-                    <button onClick={() => { setRejectOpen(null); setRejectText(""); }}
-                      className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
+                    </V2Button>
+                    <V2Button variant="secondary" onClick={() => { setRejectOpen(null); setRejectText(""); }}>Cancel</V2Button>
                   </div>
                 </div>
               )}
 
               {/* Audit trail */}
               {historyOpen === term.id && history.length > 0 && (
-                <div className="border-t bg-[#FAFAFA] px-4 py-3" style={{ borderColor: BORDER }}>
+                <div className="border-t border-v2-rule-light bg-v2-surface px-4 py-3">
                   <div className="space-y-1.5">
                     {history.map((p) => (
-                      <div key={p.id} className="flex items-baseline gap-2 text-[12px]" style={{ color: INK2 }}>
-                        <span className="font-medium capitalize" style={{ color: INK }}>{p.actor_role}</span>
+                      <div key={p.id} className="flex items-baseline gap-2 text-v2-ink-secondary" style={{ fontSize: "12px" }}>
+                        <span className="font-medium capitalize text-v2-ink">{p.actor_role}</span>
                         <span>{p.action === "propose" ? "proposed" : p.action === "counter" ? "countered" : p.action === "accept" ? "accepted" : "rejected"}</span>
-                        {p.proposed_value && <span style={{ color: INK }}>"{p.proposed_value}"</span>}
+                        {p.proposed_value && <span className="text-v2-ink">"{p.proposed_value}"</span>}
                         {p.suggested_alternative && <span className="italic">— suggested: {p.suggested_alternative}</span>}
-                        <span className="ml-auto shrink-0" style={{ color: INK3 }}>{formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}</span>
+                        <span className="ml-auto shrink-0 text-v2-ink-muted">{formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}</span>
                       </div>
                     ))}
                   </div>
@@ -462,26 +446,25 @@ function TermNegotiationPage() {
       {!locked && (
         <div className="mt-4">
           {customOpen ? (
-            <div className="border bg-white p-4" style={{ borderColor: BORDER, borderRadius: 0 }}>
-              <label className="block text-[12px] font-medium" style={{ color: INK2 }}>Add a custom term</label>
+            <div className="border border-v2-rule bg-v2-panel p-4">
+              <label className="block text-v2-ink-secondary font-medium" style={{ fontSize: "12px" }}>Add a custom term</label>
               <div className="mt-1.5 flex flex-wrap items-center gap-2">
                 <input value={customLabel} onChange={(e) => setCustomLabel(e.target.value)} placeholder="Term name"
-                  className="min-w-[220px] flex-1 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }} />
+                  className="min-w-[220px] flex-1 border border-v2-rule bg-v2-surface px-3 text-sm text-v2-ink outline-none focus:border-v2-accent"
+                  style={{ height: 36, borderRadius: "var(--v2-radius)" }} />
                 <select value={customType} onChange={(e) => setCustomType(e.target.value as TermValueType)}
-                  className="border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }}>
+                  className="border border-v2-rule bg-v2-surface px-3 text-sm text-v2-ink outline-none focus:border-v2-accent"
+                  style={{ height: 36, borderRadius: "var(--v2-radius)" }}>
                   {["text", "currency", "percentage", "boolean", "date", "number"].map((v) => <option key={v} value={v}>{v}</option>)}
                 </select>
-                <button onClick={doAddCustom} disabled={!customLabel.trim() || busy === "custom"}
-                  className="px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>Add term</button>
-                <button onClick={() => { setCustomOpen(false); setCustomLabel(""); }}
-                  className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
+                <V2Button variant="primary" onClick={doAddCustom} disabled={!customLabel.trim() || busy === "custom"}>Add term</V2Button>
+                <V2Button variant="secondary" onClick={() => { setCustomOpen(false); setCustomLabel(""); }}>Cancel</V2Button>
               </div>
             </div>
           ) : (
-            <button onClick={() => setCustomOpen(true)}
-              className="inline-flex items-center gap-1.5 border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>
+            <V2Button variant="secondary" onClick={() => setCustomOpen(true)}>
               <Plus className="h-3.5 w-3.5" /> Add custom term
-            </button>
+            </V2Button>
           )}
         </div>
       )}
@@ -489,22 +472,21 @@ function TermNegotiationPage() {
       {/* Mutual-reset confirmation dialog */}
       {resetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-md border bg-white p-6" style={{ borderColor: BORDER, borderRadius: 0 }}>
-            <h3 className="text-base font-semibold" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>
+          <div className="w-full max-w-md border border-v2-rule bg-v2-panel p-6" style={{ borderRadius: "var(--v2-radius)" }}>
+            <h3 className="text-v2-ink font-semibold" style={{ fontSize: "15px" }}>
               Switch to {INSTRUMENT_TEMPLATES[resetConfirm].label}?
             </h3>
-            <p className="mt-2 text-sm" style={{ color: INK2 }}>
+            <p className="mt-2 text-v2-ink-secondary text-sm">
               Changing the instrument type resets all terms — every proposed value and its history is cleared, and the {INSTRUMENT_TEMPLATES[resetConfirm].label} standard terms replace the current set. This affects both parties.
             </p>
-            <p className="mt-2 text-xs" style={{ color: INK3 }}>
+            <p className="mt-2 text-v2-ink-muted text-xs">
               This sends a reset request. The counterparty must approve it before any term is cleared — neither side can reset alone.
             </p>
             <div className="mt-5 flex gap-2">
-              <button onClick={() => setResetConfirm(null)} className="flex-1 border px-4 text-sm" style={{ borderColor: BORDER, color: INK2, height: 36, borderRadius: 2 }}>Cancel</button>
-              <button onClick={() => doRequestReset(resetConfirm)} disabled={busy === "instrument"}
-                className="flex-1 px-4 text-sm font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>
+              <V2Button variant="secondary" className="flex-1" onClick={() => setResetConfirm(null)}>Cancel</V2Button>
+              <V2Button variant="primary" className="flex-1" onClick={() => doRequestReset(resetConfirm)} disabled={busy === "instrument"}>
                 Request reset
-              </button>
+              </V2Button>
             </div>
           </div>
         </div>
@@ -515,22 +497,18 @@ function TermNegotiationPage() {
 
 function Header({ locked, acceptedCount, total, instrumentLabel }: { locked: boolean; acceptedCount: number; total: number; instrumentLabel?: string }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <div className="text-[12px]" style={{ color: INK3 }}>Deal room · Term Sheet</div>
-        <h1 className="mt-1 text-[28px] font-semibold leading-tight" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>Term negotiation</h1>
-        <p className="mt-1 text-sm" style={{ color: INK2 }}>
-          {locked ? "The term set is finalized." : "Both parties propose, accept, reject, or counter each term until every term is agreed."}
-        </p>
-      </div>
-      {total > 0 && (
-        <div className="border bg-white px-4 py-3 text-right" style={{ borderColor: BORDER, borderRadius: 0 }}>
-          <div className="text-[12px]" style={{ color: INK3 }}>{instrumentLabel ? `${instrumentLabel} · progress` : "Progress"}</div>
-          <div className="mt-0.5 text-lg font-semibold tabular-nums" style={{ color: acceptedCount === total ? "#166534" : INK }}>
-            {acceptedCount} <span style={{ color: INK3 }}>of</span> {total} <span className="text-sm font-normal" style={{ color: INK3 }}>accepted</span>
+    <V2PageHeader
+      breadcrumb={[{ label: "Deal room" }, { label: "Term sheet" }]}
+      title="Term negotiation"
+      description={locked ? "The term set is finalized." : "Both parties propose, accept, reject, or counter each term until every term is agreed."}
+      actions={total > 0 ? (
+        <div className="border border-v2-rule bg-v2-panel px-4 py-3 text-right">
+          <div className="text-v2-ink-muted" style={{ fontSize: "12px" }}>{instrumentLabel ? `${instrumentLabel} · progress` : "Progress"}</div>
+          <div className="mt-0.5 font-semibold font-v2-data" style={{ fontSize: "17px", color: acceptedCount === total ? "var(--v2-satisfied)" : "var(--v2-ink)" }}>
+            {acceptedCount} <span className="text-v2-ink-muted">of</span> {total} <span className="text-v2-ink-muted font-normal" style={{ fontSize: "13px" }}>accepted</span>
           </div>
         </div>
-      )}
-    </div>
+      ) : undefined}
+    />
   );
 }
