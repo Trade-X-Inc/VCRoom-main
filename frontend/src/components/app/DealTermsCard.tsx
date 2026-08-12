@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { callAction } from "@/lib/actions/call";
 import { roomGetDealTerms, roomUpdateDealTerms } from "@/lib/actions/deal-room-core";
-import { cn } from "@/lib/utils";
 import { DollarSign, Plus, Trash2, Pencil, Save, X, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { V2Button, V2EmptyState, V2Skeleton, LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td } from "@/components/v2";
 
 const FUNDING_STAGES = ["Pre-seed", "Seed", "Series A", "Series B", "Series C"] as const;
 
@@ -156,55 +156,45 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
   const keyMetrics: Record<string, string> = terms?.key_metrics ?? {};
 
   return (
-    <section className="rounded-none border border-border/60 bg-card p-5 shadow-card">
+    <section className="border border-v2-rule bg-v2-panel p-5">
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm font-semibold inline-flex items-center gap-2">
-          <DollarSign className="h-4 w-4 text-brand" /> Funding Terms
+        <div className="text-sm font-semibold inline-flex items-center gap-2 text-v2-ink">
+          <DollarSign className="h-4 w-4 text-v2-accent" /> Funding terms
         </div>
         {isFounder && !editing && (
-          <button
-            onClick={startEditing}
-            className="inline-flex items-center gap-1 text-xs text-brand hover:underline"
-          >
+          <V2Button variant="quiet" onClick={startEditing}>
             <Pencil className="h-3 w-3" /> {hasAnyData ? "Edit" : "Add terms"}
-          </button>
+          </V2Button>
         )}
         {editing && (
           <div className="flex gap-2">
-            <button
-              onClick={() => setEditing(false)}
-              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-2.5 py-1.5 hover:bg-accent"
-            >
+            <V2Button variant="secondary" onClick={() => setEditing(false)}>
               <X className="h-3 w-3" /> Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="inline-flex items-center gap-1 text-xs rounded-md bg-gradient-brand text-brand-foreground px-2.5 py-1.5 shadow-glow disabled:opacity-50"
-            >
+            </V2Button>
+            <V2Button variant="primary" onClick={handleSave} disabled={saving}>
               <Save className="h-3 w-3" /> {saving ? "Saving…" : "Save"}
-            </button>
+            </V2Button>
           </div>
         )}
       </div>
 
       {isLoading ? (
         <div className="space-y-2">
-          {[1, 2, 3].map((i) => <div key={i} className="h-8 rounded-md bg-muted animate-pulse" />)}
+          {[1, 2, 3].map((i) => <V2Skeleton key={i} style={{ height: "32px" }} />)}
         </div>
       ) : editing ? (
         <div className="space-y-4">
           {conflict && (
-            <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs text-amber-900 flex items-start gap-2">
+            <div className="border border-v2-attention px-3 py-2.5 text-v2-attention flex items-start gap-2" style={{ fontSize: "12px" }}>
               <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
               <div className="flex-1">
                 <p className="font-medium">Someone else saved changes to these terms while you were editing.</p>
                 <p className="mt-0.5">Your changes have not been saved. Reload to see the latest, or keep editing and save again.</p>
                 <div className="mt-2 flex gap-2">
-                  <button onClick={reloadAfterConflict} className="text-xs font-medium underline hover:no-underline">
+                  <button onClick={reloadAfterConflict} className="font-medium underline hover:no-underline">
                     Reload
                   </button>
-                  <button onClick={() => setConflict(false)} className="text-xs font-medium underline hover:no-underline">
+                  <button onClick={() => setConflict(false)} className="font-medium underline hover:no-underline">
                     Keep editing
                   </button>
                 </div>
@@ -212,7 +202,7 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
             </div>
           )}
           {sessionExpired && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive flex items-start gap-2">
+            <div className="border border-v2-adverse px-3 py-2.5 text-v2-adverse flex items-start gap-2" style={{ fontSize: "12px" }}>
               <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
               <div>
                 <p className="font-medium">Your session expired.</p>
@@ -223,41 +213,45 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
           {/* Core fields */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Stage</label>
+              <label className="text-v2-ink-muted uppercase font-semibold block mb-1" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Stage</label>
               <select
                 value={fundingStage}
                 onChange={(e) => setFundingStage(e.target.value)}
-                className="w-full rounded-md border border-border/60 bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full border border-v2-rule bg-v2-surface px-2.5 py-1.5 text-sm text-v2-ink focus:outline-none focus:border-v2-accent"
+                style={{ borderRadius: "var(--v2-radius)" }}
               >
                 <option value="">Select…</option>
                 {FUNDING_STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Funding ask</label>
+              <label className="text-v2-ink-muted uppercase font-semibold block mb-1" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Funding ask</label>
               <input
                 value={fundingAsk}
                 onChange={(e) => setFundingAsk(e.target.value)}
                 placeholder="e.g. $5M"
-                className="w-full rounded-md border border-border/60 bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full border border-v2-rule bg-v2-surface px-2.5 py-1.5 text-sm text-v2-ink focus:outline-none focus:border-v2-accent"
+                style={{ borderRadius: "var(--v2-radius)" }}
               />
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Pre-money valuation</label>
+              <label className="text-v2-ink-muted uppercase font-semibold block mb-1" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Pre-money valuation</label>
               <input
                 value={preMoneyVal}
                 onChange={(e) => setPreMoneyVal(e.target.value)}
                 placeholder="e.g. $20M"
-                className="w-full rounded-md border border-border/60 bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full border border-v2-rule bg-v2-surface px-2.5 py-1.5 text-sm text-v2-ink focus:outline-none focus:border-v2-accent"
+                style={{ borderRadius: "var(--v2-radius)" }}
               />
             </div>
             <div>
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">Equity offered</label>
+              <label className="text-v2-ink-muted uppercase font-semibold block mb-1" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Equity offered</label>
               <input
                 value={equityOffered}
                 onChange={(e) => setEquityOffered(e.target.value)}
                 placeholder="e.g. 20%"
-                className="w-full rounded-md border border-border/60 bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full border border-v2-rule bg-v2-surface px-2.5 py-1.5 text-sm text-v2-ink focus:outline-none focus:border-v2-accent"
+                style={{ borderRadius: "var(--v2-radius)" }}
               />
             </div>
           </div>
@@ -265,24 +259,24 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
           {/* Previous rounds */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Previous rounds</div>
-              <button onClick={addRound} className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline">
+              <div className="text-v2-ink-muted uppercase font-semibold" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Previous rounds</div>
+              <V2Button variant="quiet" onClick={addRound}>
                 <Plus className="h-3 w-3" /> Add round
-              </button>
+              </V2Button>
             </div>
             {rounds.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No previous rounds.</p>
+              <p className="text-v2-ink-muted" style={{ fontSize: "12px" }}>No previous rounds.</p>
             ) : (
               <div className="space-y-2">
                 {rounds.map((r, i) => (
                   <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
                     <input value={r.name} onChange={(e) => updateRound(i, "name", e.target.value)} placeholder="Round (e.g. Pre-seed)"
-                      className="rounded-md border border-border/60 bg-background px-2 py-1 text-xs focus:outline-none focus:border-brand/50" />
+                      className="border border-v2-rule bg-v2-surface px-2 py-1 text-xs text-v2-ink focus:outline-none focus:border-v2-accent" style={{ borderRadius: "var(--v2-radius)" }} />
                     <input value={r.amount} onChange={(e) => updateRound(i, "amount", e.target.value)} placeholder="Amount"
-                      className="rounded-md border border-border/60 bg-background px-2 py-1 text-xs focus:outline-none focus:border-brand/50" />
+                      className="border border-v2-rule bg-v2-surface px-2 py-1 text-xs text-v2-ink focus:outline-none focus:border-v2-accent" style={{ borderRadius: "var(--v2-radius)" }} />
                     <input value={r.investors} onChange={(e) => updateRound(i, "investors", e.target.value)} placeholder="Investors"
-                      className="rounded-md border border-border/60 bg-background px-2 py-1 text-xs focus:outline-none focus:border-brand/50" />
-                    <button onClick={() => removeRound(i)} className="text-muted-foreground hover:text-destructive">
+                      className="border border-v2-rule bg-v2-surface px-2 py-1 text-xs text-v2-ink focus:outline-none focus:border-v2-accent" style={{ borderRadius: "var(--v2-radius)" }} />
+                    <button onClick={() => removeRound(i)} className="text-v2-ink-muted hover:text-v2-adverse">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -294,24 +288,24 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
           {/* Key metrics */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Key metrics</div>
+              <div className="text-v2-ink-muted uppercase font-semibold" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Key metrics</div>
               {metrics.length < 6 && (
-                <button onClick={addMetric} className="inline-flex items-center gap-1 text-[10px] text-brand hover:underline">
+                <V2Button variant="quiet" onClick={addMetric}>
                   <Plus className="h-3 w-3" /> Add metric
-                </button>
+                </V2Button>
               )}
             </div>
             {metrics.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No metrics added yet.</p>
+              <p className="text-v2-ink-muted" style={{ fontSize: "12px" }}>No metrics added yet.</p>
             ) : (
               <div className="space-y-2">
                 {metrics.map((m, i) => (
                   <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
                     <input value={m.k} onChange={(e) => updateMetric(i, "k", e.target.value)} placeholder="Label (e.g. MRR)"
-                      className="rounded-md border border-border/60 bg-background px-2 py-1 text-xs focus:outline-none focus:border-brand/50" />
+                      className="border border-v2-rule bg-v2-surface px-2 py-1 text-xs text-v2-ink focus:outline-none focus:border-v2-accent" style={{ borderRadius: "var(--v2-radius)" }} />
                     <input value={m.v} onChange={(e) => updateMetric(i, "v", e.target.value)} placeholder="Value (e.g. $120k)"
-                      className="rounded-md border border-border/60 bg-background px-2 py-1 text-xs focus:outline-none focus:border-brand/50" />
-                    <button onClick={() => removeMetric(i)} className="text-muted-foreground hover:text-destructive">
+                      className="border border-v2-rule bg-v2-surface px-2 py-1 text-xs text-v2-ink focus:outline-none focus:border-v2-accent" style={{ borderRadius: "var(--v2-radius)" }} />
+                    <button onClick={() => removeMetric(i)} className="text-v2-ink-muted hover:text-v2-adverse">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -321,15 +315,10 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
           </div>
         </div>
       ) : !hasAnyData ? (
-        <div className="rounded-lg border border-dashed border-border/60 px-4 py-6 text-center">
-          <DollarSign className="h-5 w-5 text-muted-foreground/40 mx-auto mb-2" />
-          <p className="text-xs text-muted-foreground">No funding terms added yet.</p>
-          {isFounder && (
-            <button onClick={startEditing} className="mt-2 text-xs text-brand hover:underline">
-              Add funding terms
-            </button>
-          )}
-        </div>
+        <V2EmptyState
+          text="No funding terms added yet."
+          action={isFounder ? { label: "Add funding terms", onClick: startEditing } : undefined}
+        />
       ) : (
         <div className="space-y-4">
           {/* Core terms grid */}
@@ -340,9 +329,9 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
               { label: "Pre-money val.", value: formatCurrency(terms?.pre_money_valuation) },
               { label: "Equity offered", value: terms?.equity_offered ? (String(terms.equity_offered).includes("%") ? String(terms.equity_offered) : `${terms.equity_offered}%`) : "—" },
             ].map(({ label, value }) => value && value !== "—" ? (
-              <div key={label} className="rounded-lg border border-border/60 bg-background p-3">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
-                <div className="mt-1 text-sm font-semibold">{value}</div>
+              <div key={label} className="border border-v2-rule bg-v2-surface p-3">
+                <div className="text-v2-ink-muted uppercase font-semibold" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>{label}</div>
+                <div className="mt-1 text-v2-ink font-semibold font-v2-data" style={{ fontSize: "14px" }}>{value}</div>
               </div>
             ) : null)}
           </div>
@@ -350,28 +339,37 @@ export function DealTermsCard({ dealRoomId, isFounder, isInvestor }: Props) {
           {/* Previous rounds */}
           {prevRounds.length > 0 && (
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Previous rounds</div>
-              <div className="rounded-lg border border-border/60 overflow-hidden divide-y divide-border/60">
-                {prevRounds.map((r, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 text-xs">
-                    <span className="font-medium min-w-[80px]">{r.name}</span>
-                    <span className="text-muted-foreground">{r.amount}</span>
-                    {r.investors && <span className="text-muted-foreground ml-auto truncate max-w-[160px]">{r.investors}</span>}
-                  </div>
-                ))}
-              </div>
+              <div className="text-v2-ink-muted uppercase font-semibold mb-2" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Previous rounds</div>
+              <LedgerTable>
+                <LedgerHead>
+                  <tr>
+                    <Th>Round</Th>
+                    <Th>Amount</Th>
+                    <Th>Investors</Th>
+                  </tr>
+                </LedgerHead>
+                <LedgerBody>
+                  {prevRounds.map((r, i) => (
+                    <Tr key={i}>
+                      <Td>{r.name}</Td>
+                      <Td>{r.amount || "—"}</Td>
+                      <Td>{r.investors || "—"}</Td>
+                    </Tr>
+                  ))}
+                </LedgerBody>
+              </LedgerTable>
             </div>
           )}
 
           {/* Key metrics */}
           {Object.keys(keyMetrics).length > 0 && (
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Key metrics</div>
-              <div className={cn("grid gap-2", Object.keys(keyMetrics).length <= 3 ? "grid-cols-3" : "grid-cols-3 sm:grid-cols-6")}>
+              <div className="text-v2-ink-muted uppercase font-semibold mb-2" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>Key metrics</div>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                 {Object.entries(keyMetrics).map(([k, v]) => (
-                  <div key={k} className="rounded-lg border border-border/60 bg-background p-2.5 text-center">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">{k}</div>
-                    <div className="mt-0.5 text-sm font-semibold truncate">{v}</div>
+                  <div key={k} className="border border-v2-rule bg-v2-surface p-2.5 text-center">
+                    <div className="text-v2-ink-muted uppercase font-semibold truncate" style={{ fontSize: "10px", letterSpacing: "0.07em" }}>{k}</div>
+                    <div className="mt-0.5 text-v2-ink font-semibold font-v2-data truncate" style={{ fontSize: "13px" }}>{v}</div>
                   </div>
                 ))}
               </div>
