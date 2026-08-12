@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
+import {
+  V2PageHeader, V2EmptyState, V2SkeletonRows,
+  LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
+} from "@/components/v2";
 
 // R9 (c) — Deal Rooms › Meetings Calendar. Minimal cross-room view: for each
 // room, the scheduled/completed meeting dates only — reusing the existing
@@ -67,40 +70,51 @@ function FounderMeetingsCalendar() {
   const sorted = [...rows].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Deal Rooms" }, { label: "Meetings Calendar" }]}
-      title="Meetings Calendar"
-      description="Scheduled meetings across all your deal rooms."
-    >
+    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+      <V2PageHeader
+        breadcrumb={[{ label: "Deal rooms" }, { label: "Meetings calendar" }]}
+        title="Meetings calendar"
+        description="Scheduled meetings across all your deal rooms."
+      />
+
       {isLoading && rooms.length > 0 ? (
-        <EmptyState kind="loading" title="Loading" />
+        <V2SkeletonRows rows={4} columns={3} />
       ) : sorted.length === 0 ? (
-        <EmptyState kind="empty" title="No meetings scheduled" />
+        <V2EmptyState text="No meetings scheduled." />
       ) : (
-        <div className="rounded-none border border-border/60 bg-card divide-y divide-border/60">
-          {sorted.map((m) => (
-            <div key={`${m.roomId}-${m.meetingNumber}`} className="flex items-center justify-between gap-4 px-5 py-3.5">
-              <div className="flex items-center gap-3 min-w-0">
-                <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{m.investorName}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Meeting {m.meetingNumber} · {new Date(m.scheduledAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                    {m.completed && " · Completed"}
-                  </div>
-                </div>
-              </div>
-              <Link
-                to={"/app/deal-rooms/$id" as any}
-                params={{ id: m.roomId } as any}
-                className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2.5 py-1.5 text-xs shrink-0 hover:bg-accent transition-colors"
-              >
-                Open room <ArrowUpRight className="h-3 w-3" />
-              </Link>
-            </div>
-          ))}
-        </div>
+        <LedgerTable>
+          <LedgerHead>
+            <tr>
+              <Th>Investor</Th>
+              <Th>Meeting</Th>
+              <Th>Scheduled</Th>
+              <Th>Status</Th>
+              <Th />
+            </tr>
+          </LedgerHead>
+          <LedgerBody>
+            {sorted.map((m) => (
+              <Tr key={`${m.roomId}-${m.meetingNumber}`}>
+                <Td className="font-medium text-v2-ink">{m.investorName}</Td>
+                <Td>{m.meetingNumber}</Td>
+                <Td>
+                  {new Date(m.scheduledAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                </Td>
+                <Td><StatusLabel tone={m.completed ? "satisfied" : "attention"}>{m.completed ? "Completed" : "Scheduled"}</StatusLabel></Td>
+                <Td>
+                  <Link
+                    to={"/app/deal-rooms/$id" as any}
+                    params={{ id: m.roomId } as any}
+                    className="inline-flex items-center gap-1 text-v2-accent hover:underline"
+                  >
+                    Open room <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                </Td>
+              </Tr>
+            ))}
+          </LedgerBody>
+        </LedgerTable>
       )}
-    </PageFrame>
+    </div>
   );
 }
