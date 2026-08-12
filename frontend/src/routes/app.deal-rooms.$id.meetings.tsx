@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  Calendar, CheckCircle2, Video, MapPin, Loader2, X, AlertTriangle, FileAudio, RefreshCw,
+  CheckCircle2, Video, MapPin, Loader2, X, AlertTriangle, FileAudio, RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useDealRoom } from "@/hooks/useDealRoom";
@@ -11,6 +11,7 @@ import { upsertDealRoomMeeting } from "@/lib/deal-room-workflow-fn";
 import { skipMeeting, updateMeetingNotes } from "@/lib/deal-room-fn";
 import { createInterviewRoom, mintInterviewToken, saveMeetingTranscript, runMeetingExtraction, flagTranscriptionStoppedEarly, type MeetingExtraction } from "@/lib/interview-fn";
 import { LawyerGate, useLawyerGateState } from "@/components/app/LawyerGate";
+import { V2Button, V2PageHeader, StatusLabel, type StatusTone } from "@/components/v2";
 
 // R14B step 3 — the interview stage sequencer, re-mounting the old
 // (orphaned) Stage3Panel 3-slot pattern as a real route, extended to the
@@ -59,23 +60,17 @@ function statusOf(m: MeetingRow | undefined): "done" | "skipped" | "scheduled" |
   return "unscheduled";
 }
 
-const CHIP: Record<string, { label: string; bg: string; text: string }> = {
-  done: { label: "Done", bg: "rgba(16,185,129,0.1)", text: "#059669" },
-  skipped: { label: "Skipped", bg: "#F4F4F5", text: "#71717A" },
-  scheduled: { label: "Scheduled", bg: "rgba(245,158,11,0.1)", text: "#B45309" },
-  unscheduled: { label: "Not scheduled", bg: "#F4F4F5", text: "#71717A" },
+// §7.2 closed 4-tone vocabulary.
+const CHIP: Record<string, { label: string; tone: StatusTone }> = {
+  done: { label: "Done", tone: "satisfied" },
+  skipped: { label: "Skipped", tone: "neutral" },
+  scheduled: { label: "Scheduled", tone: "attention" },
+  unscheduled: { label: "Not scheduled", tone: "neutral" },
 };
 
 function StatusChip({ status }: { status: string }) {
   const c = CHIP[status] ?? CHIP.unscheduled;
-  return (
-    <span
-      className="inline-flex items-center px-2 py-0.5 text-xs font-medium whitespace-nowrap"
-      style={{ background: c.bg, color: c.text, borderRadius: 2 }}
-    >
-      {c.label}
-    </span>
-  );
+  return <StatusLabel tone={c.tone}>{c.label}</StatusLabel>;
 }
 
 // ── Embedded Daily call (private room + token) ──────────────────────────────
@@ -172,11 +167,11 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner, 
     <div className="relative w-full">
       {transcribing && (
         <div
-          className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white"
-          style={{ background: "rgba(0,0,0,0.78)" }}
+          className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 px-3 py-2 text-white font-medium"
+          style={{ background: "rgba(10,10,11,0.82)", fontSize: "12px" }}
           data-testid="transcription-indicator"
         >
-          <span className="inline-block h-2 w-2 rounded-full animate-pulse" style={{ background: "#EF4444" }} />
+          <span className="inline-block h-2 w-2 bg-v2-adverse" style={{ borderRadius: "50%" }} />
           Transcription on — this meeting is being transcribed to generate AI notes. Both parties can see this.
         </div>
       )}
@@ -422,31 +417,27 @@ function MeetingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1360px] px-8 py-8">
-      <div className="mb-6">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-[#7C3AED]" />
-          <h1 className="text-lg font-bold tracking-tight text-[#0A0A0B]" style={{ fontFamily: "Syne, sans-serif" }}>
-            Interviews
-          </h1>
-        </div>
-        <p className="mt-1 text-sm text-[#52525B]">
-          {isLawyer
+    <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui text-v2-ink">
+      <V2PageHeader
+        breadcrumb={[{ label: "Deal room" }, { label: "Interviews" }]}
+        title="Interviews"
+        description={
+          isLawyer
             ? "The Investment Terms meeting — the only stage your access covers."
-            : "Five structured meeting stages, in sequence. Each stage can be scheduled or skipped."}
-        </p>
-      </div>
+            : "Five structured meeting stages, in sequence. Each stage can be scheduled or skipped."
+        }
+      />
 
       {/* Active call panel */}
       {call && (
-        <div className="mb-6 border border-[#E4E4E7] bg-white">
-          <div className="flex items-center justify-between border-b border-[#E4E4E7] px-4 py-2.5">
-            <span className="text-sm font-semibold text-[#0A0A0B]">
+        <div className="mb-6 border border-v2-rule bg-v2-panel">
+          <div className="flex items-center justify-between border-b border-v2-rule px-4 py-2.5">
+            <span className="text-v2-ink font-semibold text-sm">
               {STAGES.find((s) => s.number === call.meetingNumber)?.label} — live
             </span>
             <button
               onClick={() => setCall(null)}
-              className="grid h-7 w-7 place-items-center text-[#71717A] hover:text-[#0A0A0B]"
+              className="grid h-7 w-7 place-items-center text-v2-ink-muted hover:text-v2-ink"
               title="Close"
             >
               <X className="h-4 w-4" />
@@ -470,7 +461,7 @@ function MeetingsPage() {
       )}
 
       {isLoading ? (
-        <div className="border border-[#E4E4E7] bg-white p-6 text-sm text-[#71717A]">Loading meeting stages…</div>
+        <div className="border border-v2-rule bg-v2-panel p-6 text-v2-ink-muted text-sm">Loading meeting stages…</div>
       ) : (
         <div className="flex flex-col gap-3">
           {visibleStages.map((stage) => {
@@ -481,24 +472,25 @@ function MeetingsPage() {
             const errHere = joinError?.meetingNumber === stage.number ? joinError : null;
 
             return (
-              <div key={stage.number} className="border border-[#E4E4E7] bg-white" data-testid={`interview-stage-${stage.slug}`}>
+              <div key={stage.number} className="border border-v2-rule bg-v2-panel" data-testid={`interview-stage-${stage.slug}`}>
                 <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="grid h-7 w-7 shrink-0 place-items-center border text-xs font-semibold"
+                      className="grid h-7 w-7 shrink-0 place-items-center border font-semibold"
                       style={{
-                        borderColor: status === "done" ? "rgba(16,185,129,0.4)" : "#E4E4E7",
-                        color: status === "done" ? "#059669" : "#71717A",
+                        borderColor: status === "done" ? "var(--v2-satisfied)" : "var(--v2-rule)",
+                        color: status === "done" ? "var(--v2-satisfied)" : "var(--v2-ink-muted)",
+                        fontSize: "12px",
                       }}
                     >
                       {status === "done" ? <CheckCircle2 className="h-3.5 w-3.5" /> : stage.number}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-[#0A0A0B]">{stage.label}</span>
+                        <span className="text-v2-ink font-semibold text-sm">{stage.label}</span>
                         <StatusChip status={status} />
                         {m?.scheduled_at && status !== "skipped" && (
-                          <span className="inline-flex items-center gap-1 text-xs text-[#71717A]">
+                          <span className="inline-flex items-center gap-1 text-v2-ink-muted" style={{ fontSize: "12px" }}>
                             {isOnline ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
                             {new Date(m.scheduled_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
                             {" · "}{isOnline ? "Online" : "In person"}
@@ -506,7 +498,7 @@ function MeetingsPage() {
                         )}
                       </div>
                       {m?.notes_shared && (
-                        <div className="mt-1 text-xs text-[#52525B] max-w-xl truncate">{m.notes_shared}</div>
+                        <div className="mt-1 text-v2-ink-secondary max-w-xl truncate" style={{ fontSize: "12px" }}>{m.notes_shared}</div>
                       )}
                     </div>
                   </div>
@@ -525,15 +517,10 @@ function MeetingsPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Join — both parties, online + scheduled or done-pending */}
                       {status === "scheduled" && isOnline && (
-                        <button
-                          onClick={() => join(stage.number)}
-                          disabled={joining === stage.number}
-                          className="inline-flex h-8 items-center gap-1.5 bg-[#7C3AED] px-3 text-xs font-medium text-white disabled:opacity-60"
-                          style={{ borderRadius: 2 }}
-                        >
+                        <V2Button variant="primary" onClick={() => join(stage.number)} disabled={joining === stage.number}>
                           {joining === stage.number ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Video className="h-3.5 w-3.5" />}
                           Join meeting
-                        </button>
+                        </V2Button>
                       )}
 
                       {isInvestor && status === "unscheduled" && (
@@ -541,8 +528,8 @@ function MeetingsPage() {
                           <select
                             value={types[stage.number] ?? "video"}
                             onChange={(e) => setTypes((p) => ({ ...p, [stage.number]: e.target.value as "video" | "in_person" }))}
-                            className="h-8 border border-[#E4E4E7] bg-white px-2 text-xs text-[#0A0A0B]"
-                            style={{ borderRadius: 2 }}
+                            className="h-8 border border-v2-rule bg-v2-surface px-2 text-v2-ink"
+                            style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
                           >
                             <option value="video">Online</option>
                             <option value="in_person">In person</option>
@@ -551,60 +538,51 @@ function MeetingsPage() {
                             type="datetime-local"
                             value={dates[stage.number] ?? ""}
                             onChange={(e) => setDates((p) => ({ ...p, [stage.number]: e.target.value }))}
-                            className="h-8 border border-[#E4E4E7] bg-white px-2 text-xs text-[#0A0A0B]"
-                            style={{ borderRadius: 2 }}
+                            className="h-8 border border-v2-rule bg-v2-surface px-2 text-v2-ink"
+                            style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
                           />
-                          <button
+                          <V2Button
+                            variant="primary"
                             onClick={() => schedule(stage.number)}
                             disabled={!dates[stage.number] || saving === stage.number}
-                            className="inline-flex h-8 items-center bg-[#7C3AED] px-3 text-xs font-medium text-white disabled:opacity-50"
-                            style={{ borderRadius: 2 }}
                             data-testid={`schedule-stage-${stage.number}`}
                           >
                             {saving === stage.number ? "…" : "Schedule"}
-                          </button>
-                          <button
+                          </V2Button>
+                          <V2Button
+                            variant="secondary"
                             onClick={() => { setSkipOpen(skipOpen === stage.number ? null : stage.number); setSkipReason(""); }}
-                            className="inline-flex h-8 items-center border border-[#E4E4E7] bg-white px-3 text-xs font-medium text-[#0A0A0B]"
-                            style={{ borderRadius: 2 }}
                           >
                             Skip
-                          </button>
+                          </V2Button>
                         </>
                       )}
 
                       {isInvestor && status === "scheduled" && (
                         <>
-                          <button
-                            onClick={() => markDone(stage.number)}
-                            disabled={saving === stage.number}
-                            className="inline-flex h-8 items-center border border-[#E4E4E7] bg-white px-3 text-xs font-medium text-[#059669]"
-                            style={{ borderRadius: 2 }}
-                          >
+                          <V2Button variant="secondary" onClick={() => markDone(stage.number)} disabled={saving === stage.number} className="text-v2-satisfied">
                             Mark done
-                          </button>
-                          <button
+                          </V2Button>
+                          <V2Button
+                            variant="secondary"
                             onClick={() => { setSkipOpen(skipOpen === stage.number ? null : stage.number); setSkipReason(""); }}
-                            className="inline-flex h-8 items-center border border-[#E4E4E7] bg-white px-3 text-xs font-medium text-[#0A0A0B]"
-                            style={{ borderRadius: 2 }}
                           >
                             Skip
-                          </button>
+                          </V2Button>
                         </>
                       )}
 
                       {isInvestor && (status === "scheduled" || status === "done") && (
-                        <button
+                        <V2Button
+                          variant="secondary"
                           onClick={() => {
                             setNotesOpen(notesOpen === stage.number ? null : stage.number);
                             setSharedDraft(m?.notes_shared ?? "");
                             setPrivateDraft(m ? (privateByMeeting.get(m.id) ?? "") : "");
                           }}
-                          className="inline-flex h-8 items-center border border-[#E4E4E7] bg-white px-3 text-xs font-medium text-[#0A0A0B]"
-                          style={{ borderRadius: 2 }}
                         >
                           Notes
-                        </button>
+                        </V2Button>
                       )}
                     </div>
                   )}
@@ -612,19 +590,14 @@ function MeetingsPage() {
 
                 {/* Join error + regenerate */}
                 {errHere && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#E4E4E7] bg-[rgba(245,158,11,0.06)] px-4 py-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-xs text-[#B45309]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-v2-rule bg-v2-attention-wash px-4 py-2.5">
+                    <span className="inline-flex items-center gap-1.5 text-v2-attention" style={{ fontSize: "12px" }}>
                       <AlertTriangle className="h-3.5 w-3.5" />
                       {errHere.message} The room may have expired.
                     </span>
-                    <button
-                      onClick={() => regenerate(stage.number)}
-                      disabled={regenerating}
-                      className="inline-flex h-7 items-center border border-[#E4E4E7] bg-white px-2.5 text-xs font-medium text-[#0A0A0B] disabled:opacity-60"
-                      style={{ borderRadius: 2 }}
-                    >
+                    <V2Button variant="secondary" onClick={() => regenerate(stage.number)} disabled={regenerating}>
                       {regenerating ? "Regenerating…" : "Regenerate room"}
-                    </button>
+                    </V2Button>
                   </div>
                 )}
 
@@ -635,9 +608,9 @@ function MeetingsPage() {
                     ? (rec.extracted_notes as MeetingExtraction)
                     : null;
                   return (
-                    <div className="border-t border-[#E4E4E7] px-4 py-3 space-y-2">
+                    <div className="border-t border-v2-rule px-4 py-3 space-y-2">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-1.5 text-xs text-[#71717A]">
+                        <span className="inline-flex items-center gap-1.5 text-v2-ink-muted" style={{ fontSize: "12px" }}>
                           <FileAudio className="h-3.5 w-3.5" />
                           {!rec || rec.transcript_status === "pending" ? "No transcript saved — call may have ended without speech captured, or was left before saving"
                             : rec.transcript_status === "failed" ? "Transcript could not be saved"
@@ -645,19 +618,14 @@ function MeetingsPage() {
                             : rec.extraction_status === "failed" ? "Transcript saved — extraction failed"
                             : "Transcript and notes ready"}
                         </span>
-                        <button
-                          onClick={() => checkRecording(stage.number)}
-                          disabled={checkingRecording === stage.number}
-                          className="inline-flex h-7 items-center gap-1.5 border border-[#E4E4E7] bg-white px-2.5 text-xs font-medium text-[#0A0A0B] disabled:opacity-60"
-                          style={{ borderRadius: 2 }}
-                        >
+                        <V2Button variant="secondary" onClick={() => checkRecording(stage.number)} disabled={checkingRecording === stage.number}>
                           {checkingRecording === stage.number ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
                           Run extraction
-                        </button>
+                        </V2Button>
                       </div>
 
                       {rec?.transcription_stopped_early && (
-                        <div className="flex items-start gap-1.5 border border-[rgba(245,158,11,0.4)] bg-[rgba(245,158,11,0.08)] px-3 py-2 text-xs text-[#92400E]">
+                        <div className="flex items-start gap-1.5 border border-v2-attention bg-v2-attention-wash px-3 py-2 text-v2-attention" style={{ fontSize: "12px" }}>
                           <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                           <span>
                             Transcription was stopped early during this meeting{rec.transcription_stopped_by ? ` by ${rec.transcription_stopped_by}` : ""}
@@ -666,12 +634,12 @@ function MeetingsPage() {
                         </div>
                       )}
                       {rec?.transcript_status === "failed" && rec.transcript_error && (
-                        <div className="border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.06)] px-3 py-2 text-xs text-[#B91C1C]">
+                        <div className="border border-v2-adverse bg-v2-adverse-wash px-3 py-2 text-v2-adverse" style={{ fontSize: "12px" }}>
                           {rec.transcript_error}
                         </div>
                       )}
                       {rec?.extraction_status === "failed" && rec.extraction_error && (
-                        <div className="border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.06)] px-3 py-2 text-xs text-[#B91C1C]">
+                        <div className="border border-v2-adverse bg-v2-adverse-wash px-3 py-2 text-v2-adverse" style={{ fontSize: "12px" }}>
                           Transcript stored successfully; AI extraction failed: {rec.extraction_error}
                         </div>
                       )}
@@ -679,17 +647,17 @@ function MeetingsPage() {
                       {notes && (
                         <div className="space-y-3 pt-1">
                           <div>
-                            <div className="text-xs font-medium text-[#71717A] mb-1">Summary</div>
-                            <p className="text-sm text-[#0A0A0B]">{notes.summary}</p>
+                            <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Summary</div>
+                            <p className="text-v2-ink text-sm">{notes.summary}</p>
                           </div>
                           {notes.topics?.length > 0 && (
                             <div>
-                              <div className="text-xs font-medium text-[#71717A] mb-1">Discussed</div>
+                              <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Discussed</div>
                               <ul className="space-y-1.5">
                                 {notes.topics.map((t, i) => (
-                                  <li key={i} className="text-sm text-[#0A0A0B]">
+                                  <li key={i} className="text-v2-ink text-sm">
                                     <span className="font-medium">{t.topic}:</span> {t.detail}
-                                    <span className="ml-1.5 text-xs text-[#71717A]">({t.confidence} confidence — "{t.source_quote}")</span>
+                                    <span className="ml-1.5 text-v2-ink-muted" style={{ fontSize: "11px" }}>({t.confidence} confidence — "{t.source_quote}")</span>
                                   </li>
                                 ))}
                               </ul>
@@ -697,12 +665,12 @@ function MeetingsPage() {
                           )}
                           {notes.stated_figures?.length > 0 && (
                             <div>
-                              <div className="text-xs font-medium text-[#71717A] mb-1">Figures mentioned</div>
+                              <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Figures mentioned</div>
                               <ul className="space-y-1.5">
                                 {notes.stated_figures.map((f, i) => (
-                                  <li key={i} className="text-sm text-[#0A0A0B]">
-                                    <span className="font-medium">{f.figure}</span> — stated by {f.stated_by}
-                                    <span className="ml-1.5 text-xs text-[#71717A]">({f.confidence} confidence — "{f.source_quote}")</span>
+                                  <li key={i} className="text-v2-ink text-sm">
+                                    <span className="font-medium font-v2-data">{f.figure}</span> — stated by {f.stated_by}
+                                    <span className="ml-1.5 text-v2-ink-muted" style={{ fontSize: "11px" }}>({f.confidence} confidence — "{f.source_quote}")</span>
                                   </li>
                                 ))}
                               </ul>
@@ -710,12 +678,12 @@ function MeetingsPage() {
                           )}
                           {notes.open_items?.length > 0 && (
                             <div>
-                              <div className="text-xs font-medium text-[#71717A] mb-1">Open items</div>
+                              <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Open items</div>
                               <ul className="space-y-1.5">
                                 {notes.open_items.map((o, i) => (
-                                  <li key={i} className="text-sm text-[#0A0A0B]">
+                                  <li key={i} className="text-v2-ink text-sm">
                                     {o.item}
-                                    <span className="ml-1.5 text-xs text-[#71717A]">({o.confidence} confidence — "{o.source_quote}")</span>
+                                    <span className="ml-1.5 text-v2-ink-muted" style={{ fontSize: "11px" }}>({o.confidence} confidence — "{o.source_quote}")</span>
                                   </li>
                                 ))}
                               </ul>
@@ -729,56 +697,46 @@ function MeetingsPage() {
 
                 {/* Skip-with-reason */}
                 {skipOpen === stage.number && (
-                  <div className="flex flex-wrap items-center gap-2 border-t border-[#E4E4E7] px-4 py-2.5">
+                  <div className="flex flex-wrap items-center gap-2 border-t border-v2-rule px-4 py-2.5">
                     <input
                       value={skipReason}
                       onChange={(e) => setSkipReason(e.target.value.slice(0, 300))}
                       placeholder="Reason (optional) — visible to both parties"
-                      className="h-8 flex-1 min-w-[220px] border border-[#E4E4E7] bg-white px-2 text-xs text-[#0A0A0B]"
-                      style={{ borderRadius: 2 }}
+                      className="h-8 flex-1 min-w-[220px] border border-v2-rule bg-v2-surface px-2 text-v2-ink"
+                      style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
                     />
-                    <button
-                      onClick={() => skip(stage.number)}
-                      disabled={saving === stage.number}
-                      className="inline-flex h-8 items-center bg-[#7C3AED] px-3 text-xs font-medium text-white disabled:opacity-60"
-                      style={{ borderRadius: 2 }}
-                    >
+                    <V2Button variant="primary" onClick={() => skip(stage.number)} disabled={saving === stage.number}>
                       Confirm skip
-                    </button>
+                    </V2Button>
                   </div>
                 )}
 
                 {/* Notes editor (investor) */}
                 {notesOpen === stage.number && isInvestor && (
-                  <div className="border-t border-[#E4E4E7] px-4 py-3 space-y-3">
+                  <div className="border-t border-v2-rule px-4 py-3 space-y-3">
                     <div>
-                      <label className="block text-xs font-medium text-[#71717A] mb-1">Shared notes — visible to both parties</label>
+                      <label className="block text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Shared notes — visible to both parties</label>
                       <textarea
                         value={sharedDraft}
                         onChange={(e) => setSharedDraft(e.target.value)}
                         rows={2}
-                        className="w-full border border-[#E4E4E7] bg-white px-2 py-1.5 text-sm text-[#0A0A0B] resize-none"
-                        style={{ borderRadius: 2 }}
+                        className="w-full border border-v2-rule bg-v2-surface px-2 py-1.5 text-sm text-v2-ink resize-none"
+                        style={{ borderRadius: "var(--v2-radius)" }}
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-[#71717A] mb-1">Private notes — investor only</label>
+                      <label className="block text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Private notes — investor only</label>
                       <textarea
                         value={privateDraft}
                         onChange={(e) => setPrivateDraft(e.target.value)}
                         rows={2}
-                        className="w-full border border-[#E4E4E7] bg-white px-2 py-1.5 text-sm text-[#0A0A0B] resize-none"
-                        style={{ borderRadius: 2 }}
+                        className="w-full border border-v2-rule bg-v2-surface px-2 py-1.5 text-sm text-v2-ink resize-none"
+                        style={{ borderRadius: "var(--v2-radius)" }}
                       />
                     </div>
-                    <button
-                      onClick={() => saveNotes(stage.number)}
-                      disabled={saving === stage.number}
-                      className="inline-flex h-8 items-center bg-[#7C3AED] px-3 text-xs font-medium text-white disabled:opacity-60"
-                      style={{ borderRadius: 2 }}
-                    >
+                    <V2Button variant="primary" onClick={() => saveNotes(stage.number)} disabled={saving === stage.number}>
                       {saving === stage.number ? "Saving…" : "Save notes"}
-                    </button>
+                    </V2Button>
                   </div>
                 )}
               </div>
