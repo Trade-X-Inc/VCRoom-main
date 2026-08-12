@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { resolveUid } from './_shared/auth.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -80,12 +81,15 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) return new Response(JSON.stringify({ error: 'Authentication required' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
+    // Identity derivation moved to ./_shared/auth.ts on 11 Aug 2026 (CLAUDE.md
+    // §19d.1). Same check as before (Supabase resolves the bearer token via
+    // /auth/v1/user internally either way) — error message preserved exactly
+    // for behavioral equivalence.
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    if (authError || !user) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    const uid = await resolveUid(req, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    if (!uid) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
-    const { data: rateCheck } = await supabase.rpc('check_ai_rate_limit', { p_user_id: user.id, p_feature: 'pitch_deck_extraction' })
+    const { data: rateCheck } = await supabase.rpc('check_ai_rate_limit', { p_user_id: uid, p_feature: 'pitch_deck_extraction' })
     if (rateCheck && !rateCheck.allowed) return new Response(JSON.stringify({ error: `Daily limit reached. Try again tomorrow.`, rate_limited: true }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     const { fileBase64, fileName, mimeType } = await req.json()

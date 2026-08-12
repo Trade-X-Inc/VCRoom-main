@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveUid } from "./_shared/auth.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
@@ -23,33 +24,10 @@ const MODEL_MAP: Record<string, string> = {
 
 const VALID_FEATURES = new Set(["coaching", "readiness", "investor_sim", "dd_report", "deal_brief"]);
 
-// Identity is derived from the caller's own bearer token, never from the
-// request body. This mirrors requireUser() in the frontend fns: resolve the
-// real uid by verifying the token against /auth/v1/user. A missing token, a
-// garbage token, or the public anon key (which has no `sub` claim) all fail
-// here and are rejected — the anon key is embedded in the client bundle and
-// must not be usable to reach this endpoint as an authenticated caller.
-// See CLAUDE.md §7.1 and the ai-router audit (§17).
-async function resolveUid(req: Request): Promise<string | null> {
-  const authHeader = req.headers.get("Authorization") ?? "";
-  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-  if (!token) return null;
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
-  try {
-    // /auth/v1/user requires the apikey header to be a project key (anon or
-    // service_role) — NOT the caller's user token. The caller's token goes in
-    // Authorization; Supabase resolves it to the user. Passing the user token
-    // as apikey returns "Invalid API key" and would reject every real user.
-    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${token}` },
-    });
-    if (!resp.ok) return null;
-    const json = await resp.json() as { id?: string };
-    return json.id ?? null;
-  } catch (_) {
-    return null;
-  }
-}
+// Identity derivation moved to ../_shared/auth.ts on 11 Aug 2026 (CLAUDE.md
+// §19d.1) — this was the original implementation resolveUid() was extracted
+// from. No behavior change: same check, same anon-key rejection, same return
+// shape. See CLAUDE.md §7.1 and the ai-router audit (§17).
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -66,7 +44,7 @@ serve(async (req) => {
 
     // Authenticate the caller from their token before anything else. The
     // request body's user_id is never trusted for identity.
-    const uid = await resolveUid(req);
+    const uid = await resolveUid(req, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     if (!uid) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
