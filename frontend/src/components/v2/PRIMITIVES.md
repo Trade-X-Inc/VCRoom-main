@@ -51,6 +51,9 @@ do not invent one here.
 | `V2Button` | §6.2 | `primary` (solid accent, one per screen) · `secondary` · `quiet` · `adverse` (bordered, never solid fill). 32px, 2px radius, visible focus ring. Labels are verbs — caller's job. |
 | `LedgerTable` + `LedgerHead`/`LedgerBody`/`Th`/`Tr`/`Td` | §6.1 | Real `<table>`. 36px rows, 1.5px ink header rule, `--v2-rule-light` separators, no zebra, `--v2-accent-wash` hover. `Tr selected` = 2px accent left rule; `Tr status="…"` = 3px semantic left rule. `numeric` cells right-align with tabular figures. |
 | `StatusLabel` | §2.5 / §7.2 | Text label + colour, **never colour alone**. Closed word set (four tones). Small text + optional dot, never a banner. |
+| `V2EmptyState` | §7.3 | Added 12 Aug 2026 (deal-room-core step 6). One sentence naming what would appear + one action, **no illustration** — replaces v1's illustrated `EmptyState` (`components/system/EmptyState.tsx`) on v2 surfaces. Narrower props than the v1 component (`text` + `action`, no `kind`/`description`) since §7.3 specifies exactly one sentence. |
+| `V2Skeleton` / `V2SkeletonRows` | §7.3 / §9 | Added 12 Aug 2026. Static muted blocks matching real table row geometry — §9 permits no loading animation beyond skeletons themselves, so no spinner, no shimmer sweep. |
+| `V2PageHeader` | §4.4 | Added 12 Aug 2026. Title/breadcrumb/actions block in v2 typography (`--text-lg` 19px, Archivo) — the v2-native replacement for v1's `PageFrame` (Syne 28px, v1 `design-tokens` colour module). Do not reuse `PageFrame` on a v2 surface. |
 
 ## RTL and locale
 
