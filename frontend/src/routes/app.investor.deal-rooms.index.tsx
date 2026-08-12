@@ -1,31 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Briefcase, Clock, Shield, ArrowRight } from "lucide-react";
+import { Clock, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
-import { cn } from "@/lib/utils";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import {
+  V2PageHeader, V2EmptyState, V2SkeletonRows,
+  LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel, ReferenceLine,
+} from "@/components/v2";
 
 export const Route = createFileRoute("/app/investor/deal-rooms/")({
   component: DealRoomsPage,
 });
 
-const STATUS_TO_LABEL: Record<string, { label: string; cls: string }> = {
-  under_review:   { label: "Reviewing",   cls: "bg-accent text-brand" },
-  info_requested: { label: "Diligence",   cls: "bg-warning/10 text-warning" },
-  partner_review: { label: "Partner",     cls: "bg-violet/10 text-violet" },
-  term_sheet:     { label: "Term Sheet",  cls: "bg-success/10 text-success" },
-  rejected:       { label: "Rejected",    cls: "bg-destructive/10 text-destructive" },
-  exited:         { label: "Exited",      cls: "bg-muted text-muted-foreground" },
-};
-
-const STAGE_TO_LABEL: Record<string, { label: string; cls: string }> = {
-  information_vault: { label: "Info Vault",  cls: "bg-muted text-muted-foreground" },
-  qa:                { label: "Q&A",         cls: "bg-accent text-brand" },
-  due_diligence:     { label: "Diligence",   cls: "bg-warning/10 text-warning" },
-  term_sheet:        { label: "Term Sheet",  cls: "bg-success/10 text-success" },
-  closing:           { label: "Closing",     cls: "bg-success/10 text-success" },
+// Workflow stage → §7.2 closed vocabulary. "Open"/"Info Vault"/"Q&A" are
+// progress states, not one of the four literal words — mapped to the
+// nearest tone (neutral: in progress, not yet satisfied or adverse).
+const STAGE_TO_LABEL: Record<string, { label: string; tone: "satisfied" | "attention" | "adverse" | "neutral" }> = {
+  information_vault: { label: "Info vault",  tone: "neutral" },
+  qa:                 { label: "Q&A",         tone: "neutral" },
+  due_diligence:      { label: "Diligence",   tone: "attention" },
+  term_sheet:         { label: "Term sheet",  tone: "attention" },
+  closing:            { label: "Closing",     tone: "attention" },
 };
 
 export function DealRoomsPage() {
@@ -39,12 +35,12 @@ export function DealRoomsPage() {
       const [membersRes, directRes] = await Promise.all([
         supabase
           .from("deal_room_members")
-          .select(`deal_room_id, deal_rooms(id, updated_at, created_at, status, workflow_stage, investor_email, startups(company_name, sector, stage, funding_target, tagline))`)
+          .select(`deal_room_id, deal_rooms(id, updated_at, created_at, status, workflow_stage, investor_email, reference_no, startups(company_name, sector, stage, funding_target, tagline))`)
           .eq("user_id", user!.id),
         // Also pull deal rooms where investor_user_id = current user
         supabase
           .from("deal_rooms")
-          .select("id, updated_at, created_at, status, workflow_stage, investor_email, startups(company_name, sector, stage, funding_target, tagline)")
+          .select("id, updated_at, created_at, status, workflow_stage, investor_email, reference_no, startups(company_name, sector, stage, funding_target, tagline)")
           .eq("investor_user_id", user!.id),
       ]);
 
@@ -55,13 +51,13 @@ export function DealRoomsPage() {
         const dr = r.deal_rooms as any;
         if (!dr?.id || seen.has(dr.id)) continue;
         seen.add(dr.id);
-        rows.push({ id: dr.id, updatedAt: dr.updated_at, createdAt: dr.created_at, status: dr.status, workflowStage: dr.workflow_stage, company: dr.startups?.company_name ?? "Unnamed", sector: dr.startups?.sector, stage: dr.startups?.stage, fundingTarget: dr.startups?.funding_target, tagline: dr.startups?.tagline });
+        rows.push({ id: dr.id, updatedAt: dr.updated_at, createdAt: dr.created_at, status: dr.status, workflowStage: dr.workflow_stage, referenceNo: dr.reference_no, company: dr.startups?.company_name ?? "Unnamed", sector: dr.startups?.sector, stage: dr.startups?.stage, fundingTarget: dr.startups?.funding_target, tagline: dr.startups?.tagline });
       }
 
       for (const dr of directRes.data ?? []) {
         if (!dr.id || seen.has(dr.id)) continue;
         seen.add(dr.id);
-        rows.push({ id: dr.id, updatedAt: dr.updated_at, createdAt: dr.created_at, status: dr.status, workflowStage: (dr as any).workflow_stage, company: (dr as any).startups?.company_name ?? "Unnamed", sector: (dr as any).startups?.sector, stage: (dr as any).startups?.stage, fundingTarget: (dr as any).startups?.funding_target, tagline: (dr as any).startups?.tagline });
+        rows.push({ id: dr.id, updatedAt: dr.updated_at, createdAt: dr.created_at, status: dr.status, workflowStage: (dr as any).workflow_stage, referenceNo: (dr as any).reference_no, company: (dr as any).startups?.company_name ?? "Unnamed", sector: (dr as any).startups?.sector, stage: (dr as any).startups?.stage, fundingTarget: (dr as any).startups?.funding_target, tagline: (dr as any).startups?.tagline });
       }
 
       return rows.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
@@ -69,86 +65,84 @@ export function DealRoomsPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "Deal rooms" }]} />
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Deal Rooms</h1>
-        <div className="text-sm text-muted-foreground">
-          {rooms.length} active data room{rooms.length !== 1 ? "s" : ""} you've been invited to
-        </div>
-      </div>
+    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+      <V2PageHeader
+        breadcrumb={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "Deal rooms" }]}
+        title="Deal rooms"
+        description={`${rooms.length} active data room${rooms.length !== 1 ? "s" : ""} you've been invited to`}
+      />
 
-      <div className="mt-6">
-        {isLoading ? (
-          <EmptyState kind="loading" title="Loading" />
-        ) : isError ? (
-          <EmptyState
-            kind="error"
-            title="Something went wrong"
-            action={{ label: "Try again", onClick: () => window.location.reload() }}
-          />
-        ) : rooms.length === 0 ? (
-          <EmptyState
-            kind="empty"
-            title="No deal rooms"
-            action={{ label: "Browse startups", href: "/app/investor/startups" }}
-          />
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {isLoading ? (
+        <V2SkeletonRows rows={4} columns={5} />
+      ) : isError ? (
+        <V2EmptyState
+          text="Deal rooms could not load."
+          action={{ label: "Refresh page", onClick: () => window.location.reload() }}
+        />
+      ) : rooms.length === 0 ? (
+        <V2EmptyState
+          text="No deal rooms yet."
+          action={{ label: "Browse startups", href: "/app/investor/startups" }}
+        />
+      ) : (
+        <LedgerTable>
+          <LedgerHead>
+            <tr>
+              <Th>Company</Th>
+              <Th>Reference</Th>
+              <Th>Stage</Th>
+              <Th>Funding target</Th>
+              <Th>Last activity</Th>
+            </tr>
+          </LedgerHead>
+          <LedgerBody>
             {rooms.map((room) => {
-              const stageInfo = STAGE_TO_LABEL[(room as any).workflowStage ?? ""] ?? { label: "Open", cls: "bg-muted text-muted-foreground" };
+              const stageInfo = STAGE_TO_LABEL[(room as any).workflowStage ?? ""] ?? { label: "Open", tone: "neutral" as const };
               const daysSinceActivity = room.updatedAt
                 ? Math.floor((Date.now() - new Date(room.updatedAt).getTime()) / (1000 * 60 * 60 * 24))
                 : null;
               const isStale = daysSinceActivity !== null && daysSinceActivity > 7;
 
               return (
-                <Link
-                  key={room.id}
-                  to="/app/deal-rooms/$id"
-                  params={{ id: room.id }}
-                  className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
-                  data-testid={`deal-room-card-${room.id}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold text-sm shrink-0">
-                        {room.company[0]}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-semibold truncate group-hover:text-brand transition-colors">{room.company}</div>
-                        <div className="text-xs text-muted-foreground">{room.sector || "—"} · {room.stage || "Stage TBD"}</div>
-                      </div>
+                <Tr key={room.id} status={isStale ? "attention" : undefined}>
+                  <Td>
+                    <Link
+                      to="/app/deal-rooms/$id"
+                      params={{ id: room.id }}
+                      className="font-medium text-v2-ink hover:text-v2-accent hover:underline"
+                      data-testid={`deal-room-card-${room.id}`}
+                    >
+                      {room.company}
+                    </Link>
+                    <div className="text-v2-ink-muted" style={{ fontSize: "11.5px" }}>{room.sector || "—"} · {room.stage || "Stage TBD"}</div>
+                    {room.tagline && (
+                      <div className="text-v2-ink-secondary" style={{ fontSize: "11.5px", marginTop: "2px" }}>{room.tagline}</div>
+                    )}
+                  </Td>
+                  <Td>
+                    <ReferenceLine refNo={(room as any).referenceNo} />
+                  </Td>
+                  <Td><StatusLabel tone={stageInfo.tone}>{stageInfo.label}</StatusLabel></Td>
+                  <Td>
+                    <div className="inline-flex items-center gap-1.5">
+                      <Shield className="h-3 w-3 text-v2-ink-muted" />
+                      {room.fundingTarget || "Target TBD"}
                     </div>
-                    <span className={cn("shrink-0 text-[10px] font-semibold rounded-full px-2.5 py-0.5", stageInfo.cls)}>
-                      {stageInfo.label}
-                    </span>
-                  </div>
-
-                  {room.tagline && (
-                    <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{room.tagline}</p>
-                  )}
-
-                  <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <Shield className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">
-                        {room.fundingTarget || "Target TBD"}
-                      </span>
-                    </div>
-                    <div className={cn("flex items-center gap-1 text-xs", isStale ? "text-warning" : "text-muted-foreground")}>
+                  </Td>
+                  <Td>
+                    <div className="inline-flex items-center gap-1.5" style={{ color: isStale ? "var(--v2-attention)" : "var(--v2-ink-secondary)" }}>
                       <Clock className="h-3 w-3" />
                       {room.updatedAt
                         ? formatDistanceToNow(new Date(room.updatedAt), { addSuffix: true })
                         : "—"}
                     </div>
-                  </div>
-                </Link>
+                  </Td>
+                </Tr>
               );
             })}
-          </div>
-        )}
-      </div>
+          </LedgerBody>
+        </LedgerTable>
+      )}
     </div>
   );
 }
