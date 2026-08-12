@@ -1,10 +1,12 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { PieChart, TrendingUp, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import {
+  V2PageHeader, V2EmptyState, V2SkeletonRows,
+  LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
+} from "@/components/v2";
 
 export const Route = createFileRoute("/app/investor/portfolio")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -91,103 +93,96 @@ export function PortfolioPage() {
     term_sheet: "Term Sheet",
   };
 
-  return (
-    <div className="p-6 lg:p-8">
-      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/decide" }, { label: "Portfolio" }]} />
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
-        <div className="text-sm text-muted-foreground">Companies you've committed to invest in</div>
-      </div>
+  const totalCompanies = invested.length + watchlistInvested.length;
 
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+  return (
+    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+      <V2PageHeader
+        breadcrumb={[{ label: "Deal flow", to: "/app/investor/decide" }, { label: "Portfolio" }]}
+        title="Portfolio"
+        description="Companies you've committed to invest in"
+      />
+
+      <div className="border border-v2-rule bg-v2-panel p-5 grid grid-cols-2 md:grid-cols-4 gap-5 mb-6">
         {[
-          ["Portfolio companies", `${invested.length + watchlistInvested.length}`],
+          ["Portfolio companies", `${totalCompanies}`],
           ["Term sheets signed", `${invested.filter((i) => i.status === "term_sheet").length}`],
           ["Investments closed", `${invested.filter((i) => ["accept", "invest"].includes(i.status)).length + watchlistInvested.length}`],
           ["Avg ticket", "—"],
         ].map(([l, v]) => (
           <div key={l}>
-            <div className="text-xs text-muted-foreground">{l}</div>
-            <div className="mt-1 text-xl font-semibold tabular-nums">{v}</div>
+            <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{l}</div>
+            <div className="mt-1 text-v2-ink font-semibold font-v2-data" style={{ fontSize: "17px" }}>{v}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6">
-        {isLoading ? (
-          <EmptyState kind="loading" title="Loading" />
-        ) : isError ? (
-          <EmptyState
-            kind="error"
-            title="Something went wrong"
-            action={{ label: "Try again", onClick: () => window.location.reload() }}
-          />
-        ) : invested.length === 0 && watchlistInvested.length === 0 ? (
-          <EmptyState kind="empty" title="No portfolio companies" />
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {isLoading ? (
+        <V2SkeletonRows rows={4} columns={4} />
+      ) : isError ? (
+        <V2EmptyState
+          text="Something went wrong loading your portfolio."
+          action={{ label: "Try again", onClick: () => window.location.reload() }}
+        />
+      ) : totalCompanies === 0 ? (
+        <V2EmptyState text="No portfolio companies yet." />
+      ) : (
+        <LedgerTable>
+          <LedgerHead>
+            <tr>
+              <Th>Company</Th>
+              <Th>Sector / stage</Th>
+              <Th>Status</Th>
+              <Th>Last activity</Th>
+              <Th />
+            </tr>
+          </LedgerHead>
+          <LedgerBody>
             {invested.map((c) => (
-              <Link
-                key={c.id}
-                to="/app/deal-rooms/$id"
-                params={{ id: c.id }}
-                className="block rounded-2xl border border-border/60 bg-card p-5 hover:shadow-card transition-shadow group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
-                    {c.company[0]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate group-hover:text-brand transition-colors">{c.company}</div>
-                    <div className="text-xs text-muted-foreground">{c.sector || "—"} · {c.stage || "—"}</div>
-                  </div>
-                  <span className="text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5 shrink-0">
-                    {statusLabel[c.status] ?? c.status}
-                  </span>
-                </div>
-                {c.decisionAt && (
-                  <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3">
-                    <Clock className="h-2.5 w-2.5" />
-                    Decision {formatDistanceToNow(new Date(c.decisionAt), { addSuffix: true })}
-                  </div>
-                )}
-              </Link>
+              <Tr key={c.id}>
+                <Td>
+                  <Link
+                    to="/app/deal-rooms/$id"
+                    params={{ id: c.id }}
+                    className="font-medium text-v2-ink hover:text-v2-accent hover:underline"
+                  >
+                    {c.company}
+                  </Link>
+                </Td>
+                <Td>{c.sector || "—"} · {c.stage || "—"}</Td>
+                <Td><StatusLabel tone="satisfied">{statusLabel[c.status] ?? c.status}</StatusLabel></Td>
+                <Td>
+                  {c.decisionAt
+                    ? `Decision ${formatDistanceToNow(new Date(c.decisionAt), { addSuffix: true })}`
+                    : "—"}
+                </Td>
+                <Td>
+                  <Link
+                    to="/app/deal-rooms/$id"
+                    params={{ id: c.id }}
+                    className="text-v2-accent hover:underline"
+                  >
+                    Open room
+                  </Link>
+                </Td>
+              </Tr>
             ))}
             {watchlistInvested.map((c: any) => (
-              <div
-                key={c.id}
-                className="rounded-2xl border border-border/60 bg-card p-5"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-brand text-brand-foreground font-semibold shrink-0">
-                    {(c.company_name ?? "?")[0]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate">{c.company_name}</div>
-                    <div className="text-xs text-muted-foreground">{c.sector || "—"} · {c.stage || "—"}</div>
-                  </div>
-                  <span className="text-[10px] font-medium rounded-full bg-success/10 text-success px-2 py-0.5 shrink-0">
-                    Invested
-                  </span>
-                </div>
-                {c.website && (
-                  <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <TrendingUp className="h-3.5 w-3.5 text-success" />
-                    {c.website}
-                  </div>
-                )}
-                {c.notes && <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{c.notes}</p>}
-                {c.created_at && (
-                  <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground border-t border-border/60 pt-3">
-                    <Clock className="h-2.5 w-2.5" />
-                    Added {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
-                  </div>
-                )}
-              </div>
+              <Tr key={c.id}>
+                <Td className="font-medium text-v2-ink">{c.company_name}</Td>
+                <Td>{c.sector || "—"} · {c.stage || "—"}</Td>
+                <Td><StatusLabel tone="satisfied">Invested</StatusLabel></Td>
+                <Td>
+                  {c.created_at
+                    ? `Added ${formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}`
+                    : "—"}
+                </Td>
+                <Td>{c.website || "—"}</Td>
+              </Tr>
             ))}
-          </div>
-        )}
-      </div>
+          </LedgerBody>
+        </LedgerTable>
+      )}
     </div>
   );
 }
