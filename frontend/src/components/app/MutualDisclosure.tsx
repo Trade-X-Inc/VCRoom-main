@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Lock, CheckCircle2, Building2, UserCircle2, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { color, font, radius } from "@/lib/design-tokens";
 import { useDealRoom } from "@/hooks/useDealRoom";
+import { V2EmptyState } from "@/components/v2";
 
 /**
  * Two-column mutual disclosure block for the deal room Information tab.
@@ -182,73 +182,73 @@ export function MutualDisclosure() {
 
   return (
     <Card>
-      <div style={{ padding: "16px 20px", borderBottom: `1px solid ${color.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="flex items-center justify-between border-b border-v2-rule px-5 py-4">
         <div>
-          <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Mutual disclosure</div>
-          <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>
+          <div className="text-v2-ink font-semibold" style={{ fontSize: "14px" }}>Mutual disclosure</div>
+          <div className="text-v2-ink-muted mt-0.5" style={{ fontSize: "12px" }}>
             {unlocked ? "Full profiles unlocked for both sides" : "Public profiles only — unlocks once this room reaches Q&A"}
           </div>
         </div>
         {!unlocked && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: color.inkTertiary }}>
-            <Lock style={{ width: 12, height: 12 }} /> Locked
+          <span className="inline-flex items-center gap-1 text-v2-ink-muted" style={{ fontSize: "11px" }}>
+            <Lock className="h-3 w-3" /> Locked
           </span>
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2">
         {/* What you see about them */}
-        <div style={{ padding: 20, borderRight: `1px solid ${color.border}` }}>
+        <div className="p-5 sm:border-r border-v2-rule">
           <SideLabel icon={isFounder ? Building2 : UserCircle2} label={isFounder ? "What you see about them (investor)" : "What you see about them (founder)"} />
           {isFounder ? (
             unlocked ? (
               investorPrivate ? (
                 <FullInvestorView profile={investorPrivate} medianDays={investorMedianDays ?? null} />
               ) : (
-                <EmptyNote text="Investor hasn't set up their profile yet." />
+                <V2EmptyState text="Investor hasn't set up their profile yet." />
               )
             ) : investorPublic ? (
               <PublicInvestorView profile={investorPublic} />
             ) : (
-              <EmptyNote text="Investor hasn't published a public profile yet." />
+              <V2EmptyState text="Investor hasn't published a public profile yet." />
             )
           ) : (
             unlocked ? (
               founderFull ? (
                 <FullFounderView startup={founderFull} sections={founderSections ?? []} />
               ) : (
-                <EmptyNote text="Founder profile not available." />
+                <V2EmptyState text="Founder profile not available." />
               )
             ) : founderPublic ? (
               <PublicFounderView startup={founderPublic} />
             ) : (
-              <EmptyNote text="Founder hasn't published a public profile yet." />
+              <V2EmptyState text="Founder hasn't published a public profile yet." />
             )
           )}
           {unlocked && isFounder && (
             (investorKeyPeople?.length ?? 0) > 0
               ? <TeamDetailList people={investorKeyPeople!} kind="investor" />
-              : <EmptyNote text="No key people added yet." />
+              : <V2EmptyState text="No key people added yet." />
           )}
           {unlocked && isInvestor && (
             (founderKeyPeople?.length ?? 0) > 0
               ? <TeamDetailList people={founderKeyPeople!} kind="founder" />
-              : <EmptyNote text="No key people added yet." />
+              : <V2EmptyState text="No key people added yet." />
           )}
         </div>
 
         {/* What they see about you */}
-        <div style={{ padding: 20 }}>
+        <div className="p-5">
           <SideLabel icon={isFounder ? Building2 : UserCircle2} label={isFounder ? "What they see about you (founder)" : "What they see about you (investor)"} />
           {!unlocked && (
-            <p style={{ fontSize: 12, color: color.inkTertiary, lineHeight: 1.6, margin: 0 }}>
+            <p className="text-v2-ink-muted leading-relaxed" style={{ fontSize: "12px", margin: 0 }}>
               {isFounder
                 ? "The investor currently sees your public profile only — the same fields visible on your published /i/ or /p/ page."
                 : "The founder currently sees your public investor profile only — the fields you've whitelisted in Settings → Public visibility."}
             </p>
           )}
           {unlocked && (
-            <p style={{ fontSize: 12, color: color.inkTertiary, lineHeight: 1.6, margin: 0 }}>
+            <p className="text-v2-ink-muted leading-relaxed" style={{ fontSize: "12px", margin: 0 }}>
               {isFounder
                 ? "The investor can now see your full stage-appropriate data pack — the Digital Profiles sections below, at their current visibility settings."
                 : "The founder can now see your full private profile — cheque range, track record, and team, exactly as shown on the left when roles are reversed."}
@@ -262,38 +262,38 @@ export function MutualDisclosure() {
 
 function TeamDetailList({ people, kind }: { people: any[]; kind: "founder" | "investor" }) {
   return (
-    <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${color.border}` }}>
-      <div style={{ fontSize: 11, color: color.inkTertiary, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.04em" }}>Team</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className="mt-3 pt-3 border-t border-v2-rule-light">
+      <div className="text-v2-ink-muted uppercase mb-2" style={{ fontSize: "11px", letterSpacing: "0.07em" }}>Team</div>
+      <div className="flex flex-col gap-3">
         {people.map((p) => (
-          <div key={p.id} style={{ display: "flex", gap: 10 }}>
+          <div key={p.id} className="flex gap-2.5">
             {(kind === "founder" ? p.photo_url : p.avatar_url) ? (
-              <img src={kind === "founder" ? p.photo_url : p.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+              <img src={kind === "founder" ? p.photo_url : p.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
             ) : (
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(124,58,237,0.1)", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+              <div className="w-8 h-8 rounded-full bg-v2-accent text-white flex items-center justify-center font-bold shrink-0" style={{ fontSize: "12px" }}>
                 {(p.name ?? "?")[0]?.toUpperCase() ?? "?"}
               </div>
             )}
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: color.ink }}>{p.name}</div>
-              <div style={{ fontSize: 11, color: color.inkTertiary }}>{kind === "founder" ? p.title : p.designation}</div>
-              {p.detail?.bio && <p style={{ fontSize: 12, color: color.inkTertiary, margin: "4px 0 0" }}>{p.detail.bio}</p>}
+            <div className="min-w-0">
+              <div className="text-v2-ink font-semibold" style={{ fontSize: "12px" }}>{p.name}</div>
+              <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{kind === "founder" ? p.title : p.designation}</div>
+              {p.detail?.bio && <p className="text-v2-ink-muted mt-1" style={{ fontSize: "12px", margin: "4px 0 0" }}>{p.detail.bio}</p>}
               {kind === "founder" && Array.isArray(p.detail?.highlights) && p.detail.highlights.length > 0 && (
-                <ul style={{ fontSize: 12, color: color.inkTertiary, margin: "4px 0 0", paddingLeft: 16 }}>
+                <ul className="text-v2-ink-muted mt-1 pl-4" style={{ fontSize: "12px" }}>
                   {p.detail.highlights.map((h: string, i: number) => <li key={i}>{h}</li>)}
                 </ul>
               )}
               {kind === "founder" && Array.isArray(p.detail?.social_links) && p.detail.social_links.length > 0 && (
-                <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                <div className="flex gap-2 mt-1">
                   {p.detail.social_links.map((s: { platform: string; url: string }, i: number) => (
-                    <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" title={s.platform} style={{ color: color.inkTertiary, display: "inline-flex" }}>
-                      <ExternalLink style={{ width: 12, height: 12 }} />
+                    <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" title={s.platform} className="text-v2-ink-muted inline-flex">
+                      <ExternalLink className="h-3 w-3" />
                     </a>
                   ))}
                 </div>
               )}
               {kind === "investor" && p.detail?.contact_email && (
-                <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 4 }}>{p.detail.contact_email}</div>
+                <div className="text-v2-ink-muted mt-1" style={{ fontSize: "12px" }}>{p.detail.contact_email}</div>
               )}
             </div>
           </div>
@@ -305,24 +305,20 @@ function TeamDetailList({ people, kind }: { people: any[]; kind: "founder" | "in
 
 function SideLabel({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
-      <Icon style={{ width: 13, height: 13, color: color.inkTertiary }} />
-      <span style={{ fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
+    <div className="flex items-center gap-1.5 mb-3">
+      <Icon className="text-v2-ink-muted" style={{ width: "13px", height: "13px" }} />
+      <span className="text-v2-ink-muted uppercase font-medium" style={{ fontSize: "11px", letterSpacing: "0.07em" }}>{label}</span>
     </div>
   );
 }
 
-function EmptyNote({ text }: { text: string }) {
-  return <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{text}</p>;
-}
-
 function PublicInvestorView({ profile }: { profile: any }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: color.ink }}>{profile.your_name || profile.fund_name}</div>
-      <div style={{ fontSize: 12, color: color.inkSecondary }}>{profile.role} {profile.fund_name && `· ${profile.fund_name}`}</div>
-      {profile.thesis_statement && <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{profile.thesis_statement}</p>}
-      {profile.sectors && <div style={{ fontSize: 11, color: color.inkTertiary }}>Sectors: {profile.sectors}</div>}
+    <div className="flex flex-col gap-1.5">
+      <div className="text-v2-ink font-semibold" style={{ fontSize: "13px" }}>{profile.your_name || profile.fund_name}</div>
+      <div className="text-v2-ink-secondary" style={{ fontSize: "12px" }}>{profile.role} {profile.fund_name && `· ${profile.fund_name}`}</div>
+      {profile.thesis_statement && <p className="text-v2-ink-muted" style={{ fontSize: "12px", margin: 0 }}>{profile.thesis_statement}</p>}
+      {profile.sectors && <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Sectors: {profile.sectors}</div>}
     </div>
   );
 }
@@ -330,25 +326,25 @@ function PublicInvestorView({ profile }: { profile: any }) {
 function FullInvestorView({ profile, medianDays }: { profile: any; medianDays: number | null }) {
   const trackRecord: { label: string; detail: string; verified: boolean }[] = Array.isArray(profile.track_record) ? profile.track_record : [];
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className="flex flex-col gap-2.5">
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: color.ink }}>{profile.your_name || profile.fund_name}</div>
-        <div style={{ fontSize: 12, color: color.inkSecondary }}>{profile.role} {profile.fund_name && `· ${profile.fund_name}`}</div>
+        <div className="text-v2-ink font-semibold" style={{ fontSize: "13px" }}>{profile.your_name || profile.fund_name}</div>
+        <div className="text-v2-ink-secondary" style={{ fontSize: "12px" }}>{profile.role} {profile.fund_name && `· ${profile.fund_name}`}</div>
       </div>
-      {profile.thesis_statement && <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{profile.thesis_statement}</p>}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12 }}>
-        <div><span style={{ color: color.inkTertiary }}>Cheque:</span> {profile.check_size_min || "—"}–{profile.check_size_max || "—"}</div>
-        <div><span style={{ color: color.inkTertiary }}>Median decision:</span> {medianDays !== null ? `${Math.round(medianDays)}d` : "—"}</div>
+      {profile.thesis_statement && <p className="text-v2-ink-muted" style={{ fontSize: "12px", margin: 0 }}>{profile.thesis_statement}</p>}
+      <div className="grid grid-cols-2 gap-2" style={{ fontSize: "12px" }}>
+        <div><span className="text-v2-ink-muted">Cheque:</span> <span className="font-v2-data">{profile.check_size_min || "—"}–{profile.check_size_max || "—"}</span></div>
+        <div><span className="text-v2-ink-muted">Median decision:</span> <span className="font-v2-data">{medianDays !== null ? `${Math.round(medianDays)}d` : "—"}</span></div>
       </div>
-      {profile.red_flags && <div style={{ fontSize: 12, color: color.inkTertiary }}>Exclusions: {profile.red_flags}</div>}
+      {profile.red_flags && <div className="text-v2-ink-muted" style={{ fontSize: "12px" }}>Exclusions: {profile.red_flags}</div>}
       {trackRecord.length > 0 && (
         <div>
-          <div style={{ fontSize: 11, color: color.inkTertiary, marginBottom: 4 }}>Track record</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div className="text-v2-ink-muted mb-1" style={{ fontSize: "11px" }}>Track record</div>
+          <div className="flex flex-col gap-1">
             {trackRecord.map((t, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12 }}>
-                <span>{t.label}</span>
-                {t.verified ? <CheckCircle2 style={{ width: 12, height: 12, color: "#10B981" }} /> : <span style={{ fontSize: 10, color: color.inkTertiary }}>Unverified</span>}
+              <div key={i} className="flex items-center justify-between" style={{ fontSize: "12px" }}>
+                <span className="text-v2-ink">{t.label}</span>
+                {t.verified ? <CheckCircle2 className="h-3 w-3 text-v2-satisfied" /> : <span className="text-v2-ink-muted" style={{ fontSize: "10px" }}>Unverified</span>}
               </div>
             ))}
           </div>
@@ -360,33 +356,33 @@ function FullInvestorView({ profile, medianDays }: { profile: any; medianDays: n
 
 function PublicFounderView({ startup }: { startup: any }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: color.ink }}>{startup.company_name}</div>
-      {startup.tagline && <div style={{ fontSize: 12, color: color.inkSecondary }}>{startup.tagline}</div>}
-      <div style={{ fontSize: 11, color: color.inkTertiary }}>{startup.sector} {startup.stage && `· ${startup.stage}`}</div>
-      {startup.one_liner && <p style={{ fontSize: 12, color: color.inkTertiary, margin: 0 }}>{startup.one_liner}</p>}
+    <div className="flex flex-col gap-1.5">
+      <div className="text-v2-ink font-semibold" style={{ fontSize: "13px" }}>{startup.company_name}</div>
+      {startup.tagline && <div className="text-v2-ink-secondary" style={{ fontSize: "12px" }}>{startup.tagline}</div>}
+      <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{startup.sector} {startup.stage && `· ${startup.stage}`}</div>
+      {startup.one_liner && <p className="text-v2-ink-muted" style={{ fontSize: "12px", margin: 0 }}>{startup.one_liner}</p>}
     </div>
   );
 }
 
 function FullFounderView({ startup, sections }: { startup: any; sections: { section_label: string; visibility: string }[] }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className="flex flex-col gap-2.5">
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: color.ink }}>{startup.company_name}</div>
-        {startup.tagline && <div style={{ fontSize: 12, color: color.inkSecondary }}>{startup.tagline}</div>}
+        <div className="text-v2-ink font-semibold" style={{ fontSize: "13px" }}>{startup.company_name}</div>
+        {startup.tagline && <div className="text-v2-ink-secondary" style={{ fontSize: "12px" }}>{startup.tagline}</div>}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12 }}>
-        <div><span style={{ color: color.inkTertiary }}>Team size:</span> {startup.team_size ?? "—"}</div>
-        <div><span style={{ color: color.inkTertiary }}>Revenue:</span> {startup.revenue ?? "—"}</div>
+      <div className="grid grid-cols-2 gap-2" style={{ fontSize: "12px" }}>
+        <div><span className="text-v2-ink-muted">Team size:</span> <span className="font-v2-data">{startup.team_size ?? "—"}</span></div>
+        <div><span className="text-v2-ink-muted">Revenue:</span> <span className="font-v2-data">{startup.revenue ?? "—"}</span></div>
       </div>
-      {startup.traction && <div style={{ fontSize: 12, color: color.inkTertiary }}>Traction: {startup.traction}</div>}
+      {startup.traction && <div className="text-v2-ink-muted" style={{ fontSize: "12px" }}>Traction: {startup.traction}</div>}
       {sections.length > 0 && (
         <div>
-          <div style={{ fontSize: 11, color: color.inkTertiary, marginBottom: 4 }}>Digital Profile sections shared</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <div className="text-v2-ink-muted mb-1" style={{ fontSize: "11px" }}>Digital Profile sections shared</div>
+          <div className="flex flex-wrap gap-1.5">
             {sections.map((s, i) => (
-              <span key={i} style={{ fontSize: 11, background: "rgba(124,58,237,0.06)", color: "#7C3AED", padding: "2px 8px", borderRadius: 2 }}>{s.section_label}</span>
+              <span key={i} className="bg-v2-accent-wash text-v2-accent px-2 py-0.5" style={{ fontSize: "11px", borderRadius: "var(--v2-radius)" }}>{s.section_label}</span>
             ))}
           </div>
         </div>
@@ -397,7 +393,7 @@ function FullFounderView({ startup, sections }: { startup: any; sections: { sect
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white }}>
+    <div className="border border-v2-rule bg-v2-panel" style={{ borderRadius: "var(--v2-radius)" }}>
       {children}
     </div>
   );

@@ -10,9 +10,9 @@ import { supabase } from "@/lib/supabase";
 import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { EmptyState } from "@/components/system";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { MutualDisclosure } from "@/components/app/MutualDisclosure";
+import { V2EmptyState } from "@/components/v2";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/information")({
   component: InformationPage,
@@ -633,7 +633,7 @@ function InformationPage() {
 
         <div className="divide-y divide-gray-100">
           {(docRequests as any[]).length === 0 ? (
-            <EmptyState kind="empty" title="No requests" />
+            <V2EmptyState text="No document requests yet." />
           ) : (
             (docRequests as any[]).map((req: any) => {
               const statusMap: Record<string, { label: string; cls: string }> = {
@@ -787,7 +787,7 @@ function InformationPage() {
 
           <div className="divide-y divide-gray-100">
             {(notes as any[]).length === 0 ? (
-              <EmptyState kind="empty" title="No notes" />
+              <V2EmptyState text="No notes yet." />
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4 group">
@@ -839,7 +839,7 @@ function InformationPage() {
           </div>
           <div className="divide-y divide-gray-100">
             {(notes as any[]).length === 0 ? (
-              <EmptyState kind="empty" title="No shared notes" />
+              <V2EmptyState text="No shared notes yet." />
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4">
