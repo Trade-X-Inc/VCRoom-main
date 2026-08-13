@@ -71,9 +71,6 @@ function DiligencePage() {
   const [runningAnalysis, setRunningAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analysisOpen, setAnalysisOpen] = useState(false);
-  const [showDecision, setShowDecision] = useState(false);
-  const [decisionOutcome, setDecisionOutcome] = useState("Pass");
-  const [decisionReason, setDecisionReason] = useState("");
 
   const [qaSummaryOpen, setQaSummaryOpen] = useState(false);
   const [vaultNotesOpen, setVaultNotesOpen] = useState(false);
@@ -775,56 +772,25 @@ function DiligencePage() {
         </div>
       </div>
 
+      {/* The "Decision" control (Pass/Withdraw/Pause + reason) was removed
+          13 Aug 2026 — second, independently duplicated copy of the same
+          dead control removed from app.deal-rooms.$id.information.tsx the
+          same day. Its submit handler was an inline console.log: it wrote
+          nothing and nothing read it. See that file's note and CLAUDE.md
+          §20.9. "Request next stage" is untouched — a real action. */}
       <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
-        {showDecision ? (
-          <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900 ">Submit a decision</div>
-            <select
-              value={decisionOutcome}
-              onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
-            >
-              {["Pass", "Withdraw", "Pause"].map((o) => <option key={o}>{o}</option>)}
-            </select>
-            <textarea
-              value={decisionReason}
-              onChange={(e) => setDecisionReason(e.target.value)}
-              rows={3}
-              placeholder="Reason (required)"
-              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none"
-            />
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecision(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500 ">Cancel</button>
-              <button
-                onClick={() => { console.log("submitDecision dd:", decisionOutcome, decisionReason); setShowDecision(false); setDecisionReason(""); }}
-                disabled={!decisionReason.trim()}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground disabled:opacity-50"
-                style={{ background: "#EF4444" }}
-              >
-                Submit decision
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <button
-              onClick={() => setShowDecision(true)}
-              className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 bg-white hover:bg-red-50 "
-            >
-              Decision
-            </button>
-            <button
-              onClick={onRequestNextStage}
-              disabled={stageRequesting}
-              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
-              style={{ background: "var(--gradient-brand)" }}
-              data-testid="dd-next-stage"
-            >
-              {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Request next stage →
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-end gap-4 flex-wrap">
+          <button
+            onClick={onRequestNextStage}
+            disabled={stageRequesting}
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+            style={{ background: "var(--gradient-brand)" }}
+            data-testid="dd-next-stage"
+          >
+            {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Request next stage →
+          </button>
+        </div>
       </div>
 
       <DDAnalysisPanel dealRoomId={dealRoomId} startupId={startupId ?? ""} isInvestor={isInvestor} />

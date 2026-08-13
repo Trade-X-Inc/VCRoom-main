@@ -3,11 +3,10 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  Shield, CheckCircle2, Clock, Download, X, MessagesSquare, Eye, Building2,
+  CheckCircle2, Download, X, MessagesSquare, Eye, Building2,
   ChevronUp, ChevronDown, Pencil, Plus, Loader2, Upload, Sparkles, Trash2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useDealRoom } from "@/hooks/useDealRoom";
@@ -32,32 +31,9 @@ function InformationPage() {
   const queryClient = useQueryClient();
   const startup = room?.startups;
 
-  // ── Pinned NDA document ──
-  const [vaultNdaModalOpen, setVaultNdaModalOpen] = useState(false);
-
-  const { data: vaultNdaDoc } = useQuery<NdaDocument | null>({
-    queryKey: ["nda-document", dealRoomId],
-    enabled: !!dealRoomId,
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      return fetchNdaDocument({ data: { dealRoomId, accessToken: session?.access_token ?? "" } });
-    },
-  });
-
-  const { data: vaultNdaSigners = [] } = useQuery({
-    queryKey: ["nda-acceptances-vault", dealRoomId],
-    enabled: !!dealRoomId,
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("nda_acceptances")
-        .select("signer_full_name, signer_company, role, accepted_at")
-        .eq("deal_room_id", dealRoomId)
-        .order("accepted_at", { ascending: true });
-      return data ?? [];
-    },
-  });
+  // NDA document/signer queries removed 13 Aug 2026 alongside this page's
+  // duplicate NDA panel — the room overview holds the canonical copy and
+  // its own queries. See the removal note further down and CLAUDE.md §20.9.
 
   // ── Pinned Q&A Reports ──
   const [qaReportModalOpen, setQaReportModalOpen] = useState<string | null>(null);
@@ -224,17 +200,6 @@ function InformationPage() {
     await refetchNotes();
   };
 
-  // ── Section 5: Decision state ──
-  const [showDecisionForm, setShowDecisionForm] = useState(false);
-  const [decisionOutcome, setDecisionOutcome] = useState("Pass");
-  const [decisionReason, setDecisionReason] = useState("");
-
-  const submitDecision = () => {
-    console.log("submitDecision — information:", decisionOutcome, decisionReason);
-    setShowDecisionForm(false);
-    setDecisionReason("");
-  };
-
   // ── Roast record ──
   const { data: roastRecord = [] } = useQuery({
     queryKey: ["deal-room-roast-record", startupId],
@@ -291,116 +256,16 @@ function InformationPage() {
         </div>
       )}
 
-      <div
-        className={cn(
-          "rounded-none border overflow-hidden",
-          vaultNdaDoc
-            ? "bg-white border-[rgba(16,185,129,0.3)]"
-            : "bg-white border-[rgba(0,0,0,0.08)]",
-        )}
-      >
-        <div className="flex items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
-              vaultNdaDoc
-                ? "bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)]"
-                : "bg-gray-100 border border-[rgba(0,0,0,0.08)]",
-            )}>
-              <Shield className={cn("h-4 w-4", vaultNdaDoc ? "text-[#10B981]" : "text-[#71717A]")} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900">Non-Disclosure Agreement</span>
-                {vaultNdaDoc ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
-                    <CheckCircle2 className="h-3 w-3" /> Signed
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-accent text-muted-foreground text-[10px] font-semibold px-2 py-0.5">
-                    <Clock className="h-3 w-3" /> Pending
-                  </span>
-                )}
-              </div>
-              <div className="text-xs text-gray-500 mt-0.5">
-                {vaultNdaDoc
-                  ? `${vaultNdaSigners.length} ${vaultNdaSigners.length === 1 ? "party" : "parties"} bound · v${vaultNdaDoc.version} · System generated`
-                  : "Auto-generated once all parties sign"}
-              </div>
-            </div>
-          </div>
-          {vaultNdaDoc && (
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => setVaultNdaModalOpen(true)}
-                className="text-xs text-gray-500 hover:text-gray-900 border border-[rgba(0,0,0,0.08)] rounded-lg px-3 py-1.5 transition-colors"
-              >
-                View NDA
-              </button>
-              <button
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 text-xs border border-[rgba(0,0,0,0.08)] rounded-lg px-3 py-1.5 text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                <Download className="h-3.5 w-3.5" /> PDF
-              </button>
-            </div>
-          )}
-        </div>
-        {vaultNdaDoc && vaultNdaSigners.length > 0 && (
-          <div className="px-5 pb-4 flex flex-wrap gap-2">
-            {(vaultNdaSigners as any[]).map((s, i) => (
-              <div key={i} className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-[rgba(0,0,0,0.08)] px-3 py-1 text-xs">
-                <CheckCircle2 className="h-3 w-3 text-[#10B981] shrink-0" />
-                <span className="font-medium text-gray-900">{s.signer_full_name}</span>
-                <span className="text-[#71717A]">· {s.role}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {vaultNdaModalOpen && vaultNdaDoc && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden"
-          onClick={() => setVaultNdaModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-2xl max-h-[85vh] bg-card border border-border/60 rounded-2xl overflow-hidden shadow-2xl flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 shrink-0">
-              <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-[#10B981]" />
-                <div>
-                  <div className="font-semibold text-sm text-foreground">Non-Disclosure Agreement</div>
-                  <div className="text-xs text-muted-foreground">
-                    v{vaultNdaDoc.version} · {vaultNdaSigners.length} {vaultNdaSigners.length === 1 ? "party" : "parties"}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 text-xs bg-accent hover:bg-accent text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors"
-                >
-                  <Download className="h-3.5 w-3.5" /> Download PDF
-                </button>
-                <button
-                  onClick={() => setVaultNdaModalOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 py-5">
-              <pre className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-sans">
-                {vaultNdaDoc.nda_text}
-              </pre>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* NDA panel removed 13 Aug 2026 — it duplicated the room overview's
+          NDA & confidentiality panel exactly (same fetchNdaDocument call,
+          same nda_acceptances read, same signer list, same view/print
+          affordances) across two permanently-adjacent, always-unlocked
+          tabs. Overview is canonical: it holds the only .nda-print-content
+          block in the codebase, so its Download PDF actually prints. This
+          copy's two print buttons called window.print() against a print
+          stylesheet that hides everything except a target this page never
+          rendered — producing a blank page. Removing the duplicate also
+          removes that live defect. See CLAUDE.md §20.9. */}
 
       {(vaultQaReports as any[]).map((report) => {
         const reportDate = new Date(report.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -855,56 +720,34 @@ function InformationPage() {
         </div>
       )}
 
+      {/* The "Decision" control (Pass/Withdraw/Pause + reason) was removed
+          13 Aug 2026. Its submit handler was a console.log — it wrote
+          nothing, anywhere, and nothing read a decision it could have
+          produced. A control that looks functional and silently does
+          nothing is the same class of defect as the 0-row silent write
+          already fixed in this group (§7.4), just at the UI layer.
+          Removed rather than wired, per the standing preference for
+          deleting an unused control over keeping it against unclear
+          future intent (the triggerDeskCron precedent, §7.4). The real
+          decision path is /app/investor/decisions, which writes the
+          decisions table properly. The product gap this leaves — no
+          in-room decline path with a recorded reason — is logged in
+          CLAUDE.md §20.2, and is the same gap §20.1's open item (5)
+          already tracks for passDeal. "Request next stage" below is
+          untouched: it is a real, authorized action. */}
       <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
-        {showDecisionForm ? (
-          <div className="space-y-3">
-            <div className="text-sm font-semibold text-gray-900">Submit a decision</div>
-            <select
-              value={decisionOutcome}
-              onChange={(e) => setDecisionOutcome(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
-            >
-              {["Pass", "Withdraw", "Pause"].map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
-            <textarea
-              value={decisionReason}
-              onChange={(e) => setDecisionReason(e.target.value)}
-              rows={3}
-              placeholder="Reason (required)"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none resize-none"
-            />
-            <div className="flex items-center gap-2">
-              <button onClick={() => setShowDecisionForm(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-2 text-sm text-gray-500">Cancel</button>
-              <button
-                onClick={submitDecision}
-                disabled={!decisionReason.trim()}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground disabled:opacity-50"
-                style={{ background: "#EF4444" }}
-              >
-                Submit decision
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <button
-              onClick={() => setShowDecisionForm(true)}
-              className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 bg-white hover:bg-red-50"
-            >
-              Decision
-            </button>
-            <button
-              onClick={onRequestNextStage}
-              disabled={stageRequesting}
-              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
-              style={{ background: "var(--gradient-brand)" }}
-              data-testid="info-vault-next-stage"
-            >
-              {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Request next stage →
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-end gap-4 flex-wrap">
+          <button
+            onClick={onRequestNextStage}
+            disabled={stageRequesting}
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+            style={{ background: "var(--gradient-brand)" }}
+            data-testid="info-vault-next-stage"
+          >
+            {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Request next stage →
+          </button>
+        </div>
       </div>
     </div>
   );
