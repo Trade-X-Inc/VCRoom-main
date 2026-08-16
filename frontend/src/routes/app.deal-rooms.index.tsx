@@ -84,24 +84,21 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
     },
   });
 
-  // Preserves the original soft-fail-to-[] contract on ANY failure, not
-  // just the ones the old .from() call could produce — room_list_by_startup
-  // returning {ok:true, rooms:[]} for a real zero-room founder reaches here
-  // as a normal (non-error) empty array via res.rooms, never via the catch
-  // block below. staleTime added (was unset) to avoid re-appending a
-  // record entry on every remount of this route.
-  const { data: rooms = [], isLoading: roomsLoading } = useQuery({
+  // A genuine zero-room founder reaches this as a normal (non-error) empty
+  // array via {ok:true, rooms:[]} — that path never touches the catch below.
+  // A real gateway failure MUST surface as an error, never degrade to [] —
+  // a caught failure that renders a plausible "0 rooms" state is worse than
+  // an uncaught one (CLAUDE.md §7.4). This exact []-on-any-failure pattern
+  // hid the §20.11 server-fn split outage behind "No deal rooms yet." for
+  // real founders with real rooms. staleTime added (was unset) to avoid
+  // re-appending a record entry on every remount of this route.
+  const { data: rooms = [], isLoading: roomsLoading, isError: roomsError } = useQuery({
     queryKey: ["deal-rooms", user?.id, startup?.id],
     enabled: !!user?.id && !!startup?.id,
     staleTime: 30_000,
     queryFn: async () => {
-      try {
-        const res = await callAction<{ rooms: any[] }>(roomListByStartup, startup!.id, { startupId: startup!.id });
-        return res.rooms ?? [];
-      } catch (err) {
-        console.error("Deal rooms query failed:", err);
-        return [];
-      }
+      const res = await callAction<{ rooms: any[] }>(roomListByStartup, startup!.id, { startupId: startup!.id });
+      return res.rooms ?? [];
     },
   });
 
@@ -186,7 +183,11 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  if (loadError) {
+  // roomsError: the gateway call itself failed (thrown, not caught-to-[]).
+  // loadError: an 8s stall guard for the case where the query never settles.
+  // Same error UI for both — the user doesn't need to know which condition
+  // fired, only that this is a real failure, not "no deal rooms exist."
+  if (loadError || roomsError) {
     return (
       <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
         <p className="text-v2-ink" style={{ fontSize: "13.5px", marginBottom: "8px" }}>Deal rooms could not load</p>

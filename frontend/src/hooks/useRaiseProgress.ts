@@ -127,10 +127,15 @@ export function useRaiseProgress() {
       );
 
       // rooms pulled separately via the gateway — {ok:true, rooms:[]} for a
-      // genuine zero-room founder reaches roomRows as [] the normal way,
-      // never via the catch below; any other failure degrades to [] too,
-      // matching this hook's existing all-failures-log-and-continue
-      // convention for the other four queries in the Promise.all.
+      // A genuine zero-room founder reaches roomRows as [] the normal way,
+      // via {ok:true, rooms:[]} — that never touches an error path. A real
+      // gateway failure MUST propagate and fail the whole useQuery (data
+      // stays undefined, consumers already null-guard `p`) rather than
+      // silently degrading this one leg to [] — a caught failure that
+      // renders a plausible "0 rooms" progress state is worse than an
+      // uncaught one (CLAUDE.md §7.4). The other four queries below still
+      // log-and-continue on their own errors; that's unchanged — only the
+      // gateway call's swallow-to-[] is removed.
       const [docs, verif, claims, badges, roomsResult] = await Promise.all([
         supabase
           .from("founder_documents")
@@ -149,8 +154,7 @@ export function useRaiseProgress() {
           .from("profile_badges")
           .select("id", { count: "exact", head: true })
           .eq("startup_id", startup.id),
-        callAction<{ rooms: any[] }>(roomListProgressFounder, startup.id, { startupId: startup.id })
-          .catch((err) => { console.error("[raise] rooms fetch failed:", err); return { rooms: [] }; }),
+        callAction<{ rooms: any[] }>(roomListProgressFounder, startup.id, { startupId: startup.id }),
       ]);
       for (const r of [docs, verif, claims, badges]) {
         if (r.error) console.error("[raise] progress fetch failed:", r.error);

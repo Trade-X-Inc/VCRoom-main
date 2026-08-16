@@ -29,8 +29,11 @@ export function useDealFlowProgress() {
       // (CLAUDE.md §20.1: a lawyer's global role can be "investor", but
       // this metric is diligence-pipeline-adjacent and they have no
       // diligence access under (b)). {ok:true, rooms:[]} for a genuine
-      // zero-room investor reaches roomRows as [] the normal way, never
-      // via the catch below.
+      // zero-room investor reaches roomRows as [] the normal way. A real
+      // gateway failure MUST propagate and fail the whole useQuery (data
+      // stays undefined, consumers already null-guard `p`), not silently
+      // degrade to [] — a caught failure that renders a plausible "0
+      // rooms" state is worse than an uncaught one (CLAUDE.md §7.4).
       const [profile, watchlist, roomsResult] = await Promise.all([
         supabase
           .from("investor_profiles")
@@ -41,8 +44,7 @@ export function useDealFlowProgress() {
           .from("investor_watchlist")
           .select("id, status", { count: "exact" })
           .eq("investor_id", user!.id),
-        callAction<{ rooms: any[] }>(roomListProgressInvestor, user!.id, {})
-          .catch((err) => { console.error("[deal-flow] rooms fetch failed:", err); return { rooms: [] }; }),
+        callAction<{ rooms: any[] }>(roomListProgressInvestor, user!.id, {}),
       ]);
       for (const r of [profile, watchlist]) {
         if (r.error) console.error("[deal-flow] fetch failed:", r.error);
