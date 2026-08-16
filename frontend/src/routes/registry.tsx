@@ -370,7 +370,7 @@ function Registry() {
               <p className="text-sm font-semibold text-foreground mb-1">Raising capital?</p>
               <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)" }}>
                 Hockystick automatically runs registry checks on all founder profiles — plus
-                LinkedIn verification, AI document review, and investor matching. Free during beta.
+                AI document review. Free during beta.
               </p>
               <a
                 href="/sign-up?role=founder"

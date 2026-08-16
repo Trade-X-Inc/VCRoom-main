@@ -63,9 +63,7 @@ export const AI_PAGES: Record<string, DocPage> = {
           head={["Feature", "For", "Docs"]}
           rows={[
             ["AI panel", "Both sides", <A href="/docs/ai/operator-panel">AI panel</A>],
-            ["Deal briefs", "Investors", <A href="/docs/ai/deal-brief">Deal briefs</A>],
             ["Profile extraction", "Founders", <A href="/docs/founders/ai">AI for founders</A>],
-            ["Intake parsing", "Investors", <A href="/docs/investors/intake">Intake</A>],
             ["Investment memos", "Investors", <A href="/docs/investors/analysis">Memos</A>],
             ["Document review", "Founders", <A href="/docs/founders/vault">Vault</A>],
             ["Data handling policy", "Everyone", <A href="/docs/ai/data-handling">Data handling</A>],
@@ -152,62 +150,6 @@ export const AI_PAGES: Record<string, DocPage> = {
             "See any data your account couldn't query itself",
             "Execute party-visible actions without an explicit confirmation click",
             "Share conversation content with the other side of any deal",
-          ]}
-        />
-      </>
-    ),
-  },
-
-  // ── /docs/ai/deal-brief ───────────────────────────────────────────────────
-  "ai/deal-brief": {
-    meta: {
-      slug: "ai/deal-brief",
-      title: "Deal briefs",
-      description:
-        "AI-generated first-pass analysis of a startup for investors: cached per company, viewed-state tracked, generated on demand.",
-      updated: UPDATED,
-      toc: [
-        { id: "overview", label: "Overview" },
-        { id: "how", label: "How it works" },
-        { id: "caching", label: "Caching" },
-        { id: "scope", label: "What it does / doesn't" },
-      ],
-    },
-    Body: () => (
-      <>
-        <Lead>
-          A deal brief is the AI's structured first read on a company — what it does, the traction
-          signals in its profile, and how it fits your thesis. It exists to answer one question
-          cheaply: does this deserve twenty minutes of human attention?
-        </Lead>
-
-        <H2 id="how">How it works</H2>
-        <Steps
-          items={[
-            <>Generate a brief from the deal flow inbox, the investor dashboard, or a deal room's Overview panel.</>,
-            <>The brief draws on the company's profile data — and inside a deal room, the room's shared context.</>,
-            <>Briefs carry a viewed/unviewed state, so new analysis is visible at a glance.</>,
-          ]}
-        />
-
-        <H2 id="caching">Caching</H2>
-        <P>
-          Briefs are cached per company. Requesting the same brief again returns the stored result
-          instantly instead of re-running the model — consistent output, no duplicate spend. A
-          brief regenerates when you explicitly ask for a fresh one.
-        </P>
-
-        <H2 id="scope">What it does / doesn't</H2>
-        <AIScope
-          does={[
-            "Summarizes a company from its profile and (in-room) shared deal data",
-            "Scores thesis fit against your stated criteria",
-            "Caches results and tracks what you've already read",
-          ]}
-          doesNot={[
-            "Access documents the founder hasn't shared with you",
-            "Replace diligence — a brief is triage, not verification",
-            "Send anything to the founder",
           ]}
         />
       </>

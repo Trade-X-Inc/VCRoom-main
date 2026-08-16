@@ -76,11 +76,6 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/trust</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>https://hockystick.app/resources</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
@@ -176,11 +171,6 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/docs/founders/verification</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>https://hockystick.app/docs/founders/team</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
@@ -192,11 +182,6 @@
   </url>
   <url>
     <loc>https://hockystick.app/docs/investors</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/docs/investors/intake</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -277,16 +262,6 @@
   </url>
   <url>
     <loc>https://hockystick.app/docs/ai/operator-panel</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/docs/ai/deal-brief</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/docs/ai/verification</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>

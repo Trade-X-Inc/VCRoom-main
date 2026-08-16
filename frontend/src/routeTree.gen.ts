@@ -24,7 +24,6 @@ import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DocsRouteImport } from './routes/docs'
-import { Route as DesignPreviewRouteImport } from './routes/design-preview'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AppRouteImport } from './routes/app'
@@ -51,7 +50,6 @@ import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
-import { Route as DevV2PrimitivesRouteImport } from './routes/dev.v2-primitives'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -236,11 +234,6 @@ const DocsRoute = DocsRouteImport.update({
   path: '/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DesignPreviewRoute = DesignPreviewRouteImport.update({
-  id: '/design-preview',
-  path: '/design-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -371,11 +364,6 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
   id: '/$',
   path: '/$',
   getParentRoute: () => DocsRoute,
-} as any)
-const DevV2PrimitivesRoute = DevV2PrimitivesRouteImport.update({
-  id: '/dev/v2-primitives',
-  path: '/dev/v2-primitives',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const CvSlugRoute = CvSlugRouteImport.update({
   id: '/cv/$slug',
@@ -964,7 +952,6 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
-  '/design-preview': typeof DesignPreviewRoute
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -1007,7 +994,6 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/dev/v2-primitives': typeof DevV2PrimitivesRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
@@ -1115,7 +1101,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/design-preview': typeof DesignPreviewRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/founders': typeof FoundersRoute
@@ -1156,7 +1141,6 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/dev/v2-primitives': typeof DevV2PrimitivesRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
@@ -1267,7 +1251,6 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
-  '/design-preview': typeof DesignPreviewRoute
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -1310,7 +1293,6 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/dev/v2-primitives': typeof DevV2PrimitivesRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
@@ -1422,7 +1404,6 @@ export interface FileRouteTypes {
     | '/app'
     | '/blog'
     | '/contact'
-    | '/design-preview'
     | '/docs'
     | '/feedback'
     | '/forgot-password'
@@ -1465,7 +1446,6 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
-    | '/dev/v2-primitives'
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
@@ -1573,7 +1553,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/design-preview'
     | '/feedback'
     | '/forgot-password'
     | '/founders'
@@ -1614,7 +1593,6 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
-    | '/dev/v2-primitives'
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
@@ -1724,7 +1702,6 @@ export interface FileRouteTypes {
     | '/app'
     | '/blog'
     | '/contact'
-    | '/design-preview'
     | '/docs'
     | '/feedback'
     | '/forgot-password'
@@ -1767,7 +1744,6 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/cv/$slug'
-    | '/dev/v2-primitives'
     | '/docs/$'
     | '/i/$slug'
     | '/join-investor/$token'
@@ -1878,7 +1854,6 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
-  DesignPreviewRoute: typeof DesignPreviewRoute
   DocsRoute: typeof DocsRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -1903,7 +1878,6 @@ export interface RootRouteChildren {
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   CvSlugRoute: typeof CvSlugRoute
-  DevV2PrimitivesRoute: typeof DevV2PrimitivesRoute
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   PSlugRoute: typeof PSlugRoute
@@ -2030,13 +2004,6 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/design-preview': {
-      id: '/design-preview'
-      path: '/design-preview'
-      fullPath: '/design-preview'
-      preLoaderRoute: typeof DesignPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -2220,13 +2187,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/docs/$'
       preLoaderRoute: typeof DocsSplatRouteImport
       parentRoute: typeof DocsRoute
-    }
-    '/dev/v2-primitives': {
-      id: '/dev/v2-primitives'
-      path: '/dev/v2-primitives'
-      fullPath: '/dev/v2-primitives'
-      preLoaderRoute: typeof DevV2PrimitivesRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/cv/$slug': {
       id: '/cv/$slug'
@@ -3278,7 +3238,6 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
-  DesignPreviewRoute: DesignPreviewRoute,
   DocsRoute: DocsRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -3303,7 +3262,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   CvSlugRoute: CvSlugRoute,
-  DevV2PrimitivesRoute: DevV2PrimitivesRoute,
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   PSlugRoute: PSlugRoute,

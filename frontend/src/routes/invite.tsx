@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Gift, Lock, Zap, ArrowRight } from "lucide-react";
+import { Lock, Zap, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/invite")({
   head: () => ({
@@ -27,7 +27,6 @@ function Invite() {
 
   const benefits = [
     { icon: Zap, title: "3 Extra AI Analyses", desc: "Unlock additional AI-powered deal analysis and company scoring." },
-    { icon: Gift, title: "Founding Member Badge", desc: "Show your early support with an exclusive badge on your profile." },
     { icon: Lock, title: "Locked-In Pricing", desc: "Founding members get special pricing forever." },
   ];
 

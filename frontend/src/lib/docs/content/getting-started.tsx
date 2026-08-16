@@ -45,8 +45,7 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
             </>,
             <>
               <strong>Investors:</strong> start with the <A href="/docs/investors">investor feature map</A>,
-              then set your thesis and read <A href="/docs/investors/intake">the intake parser</A> to
-              get your existing pipeline in.
+              then set your thesis and add companies to your <A href="/docs/investors/pipeline">pipeline</A>.
             </>,
             <>
               <strong>Evaluating the platform's security?</strong> Go straight to{" "}

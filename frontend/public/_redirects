@@ -11,6 +11,8 @@
 /docs/security/rls /docs/security/access-control 301
 /docs/founders/verification /docs/founders 301
 /docs/ai/verification /docs/ai 301
+/docs/investors/intake /docs/investors 301
+/docs/ai/deal-brief /docs/ai 301
 /trust / 301
 
 # P4: founder nav restructure — old pages consolidated into /app/prepare

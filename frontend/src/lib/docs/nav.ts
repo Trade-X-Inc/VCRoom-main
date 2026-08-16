@@ -37,7 +37,6 @@ export const DOCS_NAV: DocsNavSection[] = [
     title: "For investors",
     items: [
       { slug: "investors", title: "Investor features" },
-      { slug: "investors/intake", title: "Deal intake parser" },
       { slug: "investors/deal-flow", title: "Deal flow inbox" },
       { slug: "investors/pipeline", title: "Pipeline" },
       { slug: "investors/decisions", title: "Decisions" },
@@ -66,7 +65,6 @@ export const DOCS_NAV: DocsNavSection[] = [
     items: [
       { slug: "ai", title: "AI on Hockystick" },
       { slug: "ai/operator-panel", title: "AI panel" },
-      { slug: "ai/deal-brief", title: "Deal briefs" },
       { slug: "ai/data-handling", title: "Data handling" },
     ],
   },

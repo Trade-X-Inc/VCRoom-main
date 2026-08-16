@@ -33,7 +33,6 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
         <DocTable
           head={["Feature", "What it does", "Docs"]}
           rows={[
-            ["Deal intake parser", "Turn raw lead data into structured, thesis-scored candidates", <A href="/docs/investors/intake">Intake</A>],
             ["Deal flow inbox", "Inbound queue with AI briefs per company", <A href="/docs/investors/deal-flow">Deal flow</A>],
             ["Pipeline", "Kanban of active deal rooms by stage", <A href="/docs/investors/pipeline">Pipeline</A>],
             ["Decisions", "Invest / Hold / Pass with recorded reasons", <A href="/docs/investors/decisions">Decisions</A>],
@@ -97,66 +96,6 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
     ),
   },
 
-  // ── /docs/investors/intake ────────────────────────────────────────────────
-  "investors/intake": {
-    meta: {
-      slug: "investors/intake",
-      title: "Deal intake parser",
-      description:
-        "Paste raw lead data or upload files — the AI extracts structured company candidates and scores each against your thesis.",
-      updated: UPDATED,
-      toc: [
-        { id: "overview", label: "Overview" },
-        { id: "how", label: "How it works" },
-        { id: "rules", label: "Key rules & limits" },
-        { id: "ai", label: "What the AI does / doesn't" },
-      ],
-    },
-    Body: () => (
-      <>
-        <Lead>
-          Deal flow arrives as mess: forwarded emails, spreadsheet exports, notes from a demo day.
-          The intake parser takes that raw material — pasted text or uploaded files — and returns
-          structured company candidates, each scored against your stated thesis, in one batch.
-        </Lead>
-
-        <H2 id="how">How it works</H2>
-        <Steps
-          items={[
-            <>Paste text directly, or upload files. File types are validated before anything is processed.</>,
-            <>The AI extracts one candidate record per company it finds: name, sector, stage, geography, and whatever traction detail the source contained.</>,
-            <>If a document is image-only (a scanned one-pager, a screenshot), extraction falls back to a vision model rather than failing.</>,
-            <>Each candidate gets a thesis-fit score so you triage the batch by relevance, not source order.</>,
-            <>From the results panel, add candidates to your watchlist or send an invite email directly.</>,
-          ]}
-        />
-
-        <H2 id="rules">Key rules &amp; limits</H2>
-        <Rules
-          items={[
-            <><strong>Paste-your-own-data only, by design.</strong> There is no email or CRM OAuth integration — Hockystick never connects to your inbox. What you paste is the entire input.</>,
-            <>Every run is saved to history and can be reopened later with its full results.</>,
-            <>Extraction quality follows source quality: a candidate parsed from two vague sentences will be sparse, and the parser leaves fields empty rather than inventing them.</>,
-          ]}
-        />
-
-        <H2 id="ai">What the AI does / doesn't</H2>
-        <AIScope
-          does={[
-            "Extracts structured candidate records from text you explicitly submit",
-            "Scores each candidate against your thesis settings",
-            "Falls back to vision-model extraction for image-only documents",
-          ]}
-          doesNot={[
-            "Read your email, CRM, or anything you didn't paste or upload",
-            "Invent data — fields the source doesn't support stay empty",
-            "Add anything to your watchlist without your action",
-          ]}
-        />
-      </>
-    ),
-  },
-
   // ── /docs/investors/deal-flow ─────────────────────────────────────────────
   "investors/deal-flow": {
     meta: {
@@ -191,10 +130,10 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
 
         <H2 id="briefs">AI briefs</H2>
         <P>
-          A brief is a structured first-pass read on a company: what it does, traction signals,
-          and thesis fit. Briefs are cached — generating the same company's brief twice costs
-          nothing and stays consistent — and carry a viewed/unviewed state so you can see what's
-          new at a glance. Full detail: <A href="/docs/ai/deal-brief">Deal briefs</A>.
+          A brief is a structured first-pass read on a company: what it does and its traction
+          signals. Briefs are cached — generating the same company's brief twice costs nothing
+          and stays consistent — and carry a viewed/unviewed state so you can see what's new at
+          a glance.
         </P>
       </>
     ),
