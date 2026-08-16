@@ -22,9 +22,22 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
-import { defineAction, type JsonValue } from "./gateway";
+import { createServerFn } from "@tanstack/react-start";
+import {
+  runAction,
+  type ActionDef,
+  type ActionEnvelope,
+  type ActionResult,
+  type JsonValue,
+} from "./gateway";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Every action binds its own TOP-LEVEL createServerFn — required by
+// TanStack Start's server-fn transform. See gateway.ts / CLAUDE.md §20.11.
+const envelope = (raw: unknown): ActionEnvelope<unknown> =>
+  raw as ActionEnvelope<unknown>;
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MINT_TTL_SECONDS = 60; // short; a granted download link, not a standing URL
 
 function isUuid(v: unknown): v is string {
@@ -36,7 +49,11 @@ function optUuid(v: unknown): string | null {
 
 // mint a signed URL for storage_path — the ONLY place this happens, and only
 // after an RPC returned mode='mint'. TTL is short by design.
-async function mintSignedUrl(sb: SupabaseClient, bucket: string, path: string): Promise<string> {
+async function mintSignedUrl(
+  sb: SupabaseClient,
+  bucket: string,
+  path: string,
+): Promise<string> {
   // storage lives in the default (public REST) surface, not pack_api — a normal
   // service-role storage call, unrelated to the pack_v1 schema isolation.
   const storage = createClient(
@@ -44,8 +61,11 @@ async function mintSignedUrl(sb: SupabaseClient, bucket: string, path: string): 
     getEnvVar("SUPABASE_SERVICE_ROLE_KEY"),
     { auth: { persistSession: false } },
   ).storage;
-  const { data, error } = await storage.from(bucket).createSignedUrl(path, MINT_TTL_SECONDS);
-  if (error || !data?.signedUrl) throw new Error(`mint_failed: ${error?.message ?? "no url"}`);
+  const { data, error } = await storage
+    .from(bucket)
+    .createSignedUrl(path, MINT_TTL_SECONDS);
+  if (error || !data?.signedUrl)
+    throw new Error(`mint_failed: ${error?.message ?? "no url"}`);
   return data.signedUrl;
 }
 
@@ -57,7 +77,10 @@ type RequestAccessInput = {
 };
 type RequestAccessOutput = { [k: string]: JsonValue };
 
-export const documentRequestAccess = defineAction<RequestAccessInput, RequestAccessOutput>({
+const documentRequestAccessDef: ActionDef<
+  RequestAccessInput,
+  RequestAccessOutput
+> = {
   name: "documents.requestAccess",
   // Prepare-class: it may create a pending Release (a draft awaiting a human
   // grant) or, for open_release, produce an immediate signed URL. It never
@@ -65,12 +88,21 @@ export const documentRequestAccess = defineAction<RequestAccessInput, RequestAcc
   class: "prepare",
 
   validate: (raw): RequestAccessInput => {
-    const r = raw as { documentId?: unknown; recipientId?: unknown; governingNda?: unknown };
+    const r = raw as {
+      documentId?: unknown;
+      recipientId?: unknown;
+      governingNda?: unknown;
+    };
     if (!isUuid(r?.documentId)) throw new Error("documentId must be a uuid");
     if (!isUuid(r?.recipientId)) throw new Error("recipientId must be a uuid");
     const nda = optUuid(r?.governingNda);
-    if (nda === "invalid") throw new Error("governingNda must be a uuid or null");
-    return { documentId: r.documentId, recipientId: r.recipientId, governingNda: nda };
+    if (nda === "invalid")
+      throw new Error("governingNda must be a uuid or null");
+    return {
+      documentId: r.documentId,
+      recipientId: r.recipientId,
+      governingNda: nda,
+    };
   },
 
   authorize: async () => {
@@ -80,15 +112,22 @@ export const documentRequestAccess = defineAction<RequestAccessInput, RequestAcc
   },
 
   handle: async (ctx, input): Promise<RequestAccessOutput> => {
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("document_request_access", {
-      p_uid: ctx.uid,
-      p_org_id: ctx.scopeId,
-      p_document_id: input.documentId,
-      p_recipient: input.recipientId,
-      p_governing_nda: input.governingNda,
-    });
+    const { data, error } = await ctx.sb
+      .schema("pack_api")
+      .rpc("document_request_access", {
+        p_uid: ctx.uid,
+        p_org_id: ctx.scopeId,
+        p_document_id: input.documentId,
+        p_recipient: input.recipientId,
+        p_governing_nda: input.governingNda,
+      });
     if (error) throw new Error(`document_request_access_rpc: ${error.message}`);
-    const res = data as { ok: boolean; error?: string; mode?: string; storage_path?: string } & RequestAccessOutput;
+    const res = data as {
+      ok: boolean;
+      error?: string;
+      mode?: string;
+      storage_path?: string;
+    } & RequestAccessOutput;
     if (!res.ok) throw new Error(res.error ?? "request_access_failed");
 
     // open_release → the RPC already wrote the granted Release row; mint now.
@@ -108,7 +147,13 @@ export const documentRequestAccess = defineAction<RequestAccessInput, RequestAcc
     // record the mode so the audit trail distinguishes a mint from a pending req
     data: { mode: (output.mode as JsonValue) ?? null },
   }),
-});
+};
+export const documentRequestAccess = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(documentRequestAccessDef, data),
+  );
 
 // ── documents.grantRelease (Commit) ──────────────────────────────────────────
 // An approver flips a pending Release → granted, then a URL may be minted. This
@@ -117,7 +162,10 @@ export const documentRequestAccess = defineAction<RequestAccessInput, RequestAcc
 type GrantReleaseInput = { releaseId: string };
 type GrantReleaseOutput = { [k: string]: JsonValue };
 
-export const documentGrantRelease = defineAction<GrantReleaseInput, GrantReleaseOutput>({
+const documentGrantReleaseDef: ActionDef<
+  GrantReleaseInput,
+  GrantReleaseOutput
+> = {
   name: "documents.grantRelease",
   class: "commit",
 
@@ -130,13 +178,20 @@ export const documentGrantRelease = defineAction<GrantReleaseInput, GrantRelease
   authorize: async () => true, // org-ownership enforced in document_grant_release
 
   handle: async (ctx, input): Promise<GrantReleaseOutput> => {
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("document_grant_release", {
-      p_approver: ctx.uid,
-      p_org_id: ctx.scopeId,
-      p_release_id: input.releaseId,
-    });
+    const { data, error } = await ctx.sb
+      .schema("pack_api")
+      .rpc("document_grant_release", {
+        p_approver: ctx.uid,
+        p_org_id: ctx.scopeId,
+        p_release_id: input.releaseId,
+      });
     if (error) throw new Error(`document_grant_release_rpc: ${error.message}`);
-    const res = data as { ok: boolean; error?: string; mode?: string; storage_path?: string } & GrantReleaseOutput;
+    const res = data as {
+      ok: boolean;
+      error?: string;
+      mode?: string;
+      storage_path?: string;
+    } & GrantReleaseOutput;
     if (!res.ok) throw new Error(res.error ?? "grant_release_failed");
 
     if (res.mode === "mint" && typeof res.storage_path === "string") {
@@ -151,4 +206,10 @@ export const documentGrantRelease = defineAction<GrantReleaseInput, GrantRelease
     objectId: input.releaseId,
     data: { granted: true },
   }),
-});
+};
+export const documentGrantRelease = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(documentGrantReleaseDef, data),
+  );

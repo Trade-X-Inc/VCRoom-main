@@ -2,9 +2,22 @@
 // Read-class. Reaches pack_v1 ONLY via pack_api SECURITY DEFINER RPCs.
 // See gateway.ts and WHY_PACK_API.md.
 
-import { defineAction, type JsonValue } from "./gateway";
+import { createServerFn } from "@tanstack/react-start";
+import {
+  runAction,
+  type ActionDef,
+  type ActionEnvelope,
+  type ActionResult,
+  type JsonValue,
+} from "./gateway";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Every action binds its own TOP-LEVEL createServerFn — required by
+// TanStack Start's server-fn transform. See gateway.ts / CLAUDE.md §20.11.
+const envelope = (raw: unknown): ActionEnvelope<unknown> =>
+  raw as ActionEnvelope<unknown>;
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type PackGetInput = { packId: string };
 // pack_api.pack_get returns { ok, pack, fields } as jsonb — a JSON object.
@@ -20,7 +33,7 @@ type PackGetOutput = { [k: string]: JsonValue };
 // public.organization_members is linked; today pack_v1 has no membership table,
 // so authorize() delegates the org-ownership check to the RPC and returns true
 // to reach it. Flagged, not hidden — see the cutover TODO.
-export const packGet = defineAction<PackGetInput, PackGetOutput>({
+const packGetDef: ActionDef<PackGetInput, PackGetOutput> = {
   name: "pack.get",
   class: "read",
 
@@ -59,4 +72,9 @@ export const packGet = defineAction<PackGetInput, PackGetOutput>({
     objectId: input.packId,
     data: { read: true },
   }),
-});
+};
+export const packGet = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> => runAction(packGetDef, data),
+  );

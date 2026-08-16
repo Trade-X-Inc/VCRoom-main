@@ -17,15 +17,45 @@
 // Only room_get_term_sheet is wired here (Stage 1). The other five follow
 // in Stage 2 once this pattern is confirmed against a real consumer.
 
-import { defineAction, type JsonValue } from "./gateway";
+import { createServerFn } from "@tanstack/react-start";
+import {
+  runAction,
+  type ActionDef,
+  type ActionEnvelope,
+  type ActionResult,
+  type JsonValue,
+} from "./gateway";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const isUuid = (v: unknown): v is string => typeof v === "string" && UUID_RE.test(v);
+// EVERY action in this file binds its own TOP-LEVEL createServerFn. That is a
+// hard requirement of TanStack Start's server-fn transform, not a style
+// choice: the transform is a compile-time AST rewrite that only finds
+// statically-analysable top-level createServerFn(...).handler(...) calls. A
+// createServerFn produced by a factory is never found, so its handler ships to
+// the CLIENT and runs in the browser — which is exactly the bug this file's
+// previous shape caused (CLAUDE.md §20.11). The factories below therefore
+// build plain `def` OBJECTS; they must never return a server function.
+//
+// Enforced by eslint (src/lib/actions/** shape) AND by
+// scripts/check-action-split.mjs, which fails the build if any handler body
+// from this directory reaches dist/client.
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isUuid = (v: unknown): v is string =>
+  typeof v === "string" && UUID_RE.test(v);
 
 type Obj = { [k: string]: JsonValue };
 
-function makeRoomGetAction(name: string, fn: string) {
-  return defineAction<{ dealRoomId: string }, Obj>({
+// Shared envelope validator — identical for every action; the transform only
+// cares about the createServerFn/.handler() call being top-level.
+const envelope = (raw: unknown): ActionEnvelope<unknown> =>
+  raw as ActionEnvelope<unknown>;
+
+function roomGetDef(
+  name: string,
+  fn: string,
+): ActionDef<{ dealRoomId: string }, Obj> {
+  return {
     name,
     class: "read",
     validate: (raw) => {
@@ -36,22 +66,69 @@ function makeRoomGetAction(name: string, fn: string) {
     authorize: async () => true, // authorization enforced in the pack_api function
     handle: async (ctx, input): Promise<Obj> => {
       const { data, error } = await ctx.sb.schema("pack_api").rpc(fn, {
-        p_uid: ctx.uid, p_deal_room_id: input.dealRoomId,
+        p_uid: ctx.uid,
+        p_deal_room_id: input.dealRoomId,
       });
       if (error) throw new Error(`${fn}: ${error.message}`);
       const res = data as { ok: boolean; error?: string } & Obj;
       if (!res.ok) throw new Error(res.error ?? `${fn}_failed`);
       return res;
     },
-    record: (input) => ({ objectType: "deal_room", objectId: input.dealRoomId, data: { read: name } }),
-  });
+    record: (input) => ({
+      objectType: "deal_room",
+      objectId: input.dealRoomId,
+      data: { read: name },
+    }),
+  };
 }
 
-export const roomGetTermSheet = makeRoomGetAction("deal_room.getTermSheet", "room_get_term_sheet");
-export const roomGetIdentity = makeRoomGetAction("deal_room.getIdentity", "room_get_identity");
-export const roomGetWorkflowState = makeRoomGetAction("deal_room.getWorkflowState", "room_get_workflow_state");
-export const roomGetDealTerms = makeRoomGetAction("deal_room.getDealTerms", "room_get_deal_terms");
-export const roomGetMedia = makeRoomGetAction("deal_room.getMedia", "room_get_media");
+const termSheetDef = roomGetDef(
+  "deal_room.getTermSheet",
+  "room_get_term_sheet",
+);
+export const roomGetTermSheet = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(termSheetDef, data),
+  );
+
+const identityDef = roomGetDef("deal_room.getIdentity", "room_get_identity");
+export const roomGetIdentity = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(identityDef, data),
+  );
+
+const workflowStateDef = roomGetDef(
+  "deal_room.getWorkflowState",
+  "room_get_workflow_state",
+);
+export const roomGetWorkflowState = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(workflowStateDef, data),
+  );
+
+const dealTermsDef = roomGetDef(
+  "deal_room.getDealTerms",
+  "room_get_deal_terms",
+);
+export const roomGetDealTerms = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(dealTermsDef, data),
+  );
+
+const mediaDef = roomGetDef("deal_room.getMedia", "room_get_media");
+export const roomGetMedia = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> => runAction(mediaDef, data),
+  );
 
 // ── Multi-room list functions (migration 20260810000000) ────────────────
 // Different shape from the room_get_* single-room reads above: these take
@@ -66,8 +143,11 @@ export const roomGetMedia = makeRoomGetAction("deal_room.getMedia", "room_get_me
 
 type RoomListOutput = { rooms: JsonValue[] } & Obj;
 
-function makeRoomListByStartupAction(name: string, fn: string) {
-  return defineAction<{ startupId: string }, RoomListOutput>({
+function roomListByStartupDef(
+  name: string,
+  fn: string,
+): ActionDef<{ startupId: string }, RoomListOutput> {
+  return {
     name,
     class: "read",
     validate: (raw) => {
@@ -78,40 +158,88 @@ function makeRoomListByStartupAction(name: string, fn: string) {
     authorize: async () => true, // authorization enforced in the pack_api function
     handle: async (ctx, input): Promise<RoomListOutput> => {
       const { data, error } = await ctx.sb.schema("pack_api").rpc(fn, {
-        p_uid: ctx.uid, p_startup_id: input.startupId,
+        p_uid: ctx.uid,
+        p_startup_id: input.startupId,
       });
       if (error) throw new Error(`${fn}: ${error.message}`);
-      const res = data as { ok: boolean; error?: string; rooms?: JsonValue[] } & Obj;
+      const res = data as {
+        ok: boolean;
+        error?: string;
+        rooms?: JsonValue[];
+      } & Obj;
       if (!res.ok) throw new Error(res.error ?? `${fn}_failed`);
       return res as RoomListOutput;
     },
-    record: (input) => ({ objectType: "startup", objectId: input.startupId, data: { list: name } }),
-  });
+    record: (input) => ({
+      objectType: "startup",
+      objectId: input.startupId,
+      data: { list: name },
+    }),
+  };
 }
 
-export const roomListByStartup = makeRoomListByStartupAction("deal_room.listByStartup", "room_list_by_startup");
-export const roomListProgressFounder = makeRoomListByStartupAction("deal_room.listProgressFounder", "room_list_progress_founder");
+const listByStartupDef = roomListByStartupDef(
+  "deal_room.listByStartup",
+  "room_list_by_startup",
+);
+export const roomListByStartup = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(listByStartupDef, data),
+  );
+
+const listProgressFounderDef = roomListByStartupDef(
+  "deal_room.listProgressFounder",
+  "room_list_progress_founder",
+);
+export const roomListProgressFounder = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(listProgressFounderDef, data),
+  );
 
 // Spans every room the caller is a member of — no single room or startup
 // to scope the record entry to. Call with scopeId = the caller's own
 // user.id (their personal record partition for this kind of cross-room
 // read), not a room_id or startup_id — there isn't one.
-export const roomListProgressInvestor = defineAction<Record<string, never>, RoomListOutput>({
+const listProgressInvestorDef: ActionDef<
+  Record<string, never>,
+  RoomListOutput
+> = {
   name: "deal_room.listProgressInvestor",
   class: "read",
   validate: () => ({}),
   authorize: async () => true, // authorization enforced in the pack_api function (membership + lawyer exclusion)
   handle: async (ctx): Promise<RoomListOutput> => {
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("room_list_progress_investor", {
-      p_uid: ctx.uid,
-    });
+    const { data, error } = await ctx.sb
+      .schema("pack_api")
+      .rpc("room_list_progress_investor", {
+        p_uid: ctx.uid,
+      });
     if (error) throw new Error(`room_list_progress_investor: ${error.message}`);
-    const res = data as { ok: boolean; error?: string; rooms?: JsonValue[] } & Obj;
-    if (!res.ok) throw new Error(res.error ?? "room_list_progress_investor_failed");
+    const res = data as {
+      ok: boolean;
+      error?: string;
+      rooms?: JsonValue[];
+    } & Obj;
+    if (!res.ok)
+      throw new Error(res.error ?? "room_list_progress_investor_failed");
     return res as RoomListOutput;
   },
-  record: () => ({ objectType: "deal_room_list", objectId: null, data: { list: "deal_room.listProgressInvestor" } }),
-});
+  record: () => ({
+    objectType: "deal_room_list",
+    objectId: null,
+    data: { list: "deal_room.listProgressInvestor" },
+  }),
+};
+export const roomListProgressInvestor = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(listProgressInvestorDef, data),
+  );
 
 // ── Write functions with optimistic concurrency (migration 20260810010000)
 // §20.4 error semantics: DealTermsCard.tsx and DDWorkstation.tsx's
@@ -125,19 +253,25 @@ export const roomListProgressInvestor = defineAction<Record<string, never>, Room
 // closes/signs/accepts anything (§8.2 tool classes).
 
 type DealTermsInput = {
-  dealRoomId: string; expectedUpdatedAt: string;
-  fundingStage: string | null; fundingAsk: string | null; preMoneyValuation: string | null;
-  equityOffered: string | null; previousRounds: JsonValue; keyMetrics: JsonValue;
+  dealRoomId: string;
+  expectedUpdatedAt: string;
+  fundingStage: string | null;
+  fundingAsk: string | null;
+  preMoneyValuation: string | null;
+  equityOffered: string | null;
+  previousRounds: JsonValue;
+  keyMetrics: JsonValue;
 };
 type ConflictableOutput = Obj & { conflict?: boolean };
 
-export const roomUpdateDealTerms = defineAction<DealTermsInput, ConflictableOutput>({
+const updateDealTermsDef: ActionDef<DealTermsInput, ConflictableOutput> = {
   name: "deal_room.updateDealTerms",
   class: "prepare",
   validate: (raw) => {
     const r = raw as Record<string, unknown>;
     if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
-    if (typeof r?.expectedUpdatedAt !== "string") throw new Error("expectedUpdatedAt required");
+    if (typeof r?.expectedUpdatedAt !== "string")
+      throw new Error("expectedUpdatedAt required");
     return {
       dealRoomId: r.dealRoomId as string,
       expectedUpdatedAt: r.expectedUpdatedAt as string,
@@ -151,12 +285,19 @@ export const roomUpdateDealTerms = defineAction<DealTermsInput, ConflictableOutp
   },
   authorize: async () => true, // authorization enforced in the pack_api function (founder-only)
   handle: async (ctx, input): Promise<ConflictableOutput> => {
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("room_update_deal_terms", {
-      p_uid: ctx.uid, p_deal_room_id: input.dealRoomId, p_expected_updated_at: input.expectedUpdatedAt,
-      p_funding_stage: input.fundingStage, p_funding_ask: input.fundingAsk,
-      p_pre_money_valuation: input.preMoneyValuation, p_equity_offered: input.equityOffered,
-      p_previous_rounds: input.previousRounds, p_key_metrics: input.keyMetrics,
-    });
+    const { data, error } = await ctx.sb
+      .schema("pack_api")
+      .rpc("room_update_deal_terms", {
+        p_uid: ctx.uid,
+        p_deal_room_id: input.dealRoomId,
+        p_expected_updated_at: input.expectedUpdatedAt,
+        p_funding_stage: input.fundingStage,
+        p_funding_ask: input.fundingAsk,
+        p_pre_money_valuation: input.preMoneyValuation,
+        p_equity_offered: input.equityOffered,
+        p_previous_rounds: input.previousRounds,
+        p_key_metrics: input.keyMetrics,
+      });
     if (error) throw new Error(`room_update_deal_terms: ${error.message}`);
     const res = data as { ok: boolean; error?: string } & Obj;
     // 'conflict' is returned to the caller as data, NOT thrown — the
@@ -168,37 +309,67 @@ export const roomUpdateDealTerms = defineAction<DealTermsInput, ConflictableOutp
     return res;
   },
   record: (input, output) => ({
-    objectType: "deal_room", objectId: input.dealRoomId,
+    objectType: "deal_room",
+    objectId: input.dealRoomId,
     data: { action: "updateDealTerms", conflict: !!output.conflict },
   }),
-});
+};
+export const roomUpdateDealTerms = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(updateDealTermsDef, data),
+  );
 
-type ProductImageInput = { dealRoomId: string; expectedUpdatedAt: string; imageUrl: string };
+type ProductImageInput = {
+  dealRoomId: string;
+  expectedUpdatedAt: string;
+  imageUrl: string;
+};
 
-export const roomAppendProductImage = defineAction<ProductImageInput, ConflictableOutput>({
-  name: "deal_room.appendProductImage",
-  class: "prepare",
-  validate: (raw) => {
-    const r = raw as Record<string, unknown>;
-    if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
-    if (typeof r?.expectedUpdatedAt !== "string") throw new Error("expectedUpdatedAt required");
-    if (typeof r?.imageUrl !== "string" || !r.imageUrl.trim()) throw new Error("imageUrl required");
-    return { dealRoomId: r.dealRoomId as string, expectedUpdatedAt: r.expectedUpdatedAt as string, imageUrl: r.imageUrl as string };
-  },
-  authorize: async () => true, // authorization enforced in the pack_api function (founder-only)
-  handle: async (ctx, input): Promise<ConflictableOutput> => {
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("room_append_product_image", {
-      p_uid: ctx.uid, p_deal_room_id: input.dealRoomId,
-      p_expected_updated_at: input.expectedUpdatedAt, p_image_url: input.imageUrl,
-    });
-    if (error) throw new Error(`room_append_product_image: ${error.message}`);
-    const res = data as { ok: boolean; error?: string } & Obj;
-    if (!res.ok && res.error === "conflict") return { conflict: true };
-    if (!res.ok) throw new Error(res.error ?? "room_append_product_image_failed");
-    return res;
-  },
-  record: (input, output) => ({
-    objectType: "deal_room", objectId: input.dealRoomId,
-    data: { action: "appendProductImage", conflict: !!output.conflict },
-  }),
-});
+const appendProductImageDef: ActionDef<ProductImageInput, ConflictableOutput> =
+  {
+    name: "deal_room.appendProductImage",
+    class: "prepare",
+    validate: (raw) => {
+      const r = raw as Record<string, unknown>;
+      if (!isUuid(r?.dealRoomId)) throw new Error("dealRoomId must be a uuid");
+      if (typeof r?.expectedUpdatedAt !== "string")
+        throw new Error("expectedUpdatedAt required");
+      if (typeof r?.imageUrl !== "string" || !r.imageUrl.trim())
+        throw new Error("imageUrl required");
+      return {
+        dealRoomId: r.dealRoomId as string,
+        expectedUpdatedAt: r.expectedUpdatedAt as string,
+        imageUrl: r.imageUrl as string,
+      };
+    },
+    authorize: async () => true, // authorization enforced in the pack_api function (founder-only)
+    handle: async (ctx, input): Promise<ConflictableOutput> => {
+      const { data, error } = await ctx.sb
+        .schema("pack_api")
+        .rpc("room_append_product_image", {
+          p_uid: ctx.uid,
+          p_deal_room_id: input.dealRoomId,
+          p_expected_updated_at: input.expectedUpdatedAt,
+          p_image_url: input.imageUrl,
+        });
+      if (error) throw new Error(`room_append_product_image: ${error.message}`);
+      const res = data as { ok: boolean; error?: string } & Obj;
+      if (!res.ok && res.error === "conflict") return { conflict: true };
+      if (!res.ok)
+        throw new Error(res.error ?? "room_append_product_image_failed");
+      return res;
+    },
+    record: (input, output) => ({
+      objectType: "deal_room",
+      objectId: input.dealRoomId,
+      data: { action: "appendProductImage", conflict: !!output.conflict },
+    }),
+  };
+export const roomAppendProductImage = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(appendProductImageDef, data),
+  );

@@ -624,3 +624,11 @@ wc = wc.replace(
 );
 writeFileSync(wp, wc);
 console.log("✓ _worker.js export rewritten to CF Pages fetch handler");
+
+// ── Gateway action-split build gate (CLAUDE.md §20.11) ───────────────────────
+// Runs LAST, against the finished artifact. Fails the build if any gateway
+// handler body reached dist/client, or if any action bypasses runAction.
+// This is the regression test for the eleven-day server-fn split outage: the
+// source was correct and the artifact was wrong, which is the failure mode a
+// source-level lint rule cannot catch.
+execSync("node scripts/check-action-split.mjs", { stdio: "inherit" });

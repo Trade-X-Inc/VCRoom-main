@@ -79,5 +79,42 @@ export default tseslint.config(
     files: ["src/lib/supabase.ts"],
     rules: { "no-restricted-syntax": "off" },
   },
+  {
+    // ── Gateway action layer shape (CLAUDE.md §20.11) ────────────────────────
+    // TanStack Start's server-fn transform only finds statically-analysable
+    // TOP-LEVEL createServerFn(...).handler(...) calls. A createServerFn
+    // returned from a factory is never transformed, so its handler — including
+    // requireUser, the service-role client and the pack_api RPC — is bundled
+    // into the CLIENT and executes in the browser. That was a real eleven-day
+    // outage, not a hypothetical.
+    //
+    // This rule catches the wrong SHAPE at author time. scripts/check-action-
+    // split.mjs independently catches a wrong ARTIFACT at build time — keep
+    // both; the artifact check is the one that would have caught the original
+    // bug, since the source was correct and the bundle was not.
+    files: ["src/lib/actions/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ReturnStatement > CallExpression[callee.name='createServerFn']",
+          message:
+            "Do not return createServerFn() from a function. TanStack Start's transform cannot see it, so the handler ships to the CLIENT and runs in the browser without the service-role key (CLAUDE.md §20.11). Declare createServerFn at module top level; have the factory return the ActionDef object instead.",
+        },
+        {
+          selector:
+            "ReturnStatement > MemberExpression[object.callee.name='createServerFn']",
+          message:
+            "Do not return a createServerFn(...) chain from a function — the server-fn transform cannot see it and the handler will be bundled client-side (CLAUDE.md §20.11).",
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='handler'] > ArrowFunctionExpression > BlockStatement",
+          message:
+            "A gateway action's .handler() must be a single expression handing off to runAction(<def>, data) — not a block body. Authorization and the record append are enforced inside runAction; inlining logic here bypasses the chokepoint (CLAUDE.md §13.2/§3.7, §20.11).",
+        },
+      ],
+    },
+  },
   eslintPluginPrettier,
 );

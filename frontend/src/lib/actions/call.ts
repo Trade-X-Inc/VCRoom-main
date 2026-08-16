@@ -20,7 +20,12 @@ import { supabase } from "@/lib/supabase";
 import type { JsonValue, ActionResult } from "./gateway";
 
 type ServerAction = (opts: {
-  data: { accessToken: string; scopeId: string; isAgent?: boolean; input: unknown };
+  data: {
+    accessToken: string;
+    scopeId: string;
+    isAgent?: boolean;
+    input: unknown;
+  };
 }) => Promise<ActionResult<JsonValue>>;
 
 export async function callAction<T = JsonValue>(
@@ -28,9 +33,16 @@ export async function callAction<T = JsonValue>(
   scopeId: string,
   input: unknown,
 ): Promise<T> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const res = await action({
-    data: { accessToken: session?.access_token ?? "", scopeId, isAgent: false, input },
+    data: {
+      accessToken: session?.access_token ?? "",
+      scopeId,
+      isAgent: false,
+      input,
+    },
   });
   if (!res.ok) throw new Error(res.error);
   return res.data as T;

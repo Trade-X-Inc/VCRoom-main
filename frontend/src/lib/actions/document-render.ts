@@ -22,9 +22,22 @@
 import { createClient } from "@supabase/supabase-js";
 import * as XLSX from "xlsx";
 import { getEnvVar } from "@/lib/env";
-import { defineAction, type JsonValue } from "./gateway";
+import { createServerFn } from "@tanstack/react-start";
+import {
+  runAction,
+  type ActionDef,
+  type ActionEnvelope,
+  type ActionResult,
+  type JsonValue,
+} from "./gateway";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Every action binds its own TOP-LEVEL createServerFn — required by
+// TanStack Start's server-fn transform. See gateway.ts / CLAUDE.md §20.11.
+const envelope = (raw: unknown): ActionEnvelope<unknown> =>
+  raw as ActionEnvelope<unknown>;
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_RENDER_BYTES = 15 * 1024 * 1024; // guard: don't render huge files inline
 
 function isUuid(v: unknown): v is string {
@@ -42,7 +55,7 @@ function serviceStorage() {
 type RenderInput = { documentId: string; recipientId: string };
 type RenderOutput = { [k: string]: JsonValue };
 
-export const documentRender = defineAction<RenderInput, RenderOutput>({
+const documentRenderDef: ActionDef<RenderInput, RenderOutput> = {
   name: "documents.render",
   class: "read",
 
@@ -58,27 +71,40 @@ export const documentRender = defineAction<RenderInput, RenderOutput>({
   handle: async (ctx, input): Promise<RenderOutput> => {
     // Re-authorize + reclassify via the same gateway RPC. We do NOT trust a
     // client-supplied storage_path — the server re-derives it here.
-    const { data, error } = await ctx.sb.schema("pack_api").rpc("document_request_access", {
-      p_uid: ctx.uid,
-      p_org_id: ctx.scopeId,
-      p_document_id: input.documentId,
-      p_recipient: input.recipientId,
-      p_governing_nda: null,
-    });
+    const { data, error } = await ctx.sb
+      .schema("pack_api")
+      .rpc("document_request_access", {
+        p_uid: ctx.uid,
+        p_org_id: ctx.scopeId,
+        p_document_id: input.documentId,
+        p_recipient: input.recipientId,
+        p_governing_nda: null,
+      });
     if (error) throw new Error(`request_access_rpc: ${error.message}`);
     const res = data as {
-      ok: boolean; error?: string; mode?: string; render_kind?: string; storage_path?: string;
+      ok: boolean;
+      error?: string;
+      mode?: string;
+      render_kind?: string;
+      storage_path?: string;
     };
     if (!res.ok) throw new Error(res.error ?? "request_access_failed");
     if (res.mode !== "render" || typeof res.storage_path !== "string") {
       // not a view_only render target (e.g. pdf → pending, or release classes)
-      return { ok: false, error: "not_a_render_target", mode: res.mode ?? null };
+      return {
+        ok: false,
+        error: "not_a_render_target",
+        mode: res.mode ?? null,
+      };
     }
 
     // server-side fetch of the raw bytes (service key). These bytes never leave
     // the server as a downloadable URL — only the rendered artifact returns.
-    const dl = await serviceStorage().from("documents").download(res.storage_path);
-    if (dl.error || !dl.data) throw new Error(`download_failed: ${dl.error?.message ?? "no data"}`);
+    const dl = await serviceStorage()
+      .from("documents")
+      .download(res.storage_path);
+    if (dl.error || !dl.data)
+      throw new Error(`download_failed: ${dl.error?.message ?? "no data"}`);
     const buf = await dl.data.arrayBuffer();
     if (buf.byteLength > MAX_RENDER_BYTES) {
       return { ok: false, error: "too_large_to_render", bytes: buf.byteLength };
@@ -88,12 +114,23 @@ export const documentRender = defineAction<RenderInput, RenderOutput>({
       // return a base64 data URI — client shows <img src=dataUri>. No storage URL.
       const bytes = new Uint8Array(buf);
       let binary = "";
-      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      for (let i = 0; i < bytes.length; i++)
+        binary += String.fromCharCode(bytes[i]);
       const b64 = btoa(binary);
       const ext = res.storage_path.split(".").pop()?.toLowerCase() ?? "png";
-      const mime = ext === "jpg" || ext === "jpeg" ? "image/jpeg"
-        : ext === "gif" ? "image/gif" : ext === "webp" ? "image/webp" : "image/png";
-      return { ok: true, render_kind: "image", data_uri: `data:${mime};base64,${b64}` };
+      const mime =
+        ext === "jpg" || ext === "jpeg"
+          ? "image/jpeg"
+          : ext === "gif"
+            ? "image/gif"
+            : ext === "webp"
+              ? "image/webp"
+              : "image/png";
+      return {
+        ok: true,
+        render_kind: "image",
+        data_uri: `data:${mime};base64,${b64}`,
+      };
     }
 
     if (res.render_kind === "spreadsheet") {
@@ -101,20 +138,31 @@ export const documentRender = defineAction<RenderInput, RenderOutput>({
       const wb = XLSX.read(buf, { type: "array" });
       const sheets: JsonValue = {};
       for (const name of wb.SheetNames) {
-        const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, blankrows: false });
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], {
+          header: 1,
+          blankrows: false,
+        });
         // rows is unknown[][]; coerce cells to JSON-safe scalars
-        (sheets as Record<string, JsonValue>)[name] = (rows as unknown[][]).map((row) =>
-          row.map((cell): JsonValue =>
-            cell == null ? null
-              : typeof cell === "number" || typeof cell === "boolean" ? cell
-              : String(cell),
-          ),
+        (sheets as Record<string, JsonValue>)[name] = (rows as unknown[][]).map(
+          (row) =>
+            row.map(
+              (cell): JsonValue =>
+                cell == null
+                  ? null
+                  : typeof cell === "number" || typeof cell === "boolean"
+                    ? cell
+                    : String(cell),
+            ),
         );
       }
       return { ok: true, render_kind: "spreadsheet", sheets };
     }
 
-    return { ok: false, error: "unknown_render_kind", render_kind: res.render_kind ?? null };
+    return {
+      ok: false,
+      error: "unknown_render_kind",
+      render_kind: res.render_kind ?? null,
+    };
   },
 
   record: (input, output) => ({
@@ -122,4 +170,10 @@ export const documentRender = defineAction<RenderInput, RenderOutput>({
     objectId: input.documentId,
     data: { rendered: (output.render_kind as JsonValue) ?? null },
   }),
-});
+};
+export const documentRender = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(documentRenderDef, data),
+  );
