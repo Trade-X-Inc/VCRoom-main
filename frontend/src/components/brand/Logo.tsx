@@ -1,3 +1,7 @@
+// Icon: the reference-line monogram (PUBLIC-REGISTER.md §10 item 1,
+// resolved 17 Aug 2026), rendered from /favicon.svg. Wordmark: Archivo
+// Bold, tight tracking, ledger navy — Direction A paired with Direction B,
+// since a wordmark alone has no icon-sized form. Both directions, one mark.
 export function Logo({
   withWordmark = true,
   size = "default",
@@ -18,7 +22,15 @@ export function Logo({
         style={{ imageRendering: "crisp-edges" }}
       />
       {withWordmark && (
-        <span className={`font-bold tracking-tight text-foreground ${size === "lg" ? "text-[18px]" : "text-[15px]"}`}>
+        <span
+          style={{
+            fontFamily: "var(--font-v2-ui)",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: "#1B3A63",
+            fontSize: size === "lg" ? "18px" : "15px",
+          }}
+        >
           Hockystick
         </span>
       )}

@@ -1,6 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#0A0A0B"/>
-  <rect x="8.5" y="8" width="3.6" height="16" fill="#FFFFFF"/>
-  <rect x="8.5" y="14.2" width="11" height="3.6" fill="#FFFFFF"/>
-  <path d="M16 24 V13 L23.5 8 V19 Z" fill="#7C3AED"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
+  <!-- Hockystick icon mark — the reference-line monogram (PUBLIC-REGISTER.md
+       §10 item 1, resolved 17 Aug 2026). Constructed from the register's own
+       device: a full-height "rule" on the left, a horizontal "tick" at
+       mid-height (the exact grammar of a reference-line specimen), and a
+       shorter, deliberately unequal right stroke. Reads as a bold H at every
+       size down to 24px; the rule/tick construction is legible at full size.
+       Ledger navy #1B3A63 on warm neutral #F5F4F1, single colour, no gradient. -->
+  <rect width="256" height="256" fill="#F5F4F1"/>
+  <rect x="64" y="48" width="20" height="160" fill="#1B3A63"/>
+  <rect x="64" y="118" width="96" height="20" fill="#1B3A63"/>
+  <rect x="160" y="86" width="20" height="122" fill="#1B3A63"/>
 </svg>
