@@ -325,12 +325,17 @@ function Landing() {
     <div style={{ background: SURFACE, minHeight: "100vh" }}>
       <SiteHeader />
 
-      <main
-        id="main-content"
+      {/* A single <main> for the whole page (one per document, and it carries
+          the skip-link target). It has no width constraint of its own so the
+          screenshot section below can go full-bleed; every other section
+          gets its 62rem measure from its own inner wrapper instead. */}
+      <main id="main-content" style={{ display: "flex", flexDirection: "column", gap: "56px", paddingBottom: "96px" }}>
+      <div
         style={{
           maxWidth: "62rem",
           margin: "0 auto",
-          padding: "72px 24px 96px",
+          padding: "72px 24px 0",
+          width: "100%",
           display: "flex",
           flexDirection: "column",
           gap: "56px",
@@ -539,7 +544,83 @@ function Landing() {
           ]}
           caption="A lawyer invited at closing sees the term summary and the agreement. They do not see earlier diligence or negotiation history."
         />
+      </div>
 
+      {/* ── SCREENSHOT SECTION — a real screen, full-bleed, two-column split
+          (register §3.6.1/§3.6.3). The one product screenshot on the page:
+          the term-negotiation view, chosen because INSTRUMENT 1 above
+          already describes the mechanism in prose ("both parties propose,
+          accept, reject, or counter") without ever showing it working. Real
+          screen, captured live, never mocked — see CLAUDE.md §20.12/§20.5
+          for the capture session and the app-shell purple residue that
+          ruled out the documents-table screen for this round.
+
+          SPECIMEN prominence: the caption line alone was judged
+          insufficient — a reader's eye reaches the dollar figures (share
+          price, pre-money valuation) before it reaches a caption below a
+          720px image. A solid navy corner tag sits directly over the image,
+          in the same glance as the numbers, not just below them. Company,
+          investor and figures are all reserved specimen data (Northwind
+          Cartography / Priya Okonkwo / Meridian Lane Capital) seeded for
+          this exact purpose — never a real negotiation. */}
+      <section style={{ background: PANEL, borderTop: `1px solid ${RULE}`, borderBottom: `1px solid ${RULE}` }}>
+        <div
+          className="pub-split"
+          style={{
+            display: "grid", alignItems: "start", gap: "40px",
+            maxWidth: "72rem", margin: "0 auto", padding: "56px 24px",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <Title>Seeing it work</Title>
+            <Prose>
+              A term doesn&rsquo;t move from proposed to finalized because one
+              side declared it so. Each term carries its own status —
+              proposed, countered, accepted by one side, or locked once both
+              sides agree on the same value.
+            </Prose>
+            <Prose>
+              The room below shows all four states on one screen, mid-negotiation.
+            </Prose>
+          </div>
+
+          <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ position: "relative", border: `1px solid ${RULE}`, lineHeight: 0 }}>
+              <img
+                src="/marketing/term-sheet-specimen.png"
+                alt="Specimen term negotiation screen with reserved placeholder data, showing seven deal terms in various states: finalized, accepted by one side, proposed, and counter-proposed."
+                width={1212}
+                height={720}
+                style={{ display: "block", width: "100%", height: "auto" }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute", top: "12px", right: "12px",
+                  background: ACCENT, color: "#FFFFFF",
+                  fontFamily: UI, fontSize: "11px", fontWeight: 700,
+                  letterSpacing: "0.09em", textTransform: "uppercase",
+                  padding: "5px 10px", borderRadius: "2px",
+                }}
+              >
+                Specimen
+              </div>
+            </div>
+            <Caption>
+              <strong style={{ color: INK, fontWeight: 600 }}>Term negotiation · Specimen.</strong>{" "}
+              Company, investor, and figures are placeholder data, reserved
+              for this purpose and never a real negotiation.
+            </Caption>
+          </figure>
+        </div>
+      </section>
+
+      <div
+        style={{
+          maxWidth: "62rem", margin: "0 auto", padding: "56px 24px 0",
+          width: "100%", display: "flex", flexDirection: "column", gap: "56px",
+        }}
+      >
         <Rule />
 
         {/* ── PROSE 3 — why the mechanisms aren't ours ──────────────────────── */}
@@ -648,6 +729,7 @@ function Landing() {
             </Action>
           </div>
         </section>
+      </div>
       </main>
 
       <SiteFooter />

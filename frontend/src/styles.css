@@ -402,3 +402,18 @@ img { max-width: 100%; height: auto; }
     gap: 56px;
   }
 }
+
+/* Full-bleed two-column split for a screenshot/diagram section (register
+   §3.6.3). Prose column stays measure-capped inside its own grid track;
+   the figure column gets more room than the fold's specimen column since
+   it needs to render a legible product screenshot, not a short reference
+   line. Stacks below 900px, prose first. */
+.pub-split {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 900px) {
+  .pub-split {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    gap: 48px;
+  }
+}
