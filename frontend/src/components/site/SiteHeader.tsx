@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
-import { Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 
 // Public chrome, rebuilt to PUBLIC-REGISTER.md (17 Aug 2026).
@@ -15,10 +15,20 @@ import { useAuth } from "@/lib/auth";
 // backdrop-blur, and the ArrowRight decorative chevrons (§13 — decorative
 // iconography). The logo mark itself is untouched — brand identity remains
 // explicitly out of scope (PUBLIC-REGISTER.md §10.1).
+//
+// Two-dropdown restructure (18 Aug 2026, IA proposal §1): "Resources" is a
+// real dropdown today (Security, Docs, Tools all exist). "Product" stays a
+// flat Pricing link, deliberately not a dropdown — /how-it-works,
+// /for-founders and /for-investors don't exist yet, and a one-item dropdown
+// looks broken. Convert Product to a dropdown once at least two of those
+// land (Step 4/5 of the IA build). Never ship a dropdown entry pointing at
+// a route that doesn't exist — every href below was checked against the
+// route tree before being added.
 
 const UI = "var(--font-v2-ui)";
 const INK = "var(--v2-ink)";
 const INK_2 = "var(--v2-ink-secondary)";
+const INK_3 = "var(--v2-ink-muted)";
 const RULE = "var(--v2-rule)";
 const SURFACE = "var(--v2-surface)";
 const PANEL = "var(--v2-panel)";
@@ -35,8 +45,81 @@ const actionBase: React.CSSProperties = {
   fontFamily: UI, fontSize: "13px", fontWeight: 500, textDecoration: "none",
 };
 
+type ResourceLink = { to: string; label: string; description: string };
+
+const RESOURCE_LINKS: ResourceLink[] = [
+  { to: "/docs/security", label: "Security", description: "Access control, NDA handling, disclosure mechanics" },
+  { to: "/docs", label: "Docs", description: "Reference documentation" },
+  { to: "/tools", label: "Tools", description: "Calculators — valuation, runway, dilution, and more" },
+];
+
+function ResourcesDropdown() {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={containerRef} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="true"
+        style={{
+          ...navLink, display: "inline-flex", alignItems: "center", gap: "4px",
+          background: "transparent", border: "none", cursor: "pointer",
+        }}
+      >
+        Resources
+        <ChevronDown className="h-3.5 w-3.5" style={{ transform: open ? "rotate(180deg)" : undefined }} />
+      </button>
+      {open && (
+        <div
+          role="menu"
+          style={{
+            position: "absolute", top: "calc(100% + 8px)", left: 0,
+            width: "280px", background: PANEL, border: `1px solid ${RULE}`,
+            borderRadius: "2px", padding: "6px", zIndex: 50,
+          }}
+        >
+          {RESOURCE_LINKS.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to as any}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              style={{
+                display: "block", padding: "8px 10px", borderRadius: "2px",
+                textDecoration: "none",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--v2-accent-wash)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <div style={{ fontFamily: UI, fontSize: "13.5px", fontWeight: 500, color: INK }}>{l.label}</div>
+              <div style={{ fontFamily: UI, fontSize: "12px", color: INK_3, marginTop: "1px" }}>{l.description}</div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const { user } = useAuth();
   const dashboardUrl = user?.role === "investor" ? "/app/investor" : "/app";
 
@@ -46,7 +129,7 @@ export function SiteHeader() {
     return () => window.removeEventListener("resize", handler);
   }, []);
 
-  const close = () => setMobileMenuOpen(false);
+  const close = () => { setMobileMenuOpen(false); setMobileResourcesOpen(false); };
 
   return (
     <>
@@ -77,9 +160,9 @@ export function SiteHeader() {
 
           <nav className="hidden md:flex" style={{ alignItems: "center", gap: "24px", flex: 1, justifyContent: "center" }}>
             <Link to="/pricing" style={navLink}>Pricing</Link>
-            <Link to={"/docs" as any} style={navLink}>Docs</Link>
+            <ResourcesDropdown />
             <Link to="/blog" style={navLink}>Blog</Link>
-            <Link to="/tools" style={navLink}>Tools</Link>
+            <Link to="/about" style={navLink}>Company</Link>
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
@@ -134,21 +217,54 @@ export function SiteHeader() {
               padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px",
             }}
           >
-            {[
-              { to: "/pricing", label: "Pricing" },
-              { to: "/docs", label: "Docs" },
-              { to: "/blog", label: "Blog" },
-              { to: "/tools", label: "Tools" },
-            ].map((l) => (
-              <Link
-                key={l.to}
-                to={l.to as any}
-                onClick={close}
-                style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
-              >
-                {l.label}
-              </Link>
-            ))}
+            <Link
+              to="/pricing"
+              onClick={close}
+              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
+            >
+              Pricing
+            </Link>
+
+            <button
+              onClick={() => setMobileResourcesOpen((v) => !v)}
+              aria-expanded={mobileResourcesOpen}
+              style={{
+                ...navLink, display: "flex", alignItems: "center", justifyContent: "space-between",
+                width: "100%", padding: "10px 0", color: INK, background: "transparent", border: "none",
+              }}
+            >
+              Resources
+              <ChevronDown className="h-3.5 w-3.5" style={{ transform: mobileResourcesOpen ? "rotate(180deg)" : undefined }} />
+            </button>
+            {mobileResourcesOpen && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px", paddingLeft: "12px" }}>
+                {RESOURCE_LINKS.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to as any}
+                    onClick={close}
+                    style={{ ...navLink, display: "block", padding: "8px 0", color: INK_2 }}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <Link
+              to="/blog"
+              onClick={close}
+              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
+            >
+              Blog
+            </Link>
+            <Link
+              to="/about"
+              onClick={close}
+              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
+            >
+              Company
+            </Link>
 
             <div style={{ paddingTop: "12px", marginTop: "8px", borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", gap: "8px" }}>
               {user ? (

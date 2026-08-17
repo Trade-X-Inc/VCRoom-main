@@ -108,6 +108,9 @@ function NewsletterSignup() {
 }
 
 export function SiteFooter() {
+  // Mirrors the header's two-dropdown grouping (18 Aug 2026, IA proposal §1):
+  // Product / Resources / Company / Legal. Every href checked against the
+  // route tree before being added — nothing here points at an unbuilt page.
   const COLUMNS: { heading: string; links: { to: string; label: string }[] }[] = [
     {
       heading: "Product",
@@ -115,25 +118,16 @@ export function SiteFooter() {
         { to: "/sign-up", label: "Get started" },
         { to: "/sign-in", label: "Sign in" },
         { to: "/pricing", label: "Pricing" },
-        { to: "/docs", label: "Docs" },
-        { to: "/docs/security", label: "Security" },
-        { to: "/docs/changelog", label: "Changelog" },
-      ],
-    },
-    {
-      heading: "Company",
-      links: [
-        { to: "/about", label: "About" },
-        { to: "/contact", label: "Contact" },
-        { to: "/blog", label: "Blog" },
       ],
     },
     {
       heading: "Resources",
       links: [
+        { to: "/docs", label: "Docs" },
+        { to: "/docs/security", label: "Security" },
+        { to: "/docs/changelog", label: "Changelog" },
         { to: "/resources", label: "Resources hub" },
         { to: "/registry", label: "Company registry" },
-        { to: "/feedback", label: "Feedback" },
       ],
     },
     {
@@ -146,6 +140,15 @@ export function SiteFooter() {
         { to: "/tools/cap-table", label: "Cap table" },
         { to: "/tools/safe-note", label: "SAFE note" },
         { to: "/tools/dilution", label: "Dilution" },
+      ],
+    },
+    {
+      heading: "Company",
+      links: [
+        { to: "/about", label: "About" },
+        { to: "/contact", label: "Contact" },
+        { to: "/blog", label: "Blog" },
+        { to: "/feedback", label: "Feedback" },
       ],
     },
     {
