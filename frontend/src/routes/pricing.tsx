@@ -1,151 +1,224 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { useEffect } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { CostComparisonTable } from "@/components/site/CostComparisonTable";
-import { useAuth } from "@/lib/auth";
-import { useSubscription } from "@/hooks/useSubscription";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Data — plans come from plan_limits, not hardcoded arrays.
+// /pricing — the first page built under PUBLIC-REGISTER.md.
+//
+// The published fee schedule is a PRODUCT DECISION recorded in the Foundation
+// Document (§20.3/§20.4 as amended 17 Aug 2026), not database state. This page
+// therefore states the figures directly and no longer reads plan_limits.
+//
+// plan_limits still holds the older six-tier subscription model and drives the
+// in-app billing screen. The two disagree, and reconciling them is a product
+// decision plus a migration, not a copy fix. Logged in CLAUDE.md §20.2 as
+// BLOCKING: it must be closed before any paid signup is enabled.
+//
+// Deleted in this rebuild, deliberately: the founder/investor toggle (the
+// amended tiers are not split by audience), CostComparisonTable (an unsourced
+// comparative claim about third-party costs — Foundation §3.8), the 1.5%
+// success fee (§20.4 as amended prohibits percentages outright), "Most
+// popular" badges, "Contact us", Roast-badge pricing, and the feature-
+// checkmark grid.
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface PlanRow {
-  plan_id: string;
-  plan_name: string;
-  user_type: "founder" | "investor" | "both";
-  price_monthly_usd: number;
-  deal_room_limit: number;
-  team_member_limit: number;
-  ai_calls_per_month: number;
-  vc_connections_limit: number;
-  has_full_ai: boolean;
-  has_verification: boolean;
-  roast_price_usd: number | null;
-  extra_deal_room_price_usd: number;
-  extra_user_price_usd: number;
-  sort_order: number;
-}
+// Public register type scale (PUBLIC-REGISTER.md §3.2). Kept local rather than
+// promoted to global CSS vars: the public scale governs public pages only, and
+// global tokens would risk leaking 16px prose into the 13.5px application.
+const UI = "var(--font-v2-ui)";
+const DOC = "var(--font-v2-doc)";
+const DATA = "var(--font-v2-data)";
 
-const getPlans = createServerFn({ method: "GET" }).handler(async (): Promise<PlanRow[]> => {
-  const cfEnv = (globalThis as any).__cf_env || {};
-  const url = cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || (import.meta.env as any).VITE_SUPABASE_URL || "";
-  const key = cfEnv.SUPABASE_SERVICE_ROLE_KEY || cfEnv.VITE_SUPABASE_ANON_KEY || (import.meta.env as any).VITE_SUPABASE_ANON_KEY || "";
-  if (!url || !key) return [];
-  const resp = await fetch(
-    `${url}/rest/v1/plan_limits?is_active=eq.true&select=*&order=sort_order.asc`,
-    { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+const INK = "var(--v2-ink)";
+const INK_2 = "var(--v2-ink-secondary)";
+const INK_3 = "var(--v2-ink-muted)";
+const RULE = "var(--v2-rule)";
+const RULE_LIGHT = "var(--v2-rule-light)";
+const SURFACE = "var(--v2-surface)";
+const PANEL = "var(--v2-panel)";
+const ACCENT = "var(--v2-accent)";
+
+/** Measure cap for prose — 66–72 characters (register §3.1). */
+const MEASURE = "34rem";
+
+// ── Primitives ───────────────────────────────────────────────────────────────
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
+        letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, margin: 0,
+      }}
+    >
+      {children}
+    </p>
   );
-  if (!resp.ok) return [];
-  return resp.json();
-});
-
-// Curated copy per plan — everything numeric comes from the DB row.
-const PLAN_COPY: Record<string, { tagline: string; extras: string[]; popular?: boolean }> = {
-  founder_starter: {
-    tagline: "For founders testing the waters",
-    extras: ["Full verification system"],
-  },
-  founder_pro: {
-    tagline: "For founders actively raising",
-    extras: ["Everything in Starter"],
-    popular: true,
-  },
-  founder_scale: {
-    tagline: "For founders running multiple raises",
-    extras: ["Everything in Pro"],
-  },
-  investor_growth: {
-    tagline: "For active investors",
-    extras: [],
-  },
-  investor_pro: {
-    tagline: "For funds managing multiple deals",
-    extras: ["Priority support"],
-  },
-  investor_enterprise: {
-    tagline: "For institutions onboarding founder cohorts",
-    extras: ["White-label cohort tools", "Dedicated onboarding"],
-  },
-};
-
-function fmtNum(n: number): string {
-  return n.toLocaleString("en-US");
 }
 
-function planFeatures(p: PlanRow): string[] {
-  const isInvestor = p.user_type === "investor";
-  const conn = isInvestor ? "startup connections" : "investor connections";
-  const features: string[] = [
-    p.deal_room_limit >= 999 ? "Unlimited deal rooms" : `${p.deal_room_limit} deal rooms`,
-    `${p.team_member_limit} team member${p.team_member_limit === 1 ? "" : "s"}`,
-    p.vc_connections_limit >= 9999 ? `Unlimited ${conn}` : `${fmtNum(p.vc_connections_limit)} ${conn}`,
-    p.has_full_ai
-      ? isInvestor ? "Full AI analysis" : "Full AI (unlimited)"
-      : `Basic AI (${p.ai_calls_per_month} calls/month)`,
-  ];
-  if (!isInvestor && p.roast_price_usd !== null) {
-    features.push(
-      p.roast_price_usd === 0
-        ? "Roast badge: free"
-        : p.roast_price_usd < 50
-          ? `Roast badge: $${p.roast_price_usd} (discounted)`
-          : `Roast badge: $${p.roast_price_usd}`,
-    );
-  }
-  features.push(...(PLAN_COPY[p.plan_id]?.extras ?? []));
-  return features;
+function Title({ children }: { children: React.ReactNode }) {
+  return (
+    <h2
+      style={{
+        fontFamily: UI, fontSize: "25px", lineHeight: 1.25, fontWeight: 600,
+        letterSpacing: "-0.01em", color: INK, margin: 0,
+      }}
+    >
+      {children}
+    </h2>
+  );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Route
-// ─────────────────────────────────────────────────────────────────────────────
+function Prose({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: DOC, fontSize: "16px", lineHeight: 1.65, color: INK_2,
+        maxWidth: MEASURE, margin: 0,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function Caption({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: UI, fontSize: "12.5px", lineHeight: 1.5, color: INK_3,
+        maxWidth: MEASURE, margin: 0,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+/** Section separator — the register's primary structural device (§3.5.1). */
+function Rule() {
+  return <hr style={{ border: 0, borderTop: `1px solid ${RULE}`, margin: 0 }} />;
+}
+
+/**
+ * Instrument block — a real table at APPLICATION density (§3.4).
+ * 13.5px, 36px rows, 1.5px ink header rule, no zebra, tabular figures.
+ */
+function Instrument({
+  label, head, rows, caption, align,
+}: {
+  label: string;
+  head: string[];
+  rows: React.ReactNode[][];
+  caption: React.ReactNode;
+  /** Column indices rendered as right-aligned tabular data. */
+  align?: number[];
+}) {
+  const numeric = new Set(align ?? []);
+  return (
+    <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <Label>{label}</Label>
+      <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
+        <table
+          style={{
+            width: "100%", borderCollapse: "collapse",
+            fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55,
+          }}
+        >
+          <thead>
+            <tr>
+              {head.map((h, i) => (
+                <th
+                  key={h}
+                  scope="col"
+                  style={{
+                    fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
+                    textTransform: "uppercase", color: INK_3,
+                    textAlign: numeric.has(i) ? "end" : "start",
+                    padding: "0 16px 8px", borderBottom: `1.5px solid ${INK}`,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, ri) => (
+              <tr key={ri} style={{ borderBottom: ri === rows.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}>
+                {r.map((cell, ci) => (
+                  <td
+                    key={ci}
+                    style={{
+                      height: "36px", padding: "0 16px", color: INK,
+                      textAlign: numeric.has(ci) ? "end" : "start",
+                      fontFamily: numeric.has(ci) ? DATA : UI,
+                      fontSize: numeric.has(ci) ? "12px" : "13.5px",
+                      fontVariantNumeric: "tabular-nums",
+                      whiteSpace: numeric.has(ci) ? "nowrap" : "normal",
+                    }}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Caption>{caption}</Caption>
+    </section>
+  );
+}
+
+/** Primary action. One per section at most (§3.5.1 — the accent is rationed). */
+function Action({ to, search, children, variant = "primary" }: {
+  to: string;
+  search?: Record<string, unknown>;
+  children: React.ReactNode;
+  variant?: "primary" | "secondary";
+}) {
+  const primary = variant === "primary";
+  return (
+    <Link
+      to={to as any}
+      search={search as any}
+      style={{
+        display: "inline-flex", alignItems: "center", height: "36px",
+        padding: "0 18px", borderRadius: "2px",
+        fontFamily: UI, fontSize: "13.5px", fontWeight: 500,
+        background: primary ? ACCENT : PANEL,
+        color: primary ? "#FFFFFF" : INK,
+        border: primary ? `1px solid ${ACCENT}` : `1px solid ${RULE}`,
+        textDecoration: "none",
+      }}
+    >
+      {children}
+    </Link>
+  );
+}
+
+// ── Route ────────────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — Hockystick" },
-      { name: "description", content: "Simple, honest pricing. 30-day free trial, no credit card required. Founder plans from $19/month, investor plans from $99/month." },
+      {
+        name: "description",
+        content:
+          "A fixed fee tied to one event. Direct is USD 499 on first close. Institutional runs USD 25,000–120,000 annually, scoped in a call.",
+      },
     ],
     links: [{ rel: "canonical", href: "https://hockystick.app/pricing" }],
   }),
-  loader: () => getPlans(),
   component: PricingPage,
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────────────────────────────────────
-
-const FAQS = [
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. Cancel before your trial ends and you won't be charged.",
-  },
-  {
-    q: "What happens after 30 days?",
-    a: "Your chosen plan activates. We'll remind you 3 days before.",
-  },
-  {
-    q: "Do you offer annual plans?",
-    a: "Coming soon. Email us for early pricing.",
-  },
-  {
-    q: "What is the success fee?",
-    a: "1.5% of your closed round, minimum $500, maximum $15,000. Only applies to deals closed through Hockystick. Agreed in your deal room NDA.",
-  },
-];
-
 function PricingPage() {
-  const plans = (Route.useLoaderData() ?? []) as PlanRow[];
-  const { user } = useAuth();
-  const { subscription } = useSubscription();
-  const [audience, setAudience] = useState<"founder" | "investor">("founder");
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  // Public pages are light — same force-light pattern as the landing page.
+  // Public pages are light — same force-light pattern the other public routes use.
   useEffect(() => {
     const root = document.documentElement;
     const hadDark = root.classList.contains("dark");
@@ -161,222 +234,229 @@ function PricingPage() {
     };
   }, []);
 
-  // Default the toggle to the logged-in user's side
-  useEffect(() => {
-    if (user?.role === "investor") setAudience("investor");
-  }, [user?.role]);
-
-  const visible = useMemo(
-    () => plans.filter((p) => p.user_type === audience || p.user_type === "both"),
-    [plans, audience],
-  );
-
-  const currentPlanId = subscription?.plan_id ?? null;
-
   return (
-    <div className="bg-white min-h-screen text-gray-900">
+    <div style={{ background: SURFACE, minHeight: "100vh" }}>
       <SiteHeader />
-      <main id="main-content" className="mx-auto max-w-6xl px-6 pb-24 pt-16">
 
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
-            Simple, honest pricing
-          </h1>
-          <p className="mt-3 text-lg text-gray-600">30-day free trial. No credit card required.</p>
-
-          {/* Audience toggle */}
-          <div className="mt-8 inline-flex rounded-full border border-[#E4E4E7] bg-gray-50 p-1" role="tablist">
-            {(["founder", "investor"] as const).map((a) => (
-              <button
-                key={a}
-                role="tab"
-                aria-selected={audience === a}
-                onClick={() => setAudience(a)}
-                className={`rounded-full px-6 py-2 text-sm font-semibold transition-colors ${
-                  audience === a ? "hs-gradient text-white" : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                {a === "founder" ? "Founders" : "Investors"}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Investor beta framing */}
-        {audience === "investor" && (
-          <div className="mx-auto mb-10 max-w-2xl rounded-2xl border border-purple-200 bg-purple-50 p-6 text-center">
-            <div className="text-xs font-bold uppercase tracking-[0.14em] text-purple-700" style={{ fontFamily: "Syne, sans-serif" }}>
-              Investor access — free during beta
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-gray-700">
-              Open registration for investors during beta. Build a profile,
-              set your thesis, and get thesis-matched deal flow. Founders see your fund
-              and thesis before they share.
-            </p>
-            <Link
-              to="/sign-up"
-              search={{ role: "investor" } as any}
-              className="mt-4 inline-block rounded-lg hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
+      <main
+        id="main-content"
+        style={{
+          maxWidth: "62rem", margin: "0 auto", padding: "72px 24px 96px",
+          display: "flex", flexDirection: "column", gap: "56px",
+        }}
+      >
+        {/* ── FOLD — one promise, one action, one specimen (§4.1) ───────────
+            Two columns from 900px: the promise reads at its capped measure on
+            the left, the specimen sits beside it rather than beneath. Below
+            that width they stack, promise first. */}
+        <section
+          className="pub-fold"
+          style={{ display: "grid", gap: "40px", alignItems: "start" }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <Label>Pricing</Label>
+            <h1
+              style={{
+                fontFamily: UI, fontSize: "40px", lineHeight: 1.15, fontWeight: 700,
+                letterSpacing: "-0.02em", color: INK, margin: 0, maxWidth: "18ch",
+              }}
             >
-              Create investor account →
-            </Link>
+              A fixed fee, tied to one event.
+            </h1>
+            <p
+              style={{
+                fontFamily: DOC, fontSize: "19px", lineHeight: 1.5, color: INK_2,
+                maxWidth: MEASURE, margin: 0,
+              }}
+            >
+              Fees never scale with round size, page count, or storage volume.
+            </p>
+            <Prose>
+              You use the product free until your first close. That raise carries a fee
+              of USD 499. Nothing else is metered.
+            </Prose>
+            <div style={{ marginTop: "4px" }}>
+              <Action to="/sign-up" search={{ role: "founder" }}>Start free</Action>
+            </div>
           </div>
-        )}
 
-        {/* Plan cards */}
-        <div className="grid gap-6 md:grid-cols-3">
-          {visible.map((p) => {
-            const copy = PLAN_COPY[p.plan_id];
-            const isCurrent = currentPlanId === p.plan_id;
-            const isEnterprise = p.plan_id === "investor_enterprise";
-            const displayName = p.plan_name.replace(/^(Founder|Investor)\s+/, "");
-            return (
+          {/* Reference-line specimen — the proof-of-artifact device (§3.3). */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ borderInlineStart: `2px solid ${ACCENT}`, paddingInlineStart: "12px" }}>
               <div
-                key={p.plan_id}
-                className={`relative flex flex-col border bg-white p-7 ${
-                  copy?.popular ? "border-brand" : "border-[#E4E4E7]"
-                }`}
+                dir="ltr"
+                style={{
+                  fontFamily: DATA, fontSize: "13px", lineHeight: 1.7, color: ACCENT,
+                  unicodeBidi: "isolate", fontVariantNumeric: "tabular-nums",
+                }}
               >
-                {isCurrent ? (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white whitespace-nowrap">
-                    Your current plan
-                  </span>
-                ) : copy?.popular ? (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full hs-gradient px-3 py-1 text-xs font-semibold text-white whitespace-nowrap">
-                    Most popular
-                  </span>
-                ) : null}
-
-                <h2 className="text-lg font-bold" style={{ fontFamily: "Syne, sans-serif" }}>{displayName}</h2>
-                <p className="mt-1 text-sm text-gray-500">{copy?.tagline}</p>
-
-                <div className="mt-5 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold" style={{ fontFamily: "Syne, sans-serif" }}>
-                    ${fmtNum(p.price_monthly_usd)}
-                  </span>
-                  <span className="text-sm text-gray-500">/month</span>
-                </div>
-
-                <ul className="mt-6 flex-1 space-y-2.5">
-                  {planFeatures(p).map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-7">
-                  {isCurrent ? (
-                    <div className="w-full rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700">
-                      You're on this plan
-                    </div>
-                  ) : isEnterprise ? (
-                    <a
-                      href="mailto:hello@hockystick.app?subject=Enterprise%20plan"
-                      className="block w-full rounded-lg border border-[#E4E4E7] px-4 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-50"
-                    >
-                      Contact us
-                    </a>
-                  ) : user ? (
-                    <Link
-                      to={"/app/settings/billing" as any}
-                      className="block w-full rounded-lg hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
-                    >
-                      Upgrade
-                    </Link>
-                  ) : (
-                    <Link
-                      to={"/sign-up" as any}
-                      search={{ plan: p.plan_id, role: p.user_type } as any}
-                      className="block w-full rounded-lg hs-gradient px-4 py-3 text-center text-sm font-semibold text-white hover:hs-gradient"
-                    >
-                      Start free trial
-                    </Link>
-                  )}
-                </div>
+                ATLS01-ROM-2026-000042-31
               </div>
-            );
-          })}
-        </div>
-
-        {/* Add-ons */}
-        <div className="mt-16 rounded-2xl border border-[#E4E4E7] bg-gray-50 p-8">
-          <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>Need more? Pay as you go.</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["Extra deal room", "$5/month"],
-              ["Extra team member", "$5/month"],
-              ["Onboarding lawyer consultation", "$40 flat"],
-              ["Success fee on closed rounds", "1.5% (min $500, max $15,000)"],
-            ].map(([label, price]) => (
-              <div key={label} className="rounded-none border border-[#E4E4E7] bg-white px-4 py-3.5">
-                <div className="text-sm font-medium text-gray-900">{label}</div>
-                <div className="mt-0.5 text-sm text-purple-700 font-semibold">{price}</div>
+              <div
+                style={{
+                  fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
+                  letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3,
+                }}
+              >
+                Deal room · Specimen
               </div>
-            ))}
+            </div>
+            <Caption>
+              Every object carries a reference number with a check digit. Read one aloud
+              and a mistake shows immediately.
+            </Caption>
           </div>
-        </div>
+        </section>
 
-        {/* Why we charge founders */}
-        <div className="mx-auto mt-16 max-w-2xl rounded-2xl border border-[#E4E4E7] bg-gray-50 p-8 text-center">
-          <h2 className="text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
-            Why we charge founders
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-gray-600">
-            Fundraising infrastructure should be accountable to founders, not to investors.
-            We charge founders — not investors — because our job is to make founders
-            fundable, not to sell their information to the highest bidder. Your data is
-            never sold.
-          </p>
-        </div>
+        <Rule />
 
-        {/* Cost comparison vs traditional tools */}
-        <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="text-center text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
-            What this replaces
-          </h2>
-          <p className="mt-2 mb-6 text-center text-sm text-gray-600">
-            The same work, done the traditional way, costs thousands per raise.
-          </p>
-          <CostComparisonTable variant="light" compact />
-        </div>
+        {/* ── PROSE 1 — the principle ──────────────────────────────────────── */}
+        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Title>One fee, one event</Title>
+          <Prose>
+            Most platforms in this category bill by consumption. Pages examined,
+            documents stored, seats occupied, a percentage of the round. Each of those
+            meters grows when your deal gets harder, which is exactly when you can least
+            afford it.
+          </Prose>
+          <Prose>
+            We charge a flat fee tied to a triggering event. The fee is the same whether
+            your round is USD 500,000 or USD 5,000,000. It is the same whether your data
+            room holds forty documents or four hundred.
+          </Prose>
+          <Prose>
+            <strong style={{ color: INK, fontWeight: 600 }}>
+              Rule 20.1 — fees never scale with round size, page count, or storage
+              volume.
+            </strong>{" "}
+            This is written into the document that governs what we build, not into a
+            pricing page we can quietly revise.
+          </Prose>
+        </section>
 
-        {/* FAQ */}
-        <div className="mx-auto mt-16 max-w-2xl">
-          <h2 className="text-center text-xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>Questions</h2>
-          <div className="mt-6 divide-y divide-[#E4E4E7] rounded-2xl border border-[#E4E4E7]">
-            {FAQS.map((f, i) => (
-              <div key={f.q}>
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-semibold text-gray-900"
-                >
-                  {f.q}
-                  <ChevronDown className={`h-4 w-4 text-[#71717A] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
-                </button>
-                {openFaq === i && (
-                  <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{f.a}</p>
-                )}
-              </div>
-            ))}
+        {/* ── INSTRUMENT 1 — the fee schedule ──────────────────────────────── */}
+        <Instrument
+          label="Fee schedule · Effective 17 August 2026"
+          head={["Tier", "Who it is for", "Fee", "Basis"]}
+          align={[2]}
+          rows={[
+            [
+              <strong style={{ fontWeight: 600 }}>Direct</strong>,
+              "A founder raising up to USD 250,000",
+              "USD 499",
+              "Once, on first close",
+            ],
+            [
+              <strong style={{ fontWeight: 600 }}>Standard</strong>,
+              "A founder raising USD 250,000 – 5,000,000",
+              "USD 400 – 800",
+              "Per month, active raise only",
+            ],
+            [
+              <strong style={{ fontWeight: 600 }}>Deploying seat</strong>,
+              "An investor deploying capital",
+              "USD 2,500 – 6,000",
+              "Per seat, per year",
+            ],
+            [
+              <strong style={{ fontWeight: 600 }}>Institutional</strong>,
+              "A fund or family office",
+              "USD 25,000 – 120,000",
+              "Annually, scoped in a 30-minute call",
+            ],
+          ]}
+          caption={
+            <>
+              Direct is free until your first close. The first 100 organisations pay
+              nothing on that first close — the fee is waived once, and does not transfer
+              if the organisation changes hands.
+            </>
+          }
+        />
+
+        <Rule />
+
+        {/* ── PROSE 2 — why the institutional tier is a range ──────────────── */}
+        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Title>Why the institutional tier is a range</Title>
+          <Prose>
+            A fixed institutional number would be wrong in one of two directions. It
+            would overcharge a two-partner family office, or undercharge a fund deploying
+            across forty positions a year. Both mistakes are worse than a conversation.
+          </Prose>
+          <Prose>
+            So we publish the band and tell you what determines your position in it: how
+            many seats you need, how many concurrent raises you run, and whether you want
+            the schedule adapted to your own diligence process.
+          </Prose>
+          <Prose>
+            That conversation takes thirty minutes. We do not require it before showing
+            you the price, which is the part most of this category gets backwards.
+          </Prose>
+        </section>
+
+        {/* ── INSTRUMENT 2 — triggering events ─────────────────────────────── */}
+        <Instrument
+          label="Triggering events"
+          head={["Event", "Fee", "Not charged"]}
+          align={[1]}
+          rows={[
+            ["First close, Direct tier", "USD 499", "Rounds that do not close"],
+            ["Active raise, Standard tier", "USD 400 – 800 monthly", "Months with no active raise"],
+            ["Seat, deploying tier", "USD 2,500 – 6,000 yearly", "Seats left unassigned"],
+            ["Institutional agreement", "USD 25,000 – 120,000 yearly", "Documents, storage, pages, AI calls"],
+          ]}
+          caption="Nothing in the right-hand column is ever billed."
+        />
+
+        <Rule />
+
+        {/* ── PROSE 3 — why the founder pays ───────────────────────────────── */}
+        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Title>Why the founder pays</Title>
+          <Prose>
+            Fundraising infrastructure should answer to the founder using it. If
+            investors paid for this product, it would slowly become a product that serves
+            investors.
+          </Prose>
+          <Prose>
+            So the founder pays, and we sell nothing else. We do not sell your data. We
+            do not take a percentage of your round. We do not introduce you to anyone for
+            a fee.
+          </Prose>
+        </section>
+
+        {/* ── INSTRUMENT 3 — mechanism provenance ──────────────────────────────
+            FLAGGED FOR RECONSIDERATION: once /how-it-works exists, provenance may
+            belong there rather than competing with the fee schedule for attention
+            on this page. Kept here for now because it answers "why trust you with a
+            five-figure commitment", which is a pricing-page question. */}
+        <Instrument
+          label="Where the mechanisms come from"
+          head={["Mechanism", "Origin"]}
+          rows={[
+            ["Single-notice diligence", <>Documentary credit examination — <span style={{ fontFamily: DATA, fontSize: "12px" }}>UCP 600</span></>],
+            ["The conditions register", "Secured lending practice"],
+            ["The evidence ladder", "Insurance underwriting practice"],
+            ["Soft-circle tracking", "Syndicate practice"],
+            ["The check digit", <><span style={{ fontFamily: DATA, fontSize: "12px" }}>ISO 7064 MOD 97-10</span> — the IBAN algorithm</>],
+          ]}
+          caption="We adopt established process and name its source. Each of these is checkable against its own standard."
+        />
+
+        <Rule />
+
+        {/* ── CLOSE ────────────────────────────────────────────────────────── */}
+        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Title>Start on the Direct tier</Title>
+          <Prose>No card, no trial clock.</Prose>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
+            <Action to="/sign-up" search={{ role: "founder" }}>Start free</Action>
+            <Action to="/contact" variant="secondary">Book a 30-minute scoping call</Action>
           </div>
-        </div>
-
-        {/* Enterprise CTA */}
-        <div className="mt-16 rounded-2xl border border-purple-200 bg-purple-50 p-8 text-center">
-          <p className="text-sm text-gray-700">
-            Talking to a VC or family office? We handle enterprise contracts differently.
-          </p>
-          <a
-            href="mailto:hello@hockystick.app?subject=Enterprise%20contract"
-            className="mt-3 inline-block rounded-lg hs-gradient px-6 py-3 text-sm font-semibold text-white hover:hs-gradient"
-          >
-            Contact us →
-          </a>
-        </div>
+        </section>
       </main>
+
       <SiteFooter />
     </div>
   );

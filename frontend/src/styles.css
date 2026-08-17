@@ -387,3 +387,18 @@ img { max-width: 100%; height: auto; }
      white-on-white and invisible, so it's safe as a global baseline. */
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85);
 }
+
+/* ── Public register layout (PUBLIC-REGISTER.md) ─────────────────────────────
+   Scoped to public pages by class. The public type scale and measure caps are
+   applied inline per-component rather than as global tokens, deliberately —
+   16px prose leaking into the 13.5px application would be a real defect. This
+   rule exists only because a media query cannot be expressed inline. */
+.pub-fold {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 900px) {
+  .pub-fold {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    gap: 56px;
+  }
+}

@@ -1,10 +1,39 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 
-const NAV_LINK = "inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-1 py-2";
+// Public chrome, rebuilt to PUBLIC-REGISTER.md (17 Aug 2026).
+//
+// This is shared by every public page, so it converts the whole public frame at
+// once. That is deliberate: the register's central claim is that the marketing
+// site and the application are ONE system, and a purple-gradient header defeats
+// that on arrival regardless of how the page beneath it is built.
+//
+// Removed here: hs-gradient buttons, rounded-lg (radius ceiling is 2px),
+// backdrop-blur, and the ArrowRight decorative chevrons (§13 — decorative
+// iconography). The logo mark itself is untouched — brand identity remains
+// explicitly out of scope (PUBLIC-REGISTER.md §10.1).
+
+const UI = "var(--font-v2-ui)";
+const INK = "var(--v2-ink)";
+const INK_2 = "var(--v2-ink-secondary)";
+const RULE = "var(--v2-rule)";
+const SURFACE = "var(--v2-surface)";
+const PANEL = "var(--v2-panel)";
+const ACCENT = "var(--v2-accent)";
+
+const navLink: React.CSSProperties = {
+  fontFamily: UI, fontSize: "13.5px", fontWeight: 400, color: INK_2,
+  textDecoration: "none", padding: "8px 4px",
+};
+
+const actionBase: React.CSSProperties = {
+  display: "inline-flex", alignItems: "center", height: "32px",
+  padding: "0 14px", borderRadius: "2px",
+  fontFamily: UI, fontSize: "13px", fontWeight: 500, textDecoration: "none",
+};
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,95 +52,136 @@ export function SiteHeader() {
     <>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold"
+        style={{ background: ACCENT, color: "#FFFFFF", borderRadius: "2px" }}
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-40 w-full">
-      <div className="absolute inset-0 -z-10 backdrop-blur-xl bg-background/80 border-b border-border/60" />
 
-      <div className="mx-auto flex h-14 md:h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        {/* Left — Logo */}
-        <Link to="/" onClick={close}><Logo size="lg" /></Link>
+      <header
+        style={{
+          position: "sticky", top: 0, zIndex: 40, width: "100%",
+          background: SURFACE, borderBottom: `1px solid ${RULE}`,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "80rem", margin: "0 auto", height: "56px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            paddingInline: "24px",
+          }}
+        >
+          <Link to="/" onClick={close} style={{ textDecoration: "none", color: INK }}>
+            <Logo size="lg" />
+          </Link>
 
-        {/* Center — Nav links (desktop only) */}
-        <nav className="hidden md:flex items-center gap-5 flex-1 justify-center">
-          <Link to="/pricing" className={NAV_LINK}>Pricing</Link>
-          <Link to={"/docs" as any} className={NAV_LINK}>Docs</Link>
-          <Link to="/blog" className={NAV_LINK}>Blog</Link>
-          <Link to="/tools" className={NAV_LINK}>Tools</Link>
-        </nav>
+          <nav className="hidden md:flex" style={{ alignItems: "center", gap: "24px", flex: 1, justifyContent: "center" }}>
+            <Link to="/pricing" style={navLink}>Pricing</Link>
+            <Link to={"/docs" as any} style={navLink}>Docs</Link>
+            <Link to="/blog" style={navLink}>Blog</Link>
+            <Link to="/tools" style={navLink}>Tools</Link>
+          </nav>
 
-        {/* Right — Controls */}
-        <div className="flex items-center gap-2 shrink-0">
-          {user ? (
-            <Link to={dashboardUrl as any}
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
-              Open dashboard <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          ) : (
-            <>
-              <Link to="/sign-in" search={{ redirect: "/app" }}
-                className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-3 py-1.5">
-                Sign in
-              </Link>
-              <Link to="/sign-up" search={{ role: "founder" } as any}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-semibold hover:bg-[#6d28d9] transition-colors">
-                Get started <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </>
-          )}
-          {/* Hamburger — mobile only */}
-          <button
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            className="md:hidden grid h-9 w-9 place-items-center rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-1">
-          <Link to="/pricing" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Pricing
-          </Link>
-          <Link to={"/docs" as any} onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Docs
-          </Link>
-          <Link to="/blog" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Blog
-          </Link>
-          <Link to="/tools" onClick={close}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors">
-            Tools
-          </Link>
-          <div className="pt-3 border-t border-border/60 flex flex-col gap-2">
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
             {user ? (
-              <Link to={dashboardUrl as any} onClick={close}
-                className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center hs-gradient text-foreground hover:bg-[#6d28d9] transition-colors">
+              <Link
+                to={dashboardUrl as any}
+                className="hidden sm:inline-flex"
+                style={{ ...actionBase, background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+              >
                 Open dashboard
               </Link>
             ) : (
               <>
-                <Link to="/sign-in" search={{ redirect: "/app" }} onClick={close}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-center border border-border/60 hover:bg-accent transition-colors">
+                <Link
+                  to="/sign-in"
+                  search={{ redirect: "/app" }}
+                  className="hidden sm:inline-flex"
+                  style={{ ...actionBase, color: INK_2, background: "transparent", border: "1px solid transparent" }}
+                >
                   Sign in
                 </Link>
-                <Link to="/sign-up" search={{ role: "founder" } as any} onClick={close}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-center hs-gradient text-foreground hover:bg-[#6d28d9] transition-colors">
-                  Get started free
+                <Link
+                  to="/sign-up"
+                  search={{ role: "founder" } as any}
+                  className="hidden sm:inline-flex"
+                  style={{ ...actionBase, background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                >
+                  Get started
                 </Link>
               </>
             )}
+
+            <button
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              className="md:hidden"
+              aria-label="Toggle menu"
+              style={{
+                display: "grid", placeItems: "center", height: "32px", width: "32px",
+                borderRadius: "2px", border: `1px solid ${RULE}`, background: PANEL, color: INK_2,
+              }}
+            >
+              {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
           </div>
         </div>
-      )}
+
+        {mobileMenuOpen && (
+          <div
+            className="md:hidden"
+            style={{
+              borderTop: `1px solid ${RULE}`, background: PANEL,
+              padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px",
+            }}
+          >
+            {[
+              { to: "/pricing", label: "Pricing" },
+              { to: "/docs", label: "Docs" },
+              { to: "/blog", label: "Blog" },
+              { to: "/tools", label: "Tools" },
+            ].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to as any}
+                onClick={close}
+                style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
+              >
+                {l.label}
+              </Link>
+            ))}
+
+            <div style={{ paddingTop: "12px", marginTop: "8px", borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", gap: "8px" }}>
+              {user ? (
+                <Link
+                  to={dashboardUrl as any}
+                  onClick={close}
+                  style={{ ...actionBase, justifyContent: "center", background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                >
+                  Open dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/sign-in"
+                    search={{ redirect: "/app" }}
+                    onClick={close}
+                    style={{ ...actionBase, justifyContent: "center", background: PANEL, color: INK, border: `1px solid ${RULE}` }}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to="/sign-up"
+                    search={{ role: "founder" } as any}
+                    onClick={close}
+                    style={{ ...actionBase, justifyContent: "center", background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                  >
+                    Get started
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
     </>
   );
