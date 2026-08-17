@@ -17,13 +17,12 @@ import { useAuth } from "@/lib/auth";
 // explicitly out of scope (PUBLIC-REGISTER.md §10.1).
 //
 // Two-dropdown restructure (18 Aug 2026, IA proposal §1): "Resources" is a
-// real dropdown today (Security, Docs, Tools all exist). "Product" stays a
-// flat Pricing link, deliberately not a dropdown — /how-it-works,
-// /for-founders and /for-investors don't exist yet, and a one-item dropdown
-// looks broken. Convert Product to a dropdown once at least two of those
-// land (Step 4/5 of the IA build). Never ship a dropdown entry pointing at
-// a route that doesn't exist — every href below was checked against the
-// route tree before being added.
+// real dropdown today (schedule, Security, Docs, Tools all exist).
+// "Product" gained /how-it-works in Step 4 but stays two flat links, not a
+// dropdown yet — /for-founders and /for-investors (Step 5) are still
+// missing, and a two-item dropdown reads as thin. Convert once both land.
+// Never ship a dropdown entry pointing at a route that doesn't exist —
+// every href below was checked against the route tree before being added.
 
 const UI = "var(--font-v2-ui)";
 const INK = "var(--v2-ink)";
@@ -160,6 +159,7 @@ export function SiteHeader() {
           </Link>
 
           <nav className="hidden md:flex" style={{ alignItems: "center", gap: "24px", flex: 1, justifyContent: "center" }}>
+            <Link to="/how-it-works" style={navLink}>How it works</Link>
             <Link to="/pricing" style={navLink}>Pricing</Link>
             <ResourcesDropdown />
             <Link to="/blog" style={navLink}>Blog</Link>
@@ -218,6 +218,13 @@ export function SiteHeader() {
               padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px",
             }}
           >
+            <Link
+              to="/how-it-works"
+              onClick={close}
+              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
+            >
+              How it works
+            </Link>
             <Link
               to="/pricing"
               onClick={close}

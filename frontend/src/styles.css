@@ -195,6 +195,14 @@ img { max-width: 100%; height: auto; }
   --v2-attention-wash: #F8F0E0;
   --v2-adverse: #7A2E2A;
   --v2-adverse-wash: #F7EAE9;
+  /* Public register §3.6.5 — diagram/data-viz palette ONLY. Never interface
+     chrome (buttons, links, badges), which stays single-accent per §3.5.1.
+     Each tone is an existing token's hue at a different position, not a new
+     colour decision — see PUBLIC-REGISTER.md §3.6.5 for the full rule. */
+  --pub-viz-1: var(--v2-accent);      /* #1B3A63 — primary series / primary actor */
+  --pub-viz-2: #5B7A9E;               /* lighter step of the same navy — counterparty */
+  --pub-viz-3: var(--v2-satisfied);   /* confirmed / complete states in a diagram */
+  --pub-viz-4: var(--v2-ink-muted);   /* inactive / pending / not-yet-reached states */
   /* Geometry (§14). --v2-radius is the ONLY radius v2 components use. */
   --v2-radius: 2px;
   --v2-border: 1px;

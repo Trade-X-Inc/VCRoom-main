@@ -117,6 +117,7 @@ export function SiteFooter() {
       links: [
         { to: "/sign-up", label: "Get started" },
         { to: "/sign-in", label: "Sign in" },
+        { to: "/how-it-works", label: "How it works" },
         { to: "/pricing", label: "Pricing" },
       ],
     },

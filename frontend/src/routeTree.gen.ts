@@ -18,6 +18,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DocsRouteImport } from './routes/docs'
@@ -196,6 +197,11 @@ const JoinRoute = JoinRouteImport.update({
 const InviteRoute = InviteRouteImport.update({
   id: '/invite',
   path: '/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -918,6 +924,7 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
@@ -1060,6 +1067,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
@@ -1205,6 +1213,7 @@ export interface FileRoutesById {
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
@@ -1352,6 +1361,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/feedback'
     | '/forgot-password'
+    | '/how-it-works'
     | '/invite'
     | '/join'
     | '/join-room'
@@ -1494,6 +1504,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/feedback'
     | '/forgot-password'
+    | '/how-it-works'
     | '/invite'
     | '/join'
     | '/join-room'
@@ -1638,6 +1649,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/feedback'
     | '/forgot-password'
+    | '/how-it-works'
     | '/invite'
     | '/join'
     | '/join-room'
@@ -1784,6 +1796,7 @@ export interface RootRouteChildren {
   DocsRoute: typeof DocsRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   InviteRoute: typeof InviteRoute
   JoinRoute: typeof JoinRouteWithChildren
   JoinRoomRoute: typeof JoinRoomRoute
@@ -1883,6 +1896,13 @@ declare module '@tanstack/react-router' {
       path: '/invite'
       fullPath: '/invite'
       preLoaderRoute: typeof InviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -3120,6 +3140,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsRoute: DocsRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HowItWorksRoute: HowItWorksRoute,
   InviteRoute: InviteRoute,
   JoinRoute: JoinRouteWithChildren,
   JoinRoomRoute: JoinRoomRoute,
