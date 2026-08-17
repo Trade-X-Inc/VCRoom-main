@@ -1,6 +1,6 @@
 # The Register of Record — Design Constitution v2.0
 
-**Document:** DESIGN-CONST-V2.0 · **Date:** 30 July 2026 · **Scope:** Authenticated application only · **Public surface:** Deferred to 80% build
+**Document:** DESIGN-CONST-V2.0 · **Date:** 30 July 2026 · **Amended:** 17 August 2026 · **Scope:** Authenticated application · **Public surface:** Governed by `PUBLIC-REGISTER.md`
 
 > Paste this at the top of every build prompt that touches the authenticated application.
 
@@ -8,7 +8,13 @@ An interface for people who move other people's money. The operator works fast a
 
 ## Scope and precedence
 
-This governs everything **behind sign-in**. The public site, marketing pages, pricing, brand identity and documentation are explicitly **out of scope** and remain on the existing system until the application is roughly 80% complete. Do not touch public-facing surfaces during application work.
+This governs everything **behind sign-in**.
+
+**Amended 17 August 2026 — the public surface is no longer deferred.** This section previously read: *"The public site, marketing pages, pricing, brand identity and documentation are explicitly out of scope and remain on the existing system until the application is roughly 80% complete."* That deferral is withdrawn. The public surface is now governed by **`PUBLIC-REGISTER.md`**, a sibling document derived from this one.
+
+The two are **one system in two dialects**, not two systems. `PUBLIC-REGISTER.md` inherits this document's faces, palette, radius ceiling, numeral treatment, semantic vocabulary, motion rules, accessibility floor and every §13 prohibition without variation. It differs only where a reader with a question is served differently from an operator with a task — reading measure, hierarchy for scanning, and how the reference line appears in a marketing context. Those differences are enumerated in that document and nowhere else.
+
+Do not restyle a public surface from this document directly; read `PUBLIC-REGISTER.md`. Do not apply `PUBLIC-REGISTER.md`'s prose measure or display sizes behind sign-in.
 
 Where this conflicts with the Foundation Document, the Foundation Document wins on *what* to build; this wins on *how it looks and reads*. `CLAUDE.md` wins on implementation discipline.
 
@@ -17,6 +23,7 @@ Where this conflicts with the Foundation Document, the Foundation Document wins 
 Precedence, restated:
 - **Foundation Document** → what to build
 - **DESIGN.md** (this file) → how the application looks and reads, behind sign-in
+- **PUBLIC-REGISTER.md** → how the public surface looks and reads, derived from this document
 - **CLAUDE.md** → implementation discipline
 
 ---
@@ -490,7 +497,8 @@ Paste into the Tailwind theme layer. These are the only values permitted; anythi
 
 ---
 
-**DESIGN CONSTITUTION V2.0 · 30 JULY 2026 · APPLICATION INTERFACE ONLY**
+**DESIGN CONSTITUTION V2.0 · 30 JULY 2026 · AMENDED 17 AUGUST 2026 · APPLICATION INTERFACE**
 **SUPERSEDES DESIGN CONSTITUTION V1 IN ITS ENTIRETY**
-**PUBLIC SURFACE, BRAND IDENTITY AND MARKETING REMAIN OUT OF SCOPE UNTIL THE APPLICATION IS ~80% COMPLETE**
+**PUBLIC SURFACE GOVERNED BY PUBLIC-REGISTER.MD — THE ~80% DEFERRAL IS WITHDRAWN**
+**BRAND IDENTITY (LOGO, WORDMARK) REMAINS OUT OF SCOPE**
 **FOUNDATION DOCUMENT GOVERNS WHAT TO BUILD · THIS GOVERNS HOW IT LOOKS AND READS · CLAUDE.MD GOVERNS IMPLEMENTATION**
