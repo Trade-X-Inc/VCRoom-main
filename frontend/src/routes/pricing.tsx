@@ -7,13 +7,22 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // /pricing — the first page built under PUBLIC-REGISTER.md.
 //
 // The published fee schedule is a PRODUCT DECISION recorded in the Foundation
-// Document (§20.3/§20.4 as amended 17 Aug 2026), not database state. This page
-// therefore states the figures directly and no longer reads plan_limits.
+// Document (§20.3 as amended 17 Aug 2026, superseded the same day — ranges
+// withdrawn in favour of firm prices), not database state. This page states
+// the figures directly and does not read plan_limits.
 //
 // plan_limits still holds the older six-tier subscription model and drives the
 // in-app billing screen. The two disagree, and reconciling them is a product
 // decision plus a migration, not a copy fix. Logged in CLAUDE.md §20.2 as
 // BLOCKING: it must be closed before any paid signup is enabled.
+//
+// Institutional publishes NO number, on purpose (§20.3 as re-amended): a
+// published five-figure price would imply delivery against a compliance
+// standard (SOC 2 Type II, SSO/SAML, SCIM, a signed DPA, and similar) that
+// isn't held yet. Publishing a number against requirements we can't currently
+// deliver is the same §3.8 fabricated-signal pattern as an invented statistic
+// — so the row states the engagement route instead, with a stated reason, not
+// a bare "contact sales" (register §5 prohibits that phrase outright).
 //
 // Deleted in this rebuild, deliberately: the founder/investor toggle (the
 // amended tiers are not split by audience), CostComparisonTable (an unsourced
@@ -209,7 +218,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "A fixed fee tied to one event. Direct is USD 499 on first close. Institutional runs USD 25,000–120,000 annually, scoped in a call.",
+          "A fixed fee tied to one event. Direct is USD 499 on first close. Institutional pricing is scoped individually.",
       },
     ],
     links: [{ rel: "canonical", href: "https://hockystick.app/pricing" }],
@@ -349,20 +358,20 @@ function PricingPage() {
             [
               <strong style={{ fontWeight: 600 }}>Standard</strong>,
               "A founder raising USD 250,000 – 5,000,000",
-              "USD 400 – 800",
+              "USD 799",
               "Per month, active raise only",
             ],
             [
               <strong style={{ fontWeight: 600 }}>Deploying seat</strong>,
               "An investor deploying capital",
-              "USD 2,500 – 6,000",
+              "USD 3,999",
               "Per seat, per year",
             ],
             [
               <strong style={{ fontWeight: 600 }}>Institutional</strong>,
               "A fund or family office",
-              "USD 25,000 – 120,000",
-              "Annually, scoped in a 30-minute call",
+              "Scoped individually",
+              "hello@hockystick.app",
             ],
           ]}
           caption={
@@ -376,22 +385,21 @@ function PricingPage() {
 
         <Rule />
 
-        {/* ── PROSE 2 — why the institutional tier is a range ──────────────── */}
+        {/* ── PROSE 2 — why institutional pricing isn't published ──────────── */}
         <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>Why the institutional tier is a range</Title>
+          <Title>Why institutional pricing isn&rsquo;t published</Title>
           <Prose>
-            A fixed institutional number would be wrong in one of two directions. It
-            would overcharge a two-partner family office, or undercharge a fund deploying
-            across forty positions a year. Both mistakes are worse than a conversation.
+            An institutional buyer&rsquo;s requirements vary by fund size, seat count,
+            and how many raises they run at once. A single published number would be
+            wrong for most of them.
           </Prose>
           <Prose>
-            So we publish the band and tell you what determines your position in it: how
-            many seats you need, how many concurrent raises you run, and whether you want
-            the schedule adapted to your own diligence process.
+            So we scope it in a conversation instead of guessing at a price that fits
+            everyone. That conversation covers what you need confirmed before you sign,
+            and what determines where you land.
           </Prose>
           <Prose>
-            That conversation takes thirty minutes. We do not require it before showing
-            you the price, which is the part most of this category gets backwards.
+            Write to hello@hockystick.app to start it.
           </Prose>
         </section>
 
@@ -402,9 +410,9 @@ function PricingPage() {
           align={[1]}
           rows={[
             ["First close, Direct tier", "USD 499", "Rounds that do not close"],
-            ["Active raise, Standard tier", "USD 400 – 800 monthly", "Months with no active raise"],
-            ["Seat, deploying tier", "USD 2,500 – 6,000 yearly", "Seats left unassigned"],
-            ["Institutional agreement", "USD 25,000 – 120,000 yearly", "Documents, storage, pages, AI calls"],
+            ["Active raise, Standard tier", "USD 799 monthly", "Months with no active raise"],
+            ["Seat, deploying tier", "USD 3,999 yearly", "Seats left unassigned"],
+            ["Institutional agreement", "Scoped individually", "Documents, storage, pages, AI calls"],
           ]}
           caption="Nothing in the right-hand column is ever billed."
         />
