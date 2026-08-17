@@ -386,9 +386,11 @@ export function AboutSection() {
         <div className="rounded-none border border-border/60 bg-card p-5">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Platform</h3>
           <div className="space-y-2.5">
+            {/* "Built by" row removed 17 Aug 2026 — Foundation Document §20.7
+                confines the entity name to Terms, with the "(under
+                incorporation)" qualifier. */}
             {[
               { label: "Version", value: "v2.0 (Beta)" },
-              { label: "Built by", value: "Venture Tech LLC" },
               { label: "Location", value: "Global" },
             ].map(({ label, value }) => (
               <div key={label} className="flex items-start gap-2">

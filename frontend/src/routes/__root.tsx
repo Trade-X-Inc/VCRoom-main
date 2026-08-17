@@ -113,7 +113,10 @@ const JSON_LD = JSON.stringify({
       "@type": "Organization",
       "@id": "https://hockystick.app/#organization",
       "name": "Hockystick",
-      "legalName": "Venture Tech LLC",
+      // legalName removed 17 Aug 2026 — Foundation Document §20.7 confines the
+      // entity name to Terms, where it carries the "(under incorporation)"
+      // qualifier. A bare legalName in machine-readable structured data asserts
+      // a completed incorporation without the qualifier that makes it true.
       "url": "https://hockystick.app",
       "logo": "https://hockystick.app/apple-touch-icon.png",
       "address": {

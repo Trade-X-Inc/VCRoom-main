@@ -122,8 +122,12 @@ function Hero() {
             I&rsquo;m an investor
           </Link>
         </div>
+        {/* "DIFC regulated" removed 17 Aug 2026 — no DFSA licence is held, so
+            the claim was false. Foundation Document §20.7 prohibits it on every
+            surface. "DIFC FinTech Hive" (an address) and "DIFC governing law"
+            (a choice of law) remain permitted and are unaffected. */}
         <p className="mt-6 text-[13px]" style={{ fontFamily: DM, color: "#71717A" }}>
-          Free during beta · No credit card required · DIFC regulated
+          Free during beta · No credit card required
         </p>
       </div>
     </section>
@@ -587,7 +591,10 @@ const FAQ_GROUPS: { heading: string; items: Faq[] }[] = [
   {
     heading: "General",
     items: [
-      { q: "Who built Hockystick?", a: "Venture Tech LLC, headquartered at DIFC FinTech Hive, Dubai.", link: { to: "/about", label: "About us" } },
+      // Entity name removed 17 Aug 2026 — Foundation Document §20.7 confines it
+      // to Terms, with the "(under incorporation)" qualifier. The address is
+      // factual and stays; the question stays answerable without it.
+      { q: "Who built Hockystick?", a: "A small team operating from DIFC FinTech Hive, Dubai.", link: { to: "/about", label: "About us" } },
       { q: "What jurisdictions does Hockystick cover?", a: "Hockystick is a global platform. DIFC governing law applies to platform terms; deals operate under whatever jurisdiction the parties agree to." },
       { q: "How is the platform fee calculated?", a: "1.5% of the closed deal amount, with a minimum of $500 and a maximum of $15,000. The fee is charged at closing, never before. If a deal doesn’t close, no fee is charged." },
       { q: "What happens after a deal closes?", a: "The deal room becomes a read-only archive. Both parties retain permanent access to all documents, terms, agreements, signed copies, payment proof, and invoices." },

@@ -45,6 +45,14 @@ const sections = [
     title: "8. Governing Law",
     body: "These Terms are governed by the laws of the Dubai International Financial Centre (DIFC), United Arab Emirates, without regard to conflict of law principles. Any disputes shall be resolved exclusively in the DIFC Courts. If any provision of these terms is found unenforceable, the remaining provisions remain in full effect.",
   },
+  // Added 17 Aug 2026 — Foundation Document §20.7. The entity name appears on
+  // this page only, and always carries the "(under incorporation)" qualifier.
+  // Hockystick holds no DFSA licence and is not a regulated entity; stating
+  // that here is required rather than optional.
+  {
+    title: "9. Operating Entity",
+    body: "Hockystick is operated by Venture Tech LLC (under incorporation), with offices at DIFC FinTech Hive, Dubai, United Arab Emirates. Hockystick is a software platform. It does not hold a DFSA licence, is not a regulated financial institution, and does not act as a bank, broker, custodian, or intermediary in any transaction conducted through it.",
+  },
 ];
 
 function TermsPage() {

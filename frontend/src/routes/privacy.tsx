@@ -39,7 +39,11 @@ const sections = [
   },
   {
     title: "7. Contact Us",
-    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@hockystick.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Hockystick operates from Dubai, UAE, under the intended entity name Venture Tech LLC (DIFC, Dubai) — formal registration is in progress and this page will be updated once complete.",
+    // Entity name removed 17 Aug 2026 — Foundation Document §20.7 confines it to
+    // Terms. The wording here was already honest ("intended entity name…
+    // registration in progress"), but the rule is single-location, so the
+    // registration status is now carried by Terms §9 instead.
+    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@hockystick.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Hockystick operates from Dubai, UAE. Our operating entity and its registration status are stated in the Terms of Service.",
   },
 ];
 
