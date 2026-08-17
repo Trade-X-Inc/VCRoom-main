@@ -48,6 +48,7 @@ const actionBase: React.CSSProperties = {
 type ResourceLink = { to: string; label: string; description: string };
 
 const RESOURCE_LINKS: ResourceLink[] = [
+  { to: "/resources/schedule", label: "The disclosure schedule", description: "Every field a seed round discloses, and its required evidence" },
   { to: "/docs/security", label: "Security", description: "Access control, NDA handling, disclosure mechanics" },
   { to: "/docs", label: "Docs", description: "Reference documentation" },
   { to: "/tools", label: "Tools", description: "Calculators — valuation, runway, dilution, and more" },

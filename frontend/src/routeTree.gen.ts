@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -28,6 +27,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools/index'
+import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
@@ -39,6 +39,7 @@ import { Route as ToolsCogsRouteImport } from './routes/tools/cogs'
 import { Route as ToolsCapTableRouteImport } from './routes/tools/cap-table'
 import { Route as ToolsBurnRateRouteImport } from './routes/tools/burn-rate'
 import { Route as RoastIdRouteImport } from './routes/roast.$id'
+import { Route as ResourcesScheduleRouteImport } from './routes/resources.schedule'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
@@ -167,11 +168,6 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResourcesRoute = ResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RegistryRoute = RegistryRouteImport.update({
   id: '/registry',
   path: '/registry',
@@ -247,6 +243,11 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
   path: '/tools/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
+  id: '/resources/',
+  path: '/resources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -300,6 +301,11 @@ const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
 const RoastIdRoute = RoastIdRouteImport.update({
   id: '/roast/$id',
   path: '/roast/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesScheduleRoute = ResourcesScheduleRouteImport.update({
+  id: '/resources/schedule',
+  path: '/resources/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PSlugRoute = PSlugRouteImport.update({
@@ -918,7 +924,6 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
-  '/resources': typeof ResourcesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
@@ -953,6 +958,7 @@ export interface FileRoutesByFullPath {
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
+  '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
@@ -964,6 +970,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1059,7 +1066,6 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
-  '/resources': typeof ResourcesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
@@ -1093,6 +1099,7 @@ export interface FileRoutesByTo {
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
+  '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
@@ -1104,6 +1111,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/blog': typeof BlogIndexRoute
   '/docs': typeof DocsIndexRoute
+  '/resources': typeof ResourcesIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1203,7 +1211,6 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
-  '/resources': typeof ResourcesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/terms': typeof TermsRoute
@@ -1238,6 +1245,7 @@ export interface FileRoutesById {
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
+  '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
@@ -1249,6 +1257,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1349,7 +1358,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/registry'
-    | '/resources'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
@@ -1384,6 +1392,7 @@ export interface FileRouteTypes {
     | '/i/$slug'
     | '/join-investor/$token'
     | '/p/$slug'
+    | '/resources/schedule'
     | '/roast/$id'
     | '/tools/burn-rate'
     | '/tools/cap-table'
@@ -1395,6 +1404,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/blog/'
     | '/docs/'
+    | '/resources/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1490,7 +1500,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/registry'
-    | '/resources'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
@@ -1524,6 +1533,7 @@ export interface FileRouteTypes {
     | '/i/$slug'
     | '/join-investor/$token'
     | '/p/$slug'
+    | '/resources/schedule'
     | '/roast/$id'
     | '/tools/burn-rate'
     | '/tools/cap-table'
@@ -1535,6 +1545,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/blog'
     | '/docs'
+    | '/resources'
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1633,7 +1644,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/registry'
-    | '/resources'
     | '/sign-in'
     | '/sign-up'
     | '/terms'
@@ -1668,6 +1678,7 @@ export interface FileRouteTypes {
     | '/i/$slug'
     | '/join-investor/$token'
     | '/p/$slug'
+    | '/resources/schedule'
     | '/roast/$id'
     | '/tools/burn-rate'
     | '/tools/cap-table'
@@ -1679,6 +1690,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/blog/'
     | '/docs/'
+    | '/resources/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1778,7 +1790,6 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RegistryRoute: typeof RegistryRoute
-  ResourcesRoute: typeof ResourcesRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TermsRoute: typeof TermsRoute
@@ -1794,6 +1805,7 @@ export interface RootRouteChildren {
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   PSlugRoute: typeof PSlugRoute
+  ResourcesScheduleRoute: typeof ResourcesScheduleRoute
   RoastIdRoute: typeof RoastIdRoute
   ToolsBurnRateRoute: typeof ToolsBurnRateRoute
   ToolsCapTableRoute: typeof ToolsCapTableRoute
@@ -1802,6 +1814,7 @@ export interface RootRouteChildren {
   ToolsRunwayRoute: typeof ToolsRunwayRoute
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationRoute: typeof ToolsValuationRoute
+  ResourcesIndexRoute: typeof ResourcesIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
@@ -1828,13 +1841,6 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resources': {
-      id: '/resources'
-      path: '/resources'
-      fullPath: '/resources'
-      preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registry': {
@@ -1942,6 +1948,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resources/': {
+      id: '/resources/'
+      path: '/resources'
+      fullPath: '/resources/'
+      preLoaderRoute: typeof ResourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs/': {
       id: '/docs/'
       path: '/'
@@ -2017,6 +2030,13 @@ declare module '@tanstack/react-router' {
       path: '/roast/$id'
       fullPath: '/roast/$id'
       preLoaderRoute: typeof RoastIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/schedule': {
+      id: '/resources/schedule'
+      path: '/resources/schedule'
+      fullPath: '/resources/schedule'
+      preLoaderRoute: typeof ResourcesScheduleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/p/$slug': {
@@ -3106,7 +3126,6 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RegistryRoute: RegistryRoute,
-  ResourcesRoute: ResourcesRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TermsRoute: TermsRoute,
@@ -3122,6 +3141,7 @@ const rootRouteChildren: RootRouteChildren = {
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   PSlugRoute: PSlugRoute,
+  ResourcesScheduleRoute: ResourcesScheduleRoute,
   RoastIdRoute: RoastIdRoute,
   ToolsBurnRateRoute: ToolsBurnRateRoute,
   ToolsCapTableRoute: ToolsCapTableRoute,
@@ -3130,6 +3150,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRunwayRoute: ToolsRunwayRoute,
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationRoute: ToolsValuationRoute,
+  ResourcesIndexRoute: ResourcesIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
