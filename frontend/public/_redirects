@@ -15,6 +15,20 @@
 /docs/ai/deal-brief /docs/ai 301
 /trust / 301
 
+# /founders and /investors carried live deleted-feature claims (scored/
+# stage-tagged pipelines, "AI risk analysis", "AI-curated" target lists —
+# none of this exists; see CLAUDE.md's public-surface correctness pass).
+# Deleted rather than edited, since both are being replaced by /for-founders
+# and /for-investors. Redirecting to / until those land, not to a page that
+# doesn't exist yet — update these two targets when Step 5 ships.
+/founders / 301
+/investors / 301
+/solutions/due-diligence / 301
+/solutions/fundraising-crm / 301
+/solutions/investor-pipeline / 301
+/solutions/raise-1m / 301
+/solutions/vc-deal-room / 301
+
 # P4: founder nav restructure — old pages consolidated into /app/prepare
 /app/profile      /app/prepare#profile        301
 /app/documents    /app/prepare#documents      301

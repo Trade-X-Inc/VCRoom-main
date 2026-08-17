@@ -41,41 +41,6 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://hockystick.app/founders</loc>
-    <priority>0.9</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/investors</loc>
-    <priority>0.9</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/solutions/investor-pipeline</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/solutions/vc-deal-room</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/solutions/fundraising-crm</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/solutions/raise-1m</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://hockystick.app/solutions/due-diligence</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>https://hockystick.app/resources</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>

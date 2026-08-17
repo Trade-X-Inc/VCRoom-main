@@ -19,8 +19,6 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
-import { Route as InvestorsRouteImport } from './routes/investors'
-import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DocsRouteImport } from './routes/docs'
@@ -40,11 +38,6 @@ import { Route as ToolsDilutionRouteImport } from './routes/tools/dilution'
 import { Route as ToolsCogsRouteImport } from './routes/tools/cogs'
 import { Route as ToolsCapTableRouteImport } from './routes/tools/cap-table'
 import { Route as ToolsBurnRateRouteImport } from './routes/tools/burn-rate'
-import { Route as SolutionsVcDealRoomRouteImport } from './routes/solutions.vc-deal-room'
-import { Route as SolutionsRaise1mRouteImport } from './routes/solutions.raise-1m'
-import { Route as SolutionsInvestorPipelineRouteImport } from './routes/solutions.investor-pipeline'
-import { Route as SolutionsFundraisingCrmRouteImport } from './routes/solutions.fundraising-crm'
-import { Route as SolutionsDueDiligenceRouteImport } from './routes/solutions.due-diligence'
 import { Route as RoastIdRouteImport } from './routes/roast.$id'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
@@ -209,16 +202,6 @@ const InviteRoute = InviteRouteImport.update({
   path: '/invite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InvestorsRoute = InvestorsRouteImport.update({
-  id: '/investors',
-  path: '/investors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FoundersRoute = FoundersRouteImport.update({
-  id: '/founders',
-  path: '/founders',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -312,32 +295,6 @@ const ToolsCapTableRoute = ToolsCapTableRouteImport.update({
 const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
   id: '/tools/burn-rate',
   path: '/tools/burn-rate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsVcDealRoomRoute = SolutionsVcDealRoomRouteImport.update({
-  id: '/solutions/vc-deal-room',
-  path: '/solutions/vc-deal-room',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsRaise1mRoute = SolutionsRaise1mRouteImport.update({
-  id: '/solutions/raise-1m',
-  path: '/solutions/raise-1m',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsInvestorPipelineRoute =
-  SolutionsInvestorPipelineRouteImport.update({
-    id: '/solutions/investor-pipeline',
-    path: '/solutions/investor-pipeline',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SolutionsFundraisingCrmRoute = SolutionsFundraisingCrmRouteImport.update({
-  id: '/solutions/fundraising-crm',
-  path: '/solutions/fundraising-crm',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsDueDiligenceRoute = SolutionsDueDiligenceRouteImport.update({
-  id: '/solutions/due-diligence',
-  path: '/solutions/due-diligence',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoastIdRoute = RoastIdRouteImport.update({
@@ -955,8 +912,6 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/founders': typeof FoundersRoute
-  '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
@@ -999,11 +954,6 @@ export interface FileRoutesByFullPath {
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/roast/$id': typeof RoastIdRoute
-  '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
-  '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
-  '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
-  '/solutions/raise-1m': typeof SolutionsRaise1mRoute
-  '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
@@ -1103,8 +1053,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/founders': typeof FoundersRoute
-  '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
@@ -1146,11 +1094,6 @@ export interface FileRoutesByTo {
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/roast/$id': typeof RoastIdRoute
-  '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
-  '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
-  '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
-  '/solutions/raise-1m': typeof SolutionsRaise1mRoute
-  '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
@@ -1254,8 +1197,6 @@ export interface FileRoutesById {
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/founders': typeof FoundersRoute
-  '/investors': typeof InvestorsRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
@@ -1298,11 +1239,6 @@ export interface FileRoutesById {
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/roast/$id': typeof RoastIdRoute
-  '/solutions/due-diligence': typeof SolutionsDueDiligenceRoute
-  '/solutions/fundraising-crm': typeof SolutionsFundraisingCrmRoute
-  '/solutions/investor-pipeline': typeof SolutionsInvestorPipelineRoute
-  '/solutions/raise-1m': typeof SolutionsRaise1mRoute
-  '/solutions/vc-deal-room': typeof SolutionsVcDealRoomRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
@@ -1407,8 +1343,6 @@ export interface FileRouteTypes {
     | '/docs'
     | '/feedback'
     | '/forgot-password'
-    | '/founders'
-    | '/investors'
     | '/invite'
     | '/join'
     | '/join-room'
@@ -1451,11 +1385,6 @@ export interface FileRouteTypes {
     | '/join-investor/$token'
     | '/p/$slug'
     | '/roast/$id'
-    | '/solutions/due-diligence'
-    | '/solutions/fundraising-crm'
-    | '/solutions/investor-pipeline'
-    | '/solutions/raise-1m'
-    | '/solutions/vc-deal-room'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
@@ -1555,8 +1484,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/feedback'
     | '/forgot-password'
-    | '/founders'
-    | '/investors'
     | '/invite'
     | '/join'
     | '/join-room'
@@ -1598,11 +1525,6 @@ export interface FileRouteTypes {
     | '/join-investor/$token'
     | '/p/$slug'
     | '/roast/$id'
-    | '/solutions/due-diligence'
-    | '/solutions/fundraising-crm'
-    | '/solutions/investor-pipeline'
-    | '/solutions/raise-1m'
-    | '/solutions/vc-deal-room'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
@@ -1705,8 +1627,6 @@ export interface FileRouteTypes {
     | '/docs'
     | '/feedback'
     | '/forgot-password'
-    | '/founders'
-    | '/investors'
     | '/invite'
     | '/join'
     | '/join-room'
@@ -1749,11 +1669,6 @@ export interface FileRouteTypes {
     | '/join-investor/$token'
     | '/p/$slug'
     | '/roast/$id'
-    | '/solutions/due-diligence'
-    | '/solutions/fundraising-crm'
-    | '/solutions/investor-pipeline'
-    | '/solutions/raise-1m'
-    | '/solutions/vc-deal-room'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
@@ -1857,8 +1772,6 @@ export interface RootRouteChildren {
   DocsRoute: typeof DocsRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
-  FoundersRoute: typeof FoundersRoute
-  InvestorsRoute: typeof InvestorsRoute
   InviteRoute: typeof InviteRoute
   JoinRoute: typeof JoinRouteWithChildren
   JoinRoomRoute: typeof JoinRoomRoute
@@ -1882,11 +1795,6 @@ export interface RootRouteChildren {
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   PSlugRoute: typeof PSlugRoute
   RoastIdRoute: typeof RoastIdRoute
-  SolutionsDueDiligenceRoute: typeof SolutionsDueDiligenceRoute
-  SolutionsFundraisingCrmRoute: typeof SolutionsFundraisingCrmRoute
-  SolutionsInvestorPipelineRoute: typeof SolutionsInvestorPipelineRoute
-  SolutionsRaise1mRoute: typeof SolutionsRaise1mRoute
-  SolutionsVcDealRoomRoute: typeof SolutionsVcDealRoomRoute
   ToolsBurnRateRoute: typeof ToolsBurnRateRoute
   ToolsCapTableRoute: typeof ToolsCapTableRoute
   ToolsCogsRoute: typeof ToolsCogsRoute
@@ -1969,20 +1877,6 @@ declare module '@tanstack/react-router' {
       path: '/invite'
       fullPath: '/invite'
       preLoaderRoute: typeof InviteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investors': {
-      id: '/investors'
-      path: '/investors'
-      fullPath: '/investors'
-      preLoaderRoute: typeof InvestorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/founders': {
-      id: '/founders'
-      path: '/founders'
-      fullPath: '/founders'
-      preLoaderRoute: typeof FoundersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -2116,41 +2010,6 @@ declare module '@tanstack/react-router' {
       path: '/tools/burn-rate'
       fullPath: '/tools/burn-rate'
       preLoaderRoute: typeof ToolsBurnRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/vc-deal-room': {
-      id: '/solutions/vc-deal-room'
-      path: '/solutions/vc-deal-room'
-      fullPath: '/solutions/vc-deal-room'
-      preLoaderRoute: typeof SolutionsVcDealRoomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/raise-1m': {
-      id: '/solutions/raise-1m'
-      path: '/solutions/raise-1m'
-      fullPath: '/solutions/raise-1m'
-      preLoaderRoute: typeof SolutionsRaise1mRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/investor-pipeline': {
-      id: '/solutions/investor-pipeline'
-      path: '/solutions/investor-pipeline'
-      fullPath: '/solutions/investor-pipeline'
-      preLoaderRoute: typeof SolutionsInvestorPipelineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/fundraising-crm': {
-      id: '/solutions/fundraising-crm'
-      path: '/solutions/fundraising-crm'
-      fullPath: '/solutions/fundraising-crm'
-      preLoaderRoute: typeof SolutionsFundraisingCrmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/due-diligence': {
-      id: '/solutions/due-diligence'
-      path: '/solutions/due-diligence'
-      fullPath: '/solutions/due-diligence'
-      preLoaderRoute: typeof SolutionsDueDiligenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/roast/$id': {
@@ -3241,8 +3100,6 @@ const rootRouteChildren: RootRouteChildren = {
   DocsRoute: DocsRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
-  FoundersRoute: FoundersRoute,
-  InvestorsRoute: InvestorsRoute,
   InviteRoute: InviteRoute,
   JoinRoute: JoinRouteWithChildren,
   JoinRoomRoute: JoinRoomRoute,
@@ -3266,11 +3123,6 @@ const rootRouteChildren: RootRouteChildren = {
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   PSlugRoute: PSlugRoute,
   RoastIdRoute: RoastIdRoute,
-  SolutionsDueDiligenceRoute: SolutionsDueDiligenceRoute,
-  SolutionsFundraisingCrmRoute: SolutionsFundraisingCrmRoute,
-  SolutionsInvestorPipelineRoute: SolutionsInvestorPipelineRoute,
-  SolutionsRaise1mRoute: SolutionsRaise1mRoute,
-  SolutionsVcDealRoomRoute: SolutionsVcDealRoomRoute,
   ToolsBurnRateRoute: ToolsBurnRateRoute,
   ToolsCapTableRoute: ToolsCapTableRoute,
   ToolsCogsRoute: ToolsCogsRoute,
