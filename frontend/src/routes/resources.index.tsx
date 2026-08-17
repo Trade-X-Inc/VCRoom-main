@@ -416,22 +416,25 @@ function Resources() {
           applying. Hockystick is not affiliated with any of these programs.
         </p>
 
-        {/* CTA */}
+        {/* CTA — rewritten 18 Aug 2026: the prior copy claimed a verified
+            profile and investor matching, neither of which exist (§15/§25 —
+            same violation class as the deleted /founders and /investors
+            pages, Step 1 of the public IA rebuild). */}
         <div
           className="mt-8 p-6 rounded-lg max-w-2xl"
           style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)" }}
         >
           <p className="text-sm font-semibold text-foreground mb-1">Ready to raise?</p>
           <p className="text-xs mb-4" style={{ color: "#52525B" }}>
-            Build a verified founder profile on Hockystick and get matched with investors aligned
-            to your sector, stage, and region. Free during beta.
+            A deal room, a diligence checklist, and a term sheet — in one
+            place, once you're ready to bring an investor in.
           </p>
           <a
             href="/sign-up"
             className="inline-flex items-center min-h-9 text-xs font-medium px-4 py-2 rounded-lg transition-colors"
             style={{ background: "#7C3AED", color: "#fff" }}
           >
-            Build your verified profile →
+            Create an account →
           </a>
         </div>
 
