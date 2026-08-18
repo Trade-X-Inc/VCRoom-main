@@ -16,11 +16,11 @@ import { useAuth } from "@/lib/auth";
 // iconography). The logo mark itself is untouched — brand identity remains
 // explicitly out of scope (PUBLIC-REGISTER.md §10.1).
 //
-// Two-dropdown restructure (18 Aug 2026, IA proposal §1): "Resources" is a
-// real dropdown today (schedule, Security, Docs, Tools all exist).
-// "Product" gained /how-it-works in Step 4 but stays two flat links, not a
-// dropdown yet — /for-founders and /for-investors (Step 5) are still
-// missing, and a two-item dropdown reads as thin. Convert once both land.
+// Two-dropdown restructure (18 Aug 2026, IA proposal §1), completed in
+// Step 5: both "Product" and "Resources" are now real dropdowns.
+// "Product" waited on /for-founders and /for-investors (Step 5); with
+// those landed alongside /how-it-works (Step 4) and /pricing, it has four
+// real items and converts from the two flat links used in the interim.
 // Never ship a dropdown entry pointing at a route that doesn't exist —
 // every href below was checked against the route tree before being added.
 
@@ -44,16 +44,23 @@ const actionBase: React.CSSProperties = {
   fontFamily: UI, fontSize: "13px", fontWeight: 500, textDecoration: "none",
 };
 
-type ResourceLink = { to: string; label: string; description: string };
+type NavDropdownLink = { to: string; label: string; description: string };
 
-const RESOURCE_LINKS: ResourceLink[] = [
+const PRODUCT_LINKS: NavDropdownLink[] = [
+  { to: "/how-it-works", label: "How it works", description: "The closing pipeline and term negotiation, drawn as they run" },
+  { to: "/for-founders", label: "For founders", description: "What you control, and what releases when" },
+  { to: "/for-investors", label: "For investors", description: "The record chain, and how you reach a room" },
+  { to: "/pricing", label: "Pricing", description: "A fixed fee, tied to one event" },
+];
+
+const RESOURCE_LINKS: NavDropdownLink[] = [
   { to: "/resources/schedule", label: "The disclosure schedule", description: "Every field a seed round discloses, and its required evidence" },
   { to: "/docs/security", label: "Security", description: "Access control, NDA handling, disclosure mechanics" },
   { to: "/docs", label: "Docs", description: "Reference documentation" },
   { to: "/tools", label: "Tools", description: "Calculators — valuation, runway, dilution, and more" },
 ];
 
-function ResourcesDropdown() {
+function NavDropdown({ label, links }: { label: string; links: NavDropdownLink[] }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +89,7 @@ function ResourcesDropdown() {
           background: "transparent", border: "none", cursor: "pointer",
         }}
       >
-        Resources
+        {label}
         <ChevronDown className="h-3.5 w-3.5" style={{ transform: open ? "rotate(180deg)" : undefined }} />
       </button>
       {open && (
@@ -94,7 +101,7 @@ function ResourcesDropdown() {
             borderRadius: "2px", padding: "6px", zIndex: 50,
           }}
         >
-          {RESOURCE_LINKS.map((l) => (
+          {links.map((l) => (
             <Link
               key={l.to}
               to={l.to as any}
@@ -119,6 +126,7 @@ function ResourcesDropdown() {
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileProductOpen, setMobileProductOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const { user } = useAuth();
   const dashboardUrl = user?.role === "investor" ? "/app/investor" : "/app";
@@ -129,7 +137,7 @@ export function SiteHeader() {
     return () => window.removeEventListener("resize", handler);
   }, []);
 
-  const close = () => { setMobileMenuOpen(false); setMobileResourcesOpen(false); };
+  const close = () => { setMobileMenuOpen(false); setMobileProductOpen(false); setMobileResourcesOpen(false); };
 
   return (
     <>
@@ -159,9 +167,8 @@ export function SiteHeader() {
           </Link>
 
           <nav className="hidden md:flex" style={{ alignItems: "center", gap: "24px", flex: 1, justifyContent: "center" }}>
-            <Link to="/how-it-works" style={navLink}>How it works</Link>
-            <Link to="/pricing" style={navLink}>Pricing</Link>
-            <ResourcesDropdown />
+            <NavDropdown label="Product" links={PRODUCT_LINKS} />
+            <NavDropdown label="Resources" links={RESOURCE_LINKS} />
             <Link to="/blog" style={navLink}>Blog</Link>
             <Link to="/about" style={navLink}>Company</Link>
           </nav>
@@ -218,20 +225,31 @@ export function SiteHeader() {
               padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px",
             }}
           >
-            <Link
-              to="/how-it-works"
-              onClick={close}
-              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
+            <button
+              onClick={() => setMobileProductOpen((v) => !v)}
+              aria-expanded={mobileProductOpen}
+              style={{
+                ...navLink, display: "flex", alignItems: "center", justifyContent: "space-between",
+                width: "100%", padding: "10px 0", color: INK, background: "transparent", border: "none",
+              }}
             >
-              How it works
-            </Link>
-            <Link
-              to="/pricing"
-              onClick={close}
-              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
-            >
-              Pricing
-            </Link>
+              Product
+              <ChevronDown className="h-3.5 w-3.5" style={{ transform: mobileProductOpen ? "rotate(180deg)" : undefined }} />
+            </button>
+            {mobileProductOpen && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px", paddingLeft: "12px" }}>
+                {PRODUCT_LINKS.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to as any}
+                    onClick={close}
+                    style={{ ...navLink, display: "block", padding: "8px 0", color: INK_2 }}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            )}
 
             <button
               onClick={() => setMobileResourcesOpen((v) => !v)}

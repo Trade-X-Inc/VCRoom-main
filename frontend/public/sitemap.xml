@@ -11,6 +11,16 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://hockystick.app/for-founders</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://hockystick.app/for-investors</loc>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://hockystick.app/pricing</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>

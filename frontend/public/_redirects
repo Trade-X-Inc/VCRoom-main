@@ -19,10 +19,10 @@
 # stage-tagged pipelines, "AI risk analysis", "AI-curated" target lists —
 # none of this exists; see CLAUDE.md's public-surface correctness pass).
 # Deleted rather than edited, since both are being replaced by /for-founders
-# and /for-investors. Redirecting to / until those land, not to a page that
-# doesn't exist yet — update these two targets when Step 5 ships.
-/founders / 301
-/investors / 301
+# and /for-investors. Repointed to the real pages now that Step 5 has
+# shipped them (previously redirected to / as an interim target).
+/founders /for-founders 301
+/investors /for-investors 301
 /solutions/due-diligence / 301
 /solutions/fundraising-crm / 301
 /solutions/investor-pipeline / 301

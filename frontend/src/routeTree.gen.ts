@@ -20,6 +20,8 @@ import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ForInvestorsRouteImport } from './routes/for-investors'
+import { Route as ForFoundersRouteImport } from './routes/for-founders'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -207,6 +209,16 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForInvestorsRoute = ForInvestorsRouteImport.update({
+  id: '/for-investors',
+  path: '/for-investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFoundersRoute = ForFoundersRouteImport.update({
+  id: '/for-founders',
+  path: '/for-founders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedbackRoute = FeedbackRouteImport.update({
@@ -923,6 +935,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
+  '/for-founders': typeof ForFoundersRoute
+  '/for-investors': typeof ForInvestorsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
@@ -1066,6 +1080,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/feedback': typeof FeedbackRoute
+  '/for-founders': typeof ForFoundersRoute
+  '/for-investors': typeof ForInvestorsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
@@ -1212,6 +1228,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRouteWithChildren
   '/feedback': typeof FeedbackRoute
+  '/for-founders': typeof ForFoundersRoute
+  '/for-investors': typeof ForInvestorsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
@@ -1360,6 +1378,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/docs'
     | '/feedback'
+    | '/for-founders'
+    | '/for-investors'
     | '/forgot-password'
     | '/how-it-works'
     | '/invite'
@@ -1503,6 +1523,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/feedback'
+    | '/for-founders'
+    | '/for-investors'
     | '/forgot-password'
     | '/how-it-works'
     | '/invite'
@@ -1648,6 +1670,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/docs'
     | '/feedback'
+    | '/for-founders'
+    | '/for-investors'
     | '/forgot-password'
     | '/how-it-works'
     | '/invite'
@@ -1795,6 +1819,8 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
+  ForFoundersRoute: typeof ForFoundersRoute
+  ForInvestorsRoute: typeof ForInvestorsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HowItWorksRoute: typeof HowItWorksRoute
   InviteRoute: typeof InviteRoute
@@ -1910,6 +1936,20 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-investors': {
+      id: '/for-investors'
+      path: '/for-investors'
+      fullPath: '/for-investors'
+      preLoaderRoute: typeof ForInvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-founders': {
+      id: '/for-founders'
+      path: '/for-founders'
+      fullPath: '/for-founders'
+      preLoaderRoute: typeof ForFoundersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feedback': {
@@ -3139,6 +3179,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DocsRoute: DocsRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
+  ForFoundersRoute: ForFoundersRoute,
+  ForInvestorsRoute: ForInvestorsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HowItWorksRoute: HowItWorksRoute,
   InviteRoute: InviteRoute,

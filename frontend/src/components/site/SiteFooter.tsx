@@ -118,6 +118,8 @@ export function SiteFooter() {
         { to: "/sign-up", label: "Get started" },
         { to: "/sign-in", label: "Sign in" },
         { to: "/how-it-works", label: "How it works" },
+        { to: "/for-founders", label: "For founders" },
+        { to: "/for-investors", label: "For investors" },
         { to: "/pricing", label: "Pricing" },
       ],
     },
