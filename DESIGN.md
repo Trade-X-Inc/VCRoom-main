@@ -12,9 +12,23 @@ This governs everything **behind sign-in**.
 
 **Amended 17 August 2026 — the public surface is no longer deferred.** This section previously read: *"The public site, marketing pages, pricing, brand identity and documentation are explicitly out of scope and remain on the existing system until the application is roughly 80% complete."* That deferral is withdrawn. The public surface is now governed by **`PUBLIC-REGISTER.md`**, a sibling document derived from this one.
 
-The two are **one system in two dialects**, not two systems. `PUBLIC-REGISTER.md` inherits this document's faces, palette, radius ceiling, numeral treatment, semantic vocabulary, motion rules, accessibility floor and every §13 prohibition without variation. It differs only where a reader with a question is served differently from an operator with a task — reading measure, hierarchy for scanning, and how the reference line appears in a marketing context. Those differences are enumerated in that document and nowhere else.
+The two are **one family, not one ruleset.** They share an origin and a voice; they do not share a constraint set.
 
-Do not restyle a public surface from this document directly; read `PUBLIC-REGISTER.md`. Do not apply `PUBLIC-REGISTER.md`'s prose measure or display sizes behind sign-in.
+**Corrected 18 August 2026 — this paragraph previously read that `PUBLIC-REGISTER.md` inherits "every §13 prohibition without variation."** That sentence was wrong, and it was the mechanical cause of a public site that read as a text document rather than a marketing surface: §13's bans on radius, shadow, gradient and coloured fills are correct for a dense operational interface and actively wrong as marketing constraints. The clause is withdrawn. It is recorded here rather than deleted because it shaped roughly two weeks of public-surface work and the reason it was wrong is worth keeping.
+
+What `PUBLIC-REGISTER.md` actually inherits, and the complete list:
+
+- The three faces — Archivo, Source Serif 4, JetBrains Mono
+- The ink ramp and ledger navy as the **starting** palette, extended there
+- Tabular lining numerals wherever data appears
+- Currency-code formatting (`USD 25,000`, never a symbol)
+- The accessibility floor in §11, without variation
+- The semantic three (satisfied / attention / adverse) **where status is genuinely being communicated**, not as decoration
+- The interface-writing rules in §12
+
+**What it does not inherit:** §13 in any part. Radius, shadow, gradient, coloured background fills, card grids, motion limits, and every other §13 rule govern the authenticated application only.
+
+Do not restyle a public surface from this document directly; read `PUBLIC-REGISTER.md`. Do not apply `PUBLIC-REGISTER.md`'s display scale, section backgrounds or hero treatment behind sign-in.
 
 Where this conflicts with the Foundation Document, the Foundation Document wins on *what* to build; this wins on *how it looks and reads*. `CLAUDE.md` wins on implementation discipline.
 
@@ -407,6 +421,8 @@ Words are design material. The register inside the application is institutional 
 ---
 
 ## 13. Prohibitions
+
+> **Scope, stated explicitly (18 August 2026): §13 governs the authenticated application only.** These prohibitions do not bind the public surface, which is governed by `PUBLIC-REGISTER.md` §9 and its own, much shorter, list. A gradient or a coloured section block is a defect behind sign-in — next to real financial data it is noise competing with the record — and a legitimate design decision on a marketing page. Do not cite §13 against public-surface work. The scope section at the head of this document records why this needed saying.
 
 Each of these has appeared in a competitor product or a previous version of this one. None appears again.
 
