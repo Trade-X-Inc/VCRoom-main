@@ -210,6 +210,33 @@ img { max-width: 100%; height: auto; }
   --pub-viz-2: #5B7A9E;               /* lighter step of the same navy — counterparty */
   --pub-viz-3: var(--v2-satisfied);   /* confirmed / complete states in a diagram */
   --pub-viz-4: var(--v2-ink-muted);   /* inactive / pending / not-yet-reached states */
+
+  /* ── PUBLIC-REGISTER.md v2.0 §5.2 — the dense neutral ramp ────────────────
+     Named by hex value, unambiguously. Denser than seems necessary at the
+     light end on purpose: this is the mechanism that lets a LIGHT page build
+     section differentiation without reaching for shadows or gradients.
+     A section ground is --pub-n-00 through --pub-n-12; adjacent sections must
+     not share one. --pub-n-0d is the deep ground, ONE section per page max
+     (§5.5). PUBLIC SURFACE ONLY — never behind sign-in. */
+  --pub-n-00: #FFFFFF;   /* panel white — instruments, tables */
+  --pub-n-02: #FCFBFA;
+  --pub-n-04: #F9F8F6;
+  --pub-n-06: #F5F4F1;   /* base surface (= --v2-surface) */
+  --pub-n-09: #F0EEEA;
+  --pub-n-12: #E8E6E0;   /* = --v2-rule-light */
+  --pub-n-18: #DEDBD4;
+  --pub-n-24: #D6D4CD;   /* = --v2-rule */
+  --pub-n-38: #B4B1A8;
+  --pub-n-52: #8A8880;
+  --pub-n-0d: #0D1420;   /* deep — the dark-section ground */
+
+  /* §5.4 — signal blue. FIELD colour only: full-bleed blocks, hero treatment,
+     large-format graphic elements. NEVER interface chrome (buttons, links,
+     active nav stay ledger navy) and NEVER behind sign-in. Body prose never
+     sits on --pub-signal (5.04 = AA only); running text goes to
+     --pub-signal-deep (7.77 = AAA). See §10.1. */
+  --pub-signal: #2D6BD4;
+  --pub-signal-deep: #1E4FA3;
   /* Geometry (§14). --v2-radius is the ONLY radius v2 components use. */
   --v2-radius: 2px;
   --v2-border: 1px;
@@ -430,5 +457,74 @@ img { max-width: 100%; height: auto; }
   .pub-split {
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
     gap: 48px;
+  }
+}
+
+/* ── v2.0 §4 — the hero. Asymmetric by choice on this page: the left column
+   carries eyebrow/display/lead/action, the right carries the structural
+   graphic and the reference-line specimen, so the specimen sits at the same
+   optical weight as the tagline rather than subordinated beneath it.
+   min-height 60vh per Rule 4.1. Stacks below 960px, promise first. */
+.pub-hero {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 60vh;
+  align-content: center;
+}
+@media (min-width: 960px) {
+  .pub-hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 64px;
+  }
+}
+
+/* Fluid display and title, §3.1. Declared here rather than inline because
+   clamp() with a viewport unit is the whole point and inline styles make the
+   scale invisible to anyone reading the stylesheet for the system. */
+.pub-display {
+  font-size: clamp(44px, 6vw, 72px);
+  font-weight: 450;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.pub-title {
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+/* Structural graphic (§6.1) — one entrance pass, then rest. Carries no data
+   claim; aria-hidden at the markup level. Reduced motion renders the
+   completed frame with no animation at all. */
+/* Draws the stroke only. Deliberately does NOT animate opacity: each ring
+   carries its own inline opacity to build depth, and animating it here would
+   override that and land every ring at the same flat weight. */
+@keyframes pub-draw {
+  from { stroke-dashoffset: var(--pub-dash, 200); }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes pub-node-in {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.pub-graphic [data-draw] {
+  stroke-dasharray: var(--pub-dash, 200);
+  animation: pub-draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.pub-graphic circle[data-node] {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pub-node-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Reduced motion renders the FINISHED frame: no animation, strokes fully
+   drawn. Opacity is deliberately NOT forced to 1 — each ring carries its own
+   inline opacity to build depth, and overriding it would flatten the graphic
+   for exactly the users who never see it animate. */
+@media (prefers-reduced-motion: reduce) {
+  .pub-graphic [data-draw],
+  .pub-graphic circle[data-node] {
+    animation: none;
+    stroke-dashoffset: 0;
+    transform: none;
   }
 }
