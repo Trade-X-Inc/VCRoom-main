@@ -434,15 +434,10 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       }, { onConflict: "startup_id,template_slug" });
       if (upsertError) throw upsertError;
       toast.success(`${templateName} uploaded`);
-      // Readiness checklist refresh — new documents change the gap analysis
-      if (startup?.id) {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (!session) return;
-          import("@/lib/profile-checklist-fn").then(({ generateFounderChecklist }) =>
-            generateFounderChecklist({ data: { userAccessToken: session.access_token, startupId: startup.id } })
-          ).catch((e) => console.error("[checklist] background run failed:", e));
-        });
-      }
+      // Readiness-checklist refresh removed 18 Aug 2026 — Foundation §15/§25.
+      // This fired generateFounderChecklist on every document upload, writing
+      // an AI-generated 0-100 readiness score. Fire-and-forget with its own
+      // .catch(), so removing it affects nothing else in this handler.
       refetchFounderDocs();
       const { logActivity } = await import("@/lib/activity-log-fn");
       logActivity({

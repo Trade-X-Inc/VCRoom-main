@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { ProfileChecklist } from "@/components/app/ProfileChecklist";
 import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { UI_STAGE_ORDER, stageRank, workflowStageLabel, type DealRoomStageKey } from "@/lib/deal-room-stages";
 import { useDealRoom } from "@/hooks/useDealRoom";
@@ -318,11 +317,14 @@ function OverviewPage() {
         </div>
       </section>
 
-      {startup?.id && (
-        <section className="mb-4">
-          <ProfileChecklist startupId={startup.id} compact canRegenerate={false} />
-        </section>
-      )}
+      {/* Fundraising-readiness panel removed 18 Aug 2026 — Foundation §15/§25.
+          It rendered an AI-generated 0-100 score with an "Early"/"Ready"
+          assessment label, computed by GPT-4o and stored in
+          profile_checklists, shown to BOTH parties in the room including the
+          investor counterparty. Same class as the readiness scores retired in
+          CLAUDE.md §19a. The component's own compact-mode null path already
+          ran for every startup without a row, so removing this makes existing
+          behaviour universal rather than introducing a new state. */}
 
       <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
         <h3 className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Traction metrics</h3>

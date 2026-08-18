@@ -563,18 +563,11 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       } else {
         toast.success("Profile saved");
         queryClient.invalidateQueries({ queryKey: ["my-startup", user.id] });
-        // Regenerate the fundraising readiness checklist in the background
-        const checklistStartupId = existing?.id ?? newStartupId;
-        if (checklistStartupId) {
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) return;
-            import("@/lib/profile-checklist-fn").then(({ generateFounderChecklist }) =>
-              generateFounderChecklist({ data: { userAccessToken: session.access_token, startupId: checklistStartupId } })
-            ).then(() => {
-              queryClient.invalidateQueries({ queryKey: ["profile-checklist"] });
-            }).catch((e) => console.error("[checklist] background run failed:", e));
-          });
-        }
+        // Readiness-checklist regeneration removed 18 Aug 2026 — Foundation
+        // §15/§25. This fired generateFounderChecklist on every profile save,
+        // writing an AI-generated 0-100 readiness score. Fire-and-forget with
+        // its own .catch(), so removing it affects nothing else in this
+        // handler. See CLAUDE.md's profile_checklists retirement entry.
         queryClient.invalidateQueries({ queryKey: ["my-startup-overview"] });
         queryClient.invalidateQueries({ queryKey: ["shell-startup", user.id] });
         setMode("view");
