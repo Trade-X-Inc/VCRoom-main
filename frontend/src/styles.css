@@ -184,7 +184,14 @@ img { max-width: 100%; height: auto; }
   --v2-panel: #FFFFFF;
   --v2-ink: #16181C;
   --v2-ink-secondary: #464C58;
-  --v2-ink-muted: #6E7585;
+  /* Darkened 18 Aug 2026 from #6E7585, which measured 4.20 on --v2-surface
+     and 3.70 on --v2-rule-light — both FAIL WCAG AA for normal text. Found by
+     PUBLIC-REGISTER.md §10's requirement to measure every ground rather than
+     assume. #5E6371 holds hue and saturation (H 222->224, S 9.5%->9.2%) and
+     drops luminance 47.6%->40.6%, clearing AA on all seven grounds this token
+     is used against (worst case 4.81 on --v2-rule-light). The token is a text
+     colour in 163 of its 168 usages, so darkening carries no layout risk. */
+  --v2-ink-muted: #5E6371;
   --v2-rule: #D6D4CD;
   --v2-rule-light: #E8E6E0;
   --v2-accent: #1B3A63;
