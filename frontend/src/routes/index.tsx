@@ -128,10 +128,13 @@ function Caption({ children, onDark = false }: { children: React.ReactNode; onDa
 }
 
 /**
- * Instrument block — a real table at APPLICATION density (§6.2).
- * 13.5px, 36px rows, 1.5px header rule, no zebra, tabular figures. Sits on
- * panel white inside whichever section ground surrounds it, so tables stay
- * legible on every treatment including the deep one.
+ * Instrument block — a real table, roomier than application density (§6.2).
+ * 13.5px, ~49px rows (14/20px cell padding, not a fixed height), 1.5px
+ * header rule, no zebra, tabular figures. Sits on panel white inside
+ * whichever section ground surrounds it, so tables stay legible on every
+ * treatment including the deep one. Density raised 19 Aug 2026 — the prior
+ * 36px fixed-height rows read as cramped against the generous type scale
+ * around them.
  */
 function Instrument({
   label, head, rows, caption, onDark = false, mutedFrom,
@@ -172,7 +175,7 @@ function Instrument({
                   style={{
                     fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
                     textTransform: "uppercase", color: headInk, textAlign: "start",
-                    padding: "0 16px 8px", borderBottom: `1.5px solid ${headRule}`,
+                    padding: "0 20px 12px", borderBottom: `1.5px solid ${headRule}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -190,7 +193,7 @@ function Instrument({
                     <td
                       key={ci}
                       style={{
-                        height: "36px", padding: "10px 16px",
+                        padding: "14px 20px",
                         color: muted ? cellInkMuted : cellInk,
                         textAlign: "start", fontVariantNumeric: "tabular-nums",
                         verticalAlign: "top",
@@ -256,7 +259,7 @@ function Section({
       <div
         style={{
           maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
-          display: "flex", flexDirection: "column", gap: "40px",
+          display: "flex", flexDirection: "column", gap: "56px",
         }}
       >
         {children}
@@ -266,30 +269,42 @@ function Section({
 }
 
 // ── Structural graphic (§6.1) ────────────────────────────────────────────────
-// A calm geometric field: a ruled lattice with a set of concentric squares
-// rotating about a shared centre, drawn once on load and then still.
+// A calm geometric field: layered, slightly offset squares converging toward
+// a shared centre, with corner alignment ticks — a registration mark, the
+// device used to check that layers of a physical document (or a printed
+// plate) are aligned. Drawn once on load and then still.
 //
-// DELIBERATELY NOT A NODE-LINK GRAPH. A first version connected scattered
-// points with lines and, rendered, read unmistakably as a network/relationship
-// visualisation — the exact visual language of the matching and scoring
-// features this page's own refusals table says we do not build. Rule 6.1.1
-// prohibits a structural graphic that RESEMBLES a data claim, not merely one
-// that makes it in words, so it was rebuilt. Concentric geometry has no
-// readable "entities" and no "connections": there is nothing for a viewer to
-// interpret as data. aria-hidden; reduced motion renders the finished frame.
+// REBUILT 19 AUG 2026 from the original concentric-rings version, which the
+// founder judged too plain relative to the type scale around it. Rejected two
+// alternatives before this one: a "ruled ledger fold" (a rule field with one
+// rule splitting into a confirmed pair) read as visually flat; a "sequential
+// confirmation" row of squares strengthening into one checked mark was
+// rejected outright under Rule 6.1.1 — it reads as a progress/step indicator,
+// which implies a completion or stage claim the same way the original
+// node-link version implied a relationship claim.
+//
+// DELIBERATELY NOT A NODE-LINK GRAPH, and not a progress indicator either.
+// Offset squares converging on a shared centre have no readable "entities,"
+// no "connections," and no implied sequence or completion state — there is
+// nothing here for a viewer to interpret as data. aria-hidden; reduced
+// motion renders the finished frame.
 
 function StructuralGraphic() {
   const size = 380;
   const c = size / 2;
-  const rings = [
-    { r: 148, rot: 0 },
-    { r: 124, rot: 15 },
-    { r: 100, rot: 30 },
-    { r: 76, rot: 45 },
-    { r: 52, rot: 60 },
-    { r: 28, rot: 75 },
+  // Each square is offset from centre by a shrinking amount as it nests
+  // inward, converging toward true registration at the centremost square —
+  // the visual idea is layers of the same record coming into alignment.
+  const squares = [
+    { half: 148, dx: -14, dy: 10 },
+    { half: 128, dx: 11, dy: -12 },
+    { half: 108, dx: -9, dy: -8 },
+    { half: 88, dx: 8, dy: 7 },
+    { half: 68, dx: -5, dy: 5 },
+    { half: 48, dx: 0, dy: 0 },
   ];
-  const gridStep = size / 8;
+  const tickLen = 16;
+  const tickGap = 6;
 
   return (
     <svg
@@ -300,36 +315,21 @@ function StructuralGraphic() {
       focusable="false"
       style={{ display: "block", maxWidth: "420px" }}
     >
-      {/* ruled ground — quiet, evenly spaced, no emphasis anywhere */}
-      {Array.from({ length: 9 }).map((_, i) => (
-        <line
-          key={`v${i}`}
-          x1={i * gridStep} y1={0} x2={i * gridStep} y2={size}
-          stroke={RULE} strokeWidth={1} opacity={0.45}
-        />
-      ))}
-      {Array.from({ length: 9 }).map((_, i) => (
-        <line
-          key={`h${i}`}
-          x1={0} y1={i * gridStep} x2={size} y2={i * gridStep}
-          stroke={RULE} strokeWidth={1} opacity={0.45}
-        />
-      ))}
-
-      {/* concentric squares, each rotated a fixed step from the last */}
-      {rings.map((ring, i) => {
-        const perimeter = ring.r * 8;
+      {/* offset squares, converging toward centre registration */}
+      {squares.map((sq, i) => {
+        const cx = c + sq.dx;
+        const cy = c + sq.dy;
+        const perimeter = sq.half * 8;
         return (
           <rect
-            key={`r${i}`}
+            key={`sq${i}`}
             data-draw
-            x={c - ring.r} y={c - ring.r}
-            width={ring.r * 2} height={ring.r * 2}
+            x={cx - sq.half} y={cy - sq.half}
+            width={sq.half * 2} height={sq.half * 2}
             fill="none"
             stroke={i % 2 === 0 ? ACCENT : SIGNAL}
-            strokeWidth={i === 0 ? 1.5 : 1}
-            opacity={0.16 + i * 0.1}
-            transform={`rotate(${ring.rot} ${c} ${c})`}
+            strokeWidth={i === squares.length - 1 ? 1.5 : 1}
+            opacity={0.16 + i * 0.11}
             style={{
               ["--pub-dash" as any]: perimeter,
               animationDelay: `${0.1 + i * 0.12}s`,
@@ -338,7 +338,23 @@ function StructuralGraphic() {
         );
       })}
 
-      {/* a single centre mark — the one point of emphasis */}
+      {/* corner registration ticks — the alignment-mark device */}
+      {[
+        { x1: c, y1: c - 88 - tickGap - tickLen, x2: c, y2: c - 88 - tickGap },
+        { x1: c, y1: c + 88 + tickGap, x2: c, y2: c + 88 + tickGap + tickLen },
+        { x1: c - 88 - tickGap - tickLen, y1: c, x2: c - 88 - tickGap, y2: c },
+        { x1: c + 88 + tickGap, y1: c, x2: c + 88 + tickGap + tickLen, y2: c },
+      ].map((t, i) => (
+        <line
+          key={`tick${i}`}
+          data-node
+          x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
+          stroke={SIGNAL} strokeWidth={1.5} opacity={0.85}
+          style={{ animationDelay: `${0.75 + i * 0.06}s` }}
+        />
+      ))}
+
+      {/* a single centre mark — true registration, the one point of emphasis */}
       <circle
         data-node
         cx={c} cy={c} r={4}
@@ -458,7 +474,7 @@ function Landing() {
 
         {/* ── CLOSING PIPELINE — treatment C, recessed ─────────────────────── */}
         <Section ground={G_RECESSED}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Closing / Pipeline</Eyebrow>
             <Title>What holds together</Title>
             <Prose>
@@ -524,7 +540,7 @@ function Landing() {
 
         {/* ── FOUNDER CONTROLS — treatment A, base ─────────────────────────── */}
         <Section ground={G_BASE}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Founder / Control</Eyebrow>
             <Title>For the founder side</Title>
             <Prose>
@@ -567,7 +583,7 @@ function Landing() {
               maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
             }}
           >
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
               <Eyebrow>Product / Term sheet</Eyebrow>
               <Title>Seeing it work</Title>
               <Prose>
@@ -614,7 +630,7 @@ function Landing() {
 
         {/* ── PROVENANCE — treatment B continues on panel ──────────────────── */}
         <Section ground={G_PANEL}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Method / Provenance</Eyebrow>
             <Title>Why the mechanisms aren&rsquo;t ours</Title>
             <Prose>
@@ -653,10 +669,10 @@ function Landing() {
           <div
             style={{
               maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
-              display: "flex", flexDirection: "column", gap: "40px",
+              display: "flex", flexDirection: "column", gap: "56px",
             }}
           >
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
               <Eyebrow onDark>Position / Exclusions</Eyebrow>
               <Title onDark>What we refuse to build</Title>
               <Prose onDark>

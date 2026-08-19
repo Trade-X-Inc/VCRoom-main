@@ -118,9 +118,12 @@ function Caption({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Instrument block — a real table at APPLICATION density (§6.2).
- * 13.5px, 36px rows, 1.5px header rule, no zebra, tabular figures. Sits on
- * panel white inside whichever section ground surrounds it.
+ * Instrument block — a real table, roomier than application density (§6.2).
+ * 13.5px, ~49px rows (14/20px cell padding, not a fixed height), 1.5px
+ * header rule, no zebra, tabular figures. Sits on panel white inside
+ * whichever section ground surrounds it. Density raised 19 Aug 2026 — the
+ * prior 36px fixed-height rows read as cramped against the generous type
+ * scale around them.
  */
 function Instrument({
   label, head, rows, caption, align,
@@ -153,7 +156,7 @@ function Instrument({
                     fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
                     textTransform: "uppercase", color: INK_3,
                     textAlign: numeric.has(i) ? "end" : "start",
-                    padding: "0 16px 8px", borderBottom: `1.5px solid ${INK}`,
+                    padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -169,7 +172,7 @@ function Instrument({
                   <td
                     key={ci}
                     style={{
-                      height: "36px", padding: "10px 16px", color: INK,
+                      padding: "14px 20px", color: INK,
                       textAlign: numeric.has(ci) ? "end" : "start",
                       fontFamily: numeric.has(ci) ? DATA : UI,
                       fontSize: numeric.has(ci) ? "12px" : "13.5px",
@@ -224,7 +227,7 @@ function Section({ ground, children }: { ground: string; children: React.ReactNo
       <div
         style={{
           maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
-          display: "flex", flexDirection: "column", gap: "40px",
+          display: "flex", flexDirection: "column", gap: "56px",
         }}
       >
         {children}
@@ -342,7 +345,7 @@ function PricingPage() {
             This page's one load-bearing instrument — same role the closing
             pipeline plays on /. */}
         <Section ground={G_RECESSED}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Fee / Schedule</Eyebrow>
             <Title>One fee, one event</Title>
             <Prose>
@@ -410,7 +413,7 @@ function PricingPage() {
             Second supporting instrument; alternates off recessed, same
             pattern as the homepage's founder-controls section. */}
         <Section ground={G_BASE}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Institutional / Scope</Eyebrow>
             <Title>Why institutional pricing isn&rsquo;t published</Title>
             <Prose>
@@ -444,7 +447,7 @@ function PricingPage() {
             Identical content to the homepage's provenance table; same
             ground, deliberately, for cross-page consistency. */}
         <Section ground={G_PANEL}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Method / Provenance</Eyebrow>
             <Title>Why the founder pays</Title>
             <Prose>

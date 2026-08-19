@@ -511,7 +511,7 @@ img { max-width: 100%; height: auto; }
   stroke-dasharray: var(--pub-dash, 200);
   animation: pub-draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
-.pub-graphic circle[data-node] {
+.pub-graphic [data-node] {
   transform-box: fill-box;
   transform-origin: center;
   animation: pub-node-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -522,7 +522,7 @@ img { max-width: 100%; height: auto; }
    for exactly the users who never see it animate. */
 @media (prefers-reduced-motion: reduce) {
   .pub-graphic [data-draw],
-  .pub-graphic circle[data-node] {
+  .pub-graphic [data-node] {
     animation: none;
     stroke-dashoffset: 0;
     transform: none;
