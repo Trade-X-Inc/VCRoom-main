@@ -355,9 +355,8 @@ function PricingPage() {
               you can least afford it.
             </Prose>
             <Prose>
-              We charge a flat fee tied to a triggering event. The fee is the same
-              whether your round is USD 500,000 or USD 5,000,000. It is the same
-              whether your data room holds forty documents or four hundred.
+              We charge a flat fee tied to a triggering event — the same
+              whether your round is USD 500,000 or USD 5,000,000.
             </Prose>
             <Prose>
               <strong style={{ color: INK, fontWeight: 600 }}>

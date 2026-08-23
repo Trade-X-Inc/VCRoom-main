@@ -4,12 +4,23 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /how-it-works — Step 4 of the public IA rebuild (18 Aug 2026).
+// /how-it-works — Step 4 of the public IA rebuild (18 Aug 2026); brought
+// onto PUBLIC-REGISTER.md v2.0 (23 Aug 2026, Phase 3).
+//
+// VISUAL PASS ONLY, calibrated to /pricing's existing treatment rather than
+// the landing page's — per instruction, these pages stay calmer than the
+// landing page by design: v2.0 type scale, ground system, and table
+// density, but no SectionHeader, MetricGrid, dark section, or stat strip.
+// Three grounds: base (fold) -> recessed (closing pipeline + diagram) ->
+// panel (term negotiation + diagram) -> base (close).
 //
 // Two real diagrams, per register §3.6.2: a mechanism drawn, not tabulated,
 // where the shape of the mechanism — a sequence, a state machine — is the
 // point a table can only assert. Both are hand-built SVG, not images, so
-// they stay crisp and inherit the register's own tokens directly.
+// they stay crisp and inherit the register's own tokens directly. NOT
+// touched by this pass beyond the surrounding page chrome — both diagrams
+// are independently verified against live code (see below) and are exactly
+// the kind of factual content this pass does not edit.
 //
 // DIAGRAM 1 — the closing pipeline as a two-party swimlane. Verified against
 // the live implementation (ClosingPipeline.tsx, close.tsx, LawyerGate.tsx)
@@ -58,8 +69,7 @@ const INK_2 = "var(--v2-ink-secondary)";
 const INK_3 = "var(--v2-ink-muted)";
 const RULE = "var(--v2-rule)";
 const RULE_LIGHT = "var(--v2-rule-light)";
-const SURFACE = "var(--v2-surface)";
-const PANEL = "var(--v2-panel)";
+const PANEL = "var(--pub-n-00)";
 const ACCENT = "var(--v2-accent)";
 const SATISFIED = "var(--v2-satisfied)";
 
@@ -68,15 +78,22 @@ const VIZ_2 = "var(--pub-viz-2)"; // investor rail
 const VIZ_3 = "var(--pub-viz-3)"; // confirmed / locked
 const VIZ_4 = "var(--pub-viz-4)"; // pending / not reached
 
+// Section grounds (§5.2) — same tokens as /pricing, /.
+const G_BASE = "var(--pub-n-06)";
+const G_PANEL = "var(--pub-n-00)";
+const G_RECESSED = "var(--pub-n-09)";
+
 const MEASURE = "34rem";
+const SHELL = "72rem";
 
-// ── Primitives — identical to /pricing, /, /resources/schedule. ────────────
+// ── Primitives — ported from /pricing verbatim (§5.6 eyebrow convention,
+// v2.0 type scale, application-density-plus Instrument table). ─────────────
 
-function Label({ children }: { children: React.ReactNode }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
+        fontFamily: DATA, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
         letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, margin: 0,
       }}
     >
@@ -87,12 +104,7 @@ function Label({ children }: { children: React.ReactNode }) {
 
 function Title({ children }: { children: React.ReactNode }) {
   return (
-    <h2
-      style={{
-        fontFamily: UI, fontSize: "25px", lineHeight: 1.25, fontWeight: 600,
-        letterSpacing: "-0.01em", color: INK, margin: 0,
-      }}
-    >
+    <h2 className="pub-title" style={{ fontFamily: UI, color: INK, margin: 0 }}>
       {children}
     </h2>
   );
@@ -102,7 +114,7 @@ function Prose({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: DOC, fontSize: "16px", lineHeight: 1.65, color: INK_2,
+        fontFamily: DOC, fontSize: "17px", lineHeight: 1.65, color: INK_2,
         maxWidth: MEASURE, margin: 0,
       }}
     >
@@ -115,17 +127,13 @@ function Caption({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "12.5px", lineHeight: 1.5, color: INK_3,
+        fontFamily: UI, fontSize: "13px", lineHeight: 1.5, color: INK_3,
         maxWidth: MEASURE, margin: 0,
       }}
     >
       {children}
     </p>
   );
-}
-
-function Rule() {
-  return <hr style={{ border: 0, borderTop: `1px solid ${RULE}`, margin: 0 }} />;
 }
 
 function Action({ to, search, children, variant = "primary" }: {
@@ -140,10 +148,10 @@ function Action({ to, search, children, variant = "primary" }: {
       to={to as any}
       search={search as any}
       style={{
-        display: "inline-flex", alignItems: "center", height: "36px",
-        padding: "0 18px", borderRadius: "2px",
-        fontFamily: UI, fontSize: "13.5px", fontWeight: 500,
-        background: primary ? ACCENT : PANEL,
+        display: "inline-flex", alignItems: "center", height: "40px",
+        padding: "0 20px", borderRadius: "2px",
+        fontFamily: UI, fontSize: "14px", fontWeight: 500,
+        background: primary ? ACCENT : "transparent",
         color: primary ? "#FFFFFF" : INK,
         border: primary ? `1px solid ${ACCENT}` : `1px solid ${RULE}`,
         textDecoration: "none",
@@ -151,6 +159,22 @@ function Action({ to, search, children, variant = "primary" }: {
     >
       {children}
     </Link>
+  );
+}
+
+/** A full-bleed section: ground spans the viewport, content stays in the shell. */
+function Section({ ground, children }: { ground: string; children: React.ReactNode }) {
+  return (
+    <section style={{ background: ground }}>
+      <div
+        style={{
+          maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
+          display: "flex", flexDirection: "column", gap: "56px",
+        }}
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -411,118 +435,118 @@ function HowItWorksPage() {
   }, []);
 
   return (
-    <div style={{ background: SURFACE, minHeight: "100vh" }}>
+    <div style={{ background: G_BASE, minHeight: "100vh" }}>
       <SiteHeader />
 
-      <main
-        id="main-content"
-        style={{
-          maxWidth: "68rem", margin: "0 auto", padding: "72px 24px 96px",
-          display: "flex", flexDirection: "column", gap: "56px",
-        }}
-      >
-        {/* ── FOLD ────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <Label>How it works</Label>
-          <h1
+      <main id="main-content">
+        {/* ── FOLD — treatment A, base ────────────────────────────────────── */}
+        <section style={{ background: G_BASE }}>
+          <div
+            className="pub-hero"
             style={{
-              fontFamily: UI, fontSize: "40px", lineHeight: 1.15, fontWeight: 700,
-              letterSpacing: "-0.02em", color: INK, margin: 0, maxWidth: "20ch",
+              maxWidth: SHELL, margin: "0 auto", padding: "72px 24px 96px",
+              display: "grid", alignItems: "center", gap: "48px",
             }}
           >
-            Two mechanisms, drawn as they actually run.
-          </h1>
-          <p
-            style={{
-              fontFamily: DOC, fontSize: "19px", lineHeight: 1.5, color: INK_2,
-              maxWidth: MEASURE, margin: 0,
-            }}
-          >
-            The closing pipeline and term negotiation are the two places a
-            raise is actually decided. Both are shown below exactly as they
-            run in the product, not simplified for the page.
-          </p>
-          <div style={{ marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <Eyebrow>How it works</Eyebrow>
+              <h1
+                className="pub-display"
+                style={{ fontFamily: UI, color: INK, margin: 0, maxWidth: "16ch" }}
+              >
+                Two mechanisms, drawn as they actually run.
+              </h1>
+              <p
+                style={{
+                  fontFamily: DOC, fontSize: "21px", lineHeight: 1.5, color: INK_2,
+                  maxWidth: MEASURE, margin: 0,
+                }}
+              >
+                The closing pipeline and term negotiation are the two places a
+                raise is actually decided.
+              </p>
+              <Prose>
+                Both are shown below exactly as they run in the product, not
+                simplified for the page.
+              </Prose>
+              <div style={{ marginTop: "8px" }}>
+                <Action to="/sign-up">Create an account</Action>
+              </div>
+            </div>
           </div>
         </section>
 
-        <Rule />
-
-        {/* ── PROSE 1 — closing pipeline ─────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>The closing pipeline</Title>
-          <Prose>
-            Six gates, and most of them need both sides to act — not one side
-            declaring the other has agreed. The diagram below draws that
-            distinction directly: where the two rails converge, both parties
-            are required. Where they don&rsquo;t, one side alone is.
-          </Prose>
-          <Prose>
-            Gate 3 is the one exception, deliberately: the founder sets the
-            fee, and only the party paying it confirms. That&rsquo;s a single
-            rail acting, not a convergence, and the diagram shows it that way
-            rather than pretending every gate is symmetric.
-          </Prose>
-        </section>
-
-        {/* ── DIAGRAM 1 ──────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <Label>The closing pipeline · Two-party swimlane</Label>
-          <ClosingPipelineDiagram />
-          <Caption>
-            A dashed line between rails marks a gate that needs both parties.
-            Gate 1 is a shared decision made once, before work on the
-            remaining gates begins. Gate 3 has no counterparty gate — the
-            founder sets the fee, the designated payer alone confirms.
-          </Caption>
-        </section>
-
-        <Rule />
-
-        {/* ── PROSE 2 — term negotiation ─────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>Term negotiation</Title>
-          <Prose>
-            A term doesn&rsquo;t lock because one party says it&rsquo;s
-            agreed. Accepting a term sets only your own flag — the term
-            finalizes only once both flags are true against the exact same
-            value.
-          </Prose>
-          <Prose>
-            The rule a table can&rsquo;t show cleanly: proposing a{" "}
-            <em>new</em> value resets both flags to false, even if one side
-            had already accepted the old one. There is no state where a
-            stale acceptance carries forward onto a changed number.
-          </Prose>
-        </section>
-
-        {/* ── DIAGRAM 2 ──────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <Label>Term negotiation · State machine</Label>
-          <TermStateDiagram />
-          <Caption>
-            Every arrow is a real transition from the negotiation code, not
-            an illustration of intent — including the reset path, which
-            fires on any new proposed value regardless of which state the
-            term was in when it changed.
-          </Caption>
-        </section>
-
-        <Rule />
-
-        {/* ── CLOSE ──────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>See it on a real screen</Title>
-          <Prose>
-            The homepage shows the closing pipeline as a fee schedule and the
-            term sheet negotiation view as a live screenshot.
-          </Prose>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
-            <Action to="/" variant="secondary">See the homepage</Action>
+        {/* ── CLOSING PIPELINE — treatment C, recessed ────────────────────── */}
+        <Section ground={G_RECESSED}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Closing / Pipeline</Eyebrow>
+            <Title>The closing pipeline</Title>
+            <Prose>
+              Six gates, and most need both sides to act — not one side
+              declaring the other has agreed. Where the two rails below
+              converge, both parties are required; where they don&rsquo;t, one
+              side alone is, and the diagram draws that distinction directly.
+            </Prose>
           </div>
-        </section>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <Eyebrow>The closing pipeline · Two-party swimlane</Eyebrow>
+            <ClosingPipelineDiagram />
+            <Caption>
+              A dashed line between rails marks a gate that needs both parties.
+              Gate 1 is a shared decision made once, before work on the
+              remaining gates begins. Gate 3 has no counterparty gate — the
+              founder sets the fee, the designated payer alone confirms.
+            </Caption>
+          </div>
+        </Section>
+
+        {/* ── TERM NEGOTIATION — treatment B, panel ───────────────────────── */}
+        <Section ground={G_PANEL}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Product / Term negotiation</Eyebrow>
+            <Title>Term negotiation</Title>
+            <Prose>
+              A term doesn&rsquo;t lock because one party says it&rsquo;s
+              agreed. Accepting a term sets only your own flag — the term
+              finalizes only once both flags are true against the exact same
+              value.
+            </Prose>
+            <Prose>
+              The rule a table can&rsquo;t show cleanly: proposing a{" "}
+              <em>new</em> value resets both flags to false, even if one side
+              had already accepted the old one. There is no state where a
+              stale acceptance carries forward onto a changed number.
+            </Prose>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <Eyebrow>Term negotiation · State machine</Eyebrow>
+            <TermStateDiagram />
+            <Caption>
+              Every arrow is a real transition from the negotiation code, not
+              an illustration of intent — including the reset path, which
+              fires on any new proposed value regardless of which state the
+              term was in when it changed.
+            </Caption>
+          </div>
+        </Section>
+
+        {/* ── CLOSE — treatment A, base ────────────────────────────────────── */}
+        <Section ground={G_BASE}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <Eyebrow>See it live</Eyebrow>
+            <Title>See it on a real screen</Title>
+            <Prose>
+              The homepage shows the closing pipeline as a fee schedule and the
+              term sheet negotiation view as a live screenshot.
+            </Prose>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
+              <Action to="/sign-up">Create an account</Action>
+              <Action to="/" variant="secondary">See the homepage</Action>
+            </div>
+          </div>
+        </Section>
       </main>
 
       <SiteFooter />

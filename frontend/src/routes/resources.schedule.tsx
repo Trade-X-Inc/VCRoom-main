@@ -4,7 +4,17 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /resources/schedule — Step 3 of the public IA rebuild (18 Aug 2026).
+// /resources/schedule — Step 3 of the public IA rebuild (18 Aug 2026);
+// brought onto PUBLIC-REGISTER.md v2.0 (23 Aug 2026, Phase 3).
+//
+// VISUAL PASS ONLY, calibrated to /pricing's existing treatment rather than
+// the landing page's — per instruction, these pages stay calmer than the
+// landing page by design: v2.0 type scale, ground system, and table
+// density, but no SectionHeader, MetricGrid, dark section, or stat strip.
+// Only TWO grounds here, deliberately: base (fold) -> recessed (the
+// schedule table, this page's one real instrument) -> base (close). A
+// third treatment would be decorative — this page is genuinely one fold,
+// one instrument, and a close, not four content blocks like the others.
 //
 // Publishes the real technology/seed disclosure schedule in full — the
 // register's own highest-ranked credibility device (§6 item 1: "a real
@@ -36,22 +46,27 @@ const INK_2 = "var(--v2-ink-secondary)";
 const INK_3 = "var(--v2-ink-muted)";
 const RULE = "var(--v2-rule)";
 const RULE_LIGHT = "var(--v2-rule-light)";
-const SURFACE = "var(--v2-surface)";
-const PANEL = "var(--v2-panel)";
+const PANEL = "var(--pub-n-00)";
 const ACCENT = "var(--v2-accent)";
 const SATISFIED = "var(--v2-satisfied)";
 const ATTENTION = "var(--v2-attention)";
 
+// Section grounds (§5.2) — same tokens as /pricing, /. Only base and
+// recessed used on this page — see file header for why.
+const G_BASE = "var(--pub-n-06)";
+const G_RECESSED = "var(--pub-n-09)";
+
 const MEASURE = "34rem";
+const SHELL = "72rem";
 
-// ── Primitives — identical to /pricing's and /'s, reused rather than
-// re-derived, so all three pages read as one system. ────────────────────────
+// ── Primitives — ported from /pricing verbatim, so all pages read as one
+// system. ────────────────────────────────────────────────────────────────
 
-function Label({ children }: { children: React.ReactNode }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
+        fontFamily: DATA, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
         letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, margin: 0,
       }}
     >
@@ -62,12 +77,7 @@ function Label({ children }: { children: React.ReactNode }) {
 
 function Title({ children }: { children: React.ReactNode }) {
   return (
-    <h2
-      style={{
-        fontFamily: UI, fontSize: "25px", lineHeight: 1.25, fontWeight: 600,
-        letterSpacing: "-0.01em", color: INK, margin: 0,
-      }}
-    >
+    <h2 className="pub-title" style={{ fontFamily: UI, color: INK, margin: 0 }}>
       {children}
     </h2>
   );
@@ -77,7 +87,7 @@ function Prose({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: DOC, fontSize: "16px", lineHeight: 1.65, color: INK_2,
+        fontFamily: DOC, fontSize: "17px", lineHeight: 1.65, color: INK_2,
         maxWidth: MEASURE, margin: 0,
       }}
     >
@@ -90,17 +100,13 @@ function Caption({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "12.5px", lineHeight: 1.5, color: INK_3,
+        fontFamily: UI, fontSize: "13px", lineHeight: 1.5, color: INK_3,
         maxWidth: MEASURE, margin: 0,
       }}
     >
       {children}
     </p>
   );
-}
-
-function Rule() {
-  return <hr style={{ border: 0, borderTop: `1px solid ${RULE}`, margin: 0 }} />;
 }
 
 function Action({ to, search, children, variant = "primary" }: {
@@ -115,10 +121,10 @@ function Action({ to, search, children, variant = "primary" }: {
       to={to as any}
       search={search as any}
       style={{
-        display: "inline-flex", alignItems: "center", height: "36px",
-        padding: "0 18px", borderRadius: "2px",
-        fontFamily: UI, fontSize: "13.5px", fontWeight: 500,
-        background: primary ? ACCENT : PANEL,
+        display: "inline-flex", alignItems: "center", height: "40px",
+        padding: "0 20px", borderRadius: "2px",
+        fontFamily: UI, fontSize: "14px", fontWeight: 500,
+        background: primary ? ACCENT : "transparent",
         color: primary ? "#FFFFFF" : INK,
         border: primary ? `1px solid ${ACCENT}` : `1px solid ${RULE}`,
         textDecoration: "none",
@@ -126,6 +132,22 @@ function Action({ to, search, children, variant = "primary" }: {
     >
       {children}
     </Link>
+  );
+}
+
+/** A full-bleed section: ground spans the viewport, content stays in the shell. */
+function Section({ ground, children }: { ground: string; children: React.ReactNode }) {
+  return (
+    <section style={{ background: ground }}>
+      <div
+        style={{
+          maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
+          display: "flex", flexDirection: "column", gap: "56px",
+        }}
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -253,173 +275,179 @@ function SchedulePage() {
   }, []);
 
   return (
-    <div style={{ background: SURFACE, minHeight: "100vh" }}>
+    <div style={{ background: G_BASE, minHeight: "100vh" }}>
       <SiteHeader />
 
-      <main
-        id="main-content"
-        style={{
-          maxWidth: "68rem", margin: "0 auto", padding: "72px 24px 96px",
-          display: "flex", flexDirection: "column", gap: "56px",
-        }}
-      >
-        {/* ── FOLD ────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <Label>Resources · Disclosure schedule</Label>
-          <h1
+      <main id="main-content">
+        {/* ── FOLD — treatment A, base ────────────────────────────────────── */}
+        <section style={{ background: G_BASE }}>
+          <div
+            className="pub-hero"
             style={{
-              fontFamily: UI, fontSize: "40px", lineHeight: 1.15, fontWeight: 700,
-              letterSpacing: "-0.02em", color: INK, margin: 0, maxWidth: "20ch",
+              maxWidth: SHELL, margin: "0 auto", padding: "72px 24px 96px",
+              display: "grid", alignItems: "center", gap: "48px",
             }}
           >
-            Every field a seed round discloses.
-          </h1>
-          <p
-            style={{
-              fontFamily: DOC, fontSize: "19px", lineHeight: 1.5, color: INK_2,
-              maxWidth: MEASURE, margin: 0,
-            }}
-          >
-            Eleven fields, what evidence backs each one, and when it releases
-            to the other side. Published in full — no account required.
-          </p>
-          <div style={{ marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <Eyebrow>Resources · Disclosure schedule</Eyebrow>
+              <h1
+                className="pub-display"
+                style={{ fontFamily: UI, color: INK, margin: 0, maxWidth: "16ch" }}
+              >
+                Every field a seed round discloses.
+              </h1>
+              <p
+                style={{
+                  fontFamily: DOC, fontSize: "21px", lineHeight: 1.5, color: INK_2,
+                  maxWidth: MEASURE, margin: 0,
+                }}
+              >
+                Eleven fields, what evidence backs each one, and when it
+                releases to the other side. Published in full — no account
+                required.
+              </p>
+              <div style={{ marginTop: "8px" }}>
+                <Action to="/sign-up">Create an account</Action>
+              </div>
+            </div>
           </div>
         </section>
 
-        <Rule />
+        {/* ── THE SCHEDULE — treatment C, recessed. Only base and recessed on
+            this page — see file header for why a third treatment would be
+            decorative here. ─────────────────────────────────────────────── */}
+        <Section ground={G_RECESSED}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Schedule / Scope</Eyebrow>
+            <Title>What the schedule governs</Title>
+            <Prose>
+              A raise moves through stages — brief, presented, inside the
+              room, at closing. Each field below has a default release
+              stage, evidence it&rsquo;s checked against, and whether it&rsquo;s
+              a plain statement or something that needs to be shown.
+            </Prose>
+            <Prose>
+              This is the real technology, seed-stage schedule, published as
+              it is used — not a sample. Every field, every evidence rung,
+              every release stage below is read directly from it.
+            </Prose>
+            <Prose>
+              <strong style={{ color: INK, fontWeight: 600 }}>
+                One schedule exists today.
+              </strong>{" "}
+              Sector- and stage-specific versions are the design this table
+              is built for, not yet the library it publishes. This page will
+              grow as more are added — it will not describe schedules that
+              don&rsquo;t exist yet.
+            </Prose>
+          </div>
 
-        {/* ── PROSE 1 — what this is and what it isn't ──────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>What the schedule governs</Title>
-          <Prose>
-            A raise moves through stages — brief, presented, inside the room,
-            at closing. Each field below has a stage it releases at by
-            default, evidence it's checked against, and whether it's a plain
-            statement or something that needs to be shown.
-          </Prose>
-          <Prose>
-            This is the real technology, seed-stage schedule, published as it
-            is used — not a sample. Every field, every evidence rung, every
-            release stage below is read directly from it.
-          </Prose>
-          <Prose>
-            <strong style={{ color: INK, fontWeight: 600 }}>
-              One schedule exists today.
-            </strong>{" "}
-            Sector- and stage-specific versions are the design this table is
-            built for, not yet the library it publishes. This page will grow
-            as more are added — it will not describe schedules that don't
-            exist yet.
-          </Prose>
-        </section>
-
-        {/* ── INSTRUMENT — the schedule itself ──────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <Label>Technology · Seed · v1 · Published 4 August 2026</Label>
-          <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
-            <table
-              style={{
-                width: "100%", borderCollapse: "collapse",
-                fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55,
-              }}
-            >
-              <thead>
-                <tr>
-                  {["Field", "Section", "Type", "Releases at", "Evidence required"].map((h) => (
-                    <th
-                      key={h}
-                      scope="col"
-                      style={{
-                        fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
-                        textTransform: "uppercase", color: INK_3, textAlign: "start",
-                        padding: "0 16px 8px", borderBottom: `1.5px solid ${INK}`,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {FIELDS.map((f, i) => (
-                  <tr
-                    key={f.id}
-                    style={{ borderBottom: i === FIELDS.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}
-                  >
-                    <td style={{ padding: "14px 16px", color: INK, verticalAlign: "top" }}>
-                      <div style={{ fontWeight: 600 }}>{f.label}</div>
-                      <div
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <Eyebrow>Technology · Seed · v1 · Published 4 August 2026</Eyebrow>
+            <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
+              <table
+                style={{
+                  width: "100%", borderCollapse: "collapse",
+                  fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55,
+                }}
+              >
+                <thead>
+                  <tr>
+                    {["Field", "Section", "Type", "Releases at", "Evidence required"].map((h) => (
+                      <th
+                        key={h}
+                        scope="col"
                         style={{
-                          fontFamily: DATA, fontSize: "11px", color: INK_3, marginTop: "2px",
-                          fontVariantNumeric: "tabular-nums",
+                          fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
+                          textTransform: "uppercase", color: INK_3, textAlign: "start",
+                          padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`,
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        {f.id}
-                      </div>
-                    </td>
-                    <td style={{ padding: "14px 16px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
-                      {f.section}
-                    </td>
-                    <td style={{ padding: "14px 16px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
-                      {VALUE_TYPE_LABEL[f.valueType]}
-                    </td>
-                    <td style={{ padding: "14px 16px", verticalAlign: "top", whiteSpace: "nowrap" }}>
-                      <span
-                        style={{
-                          fontFamily: UI, fontSize: "11px", fontWeight: 500, letterSpacing: "0.05em",
-                          textTransform: "uppercase", color: f.visibilityTier === "closing" ? ATTENTION : INK_2,
-                        }}
-                      >
-                        {VISIBILITY_LABEL[f.visibilityTier]}
-                      </span>
-                      <div style={{ fontSize: "11px", color: INK_3, marginTop: "2px" }}>
-                        {RELEASE_LABEL[f.releaseClass]}
-                      </div>
-                    </td>
-                    <td style={{ padding: "14px 16px", color: INK_2, verticalAlign: "top", minWidth: "260px" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                        <div>
-                          <span style={{ color: INK_3, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Min · </span>
-                          {f.ladder.minimum.join(", ")}
-                        </div>
-                        <div>
-                          <span style={{ color: SATISFIED, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pref · </span>
-                          {f.ladder.preferred.join(", ")}
-                        </div>
-                        <div>
-                          <span style={{ color: INK_3, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Alt · </span>
-                          {f.ladder.alternative.join(", ")}
-                        </div>
-                      </div>
-                    </td>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {FIELDS.map((f, i) => (
+                    <tr
+                      key={f.id}
+                      style={{ borderBottom: i === FIELDS.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}
+                    >
+                      <td style={{ padding: "14px 20px", color: INK, verticalAlign: "top" }}>
+                        <div style={{ fontWeight: 600 }}>{f.label}</div>
+                        <div
+                          style={{
+                            fontFamily: DATA, fontSize: "11px", color: INK_3, marginTop: "2px",
+                            fontVariantNumeric: "tabular-nums",
+                          }}
+                        >
+                          {f.id}
+                        </div>
+                      </td>
+                      <td style={{ padding: "14px 20px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
+                        {f.section}
+                      </td>
+                      <td style={{ padding: "14px 20px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
+                        {VALUE_TYPE_LABEL[f.valueType]}
+                      </td>
+                      <td style={{ padding: "14px 20px", verticalAlign: "top", whiteSpace: "nowrap" }}>
+                        <span
+                          style={{
+                            fontFamily: UI, fontSize: "11px", fontWeight: 500, letterSpacing: "0.05em",
+                            textTransform: "uppercase", color: f.visibilityTier === "closing" ? ATTENTION : INK_2,
+                          }}
+                        >
+                          {VISIBILITY_LABEL[f.visibilityTier]}
+                        </span>
+                        <div style={{ fontSize: "11px", color: INK_3, marginTop: "2px" }}>
+                          {RELEASE_LABEL[f.releaseClass]}
+                        </div>
+                      </td>
+                      <td style={{ padding: "14px 20px", color: INK_2, verticalAlign: "top", minWidth: "260px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                          <div>
+                            <span style={{ color: INK_3, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Min · </span>
+                            {f.ladder.minimum.join(", ")}
+                          </div>
+                          <div>
+                            <span style={{ color: SATISFIED, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pref · </span>
+                            {f.ladder.preferred.join(", ")}
+                          </div>
+                          <div>
+                            <span style={{ color: INK_3, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Alt · </span>
+                            {f.ladder.alternative.join(", ")}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Caption>
+              &ldquo;Releases at&rdquo; is the default stage a field becomes visible
+              to a counterparty — Brief, Presented, Room, or Closing. Evidence
+              has three rungs: the minimum accepted, the preferred standard,
+              and an accepted alternative when the preferred form isn&rsquo;t
+              available.
+            </Caption>
           </div>
-          <Caption>
-            &ldquo;Releases at&rdquo; is the default stage a field becomes visible
-            to a counterparty — Brief, Presented, Room, or Closing. Evidence
-            has three rungs: the minimum accepted, the preferred standard,
-            and an accepted alternative when the preferred form isn&rsquo;t
-            available.
-          </Caption>
-        </section>
+        </Section>
 
-        <Rule />
-
-        {/* ── CLOSE ──────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>Build against a schedule that&rsquo;s already published</Title>
-          <Prose>No card, no trial clock.</Prose>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
-            <Action to="/pricing" variant="secondary">See pricing</Action>
+        {/* ── CLOSE — treatment A, base ────────────────────────────────────── */}
+        <Section ground={G_BASE}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <Eyebrow>Start / Direct tier</Eyebrow>
+            <Title>Build against a schedule that&rsquo;s already published</Title>
+            <Prose>No card, no trial clock.</Prose>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
+              <Action to="/sign-up">Create an account</Action>
+              <Action to="/pricing" variant="secondary">See pricing</Action>
+            </div>
           </div>
-        </section>
+        </Section>
       </main>
 
       <SiteFooter />

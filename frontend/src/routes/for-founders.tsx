@@ -4,7 +4,15 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /for-founders — Step 5 of the public IA rebuild (18 Aug 2026).
+// /for-founders — Step 5 of the public IA rebuild (18 Aug 2026); brought
+// onto PUBLIC-REGISTER.md v2.0 (23 Aug 2026, Phase 3).
+//
+// VISUAL PASS ONLY, calibrated to /pricing's existing treatment rather than
+// the landing page's — per instruction, these pages stay calmer than the
+// landing page by design: v2.0 type scale, ground system, and table
+// density, but no SectionHeader, MetricGrid, dark section, or stat strip.
+// Three grounds: base (fold) -> recessed (founder controls) -> panel
+// (document visibility) -> base (close).
 //
 // Replaces the deleted /founders (removed Step 1 — "AI email that sounds
 // like you", "Pipeline that thinks", intro suggestions, none of which
@@ -38,19 +46,24 @@ const INK_2 = "var(--v2-ink-secondary)";
 const INK_3 = "var(--v2-ink-muted)";
 const RULE = "var(--v2-rule)";
 const RULE_LIGHT = "var(--v2-rule-light)";
-const SURFACE = "var(--v2-surface)";
-const PANEL = "var(--v2-panel)";
+const PANEL = "var(--pub-n-00)";
 const ACCENT = "var(--v2-accent)";
 
+// Section grounds (§5.2) — same tokens as /pricing, /.
+const G_BASE = "var(--pub-n-06)";
+const G_PANEL = "var(--pub-n-00)";
+const G_RECESSED = "var(--pub-n-09)";
+
 const MEASURE = "34rem";
+const SHELL = "72rem";
 
-// ── Primitives — identical across every register page. ─────────────────────
+// ── Primitives — ported from /pricing verbatim. ─────────────────────────────
 
-function Label({ children }: { children: React.ReactNode }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
+        fontFamily: DATA, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
         letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, margin: 0,
       }}
     >
@@ -61,12 +74,7 @@ function Label({ children }: { children: React.ReactNode }) {
 
 function Title({ children }: { children: React.ReactNode }) {
   return (
-    <h2
-      style={{
-        fontFamily: UI, fontSize: "25px", lineHeight: 1.25, fontWeight: 600,
-        letterSpacing: "-0.01em", color: INK, margin: 0,
-      }}
-    >
+    <h2 className="pub-title" style={{ fontFamily: UI, color: INK, margin: 0 }}>
       {children}
     </h2>
   );
@@ -76,7 +84,7 @@ function Prose({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: DOC, fontSize: "16px", lineHeight: 1.65, color: INK_2,
+        fontFamily: DOC, fontSize: "17px", lineHeight: 1.65, color: INK_2,
         maxWidth: MEASURE, margin: 0,
       }}
     >
@@ -89,17 +97,13 @@ function Caption({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "12.5px", lineHeight: 1.5, color: INK_3,
+        fontFamily: UI, fontSize: "13px", lineHeight: 1.5, color: INK_3,
         maxWidth: MEASURE, margin: 0,
       }}
     >
       {children}
     </p>
   );
-}
-
-function Rule() {
-  return <hr style={{ border: 0, borderTop: `1px solid ${RULE}`, margin: 0 }} />;
 }
 
 function Instrument({
@@ -114,7 +118,7 @@ function Instrument({
   const numeric = new Set(align ?? []);
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Label>{label}</Label>
+      <Eyebrow>{label}</Eyebrow>
       <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
         <table
           style={{
@@ -132,7 +136,7 @@ function Instrument({
                     fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
                     textTransform: "uppercase", color: INK_3,
                     textAlign: numeric.has(i) ? "end" : "start",
-                    padding: "0 16px 8px", borderBottom: `1.5px solid ${INK}`,
+                    padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -148,12 +152,13 @@ function Instrument({
                   <td
                     key={ci}
                     style={{
-                      height: "36px", padding: "0 16px", color: INK,
+                      padding: "14px 20px", color: INK,
                       textAlign: numeric.has(ci) ? "end" : "start",
                       fontFamily: numeric.has(ci) ? DATA : UI,
                       fontSize: numeric.has(ci) ? "12px" : "13.5px",
                       fontVariantNumeric: "tabular-nums",
                       whiteSpace: numeric.has(ci) ? "nowrap" : "normal",
+                      verticalAlign: "top",
                     }}
                   >
                     {cell}
@@ -181,10 +186,10 @@ function Action({ to, search, children, variant = "primary" }: {
       to={to as any}
       search={search as any}
       style={{
-        display: "inline-flex", alignItems: "center", height: "36px",
-        padding: "0 18px", borderRadius: "2px",
-        fontFamily: UI, fontSize: "13.5px", fontWeight: 500,
-        background: primary ? ACCENT : PANEL,
+        display: "inline-flex", alignItems: "center", height: "40px",
+        padding: "0 20px", borderRadius: "2px",
+        fontFamily: UI, fontSize: "14px", fontWeight: 500,
+        background: primary ? ACCENT : "transparent",
         color: primary ? "#FFFFFF" : INK,
         border: primary ? `1px solid ${ACCENT}` : `1px solid ${RULE}`,
         textDecoration: "none",
@@ -192,6 +197,22 @@ function Action({ to, search, children, variant = "primary" }: {
     >
       {children}
     </Link>
+  );
+}
+
+/** A full-bleed section: ground spans the viewport, content stays in the shell. */
+function Section({ ground, children }: { ground: string; children: React.ReactNode }) {
+  return (
+    <section style={{ background: ground }}>
+      <div
+        style={{
+          maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
+          display: "flex", flexDirection: "column", gap: "56px",
+        }}
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -229,116 +250,120 @@ function ForFoundersPage() {
   }, []);
 
   return (
-    <div style={{ background: SURFACE, minHeight: "100vh" }}>
+    <div style={{ background: G_BASE, minHeight: "100vh" }}>
       <SiteHeader />
 
-      <main
-        id="main-content"
-        style={{
-          maxWidth: "62rem", margin: "0 auto", padding: "72px 24px 96px",
-          display: "flex", flexDirection: "column", gap: "56px",
-        }}
-      >
-        {/* ── FOLD ────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <Label>For founders</Label>
-          <h1
+      <main id="main-content">
+        {/* ── FOLD — treatment A, base ────────────────────────────────────── */}
+        <section style={{ background: G_BASE }}>
+          <div
+            className="pub-hero"
             style={{
-              fontFamily: UI, fontSize: "40px", lineHeight: 1.15, fontWeight: 700,
-              letterSpacing: "-0.02em", color: INK, margin: 0, maxWidth: "18ch",
+              maxWidth: SHELL, margin: "0 auto", padding: "72px 24px 96px",
+              display: "grid", alignItems: "center", gap: "48px",
             }}
           >
-            You open the room. You control what&rsquo;s in it.
-          </h1>
-          <p
-            style={{
-              fontFamily: DOC, fontSize: "19px", lineHeight: 1.5, color: INK_2,
-              maxWidth: MEASURE, margin: 0,
-            }}
-          >
-            Nothing is visible to an investor until you grant access — and
-            every grant is logged, not implied.
-          </p>
-          <div style={{ marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <Eyebrow>For founders</Eyebrow>
+              <h1
+                className="pub-display"
+                style={{ fontFamily: UI, color: INK, margin: 0, maxWidth: "14ch" }}
+              >
+                You open the room. You control what&rsquo;s in it.
+              </h1>
+              <p
+                style={{
+                  fontFamily: DOC, fontSize: "21px", lineHeight: 1.5, color: INK_2,
+                  maxWidth: MEASURE, margin: 0,
+                }}
+              >
+                Nothing is visible to an investor until you grant access —
+                and every grant is logged, not implied.
+              </p>
+              <div style={{ marginTop: "8px" }}>
+                <Action to="/sign-up">Create an account</Action>
+              </div>
+            </div>
           </div>
         </section>
 
-        <Rule />
-
-        {/* ── PROSE 1 — what you control ────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>What you control</Title>
-          <Prose>
-            One profile, one document vault, built once and reused across
-            every room you open. An investor sees your public profile before
-            requesting access — nothing more — and sees the rest only after
-            you grant it.
-          </Prose>
-          <Prose>
-            There is no fee until a raise on the Direct tier reaches its
-            first close.
-          </Prose>
-        </section>
-
-        <Instrument
-          label="What a founder controls"
-          head={["Control", "Set by", "Visible to"]}
-          rows={[
-            ["Document access", "Founder, per room", "Investor, after NDA"],
-            ["Financial detail", "Founder, per disclosure", "Investor, after founder grants it"],
-            ["Team member records", "Founder", "Investor, only inside an open room"],
-            ["Counsel access at closing", "Either party", "Counsel — term summary and agreement only"],
-          ]}
-          caption="A lawyer invited at closing sees the term summary and the agreement. They do not see earlier diligence or negotiation history."
-        />
-
-        <Rule />
-
-        {/* ── PROSE 2 — document visibility ─────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>Per-document visibility</Title>
-          <Prose>
-            Every document you upload carries its own visibility — shared
-            with the room, or private to you. Changing it takes one action,
-            and the room only ever shows what you&rsquo;ve actually marked
-            shared.
-          </Prose>
-          <Prose>
-            The disclosure schedule states a default release point for each
-            field — when it typically becomes visible in a raise. Your own
-            document visibility is what actually governs a specific file,
-            regardless of what the schedule recommends by default.
-          </Prose>
-        </section>
-
-        <Instrument
-          label="Document visibility, as it actually works"
-          head={["State", "Meaning", "Set where"]}
-          rows={[
-            ["Shared", "Visible to the investor in this room, appears in their workstation automatically", "Per document, in the room's document vault"],
-            ["Private", "Visible only to you — never shown to the investor in this room", "Per document, same control"],
-          ]}
-          caption={
-            <>
-              This is a per-document toggle, not a schedule field — see the{" "}
-              <Link to="/resources/schedule" style={{ color: ACCENT }}>disclosure schedule</Link>{" "}
-              for the default release point each field is designed around.
-            </>
-          }
-        />
-
-        <Rule />
-
-        {/* ── CLOSE ──────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>Start on the Direct tier</Title>
-          <Prose>No card, no trial clock.</Prose>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
-            <Action to="/resources/schedule" variant="secondary">See the disclosure schedule</Action>
+        {/* ── WHAT YOU CONTROL — treatment C, recessed ────────────────────── */}
+        <Section ground={G_RECESSED}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Founder / Control</Eyebrow>
+            <Title>What you control</Title>
+            <Prose>
+              One profile, one document vault, built once and reused across
+              every room you open. An investor sees your public profile before
+              requesting access — nothing more — and sees the rest only after
+              you grant it.
+            </Prose>
+            <Prose>
+              There is no fee until a raise on the Direct tier reaches its
+              first close.
+            </Prose>
           </div>
-        </section>
+
+          <Instrument
+            label="What a founder controls"
+            head={["Control", "Set by", "Visible to"]}
+            rows={[
+              ["Document access", "Founder, per room", "Investor, after NDA"],
+              ["Financial detail", "Founder, per disclosure", "Investor, after founder grants it"],
+              ["Team member records", "Founder", "Investor, only inside an open room"],
+              ["Counsel access at closing", "Either party", "Counsel — term summary and agreement only"],
+            ]}
+            caption="A lawyer invited at closing sees the term summary and the agreement. They do not see earlier diligence or negotiation history."
+          />
+        </Section>
+
+        {/* ── PER-DOCUMENT VISIBILITY — treatment B, panel ────────────────── */}
+        <Section ground={G_PANEL}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Document / Visibility</Eyebrow>
+            <Title>Per-document visibility</Title>
+            <Prose>
+              Every document you upload carries its own visibility — shared
+              with the room, or private to you. Changing it takes one action,
+              and the room only ever shows what you&rsquo;ve actually marked
+              shared.
+            </Prose>
+            <Prose>
+              This overrides the disclosure schedule&rsquo;s default release
+              point for a specific file, regardless of what the schedule
+              recommends.
+            </Prose>
+          </div>
+
+          <Instrument
+            label="Document visibility, as it actually works"
+            head={["State", "Meaning", "Set where"]}
+            rows={[
+              ["Shared", "Visible to the investor in this room, appears in their workstation automatically", "Per document, in the room's document vault"],
+              ["Private", "Visible only to you — never shown to the investor in this room", "Per document, same control"],
+            ]}
+            caption={
+              <>
+                This is a per-document toggle, not a schedule field — see the{" "}
+                <Link to="/resources/schedule" style={{ color: ACCENT }}>disclosure schedule</Link>{" "}
+                for the default release point each field is designed around.
+              </>
+            }
+          />
+        </Section>
+
+        {/* ── CLOSE — treatment A, base ────────────────────────────────────── */}
+        <Section ground={G_BASE}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <Eyebrow>Start / Direct tier</Eyebrow>
+            <Title>Start on the Direct tier</Title>
+            <Prose>No card, no trial clock.</Prose>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
+              <Action to="/sign-up">Create an account</Action>
+              <Action to="/resources/schedule" variant="secondary">See the disclosure schedule</Action>
+            </div>
+          </div>
+        </Section>
       </main>
 
       <SiteFooter />

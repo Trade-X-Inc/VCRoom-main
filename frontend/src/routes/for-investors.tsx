@@ -4,7 +4,15 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// /for-investors — Step 5 of the public IA rebuild (18 Aug 2026).
+// /for-investors — Step 5 of the public IA rebuild (18 Aug 2026); brought
+// onto PUBLIC-REGISTER.md v2.0 (23 Aug 2026, Phase 3).
+//
+// VISUAL PASS ONLY, calibrated to /pricing's existing treatment rather than
+// the landing page's — per instruction, these pages stay calmer than the
+// landing page by design: v2.0 type scale, ground system, and table
+// density, but no SectionHeader, MetricGrid, dark section, or stat strip.
+// Three grounds: base (fold) -> recessed (path into a room + record-chain
+// instrument) -> panel (not a blockchain claim) -> base (close).
 //
 // Replaces the deleted /investors (removed Step 1 — "All sourced deals,
 // scored and stage-tagged", "AI risk analysis", neither of which exists;
@@ -33,19 +41,24 @@ const INK_2 = "var(--v2-ink-secondary)";
 const INK_3 = "var(--v2-ink-muted)";
 const RULE = "var(--v2-rule)";
 const RULE_LIGHT = "var(--v2-rule-light)";
-const SURFACE = "var(--v2-surface)";
-const PANEL = "var(--v2-panel)";
+const PANEL = "var(--pub-n-00)";
 const ACCENT = "var(--v2-accent)";
 
+// Section grounds (§5.2) — same tokens as /pricing, /.
+const G_BASE = "var(--pub-n-06)";
+const G_PANEL = "var(--pub-n-00)";
+const G_RECESSED = "var(--pub-n-09)";
+
 const MEASURE = "34rem";
+const SHELL = "72rem";
 
-// ── Primitives ───────────────────────────────────────────────────────────────
+// ── Primitives — ported from /pricing verbatim. ─────────────────────────────
 
-function Label({ children }: { children: React.ReactNode }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
+        fontFamily: DATA, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
         letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, margin: 0,
       }}
     >
@@ -56,12 +69,7 @@ function Label({ children }: { children: React.ReactNode }) {
 
 function Title({ children }: { children: React.ReactNode }) {
   return (
-    <h2
-      style={{
-        fontFamily: UI, fontSize: "25px", lineHeight: 1.25, fontWeight: 600,
-        letterSpacing: "-0.01em", color: INK, margin: 0,
-      }}
-    >
+    <h2 className="pub-title" style={{ fontFamily: UI, color: INK, margin: 0 }}>
       {children}
     </h2>
   );
@@ -71,7 +79,7 @@ function Prose({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: DOC, fontSize: "16px", lineHeight: 1.65, color: INK_2,
+        fontFamily: DOC, fontSize: "17px", lineHeight: 1.65, color: INK_2,
         maxWidth: MEASURE, margin: 0,
       }}
     >
@@ -84,17 +92,13 @@ function Caption({ children }: { children: React.ReactNode }) {
   return (
     <p
       style={{
-        fontFamily: UI, fontSize: "12.5px", lineHeight: 1.5, color: INK_3,
+        fontFamily: UI, fontSize: "13px", lineHeight: 1.5, color: INK_3,
         maxWidth: MEASURE, margin: 0,
       }}
     >
       {children}
     </p>
   );
-}
-
-function Rule() {
-  return <hr style={{ border: 0, borderTop: `1px solid ${RULE}`, margin: 0 }} />;
 }
 
 function Instrument({
@@ -109,7 +113,7 @@ function Instrument({
   const numeric = new Set(align ?? []);
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Label>{label}</Label>
+      <Eyebrow>{label}</Eyebrow>
       <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
         <table
           style={{
@@ -127,7 +131,7 @@ function Instrument({
                     fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
                     textTransform: "uppercase", color: INK_3,
                     textAlign: numeric.has(i) ? "end" : "start",
-                    padding: "0 16px 8px", borderBottom: `1.5px solid ${INK}`,
+                    padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -143,12 +147,13 @@ function Instrument({
                   <td
                     key={ci}
                     style={{
-                      height: "36px", padding: "0 16px", color: INK,
+                      padding: "14px 20px", color: INK,
                       textAlign: numeric.has(ci) ? "end" : "start",
                       fontFamily: numeric.has(ci) ? DATA : UI,
                       fontSize: numeric.has(ci) ? "11.5px" : "13.5px",
                       fontVariantNumeric: "tabular-nums",
                       whiteSpace: numeric.has(ci) ? "nowrap" : "normal",
+                      verticalAlign: "top",
                     }}
                   >
                     {cell}
@@ -176,10 +181,10 @@ function Action({ to, search, children, variant = "primary" }: {
       to={to as any}
       search={search as any}
       style={{
-        display: "inline-flex", alignItems: "center", height: "36px",
-        padding: "0 18px", borderRadius: "2px",
-        fontFamily: UI, fontSize: "13.5px", fontWeight: 500,
-        background: primary ? ACCENT : PANEL,
+        display: "inline-flex", alignItems: "center", height: "40px",
+        padding: "0 20px", borderRadius: "2px",
+        fontFamily: UI, fontSize: "14px", fontWeight: 500,
+        background: primary ? ACCENT : "transparent",
         color: primary ? "#FFFFFF" : INK,
         border: primary ? `1px solid ${ACCENT}` : `1px solid ${RULE}`,
         textDecoration: "none",
@@ -187,6 +192,22 @@ function Action({ to, search, children, variant = "primary" }: {
     >
       {children}
     </Link>
+  );
+}
+
+/** A full-bleed section: ground spans the viewport, content stays in the shell. */
+function Section({ ground, children }: { ground: string; children: React.ReactNode }) {
+  return (
+    <section style={{ background: ground }}>
+      <div
+        style={{
+          maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
+          display: "flex", flexDirection: "column", gap: "56px",
+        }}
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -229,104 +250,106 @@ function ForInvestorsPage() {
   }, []);
 
   return (
-    <div style={{ background: SURFACE, minHeight: "100vh" }}>
+    <div style={{ background: G_BASE, minHeight: "100vh" }}>
       <SiteHeader />
 
-      <main
-        id="main-content"
-        style={{
-          maxWidth: "62rem", margin: "0 auto", padding: "72px 24px 96px",
-          display: "flex", flexDirection: "column", gap: "56px",
-        }}
-      >
-        {/* ── FOLD ────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <Label>For investors</Label>
-          <h1
+      <main id="main-content">
+        {/* ── FOLD — treatment A, base ────────────────────────────────────── */}
+        <section style={{ background: G_BASE }}>
+          <div
+            className="pub-hero"
             style={{
-              fontFamily: UI, fontSize: "40px", lineHeight: 1.15, fontWeight: 700,
-              letterSpacing: "-0.02em", color: INK, margin: 0, maxWidth: "18ch",
+              maxWidth: SHELL, margin: "0 auto", padding: "72px 24px 96px",
+              display: "grid", alignItems: "center", gap: "48px",
             }}
           >
-            Every read and write leaves a linked entry.
-          </h1>
-          <p
-            style={{
-              fontFamily: DOC, fontSize: "19px", lineHeight: 1.5, color: INK_2,
-              maxWidth: MEASURE, margin: 0,
-            }}
-          >
-            Request access, diligence, negotiate — each step in a room
-            writes to an append-only chain, not just the moments someone
-            decided were worth recording.
-          </p>
-          <div style={{ marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <Eyebrow>For investors</Eyebrow>
+              <h1
+                className="pub-display"
+                style={{ fontFamily: UI, color: INK, margin: 0, maxWidth: "14ch" }}
+              >
+                Every read and write leaves a linked entry.
+              </h1>
+              <p
+                style={{
+                  fontFamily: DOC, fontSize: "21px", lineHeight: 1.5, color: INK_2,
+                  maxWidth: MEASURE, margin: 0,
+                }}
+              >
+                Request access, diligence, negotiate — each step in a room
+                writes to an append-only chain, not just the moments someone
+                decided were worth recording.
+              </p>
+              <div style={{ marginTop: "8px" }}>
+                <Action to="/sign-up">Create an account</Action>
+              </div>
+            </div>
           </div>
         </section>
 
-        <Rule />
-
-        {/* ── PROSE 1 — the path into a room ─────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>How you reach a room</Title>
-          <Prose>
-            You request access to a founder&rsquo;s public profile. The
-            founder approves or declines — approval is what actually creates
-            the room and adds you as a member. There is no path that skips
-            the founder&rsquo;s own decision.
-          </Prose>
-          <Prose>
-            Once you&rsquo;re in, diligence and term negotiation both run
-            inside the room. Every gateway call either of you makes —
-            reading the room&rsquo;s state, proposing a term, confirming a
-            gate — appends one entry to that room&rsquo;s record.
-          </Prose>
-        </section>
-
-        {/* ── INSTRUMENT — record-chain excerpt ─────────────────────────────── */}
-        <Instrument
-          label="A real chained segment · Room 957f9750"
-          head={["Seq", "Action", "Prev hash", "Entry hash"]}
-          align={[]}
-          rows={[
-            ["1", "deal_room.getIdentity", "0000000000…000000", "f237bf94b3…198230f"],
-            ["2", "deal_room.getWorkflowState", "f237bf94b3…198230f", "cedc568019…828edf6"],
-            ["3", "deal_room.getIdentity", "cedc568019…828edf6", "6fd1412541…0cc1b6a"],
-          ]}
-          caption="Each entry's prev_hash is the entry before it's entry_hash — copied verbatim from a live query, not constructed for this page. Change an earlier entry and every hash after it stops matching, visibly, without trusting us to say so."
-        />
-
-        <Rule />
-
-        {/* ── PROSE 2 — what this actually is ────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>Not a blockchain claim</Title>
-          <Prose>
-            There&rsquo;s no token, no network, no consensus mechanism —
-            none of that is what makes a record trustworthy. What makes it
-            trustworthy is that it can&rsquo;t be quietly edited, and that a
-            break in the chain is visible to anyone, immediately, without
-            asking us to confirm it.
-          </Prose>
-          <Prose>
-            The entries above are genuinely read actions — a room&rsquo;s
-            state being fetched, not a term being changed. The chain records
-            every gateway call, not only the dramatic ones.
-          </Prose>
-        </section>
-
-        <Rule />
-
-        {/* ── CLOSE ──────────────────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Title>See a room work, end to end</Title>
-          <Prose>No card, no trial clock.</Prose>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "4px" }}>
-            <Action to="/sign-up">Create an account</Action>
-            <Action to="/how-it-works" variant="secondary">See how it works</Action>
+        {/* ── HOW YOU REACH A ROOM — treatment C, recessed ────────────────── */}
+        <Section ground={G_RECESSED}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Investor / Access</Eyebrow>
+            <Title>How you reach a room</Title>
+            <Prose>
+              You request access to a founder&rsquo;s public profile. The
+              founder approves or declines — approval is what actually creates
+              the room and adds you as a member. There is no path that skips
+              the founder&rsquo;s own decision.
+            </Prose>
+            <Prose>
+              Once you&rsquo;re in, diligence and term negotiation both run
+              inside the room, and every step writes to its record.
+            </Prose>
           </div>
-        </section>
+
+          <Instrument
+            label="A real chained segment · Room 957f9750"
+            head={["Seq", "Action", "Prev hash", "Entry hash"]}
+            align={[]}
+            rows={[
+              ["1", "deal_room.getIdentity", "0000000000…000000", "f237bf94b3…198230f"],
+              ["2", "deal_room.getWorkflowState", "f237bf94b3…198230f", "cedc568019…828edf6"],
+              ["3", "deal_room.getIdentity", "cedc568019…828edf6", "6fd1412541…0cc1b6a"],
+            ]}
+            caption="Each entry's prev_hash is the entry before it's entry_hash — copied verbatim from a live query, not constructed for this page. Change an earlier entry and every hash after it stops matching, visibly, without trusting us to say so."
+          />
+        </Section>
+
+        {/* ── NOT A BLOCKCHAIN CLAIM — treatment B, panel ─────────────────── */}
+        <Section ground={G_PANEL}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+            <Eyebrow>Method / Record</Eyebrow>
+            <Title>Not a blockchain claim</Title>
+            <Prose>
+              There&rsquo;s no token, no network, no consensus mechanism —
+              none of that is what makes a record trustworthy. What makes it
+              trustworthy is that it can&rsquo;t be quietly edited, and that a
+              break in the chain is visible to anyone, immediately, without
+              asking us to confirm it.
+            </Prose>
+            <Prose>
+              The entries above are genuinely read actions — a room&rsquo;s
+              state being fetched, not a term being changed. The chain records
+              every gateway call, not only the dramatic ones.
+            </Prose>
+          </div>
+        </Section>
+
+        {/* ── CLOSE — treatment A, base ────────────────────────────────────── */}
+        <Section ground={G_BASE}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <Eyebrow>See it live</Eyebrow>
+            <Title>See a room work, end to end</Title>
+            <Prose>No card, no trial clock.</Prose>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
+              <Action to="/sign-up">Create an account</Action>
+              <Action to="/how-it-works" variant="secondary">See how it works</Action>
+            </div>
+          </div>
+        </Section>
       </main>
 
       <SiteFooter />
