@@ -103,7 +103,7 @@ async function getSession(email: string, password: string) {
 
 async function injectSession(ctx: BrowserContext, session: any) {
   const p = await ctx.newPage();
-  await p.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await p.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await p.evaluate(({ key, s }: any) => localStorage.setItem(key, JSON.stringify({
     access_token: s.access_token, refresh_token: s.refresh_token,
     expires_in: s.expires_in, expires_at: s.expires_at,
@@ -214,7 +214,7 @@ test("2. Progress stepper renders for both founder and investor", async ({ brows
     getSession(FOUNDER_EMAIL, FOUNDER_PASS),
   ]);
 
-  const url = `https://hockystick.app/app/deal-room/${testDealRoomId}`;
+  const url = `https://lengdon.com/app/deal-room/${testDealRoomId}`;
 
   // Investor view
   const investorCtx = await browser.newContext();
@@ -277,7 +277,7 @@ test("3. Advance to stage1_review — stage_entered_at updates, content differs 
   expect(after?.[0]?.workflow_stage).toBe("stage1_review");
   expect(after?.[0]?.stage_entered_at).not.toBe(beforeAt);
 
-  const url = `https://hockystick.app/app/deal-room/${testDealRoomId}`;
+  const url = `https://lengdon.com/app/deal-room/${testDealRoomId}`;
 
   // Investor sees "Advance to Meetings" button
   const investorSession = await getSession(INVESTOR_EMAIL, INVESTOR_PASS);
@@ -352,7 +352,7 @@ test("4. Create Meeting 1 in deal_room_meetings", async () => {
 // ── Test 5: Send term sheet — stage2_unlocked=true, workflow advances ─────────
 
 test("5. Sending term sheet unlocks Stage 2 and advances to stage2_diligence", async ({ browser }) => {
-  const url = `https://hockystick.app/app/deal-room/${testDealRoomId}`;
+  const url = `https://lengdon.com/app/deal-room/${testDealRoomId}`;
 
   // Set stage to meetings + 1 completed meeting so investor can advance
   await servicePatch(`deal_rooms?id=eq.${testDealRoomId}`, {
@@ -398,7 +398,7 @@ test("5. Sending term sheet unlocks Stage 2 and advances to stage2_diligence", a
 
 test("6. Stage 2 gate present when locked, absent when unlocked", async ({ browser }) => {
   test.setTimeout(90000);
-  const url = `https://hockystick.app/app/deal-room/${testDealRoomId}`;
+  const url = `https://lengdon.com/app/deal-room/${testDealRoomId}`;
 
   // Force stage2_unlocked=false
   await servicePatch(`deal_rooms?id=eq.${testDealRoomId}`, { stage2_unlocked: false });
@@ -447,7 +447,7 @@ test("6. Stage 2 gate present when locked, absent when unlocked", async ({ brows
 
 test("7. Founder accepts term sheet → workflow_stage=closed, term_sheet_accepted_at set", async ({ browser }) => {
   test.setTimeout(90000);
-  const url = `https://hockystick.app/app/deal-room/${testDealRoomId}`;
+  const url = `https://lengdon.com/app/deal-room/${testDealRoomId}`;
 
   // Ensure term_sheet_status=sent and stage=stage2_diligence so founder sees the accept UI
   await servicePatch(`deal_rooms?id=eq.${testDealRoomId}`, {

@@ -267,7 +267,7 @@ export type DocumentsView = "document-intake" | "source-files" | "digital-docume
 
 // R9: `view` renders one IP Vault leaf's slice of this workspace under route
 // control. Source Files = physical uploads (file_path set); Digital Document
-// Vault = Hockystick-processed documents (structured content) — deliberately
+// Vault = Lengdon-processed documents (structured content) — deliberately
 // distinct concepts, never merged (R9 step 6).
 export function Documents({ view }: { view?: DocumentsView } = {}) {
   const { user } = useAuth();
@@ -387,7 +387,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       // physical uploads only
       filtered = filtered.filter(t => !!t.founderDoc?.file_path);
     } else if (view === "digital-document-vault") {
-      // Hockystick-processed documents — genuinely extracted structured
+      // Lengdon-processed documents — genuinely extracted structured
       // content only. A stored extraction_error means nothing was actually
       // extracted, so it's excluded here even though status is non-empty.
       filtered = filtered.filter(t =>
@@ -739,7 +739,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           <p className="text-sm text-muted-foreground">
             {view === "document-intake" ? "Add the documents investors expect for your stage."
               : view === "source-files" ? "The original files you uploaded."
-              : view === "digital-document-vault" ? "Your Hockystick-processed documents."
+              : view === "digital-document-vault" ? "Your Lengdon-processed documents."
               : view === "privacy-settings" ? "Control which documents each stage can see."
               : "Your document workspace — guided by AI"}
           </p>
@@ -1142,7 +1142,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         </div>
       )}
 
-      {/* R10 step 5 — Digital Document Vault: the Hockystick-processed
+      {/* R10 step 5 — Digital Document Vault: the Lengdon-processed
           counterpart to the Digital Profile — structured AI-extracted
           detail per document, ready to attach when a deal room exists. */}
       {view === "digital-document-vault" && (
@@ -1322,7 +1322,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         <div className="space-y-8">
           {[
             { key: "source-files" as const, label: "Source Files privacy", description: "Control which of your original uploaded files are visible in a deal room." },
-            { key: "digital-document-vault" as const, label: "Digital Document Vault privacy", description: "Control which Hockystick-processed documents are visible in a deal room." },
+            { key: "digital-document-vault" as const, label: "Digital Document Vault privacy", description: "Control which Lengdon-processed documents are visible in a deal room." },
           ].map(({ key, label, description }) => {
             const docsForSection = key === "source-files"
               ? documentsWithStatus.filter((t) => !!t.founderDoc?.file_path)

@@ -12,7 +12,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../../.env.test") });
 
-const BASE_URL = process.env.TEST_BASE_URL || "https://hockystick.app";
+const BASE_URL = process.env.TEST_BASE_URL || "https://lengdon.com";
 const SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co";
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const FOUNDER_EMAIL = "test-founder@hockystick.app";

@@ -452,7 +452,7 @@ function OverviewPage() {
       <div className="nda-print-content hidden print:block">
         <div style={{ fontFamily: "serif", maxWidth: "700px", margin: "0 auto", padding: "40px 0" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
-            <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.15em", color: "#6B7280", marginBottom: "4px" }}>Hockystick</div>
+            <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.15em", color: "#6B7280", marginBottom: "4px" }}>Lengdon</div>
             <div style={{ fontSize: "18px", fontWeight: "700" }}>{companyName}</div>
             <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "4px" }}>
               Non-Disclosure Agreement · v{ndaDoc?.version ?? 1} · Generated {ndaDoc?.updated_at ? format(new Date(ndaDoc.updated_at), "MMMM d, yyyy") : ""}

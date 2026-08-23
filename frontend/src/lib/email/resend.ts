@@ -13,7 +13,7 @@ function getResendKey(): string {
   return key;
 }
 
-export const APP_URL = getEnvVar("VITE_APP_URL") || "https://hockystick.app";
+export const APP_URL = getEnvVar("VITE_APP_URL") || "https://lengdon.com";
 
 export async function sendEmail({
   to,
@@ -44,11 +44,11 @@ export async function sendEmail({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Hockystick <hello@hockystick.app>",
+      from: "Lengdon <hello@lengdon.com>",
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
-      reply_to: replyTo || "hello@hockystick.app",
+      reply_to: replyTo || "hello@lengdon.com",
       tags: tags || [],
     }),
   });

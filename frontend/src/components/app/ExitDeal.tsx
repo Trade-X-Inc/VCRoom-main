@@ -5,7 +5,7 @@ import { LogOut } from "lucide-react";
 // anything: the room preserves whatever state it reached and stays accessible
 // (not archived, not read-only) so the parties could resume if they choose. No
 // fee is charged for an unclosed deal. If the fee was already paid but the deal
-// abandoned before close, that's a manual support case (hello@hockystick.app) —
+// abandoned before close, that's a manual support case (hello@lengdon.com) —
 // NOT an automatic refund. This component is UI-only: "abandoning" simply means a
 // party stops proceeding; there is no destructive action, so it only surfaces the
 // honest message + confirmation, and (when a fee was paid) the support path.
@@ -37,7 +37,7 @@ export function ExitDeal({ feeAlreadyPaid, isClosed }: { feeAlreadyPaid: boolean
             </p>
             {feeAlreadyPaid && (
               <div className="mt-3 border p-3 text-[13px]" style={{ borderColor: "#F59E0B", background: "#FFFBEB", borderRadius: 0, color: "#92400E" }}>
-                A platform fee was already confirmed for this deal. Exiting does not automatically refund it — email <strong>hello@hockystick.app</strong> and our team will resolve it manually.
+                A platform fee was already confirmed for this deal. Exiting does not automatically refund it — email <strong>hello@lengdon.com</strong> and our team will resolve it manually.
               </div>
             )}
             <div className="mt-5 flex gap-2">

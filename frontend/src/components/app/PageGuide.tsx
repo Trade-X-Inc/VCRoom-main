@@ -99,7 +99,7 @@ const GUIDES: Record<PageId, GuideContent> = {
     paragraphs: [
       "The Watchlist is your private tracker for companies you are actively evaluating.",
       "Status pipeline: Sourcing → Reviewing → Diligence → Passed or Invested or Watching. Move a company through stages as your diligence progresses.",
-      "Add companies manually or bulk-import via CSV. When a row matches a real Hockystick account by name, a Request access action appears. The score column shows how well each company matched your thesis at the time you added them.",
+      "Add companies manually or bulk-import via CSV. When a row matches a real Lengdon account by name, a Request access action appears. The score column shows how well each company matched your thesis at the time you added them.",
     ],
     aiSystemContext:
       "The user is on /app/investor/startups — the Investor Watchlist. Status values: Sourcing, Reviewing, Diligence, Passed, Invested, Watching. Companies can be added manually, via CSV, or from the deal flow feed. Score column = thesis match score at add time.",

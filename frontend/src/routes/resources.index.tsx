@@ -6,14 +6,14 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/resources/")({
   head: () => ({
     meta: [
-      { title: "Startup Resources — Hockystick" },
+      { title: "Startup Resources — Lengdon" },
       {
         name: "description",
         content:
           "Accelerators, grants, VC funds, and programs from GCC, MENA, EU, NA, SEA, and Africa. Everything you need to fund your startup.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/resources" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/resources" }],
   }),
   component: Resources,
 });
@@ -306,7 +306,7 @@ function Resources() {
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--foreground)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
         >
-          ← Back to Hockystick
+          ← Back to Lengdon
         </a>
 
         {/* Hero */}
@@ -413,7 +413,7 @@ function Resources() {
         {/* Disclaimer */}
         <p className="text-xs mt-12 leading-relaxed max-w-2xl" style={{ color: "var(--faint)" }}>
           ⚠ Program details change frequently. Verify all terms directly with each organization before
-          applying. Hockystick is not affiliated with any of these programs.
+          applying. Lengdon is not affiliated with any of these programs.
         </p>
 
         {/* CTA — rewritten 18 Aug 2026: the prior copy claimed a verified

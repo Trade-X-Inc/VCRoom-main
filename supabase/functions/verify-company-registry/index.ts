@@ -129,7 +129,7 @@ async function checkDIFC(companyName: string): Promise<{
     try {
       const res = await fetch(url, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; Hockystick-Verification-Bot/1.0)",
+          "User-Agent": "Mozilla/5.0 (compatible; Lengdon-Verification-Bot/1.0)",
           "Accept": "text/html,application/xhtml+xml",
         },
         signal: AbortSignal.timeout(10000),
@@ -159,7 +159,7 @@ async function checkDIFC(companyName: string): Promise<{
     const q = encodeURIComponent(`"${companyName}" site:difc.ae`);
     const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${q}`, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; Hockystick-Verification-Bot/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; Lengdon-Verification-Bot/1.0)",
         "Accept": "text/html",
       },
       signal: AbortSignal.timeout(8000),

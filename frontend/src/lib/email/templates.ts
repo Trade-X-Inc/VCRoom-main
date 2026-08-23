@@ -5,7 +5,7 @@ function baseLayout(content: string, previewText = "") {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="x-apple-disable-message-reformatting">
-<title>Hockystick</title>
+<title>Lengdon</title>
 <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,9 +46,9 @@ ${previewText ? `<div style="display:none;max-height:0;overflow:hidden;">${previ
       ${content}
     </div>
     <div class="footer">
-      <p>Hockystick · <a href="https://hockystick.app" style="color:#7c3aed;">hockystick.app</a></p>
-      <p style="margin-top:8px;">You're receiving this because you have an account on Hockystick.</p>
-      <p style="margin-top:4px;"><a href="https://hockystick.app/app/settings" style="color:#7c3aed;">Manage notifications</a> · <a href="https://hockystick.app/unsubscribe" style="color:#7c3aed;">Unsubscribe</a></p>
+      <p>Lengdon · <a href="https://lengdon.com" style="color:#7c3aed;">lengdon.com</a></p>
+      <p style="margin-top:8px;">You're receiving this because you have an account on Lengdon.</p>
+      <p style="margin-top:4px;"><a href="https://lengdon.com/app/settings" style="color:#7c3aed;">Manage notifications</a> · <a href="https://lengdon.com/unsubscribe" style="color:#7c3aed;">Unsubscribe</a></p>
     </div>
   </div>
 </div>
@@ -60,8 +60,8 @@ ${previewText ? `<div style="display:none;max-height:0;overflow:hidden;">${previ
 export function welcomeEmail({ name, role }: { name: string; role: "founder" | "investor" }) {
   const founderContent = `
     <div class="badge">🎉 Founding Member</div>
-    <h1>Welcome to Hockystick, ${name}.</h1>
-    <p>You've joined at exactly the right time. Hockystick is in beta — which means you get full access to every feature, completely free.</p>
+    <h1>Welcome to Lengdon, ${name}.</h1>
+    <p>You've joined at exactly the right time. Lengdon is in beta — which means you get full access to every feature, completely free.</p>
     <div class="highlight"><p>As a founding member, you'll lock in 50% off when we launch paid plans. That's our promise.</p></div>
     <h2>Get started in 3 steps:</h2>
     <ul>
@@ -69,14 +69,14 @@ export function welcomeEmail({ name, role }: { name: string; role: "founder" | "
       <li>Upload your pitch deck to your document vault</li>
       <li>Create your first deal room and invite an investor</li>
     </ul>
-    <div class="center"><a href="https://hockystick.app/app" class="btn">Open your dashboard →</a></div>
+    <div class="center"><a href="https://lengdon.com/app" class="btn">Open your dashboard →</a></div>
     <div class="divider"></div>
     <p class="meta">Questions? Reply to this email — a real human will respond.</p>
   `;
   const investorContent = `
     <div class="badge">🎉 Founding Member</div>
-    <h1>Welcome to Hockystick, ${name}.</h1>
-    <p>You're in. Hockystick is in beta and you have full access to every investor tool — AI analysis, thesis-match scoring, deal flow pipeline, and more.</p>
+    <h1>Welcome to Lengdon, ${name}.</h1>
+    <p>You're in. Lengdon is in beta and you have full access to every investor tool — AI analysis, thesis-match scoring, deal flow pipeline, and more.</p>
     <div class="highlight"><p>Founding investors lock in 50% off when paid plans launch. No action needed — it's automatic.</p></div>
     <h2>Start in 3 steps:</h2>
     <ul>
@@ -84,12 +84,12 @@ export function welcomeEmail({ name, role }: { name: string; role: "founder" | "
       <li>Add companies to your watchlist</li>
       <li>Run your first AI analysis on any startup</li>
     </ul>
-    <div class="center"><a href="https://hockystick.app/app/investor/" class="btn">Open your dashboard →</a></div>
+    <div class="center"><a href="https://lengdon.com/app/investor/" class="btn">Open your dashboard →</a></div>
     <div class="divider"></div>
     <p class="meta">Questions? Reply to this email — a real human will respond.</p>
   `;
   return {
-    subject: `Welcome to Hockystick, ${name} — you're in.`,
+    subject: `Welcome to Lengdon, ${name} — you're in.`,
     html: baseLayout(
       role === "founder" ? founderContent : investorContent,
       "Your deal room is ready. Full access, free during beta.",
@@ -116,7 +116,7 @@ export function dealRoomInviteEmail({
   const meta = [companyName, companyStage, companySector].filter(Boolean).join(" · ");
   const content = `
     <h1>${founderName} invited you to a deal room.</h1>
-    <p>You've been invited to review <strong>${companyName}</strong> on Hockystick — a private, encrypted deal room where you can access their documents, run due diligence, and make an investment decision.</p>
+    <p>You've been invited to review <strong>${companyName}</strong> on Lengdon — a private, encrypted deal room where you can access their documents, run due diligence, and make an investment decision.</p>
     <div class="highlight"><p>📋 ${meta}</p></div>
     <p>Inside the deal room you'll find:</p>
     <ul>
@@ -129,7 +129,7 @@ export function dealRoomInviteEmail({
     <p class="meta center">This invite expires in 7 days. If you have questions, reply to this email.</p>
   `;
   return {
-    subject: `${founderName} invited you to review ${companyName} on Hockystick`,
+    subject: `${founderName} invited you to review ${companyName} on Lengdon`,
     html: baseLayout(content, `${companyName} deal room is ready for your review.`),
   };
 }
@@ -322,15 +322,15 @@ export function referralInviteEmail({
   inviteLink: string;
 }) {
   const content = `
-    <h1>${inviterName} invited you to Hockystick.</h1>
-    <p>${inviterName} thinks you'd find Hockystick useful — it's the private deal room where founders and investors close deals without the chaos.</p>
+    <h1>${inviterName} invited you to Lengdon.</h1>
+    <p>${inviterName} thinks you'd find Lengdon useful — it's the private deal room where founders and investors close deals without the chaos.</p>
     <div class="highlight"><p>🎁 Because you were invited, you get <strong>3 extra AI analyses free</strong> when you join.</p></div>
-    <p>Hockystick is currently in beta — ${role === "founder" ? "founders" : "investors"} get full access to every feature, completely free.</p>
+    <p>Lengdon is currently in beta — ${role === "founder" ? "founders" : "investors"} get full access to every feature, completely free.</p>
     <div class="center"><a href="${inviteLink}" class="btn">Accept invitation →</a></div>
     <p class="meta center">This invitation expires in 14 days.</p>
   `;
   return {
-    subject: `${inviterName} invited you to Hockystick — free during beta`,
+    subject: `${inviterName} invited you to Lengdon — free during beta`,
     html: baseLayout(content, "You've been invited to the deal platform where trust gets built."),
   };
 }
@@ -339,29 +339,29 @@ export function referralInviteEmail({
 export function magicLinkEmail({ name, magicLink }: { name: string; magicLink: string }) {
   const content = `
     <h1>Your sign-in link.</h1>
-    <p>Hi ${name}, here's your sign-in link for Hockystick. This link expires in 1 hour.</p>
-    <div class="center"><a href="${magicLink}" class="btn">Sign in to Hockystick →</a></div>
+    <p>Hi ${name}, here's your sign-in link for Lengdon. This link expires in 1 hour.</p>
+    <div class="center"><a href="${magicLink}" class="btn">Sign in to Lengdon →</a></div>
     <p class="meta center">If you didn't request this, you can safely ignore this email.</p>
   `;
   return {
-    subject: "Your Hockystick sign-in link",
-    html: baseLayout(content, "Click to sign in to Hockystick."),
+    subject: "Your Lengdon sign-in link",
+    html: baseLayout(content, "Click to sign in to Lengdon."),
   };
 }
 
 // 11. BETA FEEDBACK REQUEST
 export function feedbackRequestEmail({ name, role }: { name: string; role: "founder" | "investor" }) {
   const content = `
-    <h1>How's Hockystick working for you?</h1>
-    <p>Hi ${name}, you've been using Hockystick for a week. We're in beta and your feedback directly shapes the product.</p>
+    <h1>How's Lengdon working for you?</h1>
+    <p>Hi ${name}, you've been using Lengdon for a week. We're in beta and your feedback directly shapes the product.</p>
     <p>What would you like us to build next? What's broken? What's working?</p>
     <p>Just reply to this email — we read every response personally.</p>
-    <div class="center"><a href="mailto:hello@hockystick.app?subject=Feedback%20from%20${encodeURIComponent(name)}" class="btn">Send feedback →</a></div>
+    <div class="center"><a href="mailto:hello@lengdon.com?subject=Feedback%20from%20${encodeURIComponent(name)}" class="btn">Send feedback →</a></div>
     <div class="divider"></div>
-    <p class="meta">PS — If you're finding Hockystick useful, sharing it with ${role === "founder" ? "investors you know" : "founders raising capital"} helps us grow. Thank you.</p>
+    <p class="meta">PS — If you're finding Lengdon useful, sharing it with ${role === "founder" ? "investors you know" : "founders raising capital"} helps us grow. Thank you.</p>
   `;
   return {
-    subject: "Quick question about your Hockystick experience",
+    subject: "Quick question about your Lengdon experience",
     html: baseLayout(content, "We'd love to hear how it's going."),
   };
 }
@@ -381,13 +381,13 @@ export function teamInviteEmail({
   inviteLink: string;
 }) {
   const content = `
-    <h1>${inviterName} added you to ${fundName} on Hockystick.</h1>
-    <p>You've been added as <strong>${role}</strong> on the ${fundName} team on Hockystick.</p>
+    <h1>${inviterName} added you to ${fundName} on Lengdon.</h1>
+    <p>You've been added as <strong>${role}</strong> on the ${fundName} team on Lengdon.</p>
     <p>You'll have access to the team's deal flow, due diligence workstation, AI analysis tools, and portfolio tracking.</p>
     <div class="center"><a href="${inviteLink}" class="btn">Join your team →</a></div>
   `;
   return {
-    subject: `You've been added to ${fundName} on Hockystick`,
+    subject: `You've been added to ${fundName} on Lengdon`,
     html: baseLayout(content, `${inviterName} added you to ${fundName}.`),
   };
 }
@@ -411,17 +411,17 @@ export function startupTeamInviteEmail({
   role: string;
   inviteLink: string;
 }) {
-  const roleDesc = ROLE_DESCRIPTIONS[role.toLowerCase()] ?? `You will have access to ${companyName}'s workspace on Hockystick.`;
+  const roleDesc = ROLE_DESCRIPTIONS[role.toLowerCase()] ?? `You will have access to ${companyName}'s workspace on Lengdon.`;
   const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
   const content = `
     <h2>You have been invited to join ${companyName}.</h2>
-    <p>${inviterName} has invited you to join <strong>${companyName}</strong> as a <strong>${roleLabel}</strong> on Hockystick.</p>
+    <p>${inviterName} has invited you to join <strong>${companyName}</strong> as a <strong>${roleLabel}</strong> on Lengdon.</p>
     <div class="highlight"><p>${roleDesc}</p></div>
     <div class="center"><a href="${inviteLink}" class="btn">Accept invitation →</a></div>
     <p class="meta center">This invitation expires in 7 days. If you did not expect this invitation, you can ignore this email.</p>
   `;
   return {
-    subject: `You've been invited to join ${companyName} on Hockystick`,
+    subject: `You've been invited to join ${companyName} on Lengdon`,
     html: baseLayout(content, `${inviterName} invited you to join ${companyName}.`),
   };
 }
@@ -442,7 +442,7 @@ export function lawyerInviteEmail({
 }) {
   const content = `
     <h2>You've been invited as Legal Counsel.</h2>
-    <p>${inviterName} has invited you to represent the ${side === "founder" ? "founder" : "investor"} side of the <strong>${companyName}</strong> deal room on Hockystick.</p>
+    <p>${inviterName} has invited you to represent the ${side === "founder" ? "founder" : "investor"} side of the <strong>${companyName}</strong> deal room on Lengdon.</p>
     <div class="highlight"><p>Access is scoped to this deal room's Investment Terms stage only — the deal summary, term sheet, the Investment Terms meeting, and its records. You will not see earlier-stage documents, diligence, or private notes.</p></div>
     <p>You'll be asked to sign the room's NDA when you join, same as any other participant.</p>
     <div class="center"><a href="${inviteLink}" class="btn">Accept invitation →</a></div>

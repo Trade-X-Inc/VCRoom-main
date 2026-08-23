@@ -200,14 +200,14 @@ function hashDisplay(h: string): string {
 export const Route = createFileRoute("/for-investors")({
   head: () => ({
     meta: [
-      { title: "For investors — Hockystick" },
+      { title: "For investors — Lengdon" },
       {
         name: "description",
         content:
           "Request access, diligence in the room, negotiate terms — and every step writes to a chain you can independently verify.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/for-investors" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for-investors" }],
   }),
   component: ForInvestorsPage,
 });

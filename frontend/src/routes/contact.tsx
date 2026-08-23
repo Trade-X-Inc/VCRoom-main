@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/contact')({
   head: () => ({
-    links: [{ rel: "canonical", href: "https://hockystick.app/contact" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/contact" }],
   }),
   component: Contact,
 })
@@ -33,7 +33,7 @@ function Contact() {
       .insert({ name, email, role, message })
 
     if (dbError) {
-      setError('Something went wrong. Email us directly at hello@hockystick.app')
+      setError('Something went wrong. Email us directly at hello@lengdon.com')
     } else {
       setSubmitted(true)
     }
@@ -45,7 +45,7 @@ function Contact() {
       <SiteHeader />
       <main id="main-content" className="max-w-xl mx-auto px-6 py-24">
         <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 block">
-          ← Back to Hockystick
+          ← Back to Lengdon
         </a>
 
         <p className="text-xs text-brand uppercase tracking-[0.2em] mb-4">
@@ -134,8 +134,8 @@ function Contact() {
 
             <p className="text-xs text-faint text-center pt-2">
               Or email directly:{' '}
-              <a href="mailto:hello@hockystick.app" className="text-muted-foreground hover:text-foreground">
-                hello@hockystick.app
+              <a href="mailto:hello@lengdon.com" className="text-muted-foreground hover:text-foreground">
+                hello@lengdon.com
               </a>
             </p>
           </div>

@@ -40,7 +40,7 @@ async function getSession(email: string, password: string) {
 
 async function injectSession(ctx: BrowserContext, session: any) {
   const p = await ctx.newPage();
-  await p.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await p.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await p.evaluate(({ key, val, themeKey, themeVal }: any) => {
     localStorage.setItem(key, JSON.stringify(val));
     localStorage.setItem(themeKey, themeVal);
@@ -57,7 +57,7 @@ async function injectSession(ctx: BrowserContext, session: any) {
 
 async function openIntake(ctx: BrowserContext) {
   const page = await ctx.newPage();
-  await page.goto("https://hockystick.app/app/investor/intake", { waitUntil: "networkidle", timeout: 45_000 });
+  await page.goto("https://lengdon.com/app/investor/intake", { waitUntil: "networkidle", timeout: 45_000 });
   await page.waitForSelector('button:has-text("Parse and score")', { timeout: 20_000 });
   return page;
 }

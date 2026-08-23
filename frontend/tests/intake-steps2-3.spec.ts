@@ -47,7 +47,7 @@ async function getSession(email: string, password: string): Promise<any> {
 
 async function injectSession(context: BrowserContext, session: any) {
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(
     ({ key, val, themeKey, themeVal }: any) => {
       localStorage.setItem(key, JSON.stringify(val));
@@ -72,7 +72,7 @@ async function injectSession(context: BrowserContext, session: any) {
 
 async function openIntakePage(context: BrowserContext): Promise<Page> {
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/app/investor/intake", {
+  await page.goto("https://lengdon.com/app/investor/intake", {
     waitUntil: "networkidle",
     timeout: 30_000,
   });

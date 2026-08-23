@@ -605,7 +605,7 @@ function InviteModal({
       >
         <div className="text-base font-semibold mb-1">Invite team member</div>
         <div className="text-xs text-muted-foreground mb-6">
-          They'll receive an email to join {startup.company_name} on Hockystick.
+          They'll receive an email to join {startup.company_name} on Lengdon.
         </div>
         <div className="mb-4">
           <label className={labelCls}>Email address</label>

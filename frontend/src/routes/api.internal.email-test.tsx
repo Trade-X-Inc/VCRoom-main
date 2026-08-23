@@ -32,7 +32,7 @@ const runEmailTest = createServerFn({ method: "GET" })
 
     const { subject, html } = welcomeEmail({ name: "Test User", role: "founder" });
     const result = await sendEmail({
-      to: "hello@hockystick.app",
+      to: "hello@lengdon.com",
       subject: "[TEST] " + subject,
       html,
       tags: [{ name: "type", value: "test" }],

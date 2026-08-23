@@ -1,4 +1,4 @@
-# Hockystick — Environment Variable Security Rules
+# Lengdon — Environment Variable Security Rules
 
 ## THE RULE
 VITE_ prefix = visible in browser source code.
@@ -14,7 +14,7 @@ Never put secrets in VITE_ variables.
 
 ## NEVER with VITE_ prefix (server secrets only)
 - SUPABASE_SERVICE_ROLE_KEY  — bypasses ALL Row Level Security
-- RESEND_API_KEY             — can send email as hockystick.app
+- RESEND_API_KEY             — can send email as lengdon.com
 - OPENAI_API_KEY             — can burn OpenAI credits
 - ADMIN_SECRET_KEY           — admin data access
 - HUBSPOT_PRIVATE_APP_TOKEN  — full CRM read/write

@@ -857,7 +857,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
   }
 
   const completeness = computeCompleteness(form);
-  const profileUrl = `${import.meta.env.VITE_APP_URL || "https://hockystick.app"}/i/${form.profile_slug}`;
+  const profileUrl = `${import.meta.env.VITE_APP_URL || "https://lengdon.com"}/i/${form.profile_slug}`;
 
   // R9 view gating — which cards this leaf renders
   const show = (card: string) => (view ? VIEW_CARDS[view].includes(card) : true);

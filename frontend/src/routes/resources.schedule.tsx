@@ -224,14 +224,14 @@ const VALUE_TYPE_LABEL: Record<ValueType, string> = {
 export const Route = createFileRoute("/resources/schedule")({
   head: () => ({
     meta: [
-      { title: "The disclosure schedule — Hockystick" },
+      { title: "The disclosure schedule — Lengdon" },
       {
         name: "description",
         content:
           "Every field a technology seed round discloses, its required evidence, and when it releases — published in full, no account required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/resources/schedule" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/resources/schedule" }],
   }),
   component: SchedulePage,
 });

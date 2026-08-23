@@ -11,10 +11,10 @@ import { Star } from "lucide-react";
 export const Route = createFileRoute("/feedback")({
   head: () => ({
     meta: [
-      { title: "Feedback — Hockystick" },
-      { name: "description", content: "Help us improve Hockystick." },
+      { title: "Feedback — Lengdon" },
+      { name: "description", content: "Help us improve Lengdon." },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/feedback" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/feedback" }],
   }),
   component: Feedback,
 });

@@ -55,7 +55,7 @@ async function getSession(email: string, password: string): Promise<any> {
 async function injectSession(context: BrowserContext, session: any) {
   // Navigate to the app first so cookies/storage are scoped to the right origin
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
 
   // Inject session into localStorage in the Supabase format
   await page.evaluate(({ key, session }: { key: string; session: any }) => {
@@ -87,7 +87,7 @@ test.describe("Auth smoke tests", () => {
     const context = await browser.newContext();
     const page = await signInAs(context, FOUNDER_EMAIL, FOUNDER_PASSWORD);
 
-    await page.goto("https://hockystick.app/app", { waitUntil: "networkidle" });
+    await page.goto("https://lengdon.com/app", { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/playwright-founder-landing.png" });
 
     const url = page.url();
@@ -103,7 +103,7 @@ test.describe("Auth smoke tests", () => {
     const context = await browser.newContext();
     const page = await signInAs(context, INVESTOR_EMAIL, INVESTOR_PASSWORD);
 
-    await page.goto("https://hockystick.app/app/investor", { waitUntil: "networkidle" });
+    await page.goto("https://lengdon.com/app/investor", { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/playwright-investor-landing.png" });
 
     const url = page.url();
@@ -135,7 +135,7 @@ test.describe("Portfolio entry — end-to-end", () => {
     const page = await signInAs(context, INVESTOR_EMAIL, INVESTOR_PASSWORD);
 
     // ── Navigate to profile page ──────────────────────────────────────────────
-    await page.goto("https://hockystick.app/app/investor/profile", { waitUntil: "networkidle" });
+    await page.goto("https://lengdon.com/app/investor/profile", { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/playwright-profile-loaded.png" });
     console.log("Profile page URL:", page.url());
 

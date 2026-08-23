@@ -6,7 +6,7 @@ const errorRate     = new Rate('errors');
 const dealRoomP95   = new Trend('deal_room_latency_ms');
 const rlsViolations = new Counter('rls_violations');
 
-const SITE = 'https://hockystick.app';
+const SITE = 'https://lengdon.com';
 const SUPA = 'https://ldimninnjlvxozubheib.supabase.co';
 
 // Credentials — all passed via -e flags, never hardcoded
@@ -297,7 +297,7 @@ export function handleSummary(data) {
 
   const out = `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  HOCKYSTICK — LOAD-1 RESULTS (30K target)
+  LENGDON — LOAD-1 RESULTS (30K target)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Total requests:     ${reqs}
   Error rate:         ${errRate}%

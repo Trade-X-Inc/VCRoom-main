@@ -25,7 +25,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = `sb-ldimninnjlvxozubheib-auth-token`;
-const APP_URL = process.env.R12_TEST_BASE_URL || "https://hockystick.app";
+const APP_URL = process.env.R12_TEST_BASE_URL || "https://lengdon.com";
 
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL;
 const FOUNDER_PASSWORD = testEnv.TEST_FOUNDER_PASSWORD;
@@ -88,7 +88,7 @@ test("Roast live-session state change reaches the host's open control panel live
       is_public: true,
       rules_acknowledged_at: nowIso,
       daily_room_name: "r13-realtime-test-room",
-      daily_room_url: "https://hockystick.daily.co/r13-realtime-test-room",
+      daily_room_url: "https://lengdon.daily.co/r13-realtime-test-room",
     },
   });
   expect(insertRes.ok()).toBeTruthy();
@@ -157,7 +157,7 @@ test("Roast live-session state change reaches an unauthenticated participant's o
       is_public: true,
       rules_acknowledged_at: nowIso,
       daily_room_name: "r13-realtime-test-room-2",
-      daily_room_url: "https://hockystick.daily.co/r13-realtime-test-room-2",
+      daily_room_url: "https://lengdon.daily.co/r13-realtime-test-room-2",
     },
   });
   expect(insertRes.ok()).toBeTruthy();

@@ -15,7 +15,7 @@ export function Logo({
     <div className="flex items-center gap-2">
       <img
         src="/favicon.svg"
-        alt="Hockystick"
+        alt="Lengdon"
         width={dim}
         height={dim}
         className="shrink-0"
@@ -31,7 +31,7 @@ export function Logo({
             fontSize: size === "lg" ? "18px" : "15px",
           }}
         >
-          Hockystick
+          Lengdon
         </span>
       )}
     </div>

@@ -54,8 +54,8 @@ function buildSystemPrompt(pageContext: PageContext, userRole: string): string {
   const hasCompanyContext = !!company;
 
   const identityLine = hasCompanyContext
-    ? `You are the Hockystick AI — a fundraising advisor for ${company}${stage ? `, a ${stage}-stage startup` : ""}.`
-    : "You are the Hockystick AI — a fundraising advisor built into this platform.";
+    ? `You are the Lengdon AI — a fundraising advisor for ${company}${stage ? `, a ${stage}-stage startup` : ""}.`
+    : "You are the Lengdon AI — a fundraising advisor built into this platform.";
 
   // What this panel instance actually knows vs doesn't
   const knownFields = [company && `company name (${company})`, stage && `stage (${stage})`]

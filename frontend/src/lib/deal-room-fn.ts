@@ -482,7 +482,7 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
 
       if (isBlocked) {
         const label = BLOCKED_CATEGORY_LABELS[data.category] ?? data.category;
-        const blockedReason = `Hockystick does not facilitate sharing ${label}. This protects both parties.`;
+        const blockedReason = `Lengdon does not facilitate sharing ${label}. This protects both parties.`;
         await sbFetch(url, key, "deal_room_document_requests", "POST", {
           deal_room_id: data.deal_room_id,
           requested_by: auth.uid,

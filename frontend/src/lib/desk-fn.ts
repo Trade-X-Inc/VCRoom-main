@@ -260,9 +260,9 @@ export const completeCheckpointTask = createServerFn({ method: "POST" })
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "Hockystick <noreply@hockystick.app>",
+        from: "Lengdon <noreply@lengdon.com>",
         to: [data.recipientEmail],
-        reply_to: "hello@hockystick.app",
+        reply_to: "hello@lengdon.com",
         subject,
         html,
       }),
@@ -307,7 +307,7 @@ function buildEmailHtml(senderName: string, body: string): string {
 </div>
 <div style="padding:32px;">${escaped}</div>
 <div style="padding:16px 32px 24px;text-align:center;background:#fafafa;border-top:1px solid #e4e4e7;">
-  <p style="color:#71717a;font-size:12px;margin:0;">Sent via <a href="https://hockystick.app" style="color:#7c3aed;">hockystick.app</a></p>
+  <p style="color:#71717a;font-size:12px;margin:0;">Sent via <a href="https://lengdon.com" style="color:#7c3aed;">lengdon.com</a></p>
 </div>
 </div></div></body></html>`;
 }

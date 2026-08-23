@@ -45,7 +45,7 @@ async function getSession(email: string, password: string): Promise<any> {
 
 async function injectSession(context: BrowserContext, session: any) {
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(({ key, session }: { key: string; session: any }) => {
     localStorage.setItem(key, JSON.stringify({
       access_token: session.access_token,
@@ -77,7 +77,7 @@ test.describe("Investor profile UX fixes", () => {
     await injectSession(context, session);
     const page = await context.newPage();
 
-    await page.goto("https://hockystick.app/app/investor/profile", { waitUntil: "networkidle" });
+    await page.goto("https://lengdon.com/app/investor/profile", { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/pw-profile-accordions.png" });
 
     // Portfolio accordion open: "Add portfolio company" button only exists when open
@@ -102,7 +102,7 @@ test.describe("Investor profile UX fixes", () => {
     await injectSession(context, session);
     const page = await context.newPage();
 
-    await page.goto("https://hockystick.app/app/investor/profile", { waitUntil: "networkidle" });
+    await page.goto("https://lengdon.com/app/investor/profile", { waitUntil: "networkidle" });
 
     const profile = await getInvestorProfile();
     console.log("Profile slug:", profile.profile_slug, "Published:", profile.profile_published);
@@ -144,7 +144,7 @@ test.describe("Investor profile UX fixes", () => {
     await injectSession(context, session);
     const page = await context.newPage();
 
-    await page.goto(`https://hockystick.app/i/${profile.profile_slug}`, { waitUntil: "networkidle" });
+    await page.goto(`https://lengdon.com/i/${profile.profile_slug}`, { waitUntil: "networkidle" });
     // Client-side session check + fetch takes a moment — wait for spinner to clear
     await page.waitForSelector("text=Preview mode", { timeout: 15000 });
     await page.screenshot({ path: "/tmp/pw-owner-preview.png" });
@@ -196,7 +196,7 @@ test.describe("Investor profile UX fixes", () => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    await page.goto(`https://hockystick.app/i/${profile.profile_slug}`, { waitUntil: "networkidle" });
+    await page.goto(`https://lengdon.com/i/${profile.profile_slug}`, { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/pw-nonowner-unpublished.png" });
 
     const bodyText = await page.textContent("body");

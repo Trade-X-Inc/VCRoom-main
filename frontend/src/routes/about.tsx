@@ -12,7 +12,7 @@ function About() {
       <SiteHeader />
       <main id="main-content" className="max-w-3xl mx-auto px-6 py-24">
         <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 block">
-          ← Back to Hockystick
+          ← Back to Lengdon
         </a>
 
         <p className="text-xs text-brand uppercase tracking-[0.2em] mb-4">
@@ -45,10 +45,10 @@ function About() {
 
           <div>
             <h2 className="font-syne font-bold text-xl text-foreground mb-3">
-              What Hockystick does
+              What Lengdon does
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Hockystick replaces the pitch deck with a verified founder
+              Lengdon replaces the pitch deck with a verified founder
               profile. Investors browse structured, AI-reviewed profiles
               with staged access to documents — from public overview to
               full due diligence — all inside encrypted deal rooms.
@@ -63,7 +63,7 @@ function About() {
               Where we're based
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Hockystick is a global platform, headquartered at DIFC FinTech
+              Lengdon is a global platform, headquartered at DIFC FinTech
               Hive in Dubai. Founders and investors from any jurisdiction can
               use it — the platform is built for anyone raising or deploying
               capital, wherever they are based.
@@ -94,13 +94,13 @@ function About() {
               Who built this
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Hockystick is built by a small team operating from DIFC FinTech Hive,
+              Lengdon is built by a small team operating from DIFC FinTech Hive,
               Dubai. We are in beta, and we say so. Every number on our site is a real
               platform figure, every verification check runs against live registries,
               and every NDA is DIAC-arbitrated. We would rather earn trust slowly with
               working infrastructure than borrow it with logos and press releases.
               Questions about how anything works — verification, deal rooms, data
-              handling — reach us at hello@hockystick.app and we answer directly.
+              handling — reach us at hello@lengdon.com and we answer directly.
             </p>
           </div>
         </div>

@@ -12,6 +12,12 @@ interface ChangeEntry {
 
 const CHANGELOG: { month: string; entries: ChangeEntry[] }[] = [
   {
+    month: "August 2026",
+    entries: [
+      { date: "2026-08-23", area: "Brand", text: "Platform renamed from Hockystick to Lengdon (domain lengdon.com). Operating entity is unchanged — Venture Tech LLC, DIFC, under incorporation. This is a naming change only; no product behavior changed." },
+    ],
+  },
+  {
     month: "July 2026",
     entries: [
       { date: "2026-07-12", area: "AI", text: "Confrontational due-diligence engine: the AI reads actual document contents in a deal room and cross-examines them against every stated claim — reporting contradictions, gaps, red flags, and unverifiable claims with quoted evidence and suggested Q&A questions." },
@@ -75,7 +81,7 @@ export const CHANGELOG_PAGES: Record<string, DocPage> = {
       slug: "changelog",
       title: "Changelog",
       description:
-        "What changed on Hockystick, month by month — derived from the actual commit history, not a marketing summary.",
+        "What changed on Lengdon, month by month — derived from the actual commit history, not a marketing summary.",
       updated: "2026-07-08",
       toc: CHANGELOG.map((m) => ({
         id: m.month.toLowerCase().replace(/\s+/g, "-"),

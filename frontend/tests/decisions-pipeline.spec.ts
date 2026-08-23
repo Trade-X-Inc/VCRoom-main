@@ -48,7 +48,7 @@ const INVESTOR_EMAIL = testEnv.TEST_INVESTOR_EMAIL;
 const INVESTOR_PASS  = testEnv.TEST_INVESTOR_PASSWORD;
 const INVESTOR_ID    = testEnv.TEST_INVESTOR_USER_ID;
 
-const PAGE_URL = "https://hockystick.app/app/investor/decisions";
+const PAGE_URL = "https://lengdon.com/app/investor/decisions";
 
 // Known fixture IDs
 const ALPHA_ID   = "fbcbbab3-62e4-45b2-a5ab-84f182bb1bda"; // Reviewing (stale)
@@ -85,7 +85,7 @@ async function getSession(email: string, password: string) {
 
 async function injectSession(ctx: BrowserContext, session: any) {
   const p = await ctx.newPage();
-  await p.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await p.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await p.evaluate(({ key, s }: any) => localStorage.setItem(key, JSON.stringify({
     access_token: s.access_token, refresh_token: s.refresh_token,
     expires_in: s.expires_in, expires_at: s.expires_at,

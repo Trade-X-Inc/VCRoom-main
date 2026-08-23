@@ -192,7 +192,7 @@ function JoinTeamPage() {
         <ErrorCard
           title="Invitation not available"
           message="This invitation link is invalid, expired, or has already been used. Ask the team admin to send a new invitation."
-          cta={{ label: "Go to hockystick.app →", href: "/" }}
+          cta={{ label: "Go to lengdon.com →", href: "/" }}
         />
       </PublicShell>
     );
@@ -212,7 +212,7 @@ function JoinTeamPage() {
           <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 16 }}>
             {inviterName} invited you to join{" "}
             <strong style={{ color: "var(--foreground)" }}>{companyName}</strong> as a{" "}
-            <strong style={{ color: "var(--brand)" }}>{roleLabel}</strong> on Hockystick.
+            <strong style={{ color: "var(--brand)" }}>{roleLabel}</strong> on Lengdon.
           </p>
           <div style={{ background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>
             Invite sent to <strong style={{ color: "var(--foreground)" }}>{invite?.email}</strong>
@@ -346,7 +346,7 @@ function PublicShell({ children }: { children: React.ReactNode }) {
       </div>
       {children}
       <div style={{ marginTop: 32, fontSize: 11, color: "var(--faint)" }}>
-        Hockystick · Where deals get done
+        Lengdon · Where deals get done
       </div>
     </div>
   );

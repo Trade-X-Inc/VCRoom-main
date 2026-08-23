@@ -382,14 +382,14 @@ function TermStateDiagram() {
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How it works — Hockystick" },
+      { title: "How it works — Lengdon" },
       {
         name: "description",
         content:
           "The closing pipeline and term negotiation, drawn as they actually run — six gates, two rails, and the state machine behind every term.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/how-it-works" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/how-it-works" }],
   }),
   component: HowItWorksPage,
 });

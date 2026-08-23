@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/cap-table")({
   head: () => ({
     meta: [
-      { title: "Cap Table Calculator — Model Equity & Dilution Across Rounds | Hockystick" },
+      { title: "Cap Table Calculator — Model Equity & Dilution Across Rounds | Lengdon" },
       {
         name: "description",
         content:
           "Build your startup cap table, model dilution across pre-seed, seed, and Series A rounds. See exactly how each funding round affects founder and investor ownership. Free, no signup required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/cap-table" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/cap-table" }],
   }),
   component: CapTablePage,
 });
@@ -980,7 +980,7 @@ function CapTablePage() {
             {founders.length > 0 && (
               <div className="tool-no-print">
                 <button
-                  onClick={() => { const p = document.title; document.title = "Cap Table — Hockystick"; window.print(); document.title = p; }}
+                  onClick={() => { const p = document.title; document.title = "Cap Table — Lengdon"; window.print(); document.title = p; }}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: "6px",
                     background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
@@ -1110,7 +1110,7 @@ function CapTablePage() {
             Investors review your cap table before they write a check.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            A clean cap structure signals a founder who understands how equity works. Build your Hockystick profile to show investors you are fundraising-ready.
+            A clean cap structure signals a founder who understands how equity works. Build your Lengdon profile to show investors you are fundraising-ready.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}

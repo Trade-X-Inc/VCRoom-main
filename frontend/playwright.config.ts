@@ -8,7 +8,7 @@ export default defineConfig({
   reporter: "line",
   use: {
     headless: true,
-    baseURL: "https://hockystick.app",
+    baseURL: "https://lengdon.com",
     viewport: { width: 1280, height: 800 },
     actionTimeout: 10_000,
     ignoreHTTPSErrors: true,

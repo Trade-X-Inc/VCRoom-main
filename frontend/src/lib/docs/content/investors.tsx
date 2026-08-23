@@ -10,7 +10,7 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
       slug: "investors",
       title: "Investor features",
       description:
-        "The investor side of Hockystick: watchlist-driven sourcing, AI deal briefs, structured decisions, and NDA-gated deal rooms.",
+        "The investor side of Lengdon: watchlist-driven sourcing, AI deal briefs, structured decisions, and NDA-gated deal rooms.",
       updated: UPDATED,
       toc: [
         { id: "map", label: "Feature map" },
@@ -204,7 +204,7 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Hockystick's founding complaint is the deal that dies of silence. The decisions board
+          Lengdon's founding complaint is the deal that dies of silence. The decisions board
           makes outcomes explicit: every deal ends in Invest, Hold, or Pass, and a Pass carries a
           categorized reason that the founder receives.
         </Lead>

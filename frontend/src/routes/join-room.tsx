@@ -175,7 +175,7 @@ function JoinRoomPage() {
         <ErrorCard
           title="Invitation not found"
           message="This invitation link is invalid or has already been used. Ask whoever invited you to send a new invitation."
-          cta={{ label: "Go to hockystick.app →", href: "/" }}
+          cta={{ label: "Go to lengdon.com →", href: "/" }}
         />
       </PublicShell>
     );
@@ -187,7 +187,7 @@ function JoinRoomPage() {
         <ErrorCard
           title="Invitation expired"
           message={`This invitation has expired. Ask your contact at ${companyName} to send a new invitation.`}
-          cta={{ label: "Go to hockystick.app →", href: "/" }}
+          cta={{ label: "Go to lengdon.com →", href: "/" }}
         />
       </PublicShell>
     );
@@ -334,7 +334,7 @@ function PublicShell({ children }: { children: React.ReactNode }) {
       </div>
       {children}
       <div style={{ marginTop: 32, fontSize: 11, color: "var(--faint)" }}>
-        Hockystick · Where deals get done
+        Lengdon · Where deals get done
       </div>
     </div>
   );

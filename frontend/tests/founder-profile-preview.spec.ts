@@ -58,7 +58,7 @@ async function getSession(email: string, password: string): Promise<any> {
 
 async function injectSession(context: BrowserContext, session: any) {
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(
     ({ key, session }: { key: string; session: any }) => {
       localStorage.setItem(key, JSON.stringify({
@@ -83,7 +83,7 @@ test.describe("Founder public profile — owner preview gate", () => {
     await injectSession(context, session);
     const page = await context.newPage();
 
-    await page.goto(`https://hockystick.app/p/${PROFILE_SLUG}`, { waitUntil: "networkidle" });
+    await page.goto(`https://lengdon.com/p/${PROFILE_SLUG}`, { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/pw-founder-preview-owner.png" });
 
     // Banner must be visible
@@ -107,7 +107,7 @@ test.describe("Founder public profile — owner preview gate", () => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    await page.goto(`https://hockystick.app/p/${PROFILE_SLUG}`, { waitUntil: "networkidle" });
+    await page.goto(`https://lengdon.com/p/${PROFILE_SLUG}`, { waitUntil: "networkidle" });
     await page.screenshot({ path: "/tmp/pw-founder-preview-anon.png" });
 
     // Must show private message

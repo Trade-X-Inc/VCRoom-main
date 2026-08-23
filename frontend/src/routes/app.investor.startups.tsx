@@ -93,7 +93,7 @@ export function StartupsPage() {
   const [csvOpen, setCsvOpen] = useState(false);
   // R14 — table is the default; grid/icon stay available via the toggle.
   const [viewMode, setViewMode] = useState<"list" | "grid" | "icon">("list");
-  const [platformFilter, setPlatformFilter] = useState<"all" | "hockystick">("all");
+  const [platformFilter, setPlatformFilter] = useState<"all" | "lengdon">("all");
   const [stageFilter, setStageFilter] = useState<string | null>(null);
   const [regionFilter, setRegionFilter] = useState<RegionFilter>("All");
 
@@ -108,7 +108,7 @@ export function StartupsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "hockystick_startup_sample.csv";
+    a.download = "lengdon_startup_sample.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -164,7 +164,7 @@ export function StartupsPage() {
     },
   });
 
-  // R14 — resolve watchlist rows to real Hockystick startups by exact
+  // R14 — resolve watchlist rows to real Lengdon startups by exact
   // company name, client-side (investor_watchlist has no startup_id column
   // at all). Flagged separately for its own §15/§25 review — see
   // CLAUDE.md §20.2 — not touched here.
@@ -294,7 +294,7 @@ export function StartupsPage() {
   // Platform-generated vc_leads (created via Connect)
   const { data: platformLeads = [], isLoading: platformLoading } = useQuery({
     queryKey: ["platform-vc-leads", user?.id],
-    enabled: !!user?.id && platformFilter === "hockystick",
+    enabled: !!user?.id && platformFilter === "lengdon",
     staleTime: 0,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -324,6 +324,11 @@ export function StartupsPage() {
             )
           )
         `)
+        // NOT renamed to "Lengdon" — 2 live vc_leads rows still have
+        // source = "Hockystick" (confirmed live, 23 Aug 2026). Renaming this
+        // filter without a corresponding UPDATE would silently drop those
+        // rows from the investor's watchlist view. Needs a data migration
+        // (a production write, gated by CLAUDE.md §4) before this changes.
         .eq("source", "Hockystick")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -502,15 +507,15 @@ export function StartupsPage() {
             All leads
           </button>
           <button
-            onClick={() => setPlatformFilter("hockystick")}
-            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "hockystick" ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
+            onClick={() => setPlatformFilter("lengdon")}
+            className={`px-3 py-1 rounded-md text-sm ${platformFilter === "lengdon" ? "hs-gradient text-brand-foreground" : "text-muted-foreground hover:bg-accent"}`}
           >
-            From Hockystick
+            From Lengdon
           </button>
         </div>
 
-        {/* Platform leads view — From Hockystick tab */}
-        {platformFilter === "hockystick" && (
+        {/* Platform leads view — From Lengdon tab */}
+        {platformFilter === "lengdon" && (
           <>
             {/* Region filter pills — always render when tab is active */}
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px" }}>
@@ -578,7 +583,7 @@ export function StartupsPage() {
                       <div
                         key={l.id}
                         onClick={() => slug && navigate({ to: "/p/$slug", params: { slug } })}
-                        title={slug ? undefined : "No Hockystick profile — add their details manually"}
+                        title={slug ? undefined : "No Lengdon profile — add their details manually"}
                         className="rounded-2xl bg-card p-5 group relative overflow-hidden transition-all"
                         style={{
                           border: "1px solid var(--border)",
@@ -739,7 +744,7 @@ export function StartupsPage() {
                 <button
                   onClick={() => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c)}
                   className="flex flex-col items-center gap-2 w-full"
-                  title={!c.profile_slug ? "No Hockystick profile — add their details manually" : undefined}
+                  title={!c.profile_slug ? "No Lengdon profile — add their details manually" : undefined}
                 >
                   <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-xl font-bold group-hover:scale-105 transition-transform">
                     {(c.company_name || "S")[0]}
@@ -1011,7 +1016,7 @@ export function StartupsPage() {
 
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
 
-              {/* View Hockystick profile CTA */}
+              {/* View Lengdon profile CTA */}
               {selectedWatchlist.profile_slug && (
                 <a
                   href={`/p/${selectedWatchlist.profile_slug}`}

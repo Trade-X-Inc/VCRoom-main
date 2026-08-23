@@ -9,7 +9,7 @@ import { brand, color, font, radius } from "@/lib/design-tokens";
  *
  * TODO(stripe): this entire component is a placeholder. Replace onConfirm's
  * caller-side logic with a real Stripe PaymentIntent confirmation once the
- * Hockystick entity is registered and Stripe is wired. Search the codebase
+ * Lengdon entity is registered and Stripe is wired. Search the codebase
  * for "TODO(stripe)" to find every site that needs the swap alongside this one.
  */
 export function PaymentConfirm({

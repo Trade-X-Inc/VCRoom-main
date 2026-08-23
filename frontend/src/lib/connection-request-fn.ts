@@ -119,7 +119,7 @@ export const sendConnectionRequest = createServerFn({ method: "POST" })
         stage: startup.stage,
         geography: startup.country,
         status: "New",
-        source: "Hockystick",
+        source: "Lengdon",
         discovery_request_id: requestId,
       });
       if (leads?.[0]?.id) {

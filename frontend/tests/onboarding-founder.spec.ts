@@ -25,7 +25,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = "sb-ldimninnjlvxozubheib-auth-token";
-const APP = process.env.PLAYWRIGHT_BASE_URL || "https://hockystick.app";
+const APP = process.env.PLAYWRIGHT_BASE_URL || "https://lengdon.com";
 
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL;
 const FOUNDER_PASSWORD = testEnv.TEST_FOUNDER_PASSWORD;
@@ -121,7 +121,7 @@ test.describe("Onboarding — founder flow", () => {
       return;
     }
 
-    const introTitle = page.locator("text=Welcome to Hockystick");
+    const introTitle = page.locator("text=Welcome to Lengdon");
     await expect(introTitle).toBeVisible({ timeout: 10000 });
 
     const doneBtn = page.locator('button:has-text("Done")');

@@ -6,14 +6,14 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/registry")({
   head: () => ({
     meta: [
-      { title: "Company Registry Check — Hockystick" },
+      { title: "Company Registry Check — Lengdon" },
       {
         name: "description",
         content:
           "Search across OpenCorporates (140+ jurisdictions), UK Companies House, and DIFC entity register simultaneously. Free. No account required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/registry" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/registry" }],
   }),
   component: Registry,
 });
@@ -104,7 +104,7 @@ function Registry() {
           href="/"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12"
         >
-          ← Back to Hockystick
+          ← Back to Lengdon
         </a>
 
         {/* Header */}
@@ -369,7 +369,7 @@ function Registry() {
             >
               <p className="text-sm font-semibold text-foreground mb-1">Raising capital?</p>
               <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)" }}>
-                Hockystick automatically runs registry checks on all founder profiles — plus
+                Lengdon automatically runs registry checks on all founder profiles — plus
                 AI document review. Free during beta.
               </p>
               <a

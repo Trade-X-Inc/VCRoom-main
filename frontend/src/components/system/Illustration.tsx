@@ -1,5 +1,5 @@
 /**
- * The Hockystick characters — minimal line-art figures for empty, loading,
+ * The Lengdon characters — minimal line-art figures for empty, loading,
  * error and no-results states. 64×64, 2px stroke, ink only (currentColor),
  * round caps. Like Notion's empty states, but warmer.
  *

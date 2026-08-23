@@ -44,7 +44,7 @@ async function getSession(email: string, password: string): Promise<any> {
   return data;
 }
 
-const APP_URL = process.env.R12_TEST_BASE_URL || "https://hockystick.app";
+const APP_URL = process.env.R12_TEST_BASE_URL || "https://lengdon.com";
 
 async function injectSession(context: BrowserContext, session: any) {
   const page = await context.newPage();

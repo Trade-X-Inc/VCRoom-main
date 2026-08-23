@@ -200,14 +200,14 @@ function Action({ to, search, children, variant = "primary" }: {
 export const Route = createFileRoute("/for-founders")({
   head: () => ({
     meta: [
-      { title: "For founders — Hockystick" },
+      { title: "For founders — Lengdon" },
       {
         name: "description",
         content:
           "What you control, what releases when, and what evidence backs a raise — for the founder opening the room.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/for-founders" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for-founders" }],
   }),
   component: ForFoundersPage,
 });

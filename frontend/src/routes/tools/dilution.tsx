@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/dilution")({
   head: () => ({
     meta: [
-      { title: "Dilution Calculator — See How Funding Rounds Affect Your Ownership | Hockystick" },
+      { title: "Dilution Calculator — See How Funding Rounds Affect Your Ownership | Lengdon" },
       {
         name: "description",
         content:
           "Calculate exactly how much equity each funding round dilutes your ownership. Model up to 3 rounds with option pool top-ups. Free dilution calculator for startup founders.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/dilution" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/dilution" }],
   }),
   component: DilutionPage,
 });
@@ -429,7 +429,7 @@ function DilutionPage() {
 
   const handleCopy = () => {
     const lines = [
-      "Dilution Summary (Hockystick Calculator)",
+      "Dilution Summary (Lengdon Calculator)",
       "",
       ...snapshots.map((s) => [
         `Stage: ${s.stageName}`,
@@ -438,7 +438,7 @@ function DilutionPage() {
       ].join("\n")),
       "",
       `Total founder dilution: ${fmtPct(totalDilution)} (${fmtPct(founderInitial)} → ${fmtPct(founderFinal)})`,
-      "Model yours at hockystick.app/tools/dilution",
+      "Model yours at lengdon.com/tools/dilution",
     ];
     navigator.clipboard.writeText(lines.join("\n")).then(() => {
       setCopied(true); setTimeout(() => setCopied(false), 2000);
@@ -702,7 +702,7 @@ function DilutionPage() {
                 {copied ? "Copied!" : "Copy results"}
               </button>
               <button
-                onClick={() => { const p = document.title; document.title = "Dilution Calculator — Hockystick"; window.print(); document.title = p; }}
+                onClick={() => { const p = document.title; document.title = "Dilution Calculator — Lengdon"; window.print(); document.title = p; }}
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 600, color: "#5B21B6", cursor: "pointer" }}>
                 <Download size={14} /> Download PDF
               </button>
@@ -808,7 +808,7 @@ function DilutionPage() {
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>Dilution is negotiable. Preparation is not.</h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Investors who use Hockystick come in with a full diligence workflow. Meet them with a verified profile and a prepared deal room.
+            Investors who use Lengdon come in with a full diligence workflow. Meet them with a verified profile and a prepared deal room.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}

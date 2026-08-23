@@ -10,7 +10,7 @@ export const PRICING_PAGES: Record<string, DocPage> = {
       slug: "pricing",
       title: "Pricing & plans",
       description:
-        "The six Hockystick plans, the 1.5% success fee, and how open investor registration works. Honest numbers, no hidden tiers.",
+        "The six Lengdon plans, the 1.5% success fee, and how open investor registration works. Honest numbers, no hidden tiers.",
       updated: UPDATED,
       toc: [
         { id: "model", label: "The model" },
@@ -23,9 +23,9 @@ export const PRICING_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Hockystick charges founders, not investors' wallets-by-data: the platform's job is to
+          Lengdon charges founders, not investors' wallets-by-data: the platform's job is to
           make founders fundable, so founders pay a subscription and a success fee only when a
-          round actually closes. Full live comparison at <A href="/pricing">hockystick.app/pricing</A>.
+          round actually closes. Full live comparison at <A href="/pricing">lengdon.com/pricing</A>.
         </Lead>
 
         <H2 id="model">The model</H2>
@@ -62,11 +62,11 @@ export const PRICING_PAGES: Record<string, DocPage> = {
 
         <H2 id="success-fee">The success fee</H2>
         <P>
-          When a round closes through a Hockystick deal room, the platform charges a success fee
+          When a round closes through a Lengdon deal room, the platform charges a success fee
           of <strong>1.5% of the closed amount — minimum $500, maximum $15,000</strong>. The cap
           matters: on a $5M round the fee is $15K, not $75K. The fee funds the parts of the
           platform that make closing possible — the NDA framework and the confrontational
-          due-diligence engine — and aligns Hockystick's incentive with the founder's: we only
+          due-diligence engine — and aligns Lengdon's incentive with the founder's: we only
           earn meaningfully when you close.
         </P>
 

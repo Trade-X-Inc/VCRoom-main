@@ -29,11 +29,11 @@ export interface BlogPostWithContent extends BlogPost {
 // @notionhq/client SDK was 88KB of dead weight in the CF worker bundle and
 // only its types are used now.
 
-// Brand is "Hockystick" (no e). Notion-authored content has shipped with the
+// Brand is "Lengdon" (no e). Notion-authored content has shipped with the
 // misspelling before — normalize every rendered string so it can't reach the
 // page or meta tags. Slugs are exempt: changing them would break live URLs.
 function fixBrand(text: string): string {
-  return text.replace(/Hockeystick/g, "Hockystick").replace(/hockeystick/g, "hockystick");
+  return text.replace(/Hockeystick/g, "Lengdon").replace(/hockeystick/g, "lengdon");
 }
 
 function richTextToString(richText: RichTextItemResponse[]): string {
@@ -56,7 +56,7 @@ function extractPostMeta(page: PageObjectResponse): BlogPost {
   const seoTitle = props["SEO Title"]?.rich_text ? richTextToString(props["SEO Title"].rich_text) : title;
   const seoDescription = props["SEO Description"]?.rich_text ? richTextToString(props["SEO Description"].rich_text) : excerpt;
   const author = props.Author?.rich_text ? richTextToString(props.Author.rich_text) :
-                 props.Author?.people?.[0]?.name ?? "The Hockystick Team";
+                 props.Author?.people?.[0]?.name ?? "The Lengdon Team";
   const readingTimeRaw = props["Reading Time"]?.number;
   const readingTime = readingTimeRaw != null ? `${readingTimeRaw} min read` : "5 min read";
 

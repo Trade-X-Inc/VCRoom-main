@@ -450,7 +450,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         .update({ profile_published: true, profile_slug: profileSlug, publicly_discoverable: true })
         .eq("id", startup.id);
       if (error) throw error;
-      toast.success("Profile is live on Hockystick.");
+      toast.success("Profile is live on Lengdon.");
       // Durable confirmation — the founder should know they're now visible
       // in the directory, with a link to their own public profile.
       import("@/lib/notify").then(({ notifyUser }) =>
@@ -1128,12 +1128,12 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             <div className="text-sm mt-1" style={{ color: "#52525B" }}>{form.tagline || form.description || "Add a tagline below"}</div>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: "#71717A" }}>
               <span>Your profile link:</span>
-              <span className="rounded-none border border-border bg-white px-2 py-1 text-[11px] font-medium text-foreground">hockystick.app/p/{profileSlug || "your-slug"}</span>
+              <span className="rounded-none border border-border bg-white px-2 py-1 text-[11px] font-medium text-foreground">lengdon.com/p/{profileSlug || "your-slug"}</span>
               <button
                 type="button"
                 onClick={() => {
                   if (profileSlug) {
-                    navigator.clipboard.writeText(`https://hockystick.app/p/${profileSlug}`);
+                    navigator.clipboard.writeText(`https://lengdon.com/p/${profileSlug}`);
                     toast.success("Profile URL copied");
                   }
                 }}
@@ -1519,7 +1519,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                   matching app.analytics.tsx's ChartCard convention */}
               <div>
                 <p className="text-sm font-semibold text-foreground mb-1">Profile Analytics</p>
-                <p className="text-xs mb-4" style={{ color: "#71717A" }}>Tracking views of hockystick.app/p/{startup.profile_slug}</p>
+                <p className="text-xs mb-4" style={{ color: "#71717A" }}>Tracking views of lengdon.com/p/{startup.profile_slug}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { label: "Total views", value: String(totalViews) },
@@ -1640,14 +1640,14 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               <div className="p-4 rounded-none border border-border bg-white">
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Your shareable profile link</p>
                 <div className="flex items-center gap-2">
-                  <span className="flex-1 text-sm font-mono truncate" style={{ color: "#52525B" }}>hockystick.app/p/{startup.profile_slug}</span>
+                  <span className="flex-1 text-sm font-mono truncate" style={{ color: "#52525B" }}>lengdon.com/p/{startup.profile_slug}</span>
                   <button
-                    onClick={() => { navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`); toast.success("Copied!"); }}
+                    onClick={() => { navigator.clipboard.writeText(`https://lengdon.com/p/${startup.profile_slug}`); toast.success("Copied!"); }}
                     className="px-3 py-1.5 text-xs bg-accent border border-border rounded-none hover:bg-accent transition-colors"
                     style={{ color: "#52525B" }}
                   >Copy</button>
                   <a
-                    href={`https://hockystick.app/p/${startup.profile_slug}`}
+                    href={`https://lengdon.com/p/${startup.profile_slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 text-xs bg-accent border border-brand/30 rounded-none text-brand hover:bg-accent transition-colors"

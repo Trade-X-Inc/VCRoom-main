@@ -1,4 +1,4 @@
-// R15C — Hockystick success-fee schedule (config, not hardcoded UI).
+// R15C — Lengdon success-fee schedule (config, not hardcoded UI).
 //
 // The fee model is the one already documented across the product (docs/seo.ts,
 // docs/pricing.tsx, marketing pricing): 1.5% of the closed deal amount, with a

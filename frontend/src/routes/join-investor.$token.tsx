@@ -221,7 +221,7 @@ function JoinViaInviteLinkPage() {
       </div>
 
       <p style={{ color: "var(--faint)", fontSize: 11, marginTop: 20, textAlign: "center" }}>
-        By joining, you agree to Hockystick's terms of service.
+        By joining, you agree to Lengdon's terms of service.
       </p>
     </div>
   );

@@ -1,5 +1,5 @@
 /**
- * Hockystick design system primitives (P1).
+ * Lengdon design system primitives (P1).
  * Tokens live in src/lib/design-tokens.ts — if a value isn't there,
  * it isn't in the system.
  */

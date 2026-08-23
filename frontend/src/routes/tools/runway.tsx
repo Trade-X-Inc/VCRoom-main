@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/runway")({
   head: () => ({
     meta: [
-      { title: "Startup Runway Calculator — How Long Until You Run Out of Cash | Hockystick" },
+      { title: "Startup Runway Calculator — How Long Until You Run Out of Cash | Lengdon" },
       {
         name: "description",
         content:
           "Calculate exactly how many months of runway your startup has. See your cash-out date, model three scenarios, and know when to start your next fundraise. Free, no signup required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/runway" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/runway" }],
   }),
   component: RunwayPage,
 });
@@ -356,11 +356,11 @@ function RunwayPage() {
     return "Immediate action required. Consider bridge financing while you run a parallel raise process. Do not spend time on cold outreach — work only existing relationships.";
   }
 
-  const copyText = `Runway Summary (Hockystick Calculator)
+  const copyText = `Runway Summary (Lengdon Calculator)
 Cash: ${fmt(cash)} | Net burn: ${fmt(burn)}/mo
 Runway: ${current.months >= 999 ? "∞" : Math.round(current.months)} months | Cash-out: ${current.cashOut ? formatDateLong(current.cashOut) : "N/A"}
 After 20% cut: ${cut20.months >= 999 ? "∞" : Math.round(cut20.months)} months
-Calculate yours at hockystick.app/tools/runway`;
+Calculate yours at lengdon.com/tools/runway`;
 
   const pw: React.CSSProperties = { maxWidth: "960px", margin: "0 auto", padding: "0 24px" };
 
@@ -624,7 +624,7 @@ Calculate yours at hockystick.app/tools/runway`;
                   to="/sign-up"
                   style={{ fontSize: "13px", color: "#5B21B6", textDecoration: "none" }}
                 >
-                  Build your Hockystick profile to reach investors faster →
+                  Build your Lengdon profile to reach investors faster →
                 </Link>
               </div>
             </div>
@@ -649,7 +649,7 @@ Calculate yours at hockystick.app/tools/runway`;
                 {copied ? "Copied!" : "Copy results"}
               </button>
               <button
-                onClick={() => { const p = document.title; document.title = "Runway Calculator — Hockystick"; window.print(); document.title = p; }}
+                onClick={() => { const p = document.title; document.title = "Runway Calculator — Lengdon"; window.print(); document.title = p; }}
                 style={{
                   alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "6px",
                   background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
@@ -791,7 +791,7 @@ Calculate yours at hockystick.app/tools/runway`;
       <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", background: "var(--card)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
-            Runway is how long you have. Hockystick is how fast you move.
+            Runway is how long you have. Lengdon is how fast you move.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
             Get your profile in front of investors who are actively deploying capital in your sector.

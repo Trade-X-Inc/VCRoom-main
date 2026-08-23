@@ -36,7 +36,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = "sb-ldimninnjlvxozubheib-auth-token";
-const APP = "https://hockystick.app";
+const APP = "https://lengdon.com";
 
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL;
 const FOUNDER_PASS = testEnv.TEST_FOUNDER_PASSWORD;
@@ -122,8 +122,8 @@ test.describe("UI-4: Help guide + settings expansion", () => {
 
     // Help guide heading should appear
     const body = await page.textContent("body") ?? "";
-    const hasHelpHeading = body.includes("How to use Hockystick");
-    console.log(`Has 'How to use Hockystick' heading: ${hasHelpHeading}`);
+    const hasHelpHeading = body.includes("How to use Lengdon");
+    console.log(`Has 'How to use Lengdon' heading: ${hasHelpHeading}`);
     expect(hasHelpHeading).toBe(true);
     console.log("✓ Founder help guide loaded");
 
@@ -157,8 +157,8 @@ test.describe("UI-4: Help guide + settings expansion", () => {
     const body = await page.textContent("body") ?? "";
 
     // About section heading
-    const hasAbout = body.includes("About Hockystick");
-    console.log(`Has 'About Hockystick' heading: ${hasAbout}`);
+    const hasAbout = body.includes("About Lengdon");
+    console.log(`Has 'About Lengdon' heading: ${hasAbout}`);
     expect(hasAbout).toBe(true);
 
     // Version info

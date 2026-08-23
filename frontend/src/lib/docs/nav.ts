@@ -63,7 +63,7 @@ export const DOCS_NAV: DocsNavSection[] = [
     slug: "ai",
     title: "AI",
     items: [
-      { slug: "ai", title: "AI on Hockystick" },
+      { slug: "ai", title: "AI on Lengdon" },
       { slug: "ai/operator-panel", title: "AI panel" },
       { slug: "ai/data-handling", title: "Data handling" },
     ],

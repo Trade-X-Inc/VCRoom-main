@@ -10,7 +10,7 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
       slug: "founders",
       title: "Founder features",
       description:
-        "Everything a founder can do on Hockystick: build a profile, run deal rooms, control document access, and answer investor diligence.",
+        "Everything a founder can do on Lengdon: build a profile, run deal rooms, control document access, and answer investor diligence.",
       updated: UPDATED,
       toc: [
         { id: "map", label: "Feature map" },
@@ -22,7 +22,7 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          The founder side of Hockystick is built around one loop: build a profile, get
+          The founder side of Lengdon is built around one loop: build a profile, get
           discovered by investors whose thesis you match, open a deal room, and get a real decision
           — Invest, Hold, or Pass with a reason — instead of silence.
         </Lead>
@@ -78,7 +78,7 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
       slug: "founders/profile",
       title: "Company profile",
       description:
-        "The Hockystick company profile: structured sections, per-section visibility, a public page, and a completeness score that gates AI features.",
+        "The Lengdon company profile: structured sections, per-section visibility, a public page, and a completeness score that gates AI features.",
       updated: UPDATED,
       toc: [
         { id: "overview", label: "Overview" },
@@ -102,7 +102,7 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
           items={[
             <>Open Profile from the sidebar. Sections are edited independently and saved as you go.</>,
             <>Each factual claim (revenue, customers, registration) can be backed by evidence, which the AI checks against the document you attach.</>,
-            <>Toggle <strong>Publish</strong> to generate your public page at <code>hockystick.app/p/your-slug</code>. Unpublished profiles are invisible to direct API calls, enforced at the database level.</>,
+            <>Toggle <strong>Publish</strong> to generate your public page at <code>lengdon.com/p/your-slug</code>. Unpublished profiles are invisible to direct API calls, enforced at the database level.</>,
             <>Add team members with roles, photos, and bios — they appear on the public page if the team section is visible.</>,
           ]}
         />
@@ -375,7 +375,7 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
           <A href="/docs/security/nda">NDA legal framework</A>.
         </P>
         <Callout>
-          The NDA is an agreement between you and the investor — Hockystick generates it but is not
+          The NDA is an agreement between you and the investor — Lengdon generates it but is not
           a party to it. If anything in it matters to your situation, read it with counsel.
         </Callout>
       </>

@@ -6,7 +6,7 @@ pages_build_output_dir = "./dist/client"
 [vars]
 VITE_SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co"
 VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTgzNjgsImV4cCI6MjA5Mjk3NDM2OH0.l57v3deTN8WraFeQM6HG_qMCYfo89R08wHa7L31T_wI"
-VITE_APP_URL = "https://hockystick.app"
+VITE_APP_URL = "https://lengdon.com"
 SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co"
 VITE_GOOGLE_CLIENT_ID = "1094004326767-hdd2dqad1ddtsehaa7qiqsbchfgiffou.apps.googleusercontent.com"
 VITE_TURNSTILE_SITE_KEY = "0x4AAAAAADh1iHD5_J7kFb23"
@@ -16,5 +16,5 @@ VITE_TURNSTILE_SITE_KEY = "0x4AAAAAADh1iHD5_J7kFb23"
 # never touch the product database.
 [[d1_databases]]
 binding = "CSP_REPORTS_DB"
-database_name = "hockystick-csp-reports"
+database_name = "lengdon-csp-reports"
 database_id = "853e61d4-9b2d-4867-b674-d321696de528"

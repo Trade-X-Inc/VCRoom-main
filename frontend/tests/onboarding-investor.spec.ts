@@ -25,7 +25,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = "sb-ldimninnjlvxozubheib-auth-token";
-const APP = process.env.PLAYWRIGHT_BASE_URL || "https://hockystick.app";
+const APP = process.env.PLAYWRIGHT_BASE_URL || "https://lengdon.com";
 
 const INVESTOR_EMAIL = testEnv.TEST_INVESTOR_EMAIL;
 const INVESTOR_PASSWORD = testEnv.TEST_INVESTOR_PASSWORD;
@@ -139,7 +139,7 @@ test.describe("Onboarding — investor flow", () => {
     const page = await context.newPage();
     await page.goto(`${APP}/app/investor/overview`, { waitUntil: "networkidle" });
 
-    const introTitle = page.locator("text=Welcome to Hockystick");
+    const introTitle = page.locator("text=Welcome to Lengdon");
     await expect(introTitle).toBeVisible({ timeout: 10000 });
 
     await page.close();
@@ -284,7 +284,7 @@ test.describe("Onboarding — investor flow", () => {
 
     // No further tour renders on overview once done
     await overviewPage.goto(`${APP}/app/investor/overview`, { waitUntil: "networkidle" });
-    const introTitle = overviewPage.locator("text=Welcome to Hockystick");
+    const introTitle = overviewPage.locator("text=Welcome to Lengdon");
     await expect(introTitle).not.toBeVisible({ timeout: 5000 });
 
     // Clean up the intake batch/candidate rows created by this run.

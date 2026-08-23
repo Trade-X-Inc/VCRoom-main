@@ -516,7 +516,7 @@ function InviteModal({
       >
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--color-foreground)", marginBottom: 4 }}>Invite team member</div>
         <div style={{ fontSize: 12, color: "var(--color-muted-foreground)", marginBottom: 24 }}>
-          They'll receive an email to join your investment team on Hockystick.
+          They'll receive an email to join your investment team on Lengdon.
         </div>
         <div style={{ marginBottom: 16 }}>
           <label style={labelStyle}>Email address</label>

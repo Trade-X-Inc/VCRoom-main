@@ -25,7 +25,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = `sb-ldimninnjlvxozubheib-auth-token`;
-const APP_URL = process.env.R12_TEST_BASE_URL || "https://hockystick.app";
+const APP_URL = process.env.R12_TEST_BASE_URL || "https://lengdon.com";
 
 const MEMBER_EMAIL = testEnv.TEST_FOUNDER_MEMBER_EMAIL;
 const MEMBER_PASSWORD = testEnv.TEST_FOUNDER_MEMBER_PASSWORD;

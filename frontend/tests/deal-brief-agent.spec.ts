@@ -37,7 +37,7 @@ const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaW1uaW5uamx2eG96dWJoZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM3MTA2MTYsImV4cCI6MjAyOTI4NjYxNn0.wLFUJmHMy0_5f5CZxE5P5CflK0v8Mop0iHLrj73uqFY";
 const STORAGE_KEY = "sb-ldimninnjlvxozubheib-auth-token";
-const APP = "https://hockystick.app";
+const APP = "https://lengdon.com";
 const EDGE_URL = `${SUPABASE_URL}/functions/v1/generate-deal-brief`;
 
 // Dr Henry (investor) — user_id is investor_id in deal_briefs (FK → users.id)

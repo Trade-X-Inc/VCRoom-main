@@ -10,7 +10,7 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
       slug: "deal-rooms",
       title: "How deal rooms work",
       description:
-        "The Hockystick deal room: one founder, one investor, six stages, an NDA gate, and a recorded decision at the end.",
+        "The Lengdon deal room: one founder, one investor, six stages, an NDA gate, and a recorded decision at the end.",
       updated: UPDATED,
       toc: [
         { id: "overview", label: "Overview" },
@@ -23,7 +23,7 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          A deal room is the unit of a deal on Hockystick: a private workspace between one founder
+          A deal room is the unit of a deal on Lengdon: a private workspace between one founder
           and one investor, moving through six explicit stages from first look to closing. Both
           parties see the same room, the same stage, and the same record — the deal has one state,
           not two versions of it.

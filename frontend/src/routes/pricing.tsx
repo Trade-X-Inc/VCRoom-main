@@ -241,14 +241,14 @@ function Section({ ground, children }: { ground: string; children: React.ReactNo
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Hockystick" },
+      { title: "Pricing — Lengdon" },
       {
         name: "description",
         content:
           "A fixed fee tied to one event. Direct is USD 499 on first close. Institutional pricing is scoped individually.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/pricing" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/pricing" }],
   }),
   component: PricingPage,
 });
@@ -396,7 +396,7 @@ function PricingPage() {
                 <strong style={{ fontWeight: 600 }}>Institutional</strong>,
                 "A fund or family office",
                 "Scoped individually",
-                "hello@hockystick.app",
+                "hello@lengdon.com",
               ],
             ]}
             caption={
@@ -426,7 +426,7 @@ function PricingPage() {
               fits everyone. That conversation covers what you need confirmed
               before you sign, and what determines where you land.
             </Prose>
-            <Prose>Write to hello@hockystick.app to start it.</Prose>
+            <Prose>Write to hello@lengdon.com to start it.</Prose>
           </div>
 
           <Instrument

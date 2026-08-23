@@ -153,7 +153,7 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
     },
   });
 
-  const linkUrl = link ? `https://hockystick.app/join-investor/${link.token}` : null;
+  const linkUrl = link ? `https://lengdon.com/join-investor/${link.token}` : null;
 
   const handleGenerate = async () => {
     setGenerating(true);

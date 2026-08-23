@@ -324,7 +324,7 @@ function MemberProfilePage() {
     autoSave({ achievements: next } as any);
   };
 
-  const shareUrl = profileSlug ? `https://hockystick.app/cv/${profileSlug}` : null;
+  const shareUrl = profileSlug ? `https://lengdon.com/cv/${profileSlug}` : null;
 
   if (!loaded) {
     return (

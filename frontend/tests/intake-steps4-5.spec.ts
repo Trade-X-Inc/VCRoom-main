@@ -40,7 +40,7 @@ async function getSession() {
 
 async function injectSession(ctx: BrowserContext, session: any) {
   const p = await ctx.newPage();
-  await p.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await p.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await p.evaluate(({ key, val, themeKey, themeVal }: any) => {
     localStorage.setItem(key, JSON.stringify(val));
     localStorage.setItem(themeKey, themeVal);
@@ -57,7 +57,7 @@ async function injectSession(ctx: BrowserContext, session: any) {
 
 async function openIntake(ctx: BrowserContext) {
   const page = await ctx.newPage();
-  await page.goto("https://hockystick.app/app/investor/intake", { waitUntil: "networkidle", timeout: 30_000 });
+  await page.goto("https://lengdon.com/app/investor/intake", { waitUntil: "networkidle", timeout: 30_000 });
   await page.waitForSelector('button:has-text("Parse and score")', { timeout: 15_000 });
   return page;
 }
@@ -324,20 +324,20 @@ test.describe("Intake — Steps 4+5: results panel + invite flow", () => {
     const companyName = "SkyBridge AI";
     const fundName = profile.fund_name || "Test Ventures";
     const yourName = profile.your_name || "Playwright Test Investor";
-    const inviteUrl = `https://hockystick.app/join/investor/${token}`;
+    const inviteUrl = `https://lengdon.com/join/investor/${token}`;
 
     // Verify the URL shape is correct
-    expect(inviteUrl).toMatch(/^https:\/\/hockystick\.app\/join\/investor\/[0-9a-f-]{36}$/);
+    expect(inviteUrl).toMatch(/^https:\/\/lengdon\.com\/join\/investor\/[0-9a-f-]{36}$/);
     console.log("✓ Invite URL shape correct:", inviteUrl);
 
     // Verify mailto params are properly encodeable
-    const subject = encodeURIComponent(`Invitation to join ${fundName} deal flow on Hockystick`);
+    const subject = encodeURIComponent(`Invitation to join ${fundName} deal flow on Lengdon`);
     const body = encodeURIComponent(
-      `Hi ${founderName},\n\nI'd like to invite you to connect with ${fundName} on Hockystick.\n\n${inviteUrl}\n\nBest,\n${yourName}`
+      `Hi ${founderName},\n\nI'd like to invite you to connect with ${fundName} on Lengdon.\n\n${inviteUrl}\n\nBest,\n${yourName}`
     );
     const mailto = `mailto:${founderEmail}?subject=${subject}&body=${body}`;
     expect(mailto).toContain("mailto:omar@skybridge.ai");
-    expect(mailto).toContain(encodeURIComponent("Hockystick"));
+    expect(mailto).toContain(encodeURIComponent("Lengdon"));
     expect(mailto).toContain(token);
     console.log("✓ mailto construction correct — token embedded in invite URL");
 

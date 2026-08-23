@@ -8,12 +8,12 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
   "": {
     meta: {
       slug: "",
-      title: "Hockystick Documentation",
+      title: "Lengdon Documentation",
       description:
-        "Documentation for Hockystick — the agentic fundraising platform. Feature guides, security posture, and changelog.",
+        "Documentation for Lengdon — the agentic fundraising platform. Feature guides, security posture, and changelog.",
       updated: UPDATED,
       toc: [
-        { id: "what", label: "What Hockystick is" },
+        { id: "what", label: "What Lengdon is" },
         { id: "start", label: "Where to start" },
         { id: "sections", label: "Sections" },
         { id: "honesty", label: "How these docs are written" },
@@ -22,12 +22,12 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Hockystick is a global fundraising platform for founders and investors:
+          Lengdon is a global fundraising platform for founders and investors:
           verified profiles, NDA-gated deal rooms, structured diligence, and recorded decisions —
           with an AI layer that drafts the work and never acts on your behalf without confirmation.
         </Lead>
 
-        <H2 id="what">What Hockystick is</H2>
+        <H2 id="what">What Lengdon is</H2>
         <P>
           The platform replaces the warm-intro bottleneck with structure. Founders build a profile
           whose claims are actually checked; investors set a thesis and see matched, verified

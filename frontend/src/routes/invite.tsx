@@ -7,8 +7,8 @@ import { Lock, Zap, ArrowRight } from "lucide-react";
 export const Route = createFileRoute("/invite")({
   head: () => ({
     meta: [
-      { title: "You're Invited — Hockystick" },
-      { name: "description", content: "Join Hockystick and unlock exclusive founding member benefits." },
+      { title: "You're Invited — Lengdon" },
+      { name: "description", content: "Join Lengdon and unlock exclusive founding member benefits." },
     ],
   }),
   component: Invite,
@@ -39,7 +39,7 @@ function Invite() {
           <span className="text-sm text-brand font-medium">You're invited</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight max-w-2xl mx-auto" style={{ fontFamily: "Syne, sans-serif" }}>
-          You're invited to Hockystick.
+          You're invited to Lengdon.
         </h1>
         <p className="mt-4 text-lg text-[#71717A] max-w-xl mx-auto">
           Unlock exclusive benefits reserved for founding members.

@@ -7,7 +7,7 @@ import { Logo } from '@/components/brand/Logo'
 export const Route = createFileRoute('/sign-in')({
   head: () => ({
     meta: [
-      { title: "Sign in | Hockystick" },
+      { title: "Sign in | Lengdon" },
       { name: "robots", content: "noindex" },
     ],
   }),

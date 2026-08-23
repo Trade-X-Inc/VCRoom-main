@@ -36,7 +36,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = "sb-ldimninnjlvxozubheib-auth-token";
-const APP = "https://hockystick.app";
+const APP = "https://lengdon.com";
 
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL;
 const FOUNDER_PASS = testEnv.TEST_FOUNDER_PASSWORD;
@@ -346,7 +346,7 @@ test.describe("UI-1B: Page Cleanup + Theme Fixes", () => {
     expect(hasWorkstationInNav).toBe(true);
 
     // "Home" should NOT appear as a nav item
-    const hasHomeNav = sidebarText.includes("Home") && !sidebarText.includes("Hockystick");
+    const hasHomeNav = sidebarText.includes("Home") && !sidebarText.includes("Lengdon");
     console.log(`"Home" (as nav label) still present: ${hasHomeNav}`);
     // Note: "Home" may appear in other UI text, so we just verify the nav link is gone
     expect(total).toBe(1); // Only one root link

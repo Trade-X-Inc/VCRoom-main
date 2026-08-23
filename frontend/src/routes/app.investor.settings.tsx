@@ -206,7 +206,7 @@ function InvestorNotificationsPanel() {
     <div className="space-y-5">
       <section className="rounded-none border border-border/60 bg-card p-5">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Email preferences</h2>
-        <p className="text-sm text-muted-foreground mb-4">Control which emails Hockystick sends you.</p>
+        <p className="text-sm text-muted-foreground mb-4">Control which emails Lengdon sends you.</p>
 
         {!loadedPrefs ? (
           <div className="text-sm text-muted-foreground py-4">Loading…</div>
@@ -214,7 +214,7 @@ function InvestorNotificationsPanel() {
           <div className="divide-y divide-border/40">
             <PrefRow
               label="New startup matches"
-              description="Get emailed when a founder matching your investment thesis joins Hockystick."
+              description="Get emailed when a founder matching your investment thesis joins Lengdon."
               value={prefs.thesis_match}
               onChange={(v) => handlePrefChange("thesis_match", v)}
             />
@@ -232,7 +232,7 @@ function InvestorNotificationsPanel() {
             />
             <PrefRow
               label="Product news"
-              description="Occasional updates about new Hockystick features."
+              description="Occasional updates about new Lengdon features."
               value={prefs.product_news}
               onChange={(v) => handlePrefChange("product_news", v)}
             />
@@ -262,7 +262,7 @@ function InvestorSecurityPanel() {
       toast.success("Deletion requested. Your account will be removed within 24 hours.");
       navigate({ to: "/sign-in" as any });
     } catch {
-      toast.error("Could not process deletion request. Contact support@hockystick.app");
+      toast.error("Could not process deletion request. Contact support@lengdon.com");
     } finally {
       setDeleting(false);
     }
@@ -280,8 +280,8 @@ function InvestorSecurityPanel() {
           </div>
           <div className="text-xs text-muted-foreground text-right max-w-[180px] leading-relaxed">
             To change your email, contact{" "}
-            <a href="mailto:support@hockystick.app" className="text-brand hover:text-brand/80">
-              support@hockystick.app
+            <a href="mailto:support@lengdon.com" className="text-brand hover:text-brand/80">
+              support@lengdon.com
             </a>
           </div>
         </div>

@@ -11,7 +11,7 @@
 
 import { test, expect, type Page } from "@playwright/test";
 
-const APP = "https://hockystick.app";
+const APP = "https://lengdon.com";
 
 async function goHome(page: Page) {
   await page.goto(APP + "/", { waitUntil: "networkidle" });

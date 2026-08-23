@@ -5,14 +5,14 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/tools/")({
   head: () => ({
     meta: [
-      { title: "Free Startup Tools — Calculators for Founders & Investors | Hockystick" },
+      { title: "Free Startup Tools — Calculators for Founders & Investors | Lengdon" },
       {
         name: "description",
         content:
           "Free financial tools built for startup founders raising capital. Valuation calculators, burn rate, runway, cap table, SAFE notes — accurate, methodology-backed, free to use.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools" }],
   }),
   component: ToolsIndex,
 });
@@ -265,7 +265,7 @@ function ToolsIndex() {
             lineHeight: 1.6,
           }}
         >
-          These tools don't replace a great investor relationship. Build one on Hockystick.
+          These tools don't replace a great investor relationship. Build one on Lengdon.
         </p>
         <Link
           to="/sign-up"

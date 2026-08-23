@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — Hockystick" },
-      { name: "description", content: "Terms of Service for Hockystick." },
+      { title: "Terms of Service — Lengdon" },
+      { name: "description", content: "Terms of Service for Lengdon." },
     ],
   }),
   component: TermsPage,
@@ -15,11 +15,11 @@ export const Route = createFileRoute("/terms")({
 const sections = [
   {
     title: "1. Acceptance of Terms",
-    body: "By accessing or using Hockystick, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform. Continued use of the platform constitutes acceptance of any updates to these terms.",
+    body: "By accessing or using Lengdon, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the platform. Continued use of the platform constitutes acceptance of any updates to these terms.",
   },
   {
     title: "2. Use of Service",
-    body: "You may use Hockystick solely for lawful purposes related to fundraising, investor relations, and deal management. You must not misuse the platform, attempt to gain unauthorised access, or use it to transmit harmful content. We reserve the right to suspend accounts that violate these conditions.",
+    body: "You may use Lengdon solely for lawful purposes related to fundraising, investor relations, and deal management. You must not misuse the platform, attempt to gain unauthorised access, or use it to transmit harmful content. We reserve the right to suspend accounts that violate these conditions.",
   },
   {
     title: "3. User Accounts",
@@ -27,7 +27,7 @@ const sections = [
   },
   {
     title: "4. Confidentiality",
-    body: "Deal room content, investor data, and uploaded documents are confidential and intended only for authorised participants. You agree not to share, reproduce, or distribute confidential materials without the consent of all relevant parties. Hockystick applies access controls and audit logging to support this commitment.",
+    body: "Deal room content, investor data, and uploaded documents are confidential and intended only for authorised participants. You agree not to share, reproduce, or distribute confidential materials without the consent of all relevant parties. Lengdon applies access controls and audit logging to support this commitment.",
   },
   {
     title: "5. Payments",
@@ -39,7 +39,7 @@ const sections = [
   },
   {
     title: "7. Limitation of Liability",
-    body: "To the maximum extent permitted by law, Hockystick shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform. Our total liability for any claim shall not exceed the amount you paid in the 12 months preceding the claim. The platform is provided on an 'as is' basis without warranties of any kind.",
+    body: "To the maximum extent permitted by law, Lengdon shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform. Our total liability for any claim shall not exceed the amount you paid in the 12 months preceding the claim. The platform is provided on an 'as is' basis without warranties of any kind.",
   },
   {
     title: "8. Governing Law",
@@ -47,11 +47,11 @@ const sections = [
   },
   // Added 17 Aug 2026 — Foundation Document §20.7. The entity name appears on
   // this page only, and always carries the "(under incorporation)" qualifier.
-  // Hockystick holds no DFSA licence and is not a regulated entity; stating
+  // Lengdon holds no DFSA licence and is not a regulated entity; stating
   // that here is required rather than optional.
   {
     title: "9. Operating Entity",
-    body: "Hockystick is operated by Venture Tech LLC (under incorporation), with offices at DIFC FinTech Hive, Dubai, United Arab Emirates. Hockystick is a software platform. It does not hold a DFSA licence, is not a regulated financial institution, and does not act as a bank, broker, custodian, or intermediary in any transaction conducted through it.",
+    body: "Lengdon is operated by Venture Tech LLC (under incorporation), with offices at DIFC FinTech Hive, Dubai, United Arab Emirates. Lengdon is a software platform. It does not hold a DFSA licence, is not a regulated financial institution, and does not act as a bank, broker, custodian, or intermediary in any transaction conducted through it.",
   },
 ];
 
@@ -62,7 +62,7 @@ function TermsPage() {
       <main id="main-content" className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
         <div className="mb-8">
           <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 block">
-            ← Back to Hockystick
+            ← Back to Lengdon
           </a>
         </div>
         <div className="mb-10">
@@ -80,7 +80,7 @@ function TermsPage() {
         </div>
         <div className="mt-16 pt-8 border-t border-border/40">
           <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Back to Hockystick
+            ← Back to Lengdon
           </a>
         </div>
       </main>

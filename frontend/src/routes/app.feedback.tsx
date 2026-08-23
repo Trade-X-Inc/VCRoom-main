@@ -117,7 +117,7 @@ function FeedbackPage() {
         {/* Star rating */}
         <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
           <div className="text-sm font-semibold mb-1">Overall experience</div>
-          <div className="text-xs text-muted-foreground mb-4">How would you rate Hockystick so far?</div>
+          <div className="text-xs text-muted-foreground mb-4">How would you rate Lengdon so far?</div>
           <div className="flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((v) => (
               <button

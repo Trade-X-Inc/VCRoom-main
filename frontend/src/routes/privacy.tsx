@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Hockystick" },
-      { name: "description", content: "Privacy Policy for Hockystick." },
+      { title: "Privacy Policy — Lengdon" },
+      { name: "description", content: "Privacy Policy for Lengdon." },
     ],
   }),
   component: PrivacyPage,
@@ -19,7 +19,7 @@ const sections = [
   },
   {
     title: "2. How We Use Information",
-    body: "We use your information to provide and improve the Hockystick platform, send transactional and product emails, and respond to support requests. We may use aggregated, anonymised data for analytics and product development. We do not sell your personal information to third parties.",
+    body: "We use your information to provide and improve the Lengdon platform, send transactional and product emails, and respond to support requests. We may use aggregated, anonymised data for analytics and product development. We do not sell your personal information to third parties.",
   },
   {
     title: "3. Data Sharing",
@@ -35,7 +35,7 @@ const sections = [
   },
   {
     title: "6. Your Rights",
-    body: "You have the right to access, correct, or delete your personal data at any time from your account settings. You may also request a copy of your data or object to certain processing activities. To exercise these rights, contact us at privacy@hockystick.app.",
+    body: "You have the right to access, correct, or delete your personal data at any time from your account settings. You may also request a copy of your data or object to certain processing activities. To exercise these rights, contact us at privacy@lengdon.com.",
   },
   {
     title: "7. Contact Us",
@@ -43,7 +43,7 @@ const sections = [
     // Terms. The wording here was already honest ("intended entity name…
     // registration in progress"), but the rule is single-location, so the
     // registration status is now carried by Terms §9 instead.
-    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@hockystick.app. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Hockystick operates from Dubai, UAE. Our operating entity and its registration status are stated in the Terms of Service.",
+    body: "If you have questions about this Privacy Policy or how we handle your data, please contact our privacy team at privacy@lengdon.com. For data deletion requests or GDPR inquiries, we aim to respond within 30 days. Lengdon operates from Dubai, UAE. Our operating entity and its registration status are stated in the Terms of Service.",
   },
 ];
 
@@ -54,7 +54,7 @@ function PrivacyPage() {
       <main id="main-content" className="flex-1 mx-auto w-full max-w-3xl px-6 py-16">
         <div className="mb-8">
           <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 block">
-            ← Back to Hockystick
+            ← Back to Lengdon
           </a>
         </div>
         <div className="mb-10">
@@ -72,7 +72,7 @@ function PrivacyPage() {
         </div>
         <div className="mt-16 pt-8 border-t border-border/40">
           <a href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Back to Hockystick
+            ← Back to Lengdon
           </a>
         </div>
       </main>

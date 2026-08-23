@@ -10,7 +10,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
       slug: "security",
       title: "Security & compliance",
       description:
-        "How Hockystick protects deal data: encryption, Row Level Security on every table, NDA gating, and DIFC/DIAC legal framework.",
+        "How Lengdon protects deal data: encryption, Row Level Security on every table, NDA gating, and DIFC/DIAC legal framework.",
       updated: UPDATED,
       toc: [
         { id: "summary", label: "Summary" },
@@ -25,7 +25,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Hockystick hosts confidential fundraising material — pitch decks, financial models, cap
+          Lengdon hosts confidential fundraising material — pitch decks, financial models, cap
           tables, bank statements. This page states plainly what we do to protect it, what the legal
           framework around it is, and how to reach us if you find a problem.
         </Lead>
@@ -53,7 +53,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
             </>,
             <>
               Security reports go to{" "}
-              <A href="mailto:security@hockystick.app">security@hockystick.app</A> and are
+              <A href="mailto:security@lengdon.com">security@lengdon.com</A> and are
               acknowledged within 48 hours.
             </>,
           ]}
@@ -61,7 +61,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
 
         <H2 id="encryption">Encryption</H2>
         <P>
-          All connections to hockystick.app terminate at Cloudflare's edge over TLS — TLS 1.3 for
+          All connections to lengdon.com terminate at Cloudflare's edge over TLS — TLS 1.3 for
           every modern client, with TLS 1.2 as the floor. There is no unencrypted access path; HTTP
           requests are redirected to HTTPS. At rest, all application data and uploaded documents are
           stored on Supabase infrastructure (AWS-backed) with AES-256 encryption.
@@ -110,7 +110,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
 
         <H2 id="reporting">Reporting a vulnerability</H2>
         <P>
-          Email <A href="mailto:security@hockystick.app">security@hockystick.app</A>. We acknowledge
+          Email <A href="mailto:security@lengdon.com">security@lengdon.com</A>. We acknowledge
           reports within 48 hours. Our disclosure policy, including what we ask of researchers and
           what we commit to in return, is on the{" "}
           <A href="/docs/security/disclosure">Responsible disclosure</A> page, and is also published
@@ -126,7 +126,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
       slug: "security/overview",
       title: "Security posture",
       description:
-        "The layers of Hockystick's security model: edge TLS, database-enforced authorization, NDA gating, and role-based team permissions.",
+        "The layers of Lengdon's security model: edge TLS, database-enforced authorization, NDA gating, and role-based team permissions.",
       updated: UPDATED,
       toc: [
         { id: "model", label: "The layered model" },
@@ -139,7 +139,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Security on Hockystick is layered so that no single failure exposes deal data: transport
+          Security on Lengdon is layered so that no single failure exposes deal data: transport
           encryption at the edge, authentication through Supabase Auth, authorization enforced
           inside the database itself, and a signed NDA before any counterparty sees a document.
         </Lead>
@@ -183,7 +183,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
 
         <H2 id="limits">Known boundaries</H2>
         <P>
-          We state limits as plainly as guarantees. Hockystick does not currently hold its own SOC 2
+          We state limits as plainly as guarantees. Lengdon does not currently hold its own SOC 2
           attestation — the SOC 2 Type II compliance referenced in these docs belongs to Supabase,
           our infrastructure provider. Uploaded documents are encrypted at rest but not end-to-end
           encrypted: the platform can technically read stored files, which is what allows AI
@@ -200,7 +200,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
       slug: "security/data",
       title: "Data storage, encryption, and residency",
       description:
-        "Where Hockystick data lives, how it is encrypted in transit and at rest, and what happens when you delete your account.",
+        "Where Lengdon data lives, how it is encrypted in transit and at rest, and what happens when you delete your account.",
       updated: UPDATED,
       toc: [
         { id: "where", label: "Where data lives" },
@@ -271,7 +271,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
       slug: "security/access-control",
       title: "Row Level Security",
       description:
-        "Every one of Hockystick's 107 database tables has PostgreSQL Row Level Security enabled. How the policy model works.",
+        "Every one of Lengdon's 107 database tables has PostgreSQL Row Level Security enabled. How the policy model works.",
       updated: UPDATED,
       toc: [
         { id: "what", label: "What RLS gives you" },
@@ -285,7 +285,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
         <Lead>
           Row Level Security (RLS) is a PostgreSQL feature that attaches an access policy to a table
           itself. When RLS is on, the database — not the application — decides which rows a query
-          may return or modify. Hockystick has RLS enabled on every table in the production schema.
+          may return or modify. Lengdon has RLS enabled on every table in the production schema.
         </Lead>
 
         <H2 id="what">What RLS gives you</H2>
@@ -358,7 +358,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
       slug: "security/nda",
       title: "NDA legal framework",
       description:
-        "Every Hockystick deal room NDA: DIFC governing law, DIAC arbitration seated in Dubai, New York Convention enforcement.",
+        "Every Lengdon deal room NDA: DIFC governing law, DIAC arbitration seated in Dubai, New York Convention enforcement.",
       updated: UPDATED,
       toc: [
         { id: "gate", label: "The NDA gate" },
@@ -411,7 +411,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
         <P>
           Enforcement of awards is subject to the 1958 New York Convention on the Recognition and
           Enforcement of Foreign Arbitral Awards, to which the UAE is a signatory. In practice this
-          means an award rendered in Dubai under a Hockystick NDA is enforceable in the courts of
+          means an award rendered in Dubai under a Lengdon NDA is enforceable in the courts of
           more than 170 contracting states — including every major venture jurisdiction
           worldwide.
         </P>
@@ -424,7 +424,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
         </P>
         <Callout>
           The NDA text is generated by the platform, but it is a real legal agreement between the
-          founder and the investor. Hockystick is not a party to it and does not provide legal
+          founder and the investor. Lengdon is not a party to it and does not provide legal
           advice — review it with counsel if you are unsure.
         </Callout>
       </>
@@ -437,7 +437,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
       slug: "security/disclosure",
       title: "Responsible disclosure",
       description:
-        "How to report a security vulnerability in Hockystick: security@hockystick.app, acknowledged within 48 hours.",
+        "How to report a security vulnerability in Lengdon: security@lengdon.com, acknowledged within 48 hours.",
       updated: UPDATED,
       toc: [
         { id: "how", label: "How to report" },
@@ -449,7 +449,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
     Body: () => (
       <>
         <Lead>
-          If you believe you have found a security vulnerability in Hockystick, we want to hear
+          If you believe you have found a security vulnerability in Lengdon, we want to hear
           about it — directly, before anyone else.
         </Lead>
 
@@ -457,7 +457,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
         <Steps
           items={[
             <>
-              Email <A href="mailto:security@hockystick.app">security@hockystick.app</A> with a
+              Email <A href="mailto:security@lengdon.com">security@lengdon.com</A> with a
               description of the issue, steps to reproduce, and the impact you believe it has.
             </>,
             <>Include the URL, account context (a test account is fine), and any relevant request/response detail.</>,
@@ -466,7 +466,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
         />
         <P>
           This contact is also published in machine-readable form at{" "}
-          <Code>https://hockystick.app/.well-known/security.txt</Code>.
+          <Code>https://lengdon.com/.well-known/security.txt</Code>.
         </P>
 
         <H2 id="commit">What we commit to</H2>
@@ -491,7 +491,7 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
 
         <H2 id="scope">Scope</H2>
         <P>
-          In scope: hockystick.app and its subdomains, the API endpoints they call, and the
+          In scope: lengdon.com and its subdomains, the API endpoints they call, and the
           authentication flows. Out of scope: third-party services we integrate with (Supabase,
           Cloudflare, Resend, HubSpot) — report issues in those platforms to their own programs —
           and denial-of-service findings.

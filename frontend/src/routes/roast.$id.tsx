@@ -19,7 +19,7 @@ import {
 export const Route = createFileRoute("/roast/$id")({
   head: () => ({
     meta: [
-      { title: "Founder Roast — Hockystick" },
+      { title: "Founder Roast — Lengdon" },
       { name: "description", content: "A live public pitch challenge: 1-minute pitch, competitive Q&A, every question answered on the record." },
     ],
   }),
@@ -439,7 +439,7 @@ function RoastPage() {
         <main id="main-content" className="mx-auto max-w-xl px-6 py-32 text-center">
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: SYNE }}>Roast not found</h1>
           <p className="mt-2 text-sm text-gray-600">This session doesn't exist or isn't public.</p>
-          <Link to="/" className="mt-6 inline-block rounded-lg hs-gradient px-5 py-2.5 text-sm font-semibold text-white">Back to Hockystick</Link>
+          <Link to="/" className="mt-6 inline-block rounded-lg hs-gradient px-5 py-2.5 text-sm font-semibold text-white">Back to Lengdon</Link>
         </main>
         <SiteFooter />
       </div>

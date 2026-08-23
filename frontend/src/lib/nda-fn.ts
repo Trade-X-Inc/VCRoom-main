@@ -81,7 +81,7 @@ export function buildMultiPartyNdaText(
         `Party ${i + 1}: ${s.full_name} (${formatSignerRole(s.role)})\n` +
         `  Company:    ${s.company || "—"}\n` +
         `  Accepted:   ${formatTs(s.accepted_at)}\n` +
-        `  Electronic signature confirmed via Hockystick platform`,
+        `  Electronic signature confirmed via Lengdon platform`,
     )
     .join("\n\n");
 
@@ -130,7 +130,7 @@ These obligations do not apply to information that:
 
 5. MONITORING AND WATERMARKING
 
-All materials accessed via the Hockystick deal room are electronically watermarked and access-logged. Activity within the deal room is monitored. Any breach of this Agreement may result in immediate revocation of access and legal action.
+All materials accessed via the Lengdon deal room are electronically watermarked and access-logged. Activity within the deal room is monitored. Any breach of this Agreement may result in immediate revocation of access and legal action.
 
 6. TERM
 
@@ -176,7 +176,7 @@ ${signatoriesBlock}
 
 — — —
 
-This agreement is executed electronically via Hockystick. Each party has indicated acceptance by checking the acknowledgement box and clicking "Accept & Enter Deal Room" on the Hockystick platform. Each acceptance is timestamped, logged with the accepting party's browser user-agent string, and stored immutably.
+This agreement is executed electronically via Lengdon. Each party has indicated acceptance by checking the acknowledgement box and clicking "Accept & Enter Deal Room" on the Lengdon platform. Each acceptance is timestamped, logged with the accepting party's browser user-agent string, and stored immutably.
 
 Company: ${displayCompany}${founderSigner ? `\nFounder representative: ${founderSigner.full_name}` : ""}
 Total parties bound: ${signers.length}

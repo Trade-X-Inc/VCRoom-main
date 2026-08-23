@@ -213,7 +213,7 @@ function PublicCVPage() {
           {/* Footer */}
           <div style={{ padding: "16px 36px", background: "#fafafa", borderTop: "1px solid #e5e7eb", textAlign: "center" }}>
             <span style={{ fontSize: 11, color: "#9ca3af" }}>Built on </span>
-            <a href="https://hockystick.app" style={{ fontSize: 11, color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>Hockystick</a>
+            <a href="https://lengdon.com" style={{ fontSize: 11, color: "var(--brand)", textDecoration: "none", fontWeight: 600 }}>Lengdon</a>
           </div>
         </div>
       </div>

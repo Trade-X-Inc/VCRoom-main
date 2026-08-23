@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/cogs")({
   head: () => ({
     meta: [
-      { title: "COGS Calculator — Gross Margin by Business Model | Hockystick" },
+      { title: "COGS Calculator — Gross Margin by Business Model | Lengdon" },
       {
         name: "description",
         content:
           "Calculate cost of goods sold, gross profit, and gross margin for SaaS, hardware, marketplace, and e-commerce startups. Compare your margins to industry benchmarks. Free, no signup required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/cogs" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/cogs" }],
   }),
   component: CogsPage,
 });
@@ -561,7 +561,7 @@ function OutputPanel({ result, model, copied, onCopy }: {
           {copied ? "Copied!" : "Copy results"}
         </button>
         <button
-          onClick={() => { const p = document.title; document.title = "COGS Calculator — Hockystick"; window.print(); document.title = p; }}
+          onClick={() => { const p = document.title; document.title = "COGS Calculator — Lengdon"; window.print(); document.title = p; }}
           style={{
             display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
@@ -599,11 +599,11 @@ function CogsPage() {
   }, [model, saas, mp, hw, ec]);
 
   const bm = BENCHMARKS[model];
-  const copyText = `COGS Summary (Hockystick Calculator)
+  const copyText = `COGS Summary (Lengdon Calculator)
 Business model: ${MODEL_LABELS[model]}
 Monthly COGS: ${fmt(result.totalCogs)} | Gross profit: ${fmt(result.grossProfit)} | Gross margin: ${pct(result.grossMargin)}
 Industry benchmark: ${bm.low}–${bm.high}% for ${bm.name}
-Calculate yours at hockystick.app/tools/cogs`;
+Calculate yours at lengdon.com/tools/cogs`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(copyText).then(() => {
@@ -837,7 +837,7 @@ Calculate yours at hockystick.app/tools/cogs`;
             Investors will calculate your margins before you do.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Put your financials in front of investors on Hockystick — before they find gaps in your numbers.
+            Put your financials in front of investors on Lengdon — before they find gaps in your numbers.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}

@@ -5,7 +5,7 @@
  *  1. AI panel does not cause page reload when sending a message
  *  2. AI panel sends a message and gets a reply (no crash)
  *  3. Documents page scroll height is bounded
- *  4. Browser tab title contains "Hockystick" and not "MENA"
+ *  4. Browser tab title contains "Lengdon" and not "MENA"
  */
 import { test, expect } from "@playwright/test";
 import * as dotenv from "dotenv";
@@ -15,7 +15,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../../.env.test") });
 
-const BASE_URL = process.env.TEST_BASE_URL || "https://hockystick.app";
+const BASE_URL = process.env.TEST_BASE_URL || "https://lengdon.com";
 const SUPABASE_URL = "https://ldimninnjlvxozubheib.supabase.co";
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const FOUNDER_EMAIL = "test-founder@hockystick.app";
@@ -172,12 +172,12 @@ test("Documents page: scroll height bounded (no massive empty space)", async ({ 
 // ────────────────────────────────────────────────────────────────────────────
 // Test 4: Browser tab title is correct
 // ────────────────────────────────────────────────────────────────────────────
-test("Page title: contains Hockystick, does not contain MENA", async ({ page }) => {
+test("Page title: contains Lengdon, does not contain MENA", async ({ page }) => {
   await page.goto(BASE_URL);
   await page.waitForLoadState("domcontentloaded");
 
   const title = await page.title();
-  expect(title).toContain("Hockystick");
+  expect(title).toContain("Lengdon");
   expect(title).not.toMatch(/MENA/i);
   expect(title).not.toMatch(/GCC/i);
 });

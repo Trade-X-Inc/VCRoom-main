@@ -208,7 +208,7 @@ export function ClosingPipeline({
           {!fee ? (
             role === "founder" ? (
               <>
-                <p className="text-[13px]" style={{ color: INK2 }}>Confirm the closed deal amount. The Hockystick success fee ({feeBasisLabel(Number(amountInput.replace(/[^0-9.]/g, "")) || 0)}) is calculated from it. You also choose who pays the platform fee.</p>
+                <p className="text-[13px]" style={{ color: INK2 }}>Confirm the closed deal amount. The Lengdon success fee ({feeBasisLabel(Number(amountInput.replace(/[^0-9.]/g, "")) || 0)}) is calculated from it. You also choose who pays the platform fee.</p>
                 <div className="flex flex-wrap items-end gap-4">
                   <div>
                     <label className="block text-[12px] font-medium" style={{ color: INK2 }}>Deal amount (USD)</label>
@@ -428,7 +428,7 @@ function InvoiceView({ invoice }: { invoice: any }) {
     const money = (n: any) => n != null ? `$${Number(n).toLocaleString("en-US")}` : "—";
     const html = `<!doctype html><meta charset="utf-8"><title>${invoice.invoice_number}</title>
     <style>body{font-family:'DM Sans',system-ui,sans-serif;color:#0A0A0B;max-width:640px;margin:40px auto;padding:0 24px}h1{font-family:Syne,sans-serif;font-size:20px}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #E4E4E7;font-size:13px}td:last-child{text-align:right;font-weight:600}.h{color:#71717A;font-weight:400}.brand{color:#7C3AED;font-weight:700}</style>
-    <h1 class="brand">Hockystick</h1>
+    <h1 class="brand">Lengdon</h1>
     <div style="color:#52525B;font-size:13px">Platform Success Fee Invoice</div>
     <table>
       <tr><td class="h">Invoice number</td><td>${invoice.invoice_number}</td></tr>

@@ -40,7 +40,7 @@ const INVESTOR_EMAIL = testEnv.TEST_INVESTOR_EMAIL;
 const INVESTOR_PASS  = testEnv.TEST_INVESTOR_PASSWORD;
 const INVESTOR_ID    = testEnv.TEST_INVESTOR_USER_ID;
 
-const PAGE_URL = "https://hockystick.app/app/investor/profile";
+const PAGE_URL = "https://lengdon.com/app/investor/profile";
 
 async function serviceGet(p: string) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/${p}`, {
@@ -70,7 +70,7 @@ async function getSession(email: string, password: string) {
 
 async function injectSession(ctx: BrowserContext, session: any) {
   const p = await ctx.newPage();
-  await p.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await p.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await p.evaluate(({ key, s }: any) => localStorage.setItem(key, JSON.stringify({
     access_token: s.access_token, refresh_token: s.refresh_token,
     expires_in: s.expires_in, expires_at: s.expires_at,

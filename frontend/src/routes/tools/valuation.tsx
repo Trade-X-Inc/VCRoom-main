@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/valuation")({
   head: () => ({
     meta: [
-      { title: "Startup Valuation Calculator — Free Tool for Founders | Hockystick" },
+      { title: "Startup Valuation Calculator — Free Tool for Founders | Lengdon" },
       {
         name: "description",
         content:
           "Calculate your startup's valuation using VC Method, Revenue Multiples, and Berkus Method. Built for pre-seed to Series A founders. Free, no signup required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/valuation" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/valuation" }],
   }),
   component: ValuationPage,
 });
@@ -426,10 +426,10 @@ function RevenueCalculator({ onChange }: { onChange: (r: ValuationResult) => voi
 function ValuationOutput({ result, stage, method }: { result: ValuationResult; stage: Stage; method: Method }) {
   const [copied, setCopied] = useState(false);
 
-  const copyText = `My startup valuation estimate (Hockystick Calculator):
+  const copyText = `My startup valuation estimate (Lengdon Calculator):
 Conservative: ${fmt(result.conservative)} | Realistic: ${fmt(result.realistic)} | Optimistic: ${fmt(result.optimistic)}
 Method: ${result.methodName} | Stage: ${stage}
-Calculate yours at hockystick.app/tools/valuation`;
+Calculate yours at lengdon.com/tools/valuation`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(copyText).then(() => {
@@ -496,7 +496,7 @@ Calculate yours at hockystick.app/tools/valuation`;
           {copied ? "Copied!" : "Copy results"}
         </button>
         <button
-          onClick={() => { const p = document.title; document.title = "Startup Valuation — Hockystick"; window.print(); document.title = p; }}
+          onClick={() => { const p = document.title; document.title = "Startup Valuation — Lengdon"; window.print(); document.title = p; }}
           style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
@@ -515,7 +515,7 @@ Calculate yours at hockystick.app/tools/valuation`;
             fontSize: "13px", fontWeight: 600, color: "#ffffff", textDecoration: "none",
           }}
         >
-          Build your Hockystick profile →
+          Build your Lengdon profile →
         </Link>
       </div>
     </div>
@@ -573,7 +573,7 @@ function ValuationPage() {
 
   const handlePrint = () => {
     const prev = document.title;
-    document.title = "Startup Valuation — Hockystick";
+    document.title = "Startup Valuation — Lengdon";
     window.print();
     document.title = prev;
   };
@@ -865,14 +865,14 @@ function ValuationPage() {
         </div>
       </section>
 
-      {/* ── S7: Hockystick CTA ────────────────────────────────────── */}
+      {/* ── S7: Lengdon CTA ────────────────────────────────────── */}
       <section className="tool-no-print" style={{ borderTop: "1px solid var(--border)", background: "var(--card)", padding: "72px 24px" }}>
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>
             Knowing your valuation is step one.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Step two is getting it in front of investors who are actively looking. Hockystick puts your profile in front of them — no cold email required.
+            Step two is getting it in front of investors who are actively looking. Lengdon puts your profile in front of them — no cold email required.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link

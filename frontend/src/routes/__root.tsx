@@ -101,24 +101,24 @@ const JSON_LD = JSON.stringify({
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      "name": "Hockystick",
-      "url": "https://hockystick.app",
+      "name": "Lengdon",
+      "url": "https://lengdon.com",
       "description": "A fundraising platform where founders and investors meet, run due diligence, hold structured interviews, negotiate terms, and close deals — entirely in-platform.",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free during beta" },
-      "creator": { "@id": "https://hockystick.app/#organization" },
+      "creator": { "@id": "https://lengdon.com/#organization" },
     },
     {
       "@type": "Organization",
-      "@id": "https://hockystick.app/#organization",
-      "name": "Hockystick",
+      "@id": "https://lengdon.com/#organization",
+      "name": "Lengdon",
       // legalName removed 17 Aug 2026 — Foundation Document §20.7 confines the
       // entity name to Terms, where it carries the "(under incorporation)"
       // qualifier. A bare legalName in machine-readable structured data asserts
       // a completed incorporation without the qualifier that makes it true.
-      "url": "https://hockystick.app",
-      "logo": "https://hockystick.app/apple-touch-icon.png",
+      "url": "https://lengdon.com",
+      "logo": "https://lengdon.com/apple-touch-icon.png",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "DIFC FinTech Hive",
@@ -134,30 +134,30 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Hockystick — Every deal leaves a record that holds" },
+      { title: "Lengdon — Every deal leaves a record that holds" },
       { name: "description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
-      { name: "author", content: "Hockystick" },
+      { name: "author", content: "Lengdon" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#F5F4F1" },
       // Open Graph — root-level fallback. Individual routes (the homepage,
       // /pricing) override og:title/og:description in their own head(); this
       // is what unmatched routes and social crawlers see if they don't.
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Hockystick — Every deal leaves a record that holds" },
+      { property: "og:title", content: "Lengdon — Every deal leaves a record that holds" },
       { property: "og:description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
-      { property: "og:url", content: "https://hockystick.app" },
-      { property: "og:site_name", content: "Hockystick" },
-      { property: "og:image", content: "https://hockystick.app/og-image.png" },
+      { property: "og:url", content: "https://lengdon.com" },
+      { property: "og:site_name", content: "Lengdon" },
+      { property: "og:image", content: "https://lengdon.com/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Hockystick — every deal leaves a record that holds." },
+      { property: "og:image:alt", content: "Lengdon — every deal leaves a record that holds." },
       // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@hockystickapp" },
-      { name: "twitter:title", content: "Hockystick — Every deal leaves a record that holds" },
+      { name: "twitter:site", content: "@lengdondotcom" },
+      { name: "twitter:title", content: "Lengdon — Every deal leaves a record that holds" },
       { name: "twitter:description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
-      { name: "twitter:image", content: "https://hockystick.app/og-image.png" },
+      { name: "twitter:image", content: "https://lengdon.com/og-image.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

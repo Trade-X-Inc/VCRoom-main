@@ -8,11 +8,11 @@ import { getPostBySlug, type BlogPostWithContent } from "@/lib/notion-blog";
 export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData, params }) => {
     const post = loaderData as BlogPostWithContent | null;
-    if (!post) return { meta: [{ title: "Post not found — Hockystick Blog" }] };
-    const url = `https://hockystick.app/blog/${params.slug}`;
+    if (!post) return { meta: [{ title: "Post not found — Lengdon Blog" }] };
+    const url = `https://lengdon.com/blog/${params.slug}`;
     return {
       meta: [
-        { title: `${post.seoTitle || post.title} — Hockystick Blog` },
+        { title: `${post.seoTitle || post.title} — Lengdon Blog` },
         { name: "description", content: post.seoDescription || post.excerpt },
         { property: "og:title", content: post.seoTitle || post.title },
         { property: "og:description", content: post.seoDescription || post.excerpt },
@@ -97,7 +97,7 @@ function BlogArticle() {
 
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 border-t border-gray-200 pt-6">
-            <span className="inline-flex items-center gap-1.5"><User className="h-3.5 w-3.5" />By {post.author}{post.author.includes("Hockystick") ? "" : ", Hockystick"}</span>
+            <span className="inline-flex items-center gap-1.5"><User className="h-3.5 w-3.5" />By {post.author}{post.author.includes("Lengdon") ? "" : ", Lengdon"}</span>
             <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{formatDate(post.publishDate)}</span>
             <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{post.readingTime}</span>
           </div>
@@ -126,7 +126,7 @@ function BlogArticle() {
         <div className="mt-16 p-8 rounded-2xl bg-purple-50 border border-purple-200 text-center">
           <p className="text-gray-900 mb-2 text-lg font-semibold">Ready to raise smarter?</p>
           <p className="text-gray-600 mb-6 text-sm">
-            Join founders and investors already using Hockystick to close deals faster.
+            Join founders and investors already using Lengdon to close deals faster.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/sign-up" search={{ role: "founder" } as any}>

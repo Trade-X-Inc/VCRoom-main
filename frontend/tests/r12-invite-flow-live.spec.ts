@@ -25,7 +25,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = `sb-ldimninnjlvxozubheib-auth-token`;
-const APP_URL = process.env.R12_TEST_BASE_URL || "https://hockystick.app";
+const APP_URL = process.env.R12_TEST_BASE_URL || "https://lengdon.com";
 
 const FOUNDER_STARTUP_ID = testEnv.TEST_FOUNDER_STARTUP_ID;
 const FOUNDER_USER_ID = testEnv.TEST_FOUNDER_USER_ID;
@@ -115,7 +115,7 @@ test("Invited member accepts and lands with their assigned role (analyst) active
   test.skip(!SERVICE_KEY, "Requires SUPABASE_SERVICE_ROLE_KEY in frontend/.env.local");
 
   const stamp = Date.now();
-  const email = `r12-invite-flow-${stamp}@hockystick.app`;
+  const email = `r12-invite-flow-${stamp}@lengdon.com`;
   const password = `R12invite!${stamp}`;
 
   const userId = await createDisposableInvitee(email, password);

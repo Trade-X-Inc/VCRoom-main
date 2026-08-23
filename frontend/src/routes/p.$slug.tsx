@@ -136,14 +136,14 @@ export const Route = createFileRoute("/p/$slug")({
     const d = loaderData as { startup: PublicStartup | null; slug: string };
     const startup = d?.startup;
     if (!startup) {
-      return { meta: [{ title: "Founder profile not found — Hockystick" }] };
+      return { meta: [{ title: "Founder profile not found — Lengdon" }] };
     }
     return {
       meta: [
-        { title: `${startup.company_name || "Founder profile"} — Hockystick` },
-        { name: "description", content: startup.tagline || startup.description || "Verified founder profile on Hockystick." },
-        { property: "og:title", content: `${startup.company_name || "Founder profile"} — Hockystick` },
-        { property: "og:description", content: startup.tagline || startup.description || "Verified founder profile on Hockystick." },
+        { title: `${startup.company_name || "Founder profile"} — Lengdon` },
+        { name: "description", content: startup.tagline || startup.description || "Verified founder profile on Lengdon." },
+        { property: "og:title", content: `${startup.company_name || "Founder profile"} — Lengdon` },
+        { property: "og:description", content: startup.tagline || startup.description || "Verified founder profile on Lengdon." },
       ],
     };
   },
@@ -337,7 +337,7 @@ function LockedSectionCard({
               textDecoration: 'none',
             }}
           >
-            Connect on Hockystick →
+            Connect on Lengdon →
           </a>
         </>
       ) : requestStatus === "pending" ? (
@@ -468,7 +468,7 @@ function FounderPublicProfileWrapper() {
       <div style={{ textAlign: "center", color: "#FAFAFA" }}>
         <h1 style={{ fontSize: 32, fontFamily: "Syne, sans-serif", fontWeight: 800, marginBottom: 12 }}>Profile private</h1>
         <p style={{ color: "var(--muted-foreground)", fontSize: 15 }}>This founder profile hasn't been published yet.</p>
-        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "var(--brand)", textDecoration: "underline", fontSize: 14 }}>Back to Hockystick</a>
+        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "var(--brand)", textDecoration: "underline", fontSize: 14 }}>Back to Lengdon</a>
       </div>
     </div>
   );
@@ -593,7 +593,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
           user_id: startup!.founder_id,
           kind: "view", type: "profile_view",
           title: `${investorLabel} viewed your profile`,
-          body: `${investorLabel} just visited your Hockystick profile.`,
+          body: `${investorLabel} just visited your Lengdon profile.`,
           read: false, action_url: "/app/profile?tab=analytics",
           meta: { viewer_name: viewerName, viewer_fund: viewerFund, viewer_id: user.id },
         });
@@ -1041,7 +1041,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       <div className="border-t border-gray-100 py-6 text-center">
         <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
           <Sparkles className="h-3.5 w-3.5 text-brand" />
-          Powered by Hockystick
+          Powered by Lengdon
         </Link>
       </div>
 
@@ -1061,7 +1061,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               Interested in {startup.company_name}?
             </p>
             <p style={{ color: 'var(--muted-foreground)', fontSize: 12, margin: 0 }}>
-              Request access to their full data room on Hockystick
+              Request access to their full data room on Lengdon
             </p>
           </div>
           <a

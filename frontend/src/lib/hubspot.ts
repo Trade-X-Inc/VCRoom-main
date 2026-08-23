@@ -90,7 +90,7 @@ export async function submitHubSpotForm(
             value: f.value,
           })),
           legalConsentOptions: {
-            consent: { consentToProcess: true, text: "I agree to receive communications from Hockystick." },
+            consent: { consentToProcess: true, text: "I agree to receive communications from Lengdon." },
           },
         }),
       }

@@ -124,7 +124,7 @@ function InvestorPublicProfileWrapper() {
       <div style={{ textAlign: "center" }}>
         <h1 style={{ fontSize: 28, fontFamily: font.display, fontWeight: 700, color: color.ink, marginBottom: 12 }}>Profile not found</h1>
         <p style={{ color: color.inkSecondary, fontSize: 14 }}>This investor profile is private or doesn't exist.</p>
-        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "#7C3AED", textDecoration: "underline", fontSize: 13 }}>Back to Hockystick</a>
+        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "#7C3AED", textDecoration: "underline", fontSize: 13 }}>Back to Lengdon</a>
       </div>
     </div>
   );
@@ -174,8 +174,8 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
       )}
 
       <nav style={{ borderBottom: `1px solid ${color.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", background: color.white }}>
-        <a href="https://hockystick.app" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: color.ink, textDecoration: "none" }}>Hockystick</a>
-        <a href="https://hockystick.app" style={{ fontSize: 13, color: color.inkTertiary, textDecoration: "none" }}>Join the platform</a>
+        <a href="https://lengdon.com" style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, color: color.ink, textDecoration: "none" }}>Lengdon</a>
+        <a href="https://lengdon.com" style={{ fontSize: 13, color: color.inkTertiary, textDecoration: "none" }}>Join the platform</a>
       </nav>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px 80px" }}>
@@ -339,8 +339,8 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
         {!isOwnerPreview && (
           <div style={{ background: "rgba(124,58,237,0.04)", border: "1px solid rgba(124,58,237,0.2)", padding: "28px 32px", textAlign: "center", marginTop: 32 }}>
             <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, marginBottom: 8, color: color.ink }}>Connect with {profile.fund_name || profile.your_name}</div>
-            <p style={{ color: color.inkSecondary, fontSize: 13, margin: "0 0 20px" }}>Request a connection on Hockystick — the agentic VC deal flow platform.</p>
-            <a href="https://hockystick.app"
+            <p style={{ color: color.inkSecondary, fontSize: 13, margin: "0 0 20px" }}>Request a connection on Lengdon — the agentic VC deal flow platform.</p>
+            <a href="https://lengdon.com"
               style={{ display: "inline-block", background: "#7C3AED", color: "#fff", textDecoration: "none", borderRadius: 2, padding: "10px 24px", fontSize: 13, fontWeight: 500, fontFamily: font.body }}>
               Request connection
             </a>
@@ -350,7 +350,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
 
       <div style={{ borderTop: `1px solid ${color.border}`, padding: "18px 24px", textAlign: "center", background: color.white }}>
         <span style={{ fontSize: 12, color: color.inkTertiary }}>
-          Powered by <a href="https://hockystick.app" style={{ color: color.inkTertiary, textDecoration: "none" }}>Hockystick</a>
+          Powered by <a href="https://lengdon.com" style={{ color: color.inkTertiary, textDecoration: "none" }}>Lengdon</a>
         </span>
       </div>
     </div>

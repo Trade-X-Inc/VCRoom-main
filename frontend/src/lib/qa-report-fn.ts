@@ -96,7 +96,7 @@ export const completeQaAndGenerateReport = createServerFn({ method: "POST" })
       "",
       "———",
       "",
-      "This Q&A was conducted under the deal room NDA signed by all parties on the Hockystick platform.",
+      "This Q&A was conducted under the deal room NDA signed by all parties on the Lengdon platform.",
     ].join("\n");
 
     // 5. Insert into documents (Information Vault)

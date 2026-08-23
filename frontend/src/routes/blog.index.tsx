@@ -8,10 +8,10 @@ import { getPublishedPosts, type BlogPost } from "@/lib/notion-blog";
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "Blog — Hockystick" },
+      { title: "Blog — Lengdon" },
       { name: "description", content: "Latest insights on fundraising, venture capital, and deal management." },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/blog" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/blog" }],
   }),
   loader: () => getPublishedPosts(),
   component: BlogIndex,

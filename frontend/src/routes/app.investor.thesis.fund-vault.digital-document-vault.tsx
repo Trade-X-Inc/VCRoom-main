@@ -13,7 +13,7 @@ function Page() {
     <PageFrame
       breadcrumb={[{ label: "Investor" }, { label: "Thesis" }, { label: "Fund Vault" }, { label: "Digital Document Vault" }]}
       title="Digital Document Vault"
-      description="Hockystick-processed fund documents."
+      description="Lengdon-processed fund documents."
     >
       <EmptyState kind="empty" title="Not available yet" />
     </PageFrame>

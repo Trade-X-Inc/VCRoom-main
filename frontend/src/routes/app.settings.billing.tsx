@@ -97,14 +97,14 @@ function BillingSettings() {
             <div className="pt-1">
               <button
                 disabled
-                title="Stripe integration coming soon — email hello@hockystick.app to change your plan"
+                title="Stripe integration coming soon — email hello@lengdon.com to change your plan"
                 className="inline-flex items-center rounded border border-border px-4 py-2 text-sm font-medium opacity-60 cursor-not-allowed" style={{ color: "#71717A" }}
               >
                 Manage subscription →
               </button>
               <div className="text-xs text-muted-foreground mt-2">
                 Stripe integration coming soon — email{" "}
-                <a href="mailto:hello@hockystick.app" className="text-brand hover:underline">hello@hockystick.app</a>{" "}
+                <a href="mailto:hello@lengdon.com" className="text-brand hover:underline">hello@lengdon.com</a>{" "}
                 to change your plan.
               </div>
             </div>

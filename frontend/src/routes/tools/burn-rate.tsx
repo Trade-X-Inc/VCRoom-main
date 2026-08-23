@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/burn-rate")({
   head: () => ({
     meta: [
-      { title: "Burn Rate & Runway Calculator — Free Tool for Startups | Hockystick" },
+      { title: "Burn Rate & Runway Calculator — Free Tool for Startups | Lengdon" },
       {
         name: "description",
         content:
           "Calculate your startup's monthly burn rate and runway in seconds. Model three scenarios, see your cash-out date, and know exactly when to start your next raise. Free, no signup required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/burn-rate" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/burn-rate" }],
   }),
   component: BurnRatePage,
 });
@@ -411,10 +411,10 @@ function RunwayTab({ prefillNetBurn, prefillGrossBurn, prefillMrr }: { prefillNe
 
   const currentRunway = scenarios[0].months;
 
-  const copyText = `Burn Rate & Runway Summary (Hockystick Calculator)
+  const copyText = `Burn Rate & Runway Summary (Lengdon Calculator)
 Gross burn: ${fmt(prefillGrossBurn)}/mo | Net burn: ${fmt(prefillNetBurn > 0 ? prefillNetBurn : netBurn)}/mo
 Current runway: ${Math.round(currentRunway)} months (cash out: ${scenarios[0].cashOut ? formatDate(scenarios[0].cashOut) : "N/A"})
-Calculate yours at hockystick.app/tools/burn-rate`;
+Calculate yours at lengdon.com/tools/burn-rate`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(copyText).then(() => {
@@ -515,7 +515,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
             {raiseAdvice(currentRunway)}
           </p>
           <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontSize: "13px", color: "#5B21B6", textDecoration: "none" }}>
-            Build your Hockystick profile to reach investors faster →
+            Build your Lengdon profile to reach investors faster →
           </Link>
         </div>
       </div>
@@ -535,7 +535,7 @@ Calculate yours at hockystick.app/tools/burn-rate`;
           {copied ? "Copied!" : "Copy results"}
         </button>
         <button
-          onClick={() => { const p = document.title; document.title = "Burn Rate & Runway — Hockystick"; window.print(); document.title = p; }}
+          onClick={() => { const p = document.title; document.title = "Burn Rate & Runway — Lengdon"; window.print(); document.title = p; }}
           style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
@@ -802,7 +802,7 @@ function BurnRatePage() {
             Runway tells investors how serious you are.
           </h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Investors review your financials before they take a first meeting. A Hockystick profile shows investors your financial readiness before you're in the room.
+            Investors review your financials before they take a first meeting. A Lengdon profile shows investors your financial readiness before you're in the room.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link

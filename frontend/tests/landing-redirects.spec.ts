@@ -65,7 +65,7 @@ async function injectAndNavigateCallback(ctx: BrowserContext, session: any): Pro
   const page = await ctx.newPage();
 
   // First navigate to root to set localStorage
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(({ key, s }: any) => {
     localStorage.setItem(key, JSON.stringify({
       access_token: s.access_token,
@@ -79,7 +79,7 @@ async function injectAndNavigateCallback(ctx: BrowserContext, session: any): Pro
 
   // Navigate to the auth callback — it will poll for session, find it,
   // determine the role, and do window.location.href to the landing page.
-  await page.goto("https://hockystick.app/auth/callback", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/auth/callback", { waitUntil: "domcontentloaded" });
 
   // Wait for the redirect to resolve (callback does window.location.href)
   // The callback can take up to ~5s to poll for the session + do DB queries.
@@ -149,7 +149,7 @@ test("Fix 3 — Team Chat loads with empty state, no error", async ({ browser })
   const page = await ctx.newPage();
 
   // Inject session
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(({ key, s }: any) => {
     localStorage.setItem(key, JSON.stringify({
       access_token: s.access_token,
@@ -162,7 +162,7 @@ test("Fix 3 — Team Chat loads with empty state, no error", async ({ browser })
   }, { key: STORAGE_KEY, s: session });
 
   // Navigate to team chat
-  await page.goto("https://hockystick.app/app/messages", { waitUntil: "networkidle" });
+  await page.goto("https://lengdon.com/app/messages", { waitUntil: "networkidle" });
   await page.waitForFunction(
     () => !document.body.textContent?.includes("Signing you in"),
     { timeout: 20000 }

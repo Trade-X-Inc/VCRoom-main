@@ -10,7 +10,7 @@ export const TOOLS_PAGES: Record<string, DocPage> = {
       slug: "tools",
       title: "Financial calculators",
       description:
-        "Hockystick's seven free financial calculators: valuation, burn rate, runway, cap table, dilution, COGS, and SAFE notes.",
+        "Lengdon's seven free financial calculators: valuation, burn rate, runway, cap table, dilution, COGS, and SAFE notes.",
       updated: UPDATED,
       toc: [
         { id: "overview", label: "Overview" },
@@ -21,7 +21,7 @@ export const TOOLS_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          Hockystick includes seven financial calculators, free to use with or without an account.
+          Lengdon includes seven financial calculators, free to use with or without an account.
           They exist because the numbers they produce — valuation ranges, runway, dilution — are
           exactly the numbers founders need before walking into the conversations the rest of the
           platform hosts.

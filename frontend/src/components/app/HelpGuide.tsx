@@ -110,7 +110,7 @@ export function FounderHelpGuide() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground mb-1">How to use Hockystick</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-1">How to use Lengdon</h2>
         <p className="text-sm text-muted-foreground">Everything you need to run your fundraising process on the platform.</p>
       </div>
 
@@ -166,7 +166,7 @@ export function FounderHelpGuide() {
 
         <Article heading="Rejection feedback">
           <Body>
-            When an investor passes on your deal room with a reason, Hockystick generates a debrief for your team — what the investor was looking for and what to address before approaching a similar investor.
+            When an investor passes on your deal room with a reason, Lengdon generates a debrief for your team — what the investor was looking for and what to address before approaching a similar investor.
           </Body>
         </Article>
       </Accordion>
@@ -221,7 +221,7 @@ export function FounderHelpGuide() {
         />
         <QA
           q="Is my financial data secure?"
-          a="Financial documents are encrypted in your vault. Even Hockystick admins lose access after a deal closes. Investors in a deal room can view but not download documents by default."
+          a="Financial documents are encrypted in your vault. Even Lengdon admins lose access after a deal closes. Investors in a deal room can view but not download documents by default."
         />
         <QA
           q="How do I delete my account?"
@@ -239,7 +239,7 @@ export function InvestorHelpGuide() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground mb-1">How to use Hockystick</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-1">How to use Lengdon</h2>
         <p className="text-sm text-muted-foreground">Everything you need to run your deal flow process on the platform.</p>
       </div>
 
@@ -247,7 +247,7 @@ export function InvestorHelpGuide() {
       <Accordion title="Getting started" defaultOpen>
         <Article heading="Setting up your investment thesis">
           <Body>
-            Go to Profile → set your sectors, stages, geography, and check size. Hockystick runs daily thesis matching — founders who match your criteria appear in your discovery feed. The more specific your thesis, the better your matches.
+            Go to Profile → set your sectors, stages, geography, and check size. Lengdon runs daily thesis matching — founders who match your criteria appear in your discovery feed. The more specific your thesis, the better your matches.
           </Body>
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="rounded-lg px-3 py-2.5 text-sm bg-accent/40 border border-border/40 text-muted-foreground">
@@ -374,9 +374,9 @@ export function AboutSection() {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground mb-3">About Hockystick</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-3">About Lengdon</h2>
         <p className="text-sm text-muted-foreground leading-[1.7] max-w-xl">
-          Hockystick is a private fundraising platform for early-stage founders and investors.
+          Lengdon is a private fundraising platform for early-stage founders and investors.
           We built it because the warm intro system is broken — and most alternatives weren't designed for how deals actually get done.
         </p>
       </div>
@@ -405,9 +405,9 @@ export function AboutSection() {
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Contact</h3>
           <div className="space-y-2.5">
             {[
-              { label: "Support", href: "mailto:support@hockystick.app", text: "support@hockystick.app" },
-              { label: "Press", href: "mailto:press@hockystick.app", text: "press@hockystick.app" },
-              { label: "LinkedIn", href: "https://linkedin.com/company/hockystick", text: "linkedin.com/company/hockystick" },
+              { label: "Support", href: "mailto:support@lengdon.com", text: "support@lengdon.com" },
+              { label: "Press", href: "mailto:press@lengdon.com", text: "press@lengdon.com" },
+              { label: "LinkedIn", href: "https://linkedin.com/company/lengdon", text: "linkedin.com/company/lengdon" },
             ].map(({ label, href, text }) => (
               <div key={label} className="flex items-start gap-2">
                 <span className="text-xs text-muted-foreground w-20 shrink-0">{label}</span>
@@ -444,7 +444,7 @@ export function AboutSection() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Hockystick. All rights reserved.
+        © {new Date().getFullYear()} Lengdon. All rights reserved.
       </p>
     </div>
   );

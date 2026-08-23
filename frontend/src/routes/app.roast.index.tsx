@@ -209,7 +209,7 @@ export function RoastManagement({ view }: { view?: "reports" } = {}) {
         },
       });
       if (r.ok && r.sessionId) {
-        navigator.clipboard.writeText(`https://hockystick.app/roast/${r.sessionId}`).catch(() => {});
+        navigator.clipboard.writeText(`https://lengdon.com/roast/${r.sessionId}`).catch(() => {});
         toast.success("Roast scheduled — public link copied. Share it to fill the room.");
         setShowSchedule(false);
         setScheduleStep("details");
@@ -310,7 +310,7 @@ export function RoastManagement({ view }: { view?: "reports" } = {}) {
                 A live, public Q&amp;A where investors and other founders challenge your pitch on the
                 record. Every question gets answered — live or in writing within 48 hours — and
                 nothing is ever deleted or hidden. It's the strongest trust signal a founder can earn
-                on Hockystick: completing one earns a verified Roast badge that stays on your profile.
+                on Lengdon: completing one earns a verified Roast badge that stays on your profile.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
                 {[
@@ -522,7 +522,7 @@ export function RoastManagement({ view }: { view?: "reports" } = {}) {
                       </a>
                       <SecondaryButton
                         onClick={() => {
-                          navigator.clipboard.writeText(`https://hockystick.app/roast/${s.id}`);
+                          navigator.clipboard.writeText(`https://lengdon.com/roast/${s.id}`);
                           toast.success("Public link copied");
                         }}
                       >

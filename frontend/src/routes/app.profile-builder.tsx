@@ -813,7 +813,7 @@ function SelectScreen({
         <OnboardingTour
           steps={[{
             id: "intro",
-            title: "Welcome to Hockystick",
+            title: "Welcome to Lengdon",
             body: "Let's build your founder profile, then publish it and connect with investors. This first step takes about 10-15 minutes.",
           }]}
           activeIndex={0}

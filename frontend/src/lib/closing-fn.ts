@@ -269,14 +269,14 @@ async function finalizeClose(ctx: Ctx, roomId: string) {
     invoice_number: `HS-${dealRef}-${billTo === "founder" ? "F" : "I"}${n}`,
     bill_to_role: billTo,
     content: {
-      platform: "Hockystick",
+      platform: "Lengdon",
       deal_room_ref: roomId, deal_ref_short: dealRef,
       parties, deal_amount: fee?.deal_amount ?? null, fee_amount: fee?.calculated_fee ?? null,
       fee_payer: fee?.fee_payer ?? null, currency: "USD",
       payment_status: fee?.payment_status ?? null,
       payment_confirmed_at: now, // beta: recorded at close (TODO(stripe): real charge ts)
       generated_at: now,
-      note: "Platform success fee for a deal closed through Hockystick.",
+      note: "Platform success fee for a deal closed through Lengdon.",
     },
   });
   // one invoice per party

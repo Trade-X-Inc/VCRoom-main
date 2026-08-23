@@ -17,14 +17,14 @@ const PRINT_CSS = `
 export const Route = createFileRoute("/tools/safe-note")({
   head: () => ({
     meta: [
-      { title: "SAFE Note Calculator — Model Conversion & Ownership | Hockystick" },
+      { title: "SAFE Note Calculator — Model Conversion & Ownership | Lengdon" },
       {
         name: "description",
         content:
           "Calculate how your SAFE note converts at the next priced round. Compare valuation cap vs discount rate scenarios. See exact share count and ownership before you sign. Free, no signup required.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app/tools/safe-note" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/safe-note" }],
   }),
   component: SafeNotePage,
 });
@@ -255,11 +255,11 @@ function SafeNotePage() {
     ? (result.safeShares / result.totalPostShares) * 100
     : 0;
 
-  const copyText = `SAFE Conversion Summary (Hockystick Calculator)
+  const copyText = `SAFE Conversion Summary (Lengdon Calculator)
 SAFE: ${fmt$(safeInvestment)} at ${fmt$(valuationCap)} cap, ${discountRate}% discount
 Converts at: ${fmtPrice(result.conversionPrice)}/share (${activeLabel} applies)
 Shares: ${fmtShares(result.safeShares)} | Ownership: ${fmtPct(result.ownership)}
-Model yours at hockystick.app/tools/safe-note`;
+Model yours at lengdon.com/tools/safe-note`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(copyText).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
@@ -449,7 +449,7 @@ Model yours at hockystick.app/tools/safe-note`;
                     {copied ? "Copied!" : "Copy results"}
                   </button>
                   <button
-                    onClick={() => { const p = document.title; document.title = "SAFE Note Calculator — Hockystick"; window.print(); document.title = p; }}
+                    onClick={() => { const p = document.title; document.title = "SAFE Note Calculator — Lengdon"; window.print(); document.title = p; }}
                     style={{ display: "inline-flex", alignItems: "center", gap: "6px", alignSelf: "flex-start", background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", fontWeight: 600, color: "#5B21B6", cursor: "pointer" }}>
                     <Download size={14} /> Download PDF
                   </button>
@@ -618,7 +618,7 @@ Model yours at hockystick.app/tools/safe-note`;
         <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
           <h3 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", letterSpacing: "-0.02em", marginBottom: "16px" }}>Know your terms before you sign.</h3>
           <p style={{ fontSize: "15px", color: "var(--muted-foreground)", lineHeight: 1.7, marginBottom: "28px" }}>
-            Come in with your financials ready — a Hockystick profile puts them in structured form before the first conversation.
+            Come in with your financials ready — a Lengdon profile puts them in structured form before the first conversation.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/sign-up" search={{ role: "founder" } as any}

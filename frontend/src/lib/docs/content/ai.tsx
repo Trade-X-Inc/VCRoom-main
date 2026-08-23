@@ -8,9 +8,9 @@ export const AI_PAGES: Record<string, DocPage> = {
   "ai": {
     meta: {
       slug: "ai",
-      title: "AI on Hockystick",
+      title: "AI on Lengdon",
       description:
-        "How AI is architected on Hockystick: two separate agents, a confirm-first rule for anything visible to another party, and explicit scope on every feature.",
+        "How AI is architected on Lengdon: two separate agents, a confirm-first rule for anything visible to another party, and explicit scope on every feature.",
       updated: UPDATED,
       toc: [
         { id: "philosophy", label: "Philosophy" },
@@ -24,7 +24,7 @@ export const AI_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          AI on Hockystick is an operator, not an oracle: it reads your data to answer your
+          AI on Lengdon is an operator, not an oracle: it reads your data to answer your
           questions and drafts work you would otherwise do by hand — and anything that would become
           visible to another party stops and waits for your explicit confirmation, with no
           exceptions.

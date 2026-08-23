@@ -10,7 +10,7 @@
 // attributed to an arbitrary investor.
 //
 // What it did: emailed a founder that a named investor requested profile
-// access, including a "Hockystick Verified" badge rendered from
+// access, including a "Lengdon Verified" badge rendered from
 // investor_profiles.verification_tier — itself a §15/§25 verification claim
 // whose writer (verify-investor) was stubbed earlier the same day.
 //

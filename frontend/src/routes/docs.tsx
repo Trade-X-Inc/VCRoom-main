@@ -124,7 +124,7 @@ function DocsLayout() {
           <Link to="/" className="flex items-center gap-2">
             <Logo withWordmark={false} />
             <span className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
-              Hockystick
+              Lengdon
             </span>
           </Link>
           <span className="text-gray-300">/</span>
@@ -226,8 +226,8 @@ function DocsLayout() {
           {/* Footer */}
           <footer className="mt-10 border-t border-[#E4E4E7] pt-6 pb-12 text-sm text-gray-500">
             Something wrong on this page? Email{" "}
-            <a href="mailto:docs@hockystick.app" className="text-purple-700 underline underline-offset-2">
-              docs@hockystick.app
+            <a href="mailto:docs@lengdon.com" className="text-purple-700 underline underline-offset-2">
+              docs@lengdon.com
             </a>
             .
           </footer>

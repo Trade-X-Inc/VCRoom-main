@@ -330,7 +330,7 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
             <div className="text-center -mt-2">
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(`https://hockystick.app/p/${startup.profile_slug}`);
+                  navigator.clipboard.writeText(`https://lengdon.com/p/${startup.profile_slug}`);
                   toast.success(startup.profile_published ? "Profile link copied" : "Link copied — publish your profile so investors can open it");
                 }}
                 className="text-v2-accent hover:underline"

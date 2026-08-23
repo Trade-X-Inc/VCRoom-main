@@ -1,5 +1,5 @@
 /**
- * Hockystick design tokens — the single source of truth.
+ * Lengdon design tokens — the single source of truth.
  *
  * Design law (see CLAUDE.md §9, "the Design Constitution"): flat brand violet
  * used sparingly, 0px radius on structural elements, borders over shadows,
@@ -25,7 +25,7 @@ export const color = {
 } as const;
 
 /**
- * THE Hockystick brand color. Flat, not a gradient.
+ * THE Lengdon brand color. Flat, not a gradient.
  * Used ONLY for: primary buttons, active nav indicator, links, focus rings,
  * key data accents. Never as a section background inside the app.
  */

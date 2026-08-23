@@ -94,7 +94,7 @@ async function getSession(email: string, password: string): Promise<any> {
 
 async function injectSession(context: BrowserContext, session: any) {
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(
     ({ key, session }: { key: string; session: any }) => {
       localStorage.setItem(key, JSON.stringify({
@@ -171,7 +171,7 @@ test("ACCEPTANCE: Atlas Robotics auto-detection accuracy — Financials must = 0
     await injectSession(context, session);
     const page = await context.newPage();
 
-    await page.goto(`https://hockystick.app/app/deal-room/${ATLAS_DEAL_ROOM_ID}`, { waitUntil: "networkidle" });
+    await page.goto(`https://lengdon.com/app/deal-room/${ATLAS_DEAL_ROOM_ID}`, { waitUntil: "networkidle" });
 
     // Navigate to Workstation tab (JS-click to bypass overflow-hidden tab bar)
     await page.locator("button", { hasText: /overview/i }).first().waitFor({ state: "attached", timeout: 20000 });

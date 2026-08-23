@@ -55,7 +55,7 @@ function InvestorLayout() {
       }}>
         <p style={{ color: '#ffffff', fontSize: 18, fontWeight: 600 }}>Connection issue</p>
         <p style={{ color: 'var(--muted-foreground)', fontSize: 14 }}>
-          Could not connect to Hockystick. Please check your connection and try again.
+          Could not connect to Lengdon. Please check your connection and try again.
         </p>
         <button
           onClick={() => window.location.reload()}

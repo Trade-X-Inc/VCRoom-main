@@ -31,7 +31,7 @@ await page.reload({waitUntil:"domcontentloaded"}); await wait(5000);
 await page.getByRole("button",{name:/Exit deal/i}).click().catch(()=>{}); await wait(700);
 const et=await page.evaluate(()=>document.body.innerText);
 ck("Exit: dialog shows 'nothing deleted'", /Nothing is deleted/i.test(et));
-ck("Exit: fee-paid branch shows hello@hockystick.app / no auto-refund", /hello@hockystick.app/i.test(et) && /does not automatically refund|no auto-refund/i.test(et), "support path");
+ck("Exit: fee-paid branch shows hello@lengdon.com / no auto-refund", /hello@lengdon.com/i.test(et) && /does not automatically refund|no auto-refund/i.test(et), "support path");
 await page.screenshot({path:`${OUT}/s8_exit.png`,fullPage:true});
 console.log(`\nFOUNDER-PAYS + EXIT: ${R.filter(r=>r.p).length}/${R.length} pass`);
 await b.close();

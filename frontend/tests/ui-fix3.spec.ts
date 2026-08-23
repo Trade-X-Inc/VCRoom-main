@@ -38,7 +38,7 @@ const localEnv = loadEnv(path.resolve(__dirname, "../.env.local"));
 const SUPABASE_URL = localEnv.SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
 const SERVICE_KEY = localEnv.SUPABASE_SERVICE_ROLE_KEY;
 const STORAGE_KEY = "sb-ldimninnjlvxozubheib-auth-token";
-const APP = "https://hockystick.app";
+const APP = "https://lengdon.com";
 const THEME_KEY = "vr.theme";
 
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL;
@@ -341,7 +341,7 @@ test.describe("UI-FIX-2: Theme + route fixes", () => {
     console.log("\n── TEST 8 RESULT ──");
 
     const body = await page.textContent("body") ?? "";
-    const hasHelpContent = body.includes("How to use Hockystick") || body.includes("Getting started") || body.includes("Deal Intake");
+    const hasHelpContent = body.includes("How to use Lengdon") || body.includes("Getting started") || body.includes("Deal Intake");
     console.log(`Has investor help guide content: ${hasHelpContent}`);
     expect(hasHelpContent).toBe(true);
 

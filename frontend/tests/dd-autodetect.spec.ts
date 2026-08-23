@@ -57,7 +57,7 @@ async function getSession(email: string, password: string): Promise<any> {
 
 async function injectSession(context: BrowserContext, session: any) {
   const page = await context.newPage();
-  await page.goto("https://hockystick.app/", { waitUntil: "domcontentloaded" });
+  await page.goto("https://lengdon.com/", { waitUntil: "domcontentloaded" });
   await page.evaluate(
     ({ key, session }: { key: string; session: any }) => {
       localStorage.setItem(
@@ -132,7 +132,7 @@ test.describe("DD auto-detection", () => {
     const page = await context.newPage();
 
     await page.goto(
-      `https://hockystick.app/app/deal-room/${TEST_DEAL_ROOM_ID}`,
+      `https://lengdon.com/app/deal-room/${TEST_DEAL_ROOM_ID}`,
       { waitUntil: "networkidle" }
     );
 
@@ -179,7 +179,7 @@ test.describe("DD auto-detection", () => {
     const page = await context.newPage();
 
     await page.goto(
-      `https://hockystick.app/app/deal-room/${TEST_DEAL_ROOM_ID}`,
+      `https://lengdon.com/app/deal-room/${TEST_DEAL_ROOM_ID}`,
       { waitUntil: "networkidle" }
     );
 
@@ -227,7 +227,7 @@ test.describe("DD auto-detection", () => {
     await injectSession(context, session);
     const page = await context.newPage();
 
-    await page.goto("https://hockystick.app/app/investor/diligence", { waitUntil: "networkidle" });
+    await page.goto("https://lengdon.com/app/investor/diligence", { waitUntil: "networkidle" });
 
     await page.screenshot({ path: "/tmp/pw-diligence-summary.png" });
 
@@ -285,7 +285,7 @@ test.describe("DD auto-detection", () => {
       await injectSession(context, session);
       const page = await context.newPage();
 
-      await page.goto("https://hockystick.app/app/investor/diligence", { waitUntil: "networkidle" });
+      await page.goto("https://lengdon.com/app/investor/diligence", { waitUntil: "networkidle" });
       await page.screenshot({ path: "/tmp/pw-diligence-watchlist-section.png" });
 
       // The "In diligence — not yet in a deal room" section should appear

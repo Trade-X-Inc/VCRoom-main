@@ -1,4 +1,4 @@
-# Hockystick
+# Lengdon
 
 > The fundraising platform where verified founders and investors meet, run
 > due diligence, negotiate terms, and close deals — entirely in-platform.
@@ -27,20 +27,20 @@ if a deal doesn't close. Investors: free at launch.
 
 ## Key pages
 
-- [Homepage](https://hockystick.app/): product overview, FAQ, pricing preview.
-- [Pricing](https://hockystick.app/pricing): full pricing detail.
-- [Trust & Verification](https://hockystick.app/trust): how the verification
+- [Homepage](https://lengdon.com/): product overview, FAQ, pricing preview.
+- [Pricing](https://lengdon.com/pricing): full pricing detail.
+- [Trust & Verification](https://lengdon.com/trust): how the verification
   tiers work.
-- [About](https://hockystick.app/about): company and team.
-- [Docs](https://hockystick.app/docs): full product documentation for
+- [About](https://lengdon.com/about): company and team.
+- [Docs](https://lengdon.com/docs): full product documentation for
   founders, investors, deal rooms, and the AI features.
-- [Blog](https://hockystick.app/blog): fundraising and deal-flow articles.
-- [Free calculators](https://hockystick.app/tools): valuation, burn rate,
+- [Blog](https://lengdon.com/blog): fundraising and deal-flow articles.
+- [Free calculators](https://lengdon.com/tools): valuation, burn rate,
   runway, COGS, cap table, SAFE note, and dilution calculators — no signup
   required.
 
 ## Docs
 
-Full documentation lives at https://hockystick.app/docs, organized by
+Full documentation lives at https://lengdon.com/docs, organized by
 founder features, investor features, deal rooms, and AI. The security model
 and platform changelog are at /docs/security and /docs/changelog.
