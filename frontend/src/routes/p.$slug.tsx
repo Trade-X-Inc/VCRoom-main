@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
-import { createClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -66,8 +65,15 @@ function RoastRecordLink({ startupId }: { startupId: string }) {
   );
 }
 
+// Field set matches get_public_founder_profile()'s actual output exactly
+// (supabase/migrations/20260823000000_public_founder_profile_whitelist.sql)
+// -- not the old 77-column startups row. website and registry_verified
+// removed: unused by this page (confirmed by grep) and never part of the
+// RPC's whitelist. See that migration's header comment for the full
+// section -> field derivation.
 interface PublicStartup {
   id: string;
+  founder_id: string | null;
   company_name: string | null;
   tagline: string | null;
   stage: string | null;
@@ -79,7 +85,6 @@ interface PublicStartup {
   revenue: string | null;
   team_size: number | null;
   description: string | null;
-  website: string | null;
   problem: string | null;
   solution: string | null;
   business_model: string | null;
@@ -110,8 +115,6 @@ interface PublicStartup {
   logo_url: string | null;
   profile_slug: string | null;
   social_links: Array<{ platform: string; url: string }> | null;
-  founder_id: string | null;
-  registry_verified: boolean | null;
   key_metric: string | null;
   growth_rate: string | null;
   customer_count: string | null;
@@ -149,17 +152,22 @@ export const Route = createFileRoute("/p/$slug")({
   },
   loader: async ({ params }) => {
     if (!params.slug) return { startup: null, slug: "" };
-    const cfEnv = (globalThis as any).__cf_env || {};
-    const supabaseUrl = cfEnv.SUPABASE_URL || cfEnv.VITE_SUPABASE_URL || "https://ldimninnjlvxozubheib.supabase.co";
-    const serviceKey = cfEnv.SUPABASE_SERVICE_ROLE_KEY || "";
-    const client = serviceKey ? createClient(supabaseUrl, serviceKey) : supabase;
-    // Only return the profile if publicly published — owner preview is handled client-side
-    const { data } = await client
-      .from("startups")
-      .select("*")
-      .eq("profile_slug", params.slug)
-      .eq("profile_published", true)
-      .maybeSingle();
+    // Anon client, SECURITY DEFINER RPC — NEVER service-role + select(*) on
+    // a public-facing route. get_public_founder_profile() re-checks
+    // profile_published internally and returns only the always-public
+    // field set plus each conditional section's fields where that row's
+    // own section_visibility marks the section public, filtered in SQL —
+    // not by what this page chooses to render. Mirrors /i/:slug's
+    // get_public_investor_profile(). See CLAUDE.md's incident entry and
+    // supabase/migrations/20260823000000_public_founder_profile_whitelist.sql
+    // for the exposure this closed (70 days, full 77-column row, including
+    // founder_email/burn_rate/unit_economics, shipped to every anonymous
+    // visitor of a published profile).
+    const { data, error } = await supabase.rpc("get_public_founder_profile", { p_slug: params.slug });
+    if (error) {
+      console.error("[p.$slug] get_public_founder_profile failed:", error);
+      return { startup: null, slug: params.slug };
+    }
     return { startup: data as PublicStartup | null, slug: params.slug };
   },
   component: FounderPublicProfileWrapper,
@@ -401,8 +409,11 @@ function LockedSectionCard({
 
 // ─── Owner-preview wrapper ────────────────────────────────────────────────────
 // Mirrors the same pattern used on /i/$slug. The server loader has no session
-// context (service-role client, no user JWT), so owner detection happens here
-// on the client after auth is available.
+// context (anon RPC call, no user JWT), so owner detection happens here on
+// the client after auth is available, using the authenticated user's own
+// session and startups_own RLS (founder_id = auth.uid()) -- not the public
+// RPC, which never returns unpublished or non-whitelisted data regardless
+// of who calls it.
 
 function FounderPublicProfileWrapper() {
   const { startup: publicStartup, slug } = Route.useLoaderData() as { startup: PublicStartup | null; slug: string };
