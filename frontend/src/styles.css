@@ -137,7 +137,7 @@ img { max-width: 100%; height: auto; }
   --accent: #FAFAFA;
   --accent-foreground: #0A0A0B;
 
-  /* Brand — Hockystick violet. Flat, per CLAUDE.md §9.0: primary buttons,
+  /* Brand — Lengdon violet. Flat, per CLAUDE.md §9.0: primary buttons,
      active nav indicator, links, focus rings, key data accents only. */
   --brand: #7C3AED;
   --brand-foreground: #FFFFFF;
@@ -384,7 +384,7 @@ img { max-width: 100%; height: auto; }
   }
 }
 
-/* ── Hockystick design system — see src/lib/design-tokens.ts ──────────────
+/* ── Lengdon design system — see src/lib/design-tokens.ts ──────────────
    CLAUDE.md §9.0: brand is flat #7C3AED, used sparingly (buttons, active
    nav, links, focus rings, key accents). These utilities are kept so
    existing call sites don't break; they now paint flat, not a gradient. */
@@ -474,6 +474,47 @@ img { max-width: 100%; height: auto; }
   .pub-hero {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     gap: 64px;
+  }
+}
+
+/* Metric grid — hairline-divided stat/fact cells (structural device, 23 Aug
+   2026). 1 column under 480px, 2 from 480px, up to 4 (component-supplied
+   count) from 720px — below 720px every cell's left rule is suppressed
+   since a wrapped grid would otherwise put dividers on top of cells rather
+   than between them. */
+.pub-metric-grid {
+  grid-template-columns: 1fr !important;
+}
+.pub-metric-grid > div {
+  border-inline-start: none !important;
+}
+@media (min-width: 480px) {
+  .pub-metric-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (min-width: 720px) {
+  .pub-metric-grid {
+    grid-template-columns: var(--pub-metric-cols, repeat(4, 1fr)) !important;
+  }
+  .pub-metric-grid > div {
+    border-inline-start: 1px solid var(--v2-rule) !important;
+  }
+  .pub-metric-grid > div:nth-child(1) {
+    border-inline-start: none !important;
+  }
+}
+
+/* Section header row — title beside a short lead line (structural device,
+   23 Aug 2026, see SectionHeader's own comment). Column, title-first, under
+   860px; row with bottom alignment from 860px so the lead line's baseline
+   sits level with the title's, matching the reference's own row layout. */
+@media (min-width: 860px) {
+  .pub-section-header-row {
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    gap: 40px !important;
   }
 }
 

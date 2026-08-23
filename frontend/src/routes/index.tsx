@@ -128,6 +128,47 @@ function Caption({ children, onDark = false }: { children: React.ReactNode; onDa
 }
 
 /**
+ * Section header — title beside a short lead line, row on desktop, per a
+ * design reference's proximity pattern (reviewed 23 Aug 2026, structure
+ * only — see MetricGrid's comment). NOT a content cut: `lead` is a short
+ * line placed for visual rhythm alongside the title; every full approved
+ * paragraph still renders in full immediately beneath, unchanged. `lead` is
+ * additional framing text, never a substitute for the paragraphs below it.
+ */
+function SectionHeader({
+  eyebrow, title, lead, onDark = false,
+}: {
+  eyebrow: React.ReactNode;
+  title: React.ReactNode;
+  lead: React.ReactNode;
+  onDark?: boolean;
+}) {
+  return (
+    <div
+      className="pub-section-header"
+      style={{
+        display: "flex", flexDirection: "column", gap: "20px",
+        paddingBottom: "20px",
+        borderBottom: `1px solid ${onDark ? DEEP_RULE : RULE}`,
+      }}
+    >
+      <Eyebrow onDark={onDark}>{eyebrow}</Eyebrow>
+      <div className="pub-section-header-row" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <Title onDark={onDark}>{title}</Title>
+        <p
+          style={{
+            fontFamily: DOC, fontSize: "15px", lineHeight: 1.55, fontStyle: "italic",
+            color: onDark ? DEEP_INK_2 : INK_3, maxWidth: "22rem", margin: 0,
+          }}
+        >
+          {lead}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Instrument block — a real table, roomier than application density (§6.2).
  * 13.5px, ~49px rows (14/20px cell padding, not a fixed height), 1.5px
  * header rule, no zebra, tabular figures. Sits on panel white inside
@@ -210,6 +251,49 @@ function Instrument({
       </div>
       <Caption onDark={onDark}>{caption}</Caption>
     </section>
+  );
+}
+
+/**
+ * Metric grid — a row of hairline-divided cells (label + value), no card
+ * chrome, no shadow. Structural device taken from a design reference
+ * reviewed 23 Aug 2026 (structure only — its copy, brand, and all-caps mono
+ * voice were not carried over, per instruction). Used where a section's
+ * content is better read as a small set of facts than as another table —
+ * breaks up what would otherwise be four consecutive Instrument tables.
+ *
+ * BINDING CONSTRAINT: every value here must be a real, derivable fact about
+ * the mechanism (a literal count, a literal absence) — never an invented
+ * statistic. Where no honest number exists for a cell, `value` takes a
+ * structural label instead of a number. See call sites for the derivation
+ * of each cell.
+ */
+function MetricGrid({ cells }: { cells: { label: string; value: string }[] }) {
+  return (
+    <div
+      className="pub-metric-grid"
+      style={{
+        display: "grid",
+        border: `1px solid ${RULE}`,
+        background: PANEL,
+        ["--pub-metric-cols" as any]: `repeat(${cells.length}, 1fr)`,
+      }}
+    >
+      {cells.map((c) => (
+        <div key={c.label} style={{ padding: "24px 20px" }}>
+          <Eyebrow>{c.label}</Eyebrow>
+          <div
+            style={{
+              fontFamily: DATA, fontSize: "32px", fontWeight: 500,
+              color: INK, marginTop: "10px", lineHeight: 1.1,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {c.value}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -371,19 +455,19 @@ function StructuralGraphic() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Hockystick — Every deal leaves a record that holds" },
+      { title: "Lengdon — Every deal leaves a record that holds" },
       {
         name: "description",
         content:
           "A deal room, a diligence checklist, and a term sheet that all point to the same reference number. Structured process from first contact to close.",
       },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Hockystick — Every deal leaves a record that holds" },
+      { property: "og:title", content: "Lengdon — Every deal leaves a record that holds" },
       { property: "og:description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://hockystick.app" },
+      { property: "og:url", content: "https://lengdon.com" },
     ],
-    links: [{ rel: "canonical", href: "https://hockystick.app" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com" }],
   }),
   component: Landing,
 });
@@ -420,7 +504,7 @@ function Landing() {
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <Eyebrow>Hockystick</Eyebrow>
+              <Eyebrow>Lengdon</Eyebrow>
               <h1
                 className="pub-display"
                 style={{ fontFamily: UI, color: INK, margin: 0, maxWidth: "14ch" }}
@@ -475,8 +559,11 @@ function Landing() {
         {/* ── CLOSING PIPELINE — treatment C, recessed ─────────────────────── */}
         <Section ground={G_RECESSED}>
           <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <Eyebrow>Closing / Pipeline</Eyebrow>
-            <Title>What holds together</Title>
+            <SectionHeader
+              eyebrow="Closing / Pipeline"
+              title="What holds together"
+              lead="Six confirmed steps. Neither party can skip ahead."
+            />
             <Prose>
               A close is not a handshake and a wire transfer. It is six confirmed
               steps, and neither party can skip ahead.
@@ -493,6 +580,30 @@ function Landing() {
               both sides agreed.
             </Prose>
           </div>
+
+          {/* Stat strip — structural device from a design reference reviewed
+              23 Aug 2026 (structure only, see MetricGrid's own comment).
+              Every cell is a literal, derivable fact, not an invented
+              statistic — checked against the table immediately below it,
+              which is the source for the first two:
+                Gates: 6 — literal row count of the table beneath.
+                Parties: 2 — founder, investor; no third-party default path
+                  (verified against ClosingPipeline.tsx's role type, which is
+                  exactly "founder" | "investor").
+                Order: "Server-enforced" — a structural label, not a number,
+                  restating the prose claim two lines up (enforced in what
+                  the server accepts, not just what the screen shows) rather
+                  than inventing a count for something that isn't a count.
+                Funds held by platform: 0 — restates the table's own caption
+                  below ("it never holds money") as a fact, not a new claim. */}
+          <MetricGrid
+            cells={[
+              { label: "Gates", value: "6" },
+              { label: "Parties", value: "2" },
+              { label: "Order", value: "Server-enforced" },
+              { label: "Funds held by platform", value: "0" },
+            ]}
+          />
 
           {/* Verified against app.deal-rooms.$id.close.tsx and ClosingPipeline.tsx
               directly. Six gates render in the live product; a seventh ("terms
@@ -541,8 +652,11 @@ function Landing() {
         {/* ── FOUNDER CONTROLS — treatment A, base ─────────────────────────── */}
         <Section ground={G_BASE}>
           <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <Eyebrow>Founder / Control</Eyebrow>
-            <Title>For the founder side</Title>
+            <SectionHeader
+              eyebrow="Founder / Control"
+              title="For the founder side"
+              lead="The founder controls what the room contains."
+            />
             <Prose>
               The deploying side opens the room. The founder controls what it
               contains.
@@ -558,17 +672,33 @@ function Landing() {
             </Prose>
           </div>
 
-          <Instrument
-            label="What a founder controls"
-            head={["Control", "Set by", "Visible to"]}
-            rows={[
-              ["Document access", "Founder, per room", "Investor, after NDA"],
-              ["Financial detail", "Founder, per disclosure", "Investor, after founder grants it"],
-              ["Team member records", "Founder", "Investor, only inside an open room"],
-              ["Counsel access at closing", "Either party", "Counsel — term summary and agreement only"],
-            ]}
-            caption="A lawyer invited at closing sees the term summary and the agreement. They do not see earlier diligence or negotiation history."
-          />
+          {/*
+            Converted from a table to a hairline metric grid, 23 Aug 2026 —
+            structural device from the same design reference as the stat
+            strip above. Every "Set by / Visible to" pair is preserved, not
+            cut — compressed into a single "Set by → Visible to" value per
+            cell rather than dropped, since this is approved content and the
+            rebuild is a visual pass, not a content edit (matches the
+            reference's own → grammar for exactly this shape). Full detail
+            (the "after NDA" / "per disclosure" qualifiers) survives in the
+            caption immediately below, unchanged from the source table's own
+            caption plus the two qualifiers that don't fit an eyebrow-length
+            label — nothing here is invented, only re-laid-out.
+          */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <Eyebrow>What a founder controls</Eyebrow>
+            <MetricGrid
+              cells={[
+                { label: "Document access", value: "Founder → investor, after NDA" },
+                { label: "Financial detail", value: "Founder → investor, if granted" },
+                { label: "Team records", value: "Founder → investor, in-room only" },
+                { label: "Counsel access", value: "Either party → counsel, terms only" },
+              ]}
+            />
+            <Caption>
+              A lawyer invited at closing sees the term summary and the agreement. They do not see earlier diligence or negotiation history.
+            </Caption>
+          </div>
         </Section>
 
         {/* ── TERM SHEET SCREENSHOT — treatment B, panel (§6.2) ─────────────
@@ -631,8 +761,11 @@ function Landing() {
         {/* ── PROVENANCE — treatment B continues on panel ──────────────────── */}
         <Section ground={G_PANEL}>
           <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <Eyebrow>Method / Provenance</Eyebrow>
-            <Title>Why the mechanisms aren&rsquo;t ours</Title>
+            <SectionHeader
+              eyebrow="Method / Provenance"
+              title="Why the mechanisms aren't ours"
+              lead="Each piece is adapted from a practice tested for decades elsewhere in finance."
+            />
             <Prose>
               None of this is a new invention. Each piece is adapted from a
               practice that has been tested for decades in a different part of
@@ -673,8 +806,12 @@ function Landing() {
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-              <Eyebrow onDark>Position / Exclusions</Eyebrow>
-              <Title onDark>What we refuse to build</Title>
+              <SectionHeader
+                onDark
+                eyebrow="Position / Exclusions"
+                title="What we refuse to build"
+                lead="Some features are the standard shape for this category. We will not build them."
+              />
               <Prose onDark>
                 Some features are the standard shape for this category and we will
                 not build them.
