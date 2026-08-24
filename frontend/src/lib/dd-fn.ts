@@ -592,10 +592,17 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
       docPayloads.push({ name: d.title ?? d.file_name ?? "Untitled", source: "founder_library", content: text || `(status: ${d.status}; no readable content)` });
     }
 
-    // 2. Claims with verdicts
+    // 2. Claims — ai_verdict/ai_confidence/ai_reasoning deliberately NOT
+    // selected here. Those columns are founder-private self-refinement
+    // signal (see useRaiseProgress.ts's founder-scoped read) and must never
+    // reach an investor-triggered path. This function is investor-run
+    // (DDAnalysisPanel gates the "Run deep analysis" button on isInvestor)
+    // and its output renders to both parties, so any verdict field
+    // included here would leak into investor-facing findings. Found live
+    // 24 Aug 2026 — see CLAUDE.md's incident entry.
     const { data: claims } = await sb
       .from("startup_claims")
-      .select("claim_type, claim_label, claim_value, claim_category, ai_verdict, proof_status")
+      .select("claim_type, claim_label, claim_value, claim_category, proof_status")
       .eq("startup_id", data.startupId);
 
     // 3. Stated metrics from the profile
@@ -631,7 +638,7 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
     const userMessage = [
       "STATED PROFILE AND METRICS:",
       JSON.stringify(startup ?? {}, null, 1),
-      "\nCLAIMS (with our AI verification verdicts — 'verified' means a document supported it):",
+      "\nCLAIMS (as stated by the founder — cross-check these against the documents yourself):",
       claims?.length ? JSON.stringify(claims, null, 1) : "No claims submitted.",
       "\nDD CHECKLIST STATE:",
       goals?.length ? JSON.stringify(goals) : "No DD goals set.",
