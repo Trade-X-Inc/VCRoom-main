@@ -140,6 +140,7 @@ export function SiteFooter() {
       heading: "Resources",
       links: [
         { to: "/resources/schedule", label: "The disclosure schedule" },
+        { to: "/sectors", label: "Sector schedules" },
         { to: "/docs", label: "Docs" },
         { to: "/docs/security", label: "Security" },
         { to: "/docs/changelog", label: "Changelog" },
