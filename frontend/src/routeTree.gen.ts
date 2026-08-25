@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VirtualDataRoomRouteImport } from './routes/virtual-data-room'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SubProcessorsRouteImport } from './routes/sub-processors'
 import { Route as StatusRouteImport } from './routes/status'
@@ -26,8 +27,10 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForInvestorsRouteImport } from './routes/for-investors'
 import { Route as ForFoundersRouteImport } from './routes/for-founders'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as DueDiligenceChecklistRouteImport } from './routes/due-diligence-checklist'
 import { Route as DpaRouteImport } from './routes/dpa'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as DealManagementSoftwareRouteImport } from './routes/deal-management-software'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -39,6 +42,7 @@ import { Route as ToolsIndexRouteImport } from './routes/tools/index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ToolsValuationRouteImport } from './routes/tools/valuation'
@@ -68,6 +72,11 @@ import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$t
 import { Route as ISlugRouteImport } from './routes/i.$slug'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
+import { Route as CompareIdealsRouteImport } from './routes/compare.ideals'
+import { Route as CompareFirmexRouteImport } from './routes/compare.firmex'
+import { Route as CompareDocsendRouteImport } from './routes/compare.docsend'
+import { Route as CompareDealroomRouteImport } from './routes/compare.dealroom'
+import { Route as CompareDatasiteRouteImport } from './routes/compare.datasite'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppUsersRouteImport } from './routes/app.users'
@@ -176,6 +185,11 @@ import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } fr
 import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
+const VirtualDataRoomRoute = VirtualDataRoomRouteImport.update({
+  id: '/virtual-data-room',
+  path: '/virtual-data-room',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -261,6 +275,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DueDiligenceChecklistRoute = DueDiligenceChecklistRouteImport.update({
+  id: '/due-diligence-checklist',
+  path: '/due-diligence-checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DpaRoute = DpaRouteImport.update({
   id: '/dpa',
   path: '/dpa',
@@ -269,6 +288,11 @@ const DpaRoute = DpaRouteImport.update({
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealManagementSoftwareRoute = DealManagementSoftwareRouteImport.update({
+  id: '/deal-management-software',
+  path: '/deal-management-software',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -325,6 +349,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DocsRoute,
+} as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
@@ -470,6 +499,31 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
 const CvSlugRoute = CvSlugRouteImport.update({
   id: '/cv/$slug',
   path: '/cv/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareIdealsRoute = CompareIdealsRouteImport.update({
+  id: '/compare/ideals',
+  path: '/compare/ideals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareFirmexRoute = CompareFirmexRouteImport.update({
+  id: '/compare/firmex',
+  path: '/compare/firmex',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareDocsendRoute = CompareDocsendRouteImport.update({
+  id: '/compare/docsend',
+  path: '/compare/docsend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareDealroomRoute = CompareDealroomRouteImport.update({
+  id: '/compare/dealroom',
+  path: '/compare/dealroom',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareDatasiteRoute = CompareDatasiteRouteImport.update({
+  id: '/compare/datasite',
+  path: '/compare/datasite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -1056,8 +1110,10 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/deal-management-software': typeof DealManagementSoftwareRoute
   '/docs': typeof DocsRouteWithChildren
   '/dpa': typeof DpaRoute
+  '/due-diligence-checklist': typeof DueDiligenceChecklistRoute
   '/feedback': typeof FeedbackRoute
   '/for-founders': typeof ForFoundersRoute
   '/for-investors': typeof ForInvestorsRoute
@@ -1075,6 +1131,7 @@ export interface FileRoutesByFullPath {
   '/status': typeof StatusRoute
   '/sub-processors': typeof SubProcessorsRoute
   '/terms': typeof TermsRoute
+  '/virtual-data-room': typeof VirtualDataRoomRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1101,6 +1158,11 @@ export interface FileRoutesByFullPath {
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/compare/datasite': typeof CompareDatasiteRoute
+  '/compare/dealroom': typeof CompareDealroomRoute
+  '/compare/docsend': typeof CompareDocsendRoute
+  '/compare/firmex': typeof CompareFirmexRoute
+  '/compare/ideals': typeof CompareIdealsRoute
   '/cv/$slug': typeof CvSlugRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
@@ -1130,6 +1192,7 @@ export interface FileRoutesByFullPath {
   '/tools/valuation': typeof ToolsValuationRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/compare/': typeof CompareIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
@@ -1222,7 +1285,9 @@ export interface FileRoutesByTo {
   '/acceptable-use': typeof AcceptableUseRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/deal-management-software': typeof DealManagementSoftwareRoute
   '/dpa': typeof DpaRoute
+  '/due-diligence-checklist': typeof DueDiligenceChecklistRoute
   '/feedback': typeof FeedbackRoute
   '/for-founders': typeof ForFoundersRoute
   '/for-investors': typeof ForInvestorsRoute
@@ -1240,6 +1305,7 @@ export interface FileRoutesByTo {
   '/status': typeof StatusRoute
   '/sub-processors': typeof SubProcessorsRoute
   '/terms': typeof TermsRoute
+  '/virtual-data-room': typeof VirtualDataRoomRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1265,6 +1331,11 @@ export interface FileRoutesByTo {
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/compare/datasite': typeof CompareDatasiteRoute
+  '/compare/dealroom': typeof CompareDealroomRoute
+  '/compare/docsend': typeof CompareDocsendRoute
+  '/compare/firmex': typeof CompareFirmexRoute
+  '/compare/ideals': typeof CompareIdealsRoute
   '/cv/$slug': typeof CvSlugRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
@@ -1294,6 +1365,7 @@ export interface FileRoutesByTo {
   '/tools/valuation': typeof ToolsValuationRoute
   '/app': typeof AppIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/compare': typeof CompareIndexRoute
   '/docs': typeof DocsIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/sectors': typeof SectorsIndexRoute
@@ -1389,8 +1461,10 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/deal-management-software': typeof DealManagementSoftwareRoute
   '/docs': typeof DocsRouteWithChildren
   '/dpa': typeof DpaRoute
+  '/due-diligence-checklist': typeof DueDiligenceChecklistRoute
   '/feedback': typeof FeedbackRoute
   '/for-founders': typeof ForFoundersRoute
   '/for-investors': typeof ForInvestorsRoute
@@ -1408,6 +1482,7 @@ export interface FileRoutesById {
   '/status': typeof StatusRoute
   '/sub-processors': typeof SubProcessorsRoute
   '/terms': typeof TermsRoute
+  '/virtual-data-room': typeof VirtualDataRoomRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1434,6 +1509,11 @@ export interface FileRoutesById {
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/compare/datasite': typeof CompareDatasiteRoute
+  '/compare/dealroom': typeof CompareDealroomRoute
+  '/compare/docsend': typeof CompareDocsendRoute
+  '/compare/firmex': typeof CompareFirmexRoute
+  '/compare/ideals': typeof CompareIdealsRoute
   '/cv/$slug': typeof CvSlugRoute
   '/docs/$': typeof DocsSplatRoute
   '/i/$slug': typeof ISlugRoute
@@ -1463,6 +1543,7 @@ export interface FileRoutesById {
   '/tools/valuation': typeof ToolsValuationRoute
   '/app/': typeof AppIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/compare/': typeof CompareIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
@@ -1559,8 +1640,10 @@ export interface FileRouteTypes {
     | '/blog'
     | '/careers'
     | '/contact'
+    | '/deal-management-software'
     | '/docs'
     | '/dpa'
+    | '/due-diligence-checklist'
     | '/feedback'
     | '/for-founders'
     | '/for-investors'
@@ -1578,6 +1661,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/sub-processors'
     | '/terms'
+    | '/virtual-data-room'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1604,6 +1688,11 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/auth/callback'
     | '/blog/$slug'
+    | '/compare/datasite'
+    | '/compare/dealroom'
+    | '/compare/docsend'
+    | '/compare/firmex'
+    | '/compare/ideals'
     | '/cv/$slug'
     | '/docs/$'
     | '/i/$slug'
@@ -1633,6 +1722,7 @@ export interface FileRouteTypes {
     | '/tools/valuation'
     | '/app/'
     | '/blog/'
+    | '/compare/'
     | '/docs/'
     | '/resources/'
     | '/sectors/'
@@ -1725,7 +1815,9 @@ export interface FileRouteTypes {
     | '/acceptable-use'
     | '/careers'
     | '/contact'
+    | '/deal-management-software'
     | '/dpa'
+    | '/due-diligence-checklist'
     | '/feedback'
     | '/for-founders'
     | '/for-investors'
@@ -1743,6 +1835,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/sub-processors'
     | '/terms'
+    | '/virtual-data-room'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1768,6 +1861,11 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/auth/callback'
     | '/blog/$slug'
+    | '/compare/datasite'
+    | '/compare/dealroom'
+    | '/compare/docsend'
+    | '/compare/firmex'
+    | '/compare/ideals'
     | '/cv/$slug'
     | '/docs/$'
     | '/i/$slug'
@@ -1797,6 +1895,7 @@ export interface FileRouteTypes {
     | '/tools/valuation'
     | '/app'
     | '/blog'
+    | '/compare'
     | '/docs'
     | '/resources'
     | '/sectors'
@@ -1891,8 +1990,10 @@ export interface FileRouteTypes {
     | '/blog'
     | '/careers'
     | '/contact'
+    | '/deal-management-software'
     | '/docs'
     | '/dpa'
+    | '/due-diligence-checklist'
     | '/feedback'
     | '/for-founders'
     | '/for-investors'
@@ -1910,6 +2011,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/sub-processors'
     | '/terms'
+    | '/virtual-data-room'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1936,6 +2038,11 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/auth/callback'
     | '/blog/$slug'
+    | '/compare/datasite'
+    | '/compare/dealroom'
+    | '/compare/docsend'
+    | '/compare/firmex'
+    | '/compare/ideals'
     | '/cv/$slug'
     | '/docs/$'
     | '/i/$slug'
@@ -1965,6 +2072,7 @@ export interface FileRouteTypes {
     | '/tools/valuation'
     | '/app/'
     | '/blog/'
+    | '/compare/'
     | '/docs/'
     | '/resources/'
     | '/sectors/'
@@ -2060,8 +2168,10 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
+  DealManagementSoftwareRoute: typeof DealManagementSoftwareRoute
   DocsRoute: typeof DocsRouteWithChildren
   DpaRoute: typeof DpaRoute
+  DueDiligenceChecklistRoute: typeof DueDiligenceChecklistRoute
   FeedbackRoute: typeof FeedbackRoute
   ForFoundersRoute: typeof ForFoundersRoute
   ForInvestorsRoute: typeof ForInvestorsRoute
@@ -2079,6 +2189,7 @@ export interface RootRouteChildren {
   StatusRoute: typeof StatusRoute
   SubProcessorsRoute: typeof SubProcessorsRoute
   TermsRoute: typeof TermsRoute
+  VirtualDataRoomRoute: typeof VirtualDataRoomRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
   ApiEmailTestRoute: typeof ApiEmailTestRoute
@@ -2087,6 +2198,11 @@ export interface RootRouteChildren {
   ApiHubspotSyncRoute: typeof ApiHubspotSyncRoute
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  CompareDatasiteRoute: typeof CompareDatasiteRoute
+  CompareDealroomRoute: typeof CompareDealroomRoute
+  CompareDocsendRoute: typeof CompareDocsendRoute
+  CompareFirmexRoute: typeof CompareFirmexRoute
+  CompareIdealsRoute: typeof CompareIdealsRoute
   CvSlugRoute: typeof CvSlugRoute
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
@@ -2113,6 +2229,7 @@ export interface RootRouteChildren {
   ToolsRunwayRoute: typeof ToolsRunwayRoute
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationRoute: typeof ToolsValuationRoute
+  CompareIndexRoute: typeof CompareIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   SectorsIndexRoute: typeof SectorsIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -2122,6 +2239,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/virtual-data-room': {
+      id: '/virtual-data-room'
+      path: '/virtual-data-room'
+      fullPath: '/virtual-data-room'
+      preLoaderRoute: typeof VirtualDataRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -2241,6 +2365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/due-diligence-checklist': {
+      id: '/due-diligence-checklist'
+      path: '/due-diligence-checklist'
+      fullPath: '/due-diligence-checklist'
+      preLoaderRoute: typeof DueDiligenceChecklistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dpa': {
       id: '/dpa'
       path: '/dpa'
@@ -2253,6 +2384,13 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deal-management-software': {
+      id: '/deal-management-software'
+      path: '/deal-management-software'
+      fullPath: '/deal-management-software'
+      preLoaderRoute: typeof DealManagementSoftwareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -2331,6 +2469,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docs/'
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
+    }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
@@ -2533,6 +2678,41 @@ declare module '@tanstack/react-router' {
       path: '/cv/$slug'
       fullPath: '/cv/$slug'
       preLoaderRoute: typeof CvSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/ideals': {
+      id: '/compare/ideals'
+      path: '/compare/ideals'
+      fullPath: '/compare/ideals'
+      preLoaderRoute: typeof CompareIdealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/firmex': {
+      id: '/compare/firmex'
+      path: '/compare/firmex'
+      fullPath: '/compare/firmex'
+      preLoaderRoute: typeof CompareFirmexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/docsend': {
+      id: '/compare/docsend'
+      path: '/compare/docsend'
+      fullPath: '/compare/docsend'
+      preLoaderRoute: typeof CompareDocsendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/dealroom': {
+      id: '/compare/dealroom'
+      path: '/compare/dealroom'
+      fullPath: '/compare/dealroom'
+      preLoaderRoute: typeof CompareDealroomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/datasite': {
+      id: '/compare/datasite'
+      path: '/compare/datasite'
+      fullPath: '/compare/datasite'
+      preLoaderRoute: typeof CompareDatasiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -3580,8 +3760,10 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
+  DealManagementSoftwareRoute: DealManagementSoftwareRoute,
   DocsRoute: DocsRouteWithChildren,
   DpaRoute: DpaRoute,
+  DueDiligenceChecklistRoute: DueDiligenceChecklistRoute,
   FeedbackRoute: FeedbackRoute,
   ForFoundersRoute: ForFoundersRoute,
   ForInvestorsRoute: ForInvestorsRoute,
@@ -3599,6 +3781,7 @@ const rootRouteChildren: RootRouteChildren = {
   StatusRoute: StatusRoute,
   SubProcessorsRoute: SubProcessorsRoute,
   TermsRoute: TermsRoute,
+  VirtualDataRoomRoute: VirtualDataRoomRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
   ApiEmailTestRoute: ApiEmailTestRoute,
@@ -3607,6 +3790,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHubspotSyncRoute: ApiHubspotSyncRoute,
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  CompareDatasiteRoute: CompareDatasiteRoute,
+  CompareDealroomRoute: CompareDealroomRoute,
+  CompareDocsendRoute: CompareDocsendRoute,
+  CompareFirmexRoute: CompareFirmexRoute,
+  CompareIdealsRoute: CompareIdealsRoute,
   CvSlugRoute: CvSlugRoute,
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
@@ -3633,6 +3821,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRunwayRoute: ToolsRunwayRoute,
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationRoute: ToolsValuationRoute,
+  CompareIndexRoute: CompareIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   SectorsIndexRoute: SectorsIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
