@@ -7,8 +7,5 @@ frontend/test-results/
 test-results/
 .claude/
 
-# Design reference, read from in place per instruction — never committed.
-DesignCopy-main-2/
-
 # Local wrangler pages dev state.
 .wrangler/
