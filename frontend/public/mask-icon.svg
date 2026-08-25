@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
-  <!-- Safari pinned-tab mask — single-colour silhouette, coloured via the
-       link tag's `color` attribute (see __root.tsx), not fill. Matches
-       favicon.svg's monogram construction exactly. -->
-  <rect x="64" y="48" width="20" height="160"/>
-  <rect x="64" y="118" width="96" height="20"/>
-  <rect x="160" y="86" width="20" height="122"/>
-</svg>

@@ -15,13 +15,16 @@ function DocsPage() {
 
   if (!page) {
     return (
-      <div className="max-w-3xl">
-        <h1 className="mb-3 text-3xl font-bold text-gray-900" style={{ fontFamily: "Syne, sans-serif" }}>
+      <div style={{ maxWidth: "48rem" }}>
+        <h1
+          className="pub-title"
+          style={{ fontFamily: "var(--font-v2-ui)", color: "var(--v2-ink)", margin: "0 0 12px" }}
+        >
           Page not found
         </h1>
-        <p className="text-[15px] leading-7 text-gray-700">
+        <p style={{ fontFamily: "var(--font-v2-doc)", fontSize: "15.5px", lineHeight: 1.7, color: "var(--v2-ink-secondary)" }}>
           There is no documentation page at this address. Start from the{" "}
-          <Link to={"/docs" as any} className="text-purple-700 underline underline-offset-2">
+          <Link to={"/docs" as any} style={{ color: "var(--v2-accent)", textDecoration: "underline", textUnderlineOffset: "2px" }}>
             documentation overview
           </Link>
           .

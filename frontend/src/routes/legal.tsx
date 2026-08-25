@@ -133,7 +133,7 @@ function LegalPage() {
             <Eyebrow>Documents</Eyebrow>
             <Title>Five documents</Title>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1px", background: RULE, border: `1px solid ${RULE}` }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1px", background: RULE, border: `1px solid ${RULE}` }}>
             {DOCS.map((d) => (
               <Link
                 key={d.to}
@@ -141,6 +141,7 @@ function LegalPage() {
                 style={{
                   background: "var(--pub-n-00)", padding: "22px", textDecoration: "none",
                   display: "flex", flexDirection: "column", gap: "8px", color: INK,
+                  flex: "1 1 220px", minWidth: "220px",
                 }}
               >
                 <span style={{ fontFamily: UI, fontSize: "15px", fontWeight: 600 }}>{d.title}</span>

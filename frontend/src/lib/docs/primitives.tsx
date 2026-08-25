@@ -1,7 +1,27 @@
-// Shared building blocks for docs pages. All docs pages are always light-themed
-// (like the landing page), so colors here are explicit grays, not theme tokens.
+// Shared building blocks for docs pages. All docs pages are always
+// light-themed (like the landing page), so colors here are explicit tokens,
+// not theme-conditional. Brought onto PUBLIC-REGISTER.md v2.0 (25 Aug 2026,
+// founder-reported fix, CLAUDE.md §20.5's tracked pending item) — VISUAL
+// PASS ONLY, every prop/behavior unchanged, only the token/font/class layer.
 
 import type { ReactNode } from "react";
+
+const UI = "var(--font-v2-ui)";
+const DOC = "var(--font-v2-doc)";
+const DATA = "var(--font-v2-data)";
+
+const INK = "var(--v2-ink)";
+const INK_2 = "var(--v2-ink-secondary)";
+const INK_3 = "var(--v2-ink-muted)";
+const RULE = "var(--v2-rule)";
+const RULE_LIGHT = "var(--v2-rule-light)";
+const ACCENT = "var(--v2-accent)";
+const ACCENT_WASH = "var(--v2-accent-wash)";
+const ATTENTION = "var(--v2-attention)";
+const ATTENTION_WASH = "var(--v2-attention-wash)";
+const SATISFIED = "var(--v2-satisfied)";
+const ADVERSE = "var(--v2-adverse)";
+const PANEL = "var(--pub-n-00)";
 
 export interface DocMeta {
   slug: string; // path under /docs
@@ -20,10 +40,10 @@ export function H2({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
-      className="group scroll-mt-24 text-xl font-semibold text-gray-900 mt-10 mb-3"
-      style={{ fontFamily: "Syne, sans-serif" }}
+      className="scroll-mt-24"
+      style={{ fontFamily: UI, fontWeight: 700, fontSize: "22px", letterSpacing: "-0.015em", color: INK, margin: "40px 0 12px" }}
     >
-      <a href={`#${id}`} className="no-underline text-gray-900 hover:text-purple-700">
+      <a href={`#${id}`} style={{ color: "inherit", textDecoration: "none" }}>
         {children}
       </a>
     </h2>
@@ -32,18 +52,26 @@ export function H2({ id, children }: { id: string; children: ReactNode }) {
 
 export function H3({ children }: { children: ReactNode }) {
   return (
-    <h3 className="text-base font-semibold text-gray-900 mt-6 mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
+    <h3 style={{ fontFamily: UI, fontWeight: 600, fontSize: "16px", color: INK, margin: "24px 0 8px" }}>
       {children}
     </h3>
   );
 }
 
 export function P({ children }: { children: ReactNode }) {
-  return <p className="text-[15px] leading-7 text-gray-700 mb-4">{children}</p>;
+  return (
+    <p style={{ fontFamily: DOC, fontSize: "15.5px", lineHeight: 1.7, color: INK_2, margin: "0 0 16px" }}>
+      {children}
+    </p>
+  );
 }
 
 export function Lead({ children }: { children: ReactNode }) {
-  return <p className="text-base leading-7 text-gray-600 mb-6">{children}</p>;
+  return (
+    <p style={{ fontFamily: DOC, fontSize: "17px", lineHeight: 1.65, color: INK_2, margin: "0 0 24px" }}>
+      {children}
+    </p>
+  );
 }
 
 export function A({ href, children }: { href: string; children: ReactNode }) {
@@ -51,7 +79,7 @@ export function A({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a
       href={href}
-      className="text-purple-700 underline decoration-purple-300 underline-offset-2 hover:decoration-purple-700"
+      style={{ color: ACCENT, textDecoration: "underline", textUnderlineOffset: "2px" }}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
       {children}
@@ -61,7 +89,13 @@ export function A({ href, children }: { href: string; children: ReactNode }) {
 
 export function Code({ children }: { children: ReactNode }) {
   return (
-    <code className="rounded bg-gray-100 border border-gray-200 px-1.5 py-0.5 text-[13px] text-gray-800 font-mono">
+    <code
+      style={{
+        fontFamily: DATA, fontSize: "13px", color: INK_2,
+        background: "var(--pub-n-09)", border: `1px solid ${RULE_LIGHT}`,
+        borderRadius: "2px", padding: "1.5px 6px",
+      }}
+    >
       {children}
     </code>
   );
@@ -69,10 +103,17 @@ export function Code({ children }: { children: ReactNode }) {
 
 export function Steps({ items }: { items: ReactNode[] }) {
   return (
-    <ol className="mb-4 space-y-3">
+    <ol style={{ listStyle: "none", margin: "0 0 16px", padding: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
       {items.map((item, i) => (
-        <li key={i} className="flex gap-3 text-[15px] leading-7 text-gray-700">
-          <span className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-purple-50 border border-purple-200 text-xs font-semibold text-purple-700">
+        <li key={i} style={{ display: "flex", gap: "12px", fontFamily: DOC, fontSize: "15.5px", lineHeight: 1.7, color: INK_2 }}>
+          <span
+            style={{
+              flexShrink: 0, marginTop: "3px", display: "grid", placeItems: "center",
+              height: "22px", width: "22px", borderRadius: "50%",
+              background: ACCENT_WASH, border: `1px solid ${ACCENT}`,
+              fontFamily: DATA, fontSize: "11px", fontWeight: 600, color: ACCENT,
+            }}
+          >
             {i + 1}
           </span>
           <span>{item}</span>
@@ -84,10 +125,10 @@ export function Steps({ items }: { items: ReactNode[] }) {
 
 export function Rules({ items }: { items: ReactNode[] }) {
   return (
-    <ul className="mb-4 space-y-2">
+    <ul style={{ listStyle: "none", margin: "0 0 16px", padding: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
       {items.map((item, i) => (
-        <li key={i} className="flex gap-2.5 text-[15px] leading-7 text-gray-700">
-          <span aria-hidden="true" className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
+        <li key={i} style={{ display: "flex", gap: "10px", fontFamily: DOC, fontSize: "15.5px", lineHeight: 1.7, color: INK_2 }}>
+          <span aria-hidden="true" style={{ marginTop: "10px", height: "5px", width: "5px", flexShrink: 0, borderRadius: "50%", background: INK_3 }} />
           <span>{item}</span>
         </li>
       ))}
@@ -96,34 +137,45 @@ export function Rules({ items }: { items: ReactNode[] }) {
 }
 
 export function Callout({ kind = "note", children }: { kind?: "note" | "warning"; children: ReactNode }) {
-  const styles =
-    kind === "warning"
-      ? "border-amber-300 bg-amber-50 text-amber-900"
-      : "border-purple-200 bg-purple-50 text-purple-950";
+  const isWarning = kind === "warning";
   return (
-    <div className={`mb-4 rounded-lg border px-4 py-3 text-sm leading-6 ${styles}`}>{children}</div>
+    <div
+      style={{
+        marginBottom: "16px", borderRadius: "2px",
+        border: `1px solid ${isWarning ? ATTENTION : ACCENT}`,
+        background: isWarning ? ATTENTION_WASH : ACCENT_WASH,
+        padding: "14px 16px", fontFamily: UI, fontSize: "13.5px", lineHeight: 1.6,
+        color: isWarning ? ATTENTION : ACCENT,
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
 /** "What the AI does / doesn't do" — required on every AI feature page. */
 export function AIScope({ does, doesNot }: { does: ReactNode[]; doesNot: ReactNode[] }) {
   return (
-    <div className="mb-4 grid gap-4 sm:grid-cols-2">
-      <div className="rounded-lg border border-gray-200 p-4">
-        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-700">The AI does</div>
-        <ul className="space-y-1.5">
+    <div className="sm:grid-cols-2" style={{ marginBottom: "16px", display: "grid", gap: "16px" }}>
+      <div style={{ border: `1px solid ${RULE}`, borderRadius: "2px", padding: "16px" }}>
+        <div style={{ marginBottom: "8px", fontFamily: DATA, fontSize: "10.5px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: SATISFIED }}>
+          The AI does
+        </div>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "6px" }}>
           {does.map((d, i) => (
-            <li key={i} className="text-sm leading-6 text-gray-700">
+            <li key={i} style={{ fontFamily: UI, fontSize: "13.5px", lineHeight: 1.6, color: INK_2 }}>
               {d}
             </li>
           ))}
         </ul>
       </div>
-      <div className="rounded-lg border border-gray-200 p-4">
-        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-700">The AI does not</div>
-        <ul className="space-y-1.5">
+      <div style={{ border: `1px solid ${RULE}`, borderRadius: "2px", padding: "16px" }}>
+        <div style={{ marginBottom: "8px", fontFamily: DATA, fontSize: "10.5px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: ADVERSE }}>
+          The AI does not
+        </div>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "6px" }}>
           {doesNot.map((d, i) => (
-            <li key={i} className="text-sm leading-6 text-gray-700">
+            <li key={i} style={{ fontFamily: UI, fontSize: "13.5px", lineHeight: 1.6, color: INK_2 }}>
               {d}
             </li>
           ))}
@@ -135,12 +187,18 @@ export function AIScope({ does, doesNot }: { does: ReactNode[]; doesNot: ReactNo
 
 export function DocTable({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   return (
-    <div className="mb-4 overflow-x-auto rounded-lg border border-gray-200">
-      <table className="w-full text-left text-sm">
+    <div style={{ marginBottom: "16px", overflowX: "auto", border: `1px solid ${RULE}`, borderRadius: "2px" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontFamily: UI, fontSize: "13.5px" }}>
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
+          <tr style={{ borderBottom: `1.5px solid ${INK}`, background: "var(--pub-n-06)" }}>
             {head.map((h) => (
-              <th key={h} className="px-4 py-2.5 font-semibold text-gray-900 whitespace-nowrap">
+              <th
+                key={h}
+                style={{
+                  padding: "10px 16px", fontWeight: 500, color: INK_3, whiteSpace: "nowrap",
+                  fontFamily: DATA, fontSize: "10.5px", textTransform: "uppercase", letterSpacing: "0.08em",
+                }}
+              >
                 {h}
               </th>
             ))}
@@ -148,9 +206,9 @@ export function DocTable({ head, rows }: { head: string[]; rows: ReactNode[][] }
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="border-b border-gray-100 last:border-0 align-top">
+            <tr key={i} style={{ borderBottom: i === rows.length - 1 ? "none" : `1px solid ${RULE_LIGHT}`, verticalAlign: "top", background: PANEL }}>
               {row.map((cell, j) => (
-                <td key={j} className="px-4 py-2.5 text-gray-700">
+                <td key={j} style={{ padding: "10px 16px", color: INK_2 }}>
                   {cell}
                 </td>
               ))}

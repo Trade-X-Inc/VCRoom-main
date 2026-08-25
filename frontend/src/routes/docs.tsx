@@ -4,7 +4,37 @@ import { ChevronRight, Menu, Search, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { DOCS_NAV, findSection, prevNext } from "@/lib/docs/nav";
 import { getDocPage } from "@/lib/docs/registry";
-import { cn } from "@/lib/utils";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// /docs layout — brought onto PUBLIC-REGISTER.md v2.0 (25 Aug 2026, founder-
+// reported fix, CLAUDE.md §20.5's tracked pending item). VISUAL PASS ONLY,
+// same discipline as every other v2.0 conversion in this codebase: every
+// piece of functional logic (search filter, active-route detection, mobile
+// drawer, sticky sidebar/TOC, prev/next ordering from DOCS_FLAT) is
+// unchanged — only the token/font/class layer changed, from v1 (Syne,
+// hs-gradient, purple-*, Tailwind gray-*) to v2.0 (--v2-*/--pub-n-* tokens,
+// Archivo/Source Serif 4/JetBrains Mono via var(--font-v2-*)).
+//
+// SIDEBAR HIERARCHY — founder reported the old sidebar as "flat, no
+// hierarchy." Fixed with: bold uppercase mono section headers (matching the
+// Eyebrow pattern used everywhere else on the public site), a left-rule
+// active-state indicator instead of a flat background fill (matching the
+// TOC's own active-rule convention below it), and increased weight/size
+// contrast between section header and item label.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const UI = "var(--font-v2-ui)";
+const DATA = "var(--font-v2-data)";
+
+const INK = "var(--v2-ink)";
+const INK_2 = "var(--v2-ink-secondary)";
+const INK_3 = "var(--v2-ink-muted)";
+const RULE = "var(--v2-rule)";
+const RULE_LIGHT = "var(--v2-rule-light)";
+const ACCENT = "var(--v2-accent)";
+const ACCENT_WASH = "var(--v2-accent-wash)";
+const PANEL = "var(--pub-n-00)";
+const SURFACE = "var(--pub-n-06)";
 
 export const Route = createFileRoute("/docs")({
   component: DocsLayout,
@@ -56,37 +86,53 @@ function DocsLayout() {
   }, [query]);
 
   const sidebar = (
-    <nav aria-label="Documentation" className="flex h-full flex-col">
-      <div className="relative mb-4">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#71717A]" />
+    <nav aria-label="Documentation" style={{ display: "flex", height: "100%", minHeight: 0, flexDirection: "column" }}>
+      <div style={{ position: "relative", marginBottom: "20px" }}>
+        <Search
+          style={{
+            position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)",
+            width: "14px", height: "14px", color: INK_3, pointerEvents: "none",
+          }}
+        />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search docs"
-          className="w-full rounded-lg border border-[#E4E4E7] bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand focus:outline-none"
+          style={{
+            width: "100%", border: `1px solid ${RULE}`, background: PANEL,
+            borderRadius: "2px", padding: "8px 10px 8px 30px",
+            fontFamily: UI, fontSize: "13.5px", color: INK,
+          }}
         />
       </div>
-      <div className="flex-1 space-y-6 overflow-y-auto pb-8">
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingBottom: "32px", display: "flex", flexDirection: "column", gap: "22px" }}>
         {filteredNav.map((s) => (
           <div key={s.slug || "start"}>
-            <div className="mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+            <div
+              style={{
+                fontFamily: DATA, fontSize: "10.5px", fontWeight: 600, letterSpacing: "0.09em",
+                textTransform: "uppercase", color: INK_3, marginBottom: "8px", paddingInlineStart: "2px",
+              }}
+            >
               {s.title}
             </div>
-            <ul className="space-y-0.5">
+            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "1px" }}>
               {s.items.map((item) => {
                 const active = item.slug === slug;
                 return (
                   <li key={item.slug || "index"}>
                     <Link
                       to={(item.slug ? `/docs/${item.slug}` : "/docs") as any}
-                      className={cn(
-                        "flex items-center min-h-9 rounded-md px-2 py-1.5 text-sm",
-                        active
-                          ? "bg-purple-50 font-medium text-purple-800"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                      )}
                       aria-current={active ? "page" : undefined}
+                      style={{
+                        display: "block", minHeight: "34px", padding: "7px 10px 7px 12px",
+                        fontFamily: UI, fontSize: "13.5px", textDecoration: "none",
+                        borderInlineStart: active ? `2px solid ${ACCENT}` : "2px solid transparent",
+                        background: active ? ACCENT_WASH : "transparent",
+                        color: active ? ACCENT : INK_2,
+                        fontWeight: active ? 600 : 400,
+                      }}
                     >
                       {item.title}
                     </Link>
@@ -97,70 +143,90 @@ function DocsLayout() {
           </div>
         ))}
         {filteredNav.length === 0 && (
-          <p className="px-2 text-sm text-gray-500">No pages match “{query}”.</p>
+          <p style={{ fontFamily: UI, fontSize: "13.5px", color: INK_3, padding: "0 2px" }}>
+            No pages match &ldquo;{query}&rdquo;.
+          </p>
         )}
       </div>
     </nav>
   );
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div style={{ minHeight: "100vh", background: SURFACE, color: INK }}>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50"
+        style={{ background: ACCENT, color: "#FFFFFF", borderRadius: "2px", padding: "8px 16px", fontFamily: UI, fontSize: "13.5px", fontWeight: 600 }}
       >
         Skip to content
       </a>
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#E4E4E7] bg-accent backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
+
+      <header style={{ position: "sticky", top: 0, zIndex: 40, borderBottom: `1px solid ${RULE}`, background: SURFACE }}>
+        <div style={{ margin: "0 auto", maxWidth: "80rem", display: "flex", alignItems: "center", gap: "12px", height: "56px", padding: "0 24px" }}>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="grid h-9 w-9 place-items-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900 lg:hidden"
             aria-label="Open docs navigation"
+            className="lg:hidden"
+            style={{
+              display: "grid", placeItems: "center", height: "36px", width: "36px",
+              borderRadius: "2px", border: `1px solid ${RULE}`, background: PANEL, color: INK_2,
+            }}
           >
-            <Menu className="h-4 w-4" />
+            <Menu style={{ width: "16px", height: "16px" }} />
           </button>
-          <Link to="/" className="flex items-center gap-2">
-            <Logo withWordmark={false} />
-            <span className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
-              Lengdon
-            </span>
+          <Link to="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
+            <Logo withWordmark />
           </Link>
-          <span className="text-gray-300">/</span>
-          <Link to={"/docs" as any} className="text-sm font-medium text-gray-700 hover:text-gray-900">
+          <span style={{ color: RULE }}>/</span>
+          <Link
+            to={"/docs" as any}
+            style={{ fontFamily: UI, fontSize: "13.5px", fontWeight: 500, color: INK_2, textDecoration: "none" }}
+          >
             Docs
           </Link>
-          <div className="ml-auto flex items-center gap-4">
-            <Link to={"/sign-in" as any} className="hidden text-sm text-gray-600 hover:text-gray-900 sm:block">
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "16px" }}>
+            <Link
+              to={"/sign-in" as any}
+              className="hidden sm:inline-flex"
+              style={{ fontFamily: UI, fontSize: "13.5px", color: INK_2, textDecoration: "none" }}
+            >
               Sign in
             </Link>
             <Link
               to="/sign-up"
               search={{ role: "founder" } as any}
-              className="inline-flex items-center min-h-9 rounded-[2px] hs-gradient px-3.5 py-1.5 text-sm font-medium text-white hover:hs-gradient"
+              style={{
+                display: "inline-flex", alignItems: "center", height: "32px", padding: "0 14px",
+                borderRadius: "2px", background: ACCENT, color: "#FFFFFF",
+                fontFamily: UI, fontSize: "13px", fontWeight: 500, textDecoration: "none",
+              }}
             >
-              Get started →
+              Get started
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Mobile sidebar drawer */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setSidebarOpen(false)} />
-          <div className="absolute inset-y-0 left-0 w-72 overflow-y-auto bg-white p-4 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>
-                Documentation
-              </span>
+        <div className="lg:hidden" style={{ position: "fixed", inset: 0, zIndex: 50 }}>
+          <div
+            onClick={() => setSidebarOpen(false)}
+            style={{ position: "absolute", inset: 0, background: "rgba(22, 24, 28, 0.4)" }}
+          />
+          <div
+            style={{
+              position: "absolute", insetBlock: 0, left: 0, width: "288px", overflowY: "auto",
+              background: PANEL, padding: "20px", boxShadow: "0 0 24px rgba(22, 24, 28, 0.16)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+              <span style={{ fontFamily: UI, fontSize: "14px", fontWeight: 600, color: INK }}>Documentation</span>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-gray-100"
                 aria-label="Close docs navigation"
+                style={{ display: "grid", placeItems: "center", height: "32px", width: "32px", borderRadius: "2px", color: INK_2, background: "transparent", border: "none" }}
               >
-                <X className="h-4 w-4" />
+                <X style={{ width: "16px", height: "16px" }} />
               </button>
             </div>
             {sidebar}
@@ -168,45 +234,53 @@ function DocsLayout() {
         </div>
       )}
 
-      <div className="mx-auto flex max-w-7xl px-4 sm:px-6">
-        {/* Desktop sidebar */}
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 border-r border-[#E4E4E7] py-6 pr-4 lg:block">
+      <div style={{ margin: "0 auto", maxWidth: "80rem", display: "flex", padding: "0 24px" }}>
+        <aside
+          className="hidden lg:block"
+          style={{
+            position: "sticky", top: "56px", height: "calc(100vh - 56px)", width: "256px",
+            flexShrink: 0, borderInlineEnd: `1px solid ${RULE}`, padding: "28px 20px 28px 0",
+          }}
+        >
           {sidebar}
         </aside>
 
-        {/* Main column */}
-        <main id="main-content" className="min-w-0 flex-1 py-8 lg:px-10">
-          {/* Breadcrumbs */}
-          <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-gray-500">
-            <Link to={"/docs" as any} className="hover:text-gray-900">
+        <main id="main-content" className="lg:px-10" style={{ minWidth: 0, flex: 1, padding: "32px 0" }}>
+          <nav
+            aria-label="Breadcrumb"
+            style={{ marginBottom: "24px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", fontFamily: UI, fontSize: "13px", color: INK_3 }}
+          >
+            <Link to={"/docs" as any} style={{ color: INK_3, textDecoration: "none" }}>
               Docs
             </Link>
             {section && slug && (
               <>
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight style={{ width: "13px", height: "13px" }} />
                 <span>{section.title}</span>
               </>
             )}
             {page && page.meta.slug !== "" && (
               <>
-                <ChevronRight className="h-3.5 w-3.5" />
-                <span className="text-gray-900">{page.meta.title}</span>
+                <ChevronRight style={{ width: "13px", height: "13px" }} />
+                <span style={{ color: INK }}>{page.meta.title}</span>
               </>
             )}
           </nav>
 
           <Outlet />
 
-          {/* Prev / next */}
           {(prev || next) && (
-            <div className="mt-12 grid gap-3 border-t border-[#E4E4E7] pt-6 sm:grid-cols-2">
+            <div
+              className="sm:grid-cols-2"
+              style={{ marginTop: "48px", display: "grid", gap: "12px", borderTop: `1px solid ${RULE}`, paddingTop: "24px" }}
+            >
               {prev ? (
                 <Link
                   to={(prev.slug ? `/docs/${prev.slug}` : "/docs") as any}
-                  className="rounded-lg border border-[#E4E4E7] p-4 hover:border-purple-300"
+                  style={{ border: `1px solid ${RULE}`, borderRadius: "2px", padding: "16px", textDecoration: "none" }}
                 >
-                  <div className="text-xs text-gray-500">Previous</div>
-                  <div className="text-sm font-medium text-gray-900">{prev.title}</div>
+                  <div style={{ fontFamily: DATA, fontSize: "10.5px", textTransform: "uppercase", letterSpacing: "0.08em", color: INK_3 }}>Previous</div>
+                  <div style={{ fontFamily: UI, fontSize: "13.5px", fontWeight: 500, color: INK, marginTop: "3px" }}>{prev.title}</div>
                 </Link>
               ) : (
                 <span />
@@ -214,37 +288,43 @@ function DocsLayout() {
               {next && (
                 <Link
                   to={(next.slug ? `/docs/${next.slug}` : "/docs") as any}
-                  className="rounded-lg border border-[#E4E4E7] p-4 text-right hover:border-purple-300 sm:col-start-2"
+                  className="sm:col-start-2"
+                  style={{ border: `1px solid ${RULE}`, borderRadius: "2px", padding: "16px", textAlign: "right", textDecoration: "none" }}
                 >
-                  <div className="text-xs text-gray-500">Next</div>
-                  <div className="text-sm font-medium text-gray-900">{next.title}</div>
+                  <div style={{ fontFamily: DATA, fontSize: "10.5px", textTransform: "uppercase", letterSpacing: "0.08em", color: INK_3 }}>Next</div>
+                  <div style={{ fontFamily: UI, fontSize: "13.5px", fontWeight: 500, color: INK, marginTop: "3px" }}>{next.title}</div>
                 </Link>
               )}
             </div>
           )}
 
-          {/* Footer */}
-          <footer className="mt-10 border-t border-[#E4E4E7] pt-6 pb-12 text-sm text-gray-500">
+          <footer style={{ marginTop: "40px", borderTop: `1px solid ${RULE}`, paddingTop: "24px", paddingBottom: "48px", fontFamily: UI, fontSize: "13.5px", color: INK_3 }}>
             Something wrong on this page? Email{" "}
-            <a href="mailto:docs@lengdon.com" className="text-purple-700 underline underline-offset-2">
+            <a href="mailto:docs@lengdon.com" style={{ color: ACCENT, textDecoration: "underline" }}>
               docs@lengdon.com
             </a>
             .
           </footer>
         </main>
 
-        {/* "On this page" — desktop right column */}
         {page && page.meta.toc.length > 0 && (
-          <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 py-8 pl-6 xl:block">
-            <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+          <aside
+            className="hidden xl:block"
+            style={{ position: "sticky", top: "56px", height: "calc(100vh - 56px)", width: "224px", flexShrink: 0, padding: "32px 0 32px 24px" }}
+          >
+            <div style={{ fontFamily: DATA, fontSize: "10.5px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.09em", color: INK_3, marginBottom: "10px" }}>
               On this page
             </div>
-            <ul className="space-y-1.5 border-l border-[#E4E4E7]">
+            <ul style={{ listStyle: "none", margin: 0, padding: 0, borderInlineStart: `1px solid ${RULE_LIGHT}`, display: "flex", flexDirection: "column", gap: "6px" }}>
               {page.meta.toc.map((t) => (
                 <li key={t.id}>
                   <a
                     href={`#${t.id}`}
-                    className="-ml-px block border-l border-transparent pl-3 text-[13px] leading-6 text-gray-600 hover:border-brand hover:text-gray-900"
+                    style={{
+                      display: "block", marginInlineStart: "-1px", borderInlineStart: "1px solid transparent",
+                      paddingInlineStart: "12px", fontFamily: UI, fontSize: "12.5px", lineHeight: 1.6,
+                      color: INK_2, textDecoration: "none",
+                    }}
                   >
                     {t.label}
                   </a>
