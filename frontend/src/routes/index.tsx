@@ -189,22 +189,20 @@ function Instrument({
    *  keep a primary claim dominant and its supporting reason subordinate. */
   mutedFrom?: number;
 }) {
-  const panelBg = onDark ? "rgba(255,255,255,0.03)" : PANEL;
-  const borderCol = onDark ? DEEP_RULE : RULE;
   const headRule = onDark ? DEEP_INK_2 : INK;
-  const rowRule = onDark ? DEEP_RULE : RULE_LIGHT;
   const cellInk = onDark ? DEEP_INK : INK;
   const cellInkMuted = onDark ? DEEP_INK_MUTED : INK_2;
-  const headInk = onDark ? DEEP_INK_2 : INK_3;
+  const headInk = onDark ? DEEP_INK : INK_3;
+  const zebraBg = onDark ? "rgba(255,255,255,0.04)" : "var(--pub-n-09)";
 
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       <Eyebrow onDark={onDark}>{label}</Eyebrow>
-      <div style={{ background: panelBg, border: `1px solid ${borderCol}`, overflowX: "auto" }}>
+      <div style={{ overflowX: "auto" }}>
         <table
           style={{
             width: "100%", borderCollapse: "collapse",
-            fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55,
+            fontFamily: UI, fontSize: "14px", lineHeight: 1.55,
           }}
         >
           <thead>
@@ -214,9 +212,9 @@ function Instrument({
                   key={h}
                   scope="col"
                   style={{
-                    fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
-                    textTransform: "uppercase", color: headInk, textAlign: "start",
-                    padding: "0 20px 12px", borderBottom: `1.5px solid ${headRule}`,
+                    fontSize: "13.5px", fontWeight: 700, letterSpacing: "0",
+                    textTransform: "none", color: headInk, textAlign: "start",
+                    padding: "0 24px 14px", borderBottom: `1.5px solid ${headRule}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -227,14 +225,14 @@ function Instrument({
           </thead>
           <tbody>
             {rows.map((r, ri) => (
-              <tr key={ri} style={{ borderBottom: ri === rows.length - 1 ? "none" : `1px solid ${rowRule}` }}>
+              <tr key={ri} style={{ background: ri % 2 === 1 ? zebraBg : "transparent" }}>
                 {r.map((cell, ci) => {
                   const muted = mutedFrom !== undefined && ci >= mutedFrom;
                   return (
                     <td
                       key={ci}
                       style={{
-                        padding: "14px 20px",
+                        padding: "18px 24px",
                         color: muted ? cellInkMuted : cellInk,
                         textAlign: "start", fontVariantNumeric: "tabular-nums",
                         verticalAlign: "top",

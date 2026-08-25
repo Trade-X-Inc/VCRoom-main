@@ -114,11 +114,11 @@ function Instrument({
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       <Eyebrow>{label}</Eyebrow>
-      <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
+      <div style={{ overflowX: "auto" }}>
         <table
           style={{
             width: "100%", borderCollapse: "collapse",
-            fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55,
+            fontFamily: UI, fontSize: "14px", lineHeight: 1.55,
           }}
         >
           <thead>
@@ -128,10 +128,10 @@ function Instrument({
                   key={h}
                   scope="col"
                   style={{
-                    fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
-                    textTransform: "uppercase", color: INK_3,
+                    fontSize: "13.5px", fontWeight: 700, letterSpacing: "0",
+                    textTransform: "none", color: INK,
                     textAlign: numeric.has(i) ? "end" : "start",
-                    padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`,
+                    padding: "0 24px 14px", borderBottom: `1.5px solid ${INK}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -142,15 +142,15 @@ function Instrument({
           </thead>
           <tbody>
             {rows.map((r, ri) => (
-              <tr key={ri} style={{ borderBottom: ri === rows.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}>
+              <tr key={ri} style={{ background: ri % 2 === 1 ? "var(--pub-n-09)" : "transparent" }}>
                 {r.map((cell, ci) => (
                   <td
                     key={ci}
                     style={{
-                      padding: "14px 20px", color: INK,
+                      padding: "18px 24px", color: INK,
                       textAlign: numeric.has(ci) ? "end" : "start",
                       fontFamily: numeric.has(ci) ? DATA : UI,
-                      fontSize: numeric.has(ci) ? "11.5px" : "13.5px",
+                      fontSize: numeric.has(ci) ? "12px" : "14px",
                       fontVariantNumeric: "tabular-nums",
                       whiteSpace: numeric.has(ci) ? "nowrap" : "normal",
                       verticalAlign: "top",

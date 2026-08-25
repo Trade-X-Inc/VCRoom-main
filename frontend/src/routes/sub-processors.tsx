@@ -108,8 +108,8 @@ function SubProcessorsPage() {
           <div style={{ maxWidth: SHELL, margin: "0 auto", padding: "88px 24px", display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Providers</Eyebrow>
             <Title>Maintained, not exhaustive of every tool in use</Title>
-            <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55 }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: UI, fontSize: "14px", lineHeight: 1.55 }}>
                 <thead>
                   <tr>
                     {["Provider", "Purpose", "Region"].map((h) => (
@@ -117,9 +117,9 @@ function SubProcessorsPage() {
                         key={h}
                         scope="col"
                         style={{
-                          fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
-                          textTransform: "uppercase", color: INK_3, textAlign: "start",
-                          padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`, whiteSpace: "nowrap",
+                          fontSize: "13.5px", fontWeight: 700, letterSpacing: "0",
+                          textTransform: "none", color: INK, textAlign: "start",
+                          padding: "0 24px 14px", borderBottom: `1.5px solid ${INK}`, whiteSpace: "nowrap",
                         }}
                       >
                         {h}
@@ -129,9 +129,9 @@ function SubProcessorsPage() {
                 </thead>
                 <tbody>
                   {PROVIDERS.map((row, ri) => (
-                    <tr key={row[0]} style={{ borderBottom: ri === PROVIDERS.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}>
+                    <tr key={row[0]} style={{ background: ri % 2 === 1 ? "var(--pub-n-09)" : "transparent" }}>
                       {row.map((cell, ci) => (
-                        <td key={ci} style={{ padding: "14px 20px", color: ci === 0 ? INK : INK_2, fontWeight: ci === 0 ? 600 : 400, verticalAlign: "top" }}>
+                        <td key={ci} style={{ padding: "18px 24px", color: ci === 0 ? INK : INK_2, fontWeight: ci === 0 ? 600 : 400, verticalAlign: "top" }}>
                           {cell}
                         </td>
                       ))}
