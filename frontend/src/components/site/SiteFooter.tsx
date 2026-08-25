@@ -124,6 +124,19 @@ export function SiteFooter() {
       ],
     },
     {
+      heading: "Solutions",
+      links: [
+        { to: "/solutions/angels", label: "Angels" },
+        { to: "/solutions/syndicates", label: "Syndicates" },
+        { to: "/solutions/spvs", label: "SPVs" },
+        { to: "/solutions/advisors", label: "Advisors and introducers" },
+        { to: "/solutions/family-offices", label: "Family offices" },
+        { to: "/solutions/venture-capital", label: "Venture capital" },
+        { to: "/solutions/private-equity", label: "Private equity" },
+        { to: "/solutions/limited-partners", label: "Limited partners" },
+      ],
+    },
+    {
       heading: "Resources",
       links: [
         { to: "/resources/schedule", label: "The disclosure schedule" },
