@@ -128,6 +128,27 @@ function Caption({ children, onDark = false }: { children: React.ReactNode; onDa
 }
 
 /**
+ * A table's own label ("The closing pipeline", "Where the mechanisms come
+ * from") — distinct from the §5.6 breadcrumb Eyebrow it used to share,
+ * which stayed 11px/letter-spaced by design and read as too small to
+ * register as a real sub-header sitting directly above a table. Same grey
+ * ink, larger and bolder so it's legible as a heading at a glance.
+ * Founder feedback, 25 Aug 2026.
+ */
+function InstrumentLabel({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
+  return (
+    <p
+      style={{
+        fontFamily: UI, fontSize: "17px", lineHeight: 1.3, fontWeight: 700,
+        color: onDark ? DEEP_INK_2 : INK_3, margin: 0,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+/**
  * Section header — title beside a short lead line, row on desktop, per a
  * design reference's proximity pattern (reviewed 23 Aug 2026, structure
  * only — see MetricGrid's comment). NOT a content cut: `lead` is a short
@@ -197,7 +218,7 @@ function Instrument({
 
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Eyebrow onDark={onDark}>{label}</Eyebrow>
+      <InstrumentLabel onDark={onDark}>{label}</InstrumentLabel>
       <div style={{ overflowX: "auto" }}>
         <table
           style={{
@@ -266,31 +287,65 @@ function Instrument({
  * structural label instead of a number. See call sites for the derivation
  * of each cell.
  */
+/**
+ * A value reads as a genuine statistic (large numeral treatment) only when
+ * it's short and numeral-led — "6", "2", "0". Anything longer (a sentence,
+ * a structural label like "Server-enforced") is a fact, not a stat, and
+ * gets a smaller, semibold UI-font size instead — sizing a value by its
+ * pixel weight rather than its actual informational content is what made
+ * "Server-enforced" and full sentences like "Founder → investor, after
+ * NDA" read as oversized text with unclear meaning. Founder feedback,
+ * 25 Aug 2026 (Proposal D).
+ */
+function isStatValue(value: string): boolean {
+  return value.length <= 3 && /^\d/.test(value);
+}
+
 function MetricGrid({ cells }: { cells: { label: string; value: string }[] }) {
   return (
     <div
       className="pub-metric-grid"
       style={{
         display: "grid",
-        border: `1px solid ${RULE}`,
-        background: PANEL,
         ["--pub-metric-cols" as any]: `repeat(${cells.length}, 1fr)`,
       }}
     >
-      {cells.map((c) => (
-        <div key={c.label} style={{ padding: "24px 20px" }}>
-          <Eyebrow>{c.label}</Eyebrow>
-          <div
-            style={{
-              fontFamily: DATA, fontSize: "32px", fontWeight: 500,
-              color: INK, marginTop: "10px", lineHeight: 1.1,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {c.value}
+      {cells.map((c) => {
+        const stat = isStatValue(c.value);
+        return (
+          <div key={c.label} style={{ paddingRight: "24px" }}>
+            <Eyebrow>{c.label}</Eyebrow>
+            {stat ? (
+              <div
+                style={{
+                  fontFamily: DATA, fontSize: "28px", fontWeight: 500,
+                  color: INK, marginTop: "10px", lineHeight: 1.15,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {c.value}
+              </div>
+            ) : (
+              <div
+                style={{
+                  fontFamily: UI, fontSize: "15px", fontWeight: 600,
+                  color: INK, marginTop: "10px", lineHeight: 1.35,
+                }}
+              >
+                {c.value.split(/(\s*→\s*)/).map((part, i) =>
+                  part.trim() === "→" ? (
+                    <span key={i} style={{ color: INK_3, fontWeight: 400 }}>
+                      {" → "}
+                    </span>
+                  ) : (
+                    part
+                  )
+                )}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -540,13 +595,25 @@ function Landing() {
                   paper ground (--pub-n-06, #F5F4F1) would show a visible
                   white rectangle seam. Wrapped in an explicit white panel
                   card (--pub-n-00, #FFFFFF — an exact match, not an
-                  approximation) with the same border treatment already used
-                  for the reference-number specimen block below it, so the
-                  image reads as a deliberately bounded card rather than a
-                  mismatched background collision. */}
+                  approximation, confirmed by sampling the image's own
+                  border-region pixels directly: avg rgb(253,252,251)) with
+                  the same border treatment already used for the
+                  reference-number specimen block below it, so the image
+                  reads as a deliberately bounded card rather than a
+                  mismatched background collision.
+                  Enlarged 25 Aug 2026 (founder feedback — "the image needs
+                  to enlarge more") from a fixed 480px cap to fill its grid
+                  column (100% up to 640px), matching the hero column's own
+                  ~46% share of the shell width at desktop rather than
+                  capping well short of it. Grid stays .pub-hero's existing
+                  single-column-under-960px / 1.15fr-1fr-above-960px split
+                  (styles.css), so this card scales down to full-width on
+                  mobile automatically — verified live at 375px and 768px,
+                  no horizontal scroll, no distortion (width: 100%, height:
+                  auto preserves the 900:604 aspect ratio at every size). */}
               <div
                 style={{
-                  width: "100%", maxWidth: "480px", background: "var(--pub-n-00)",
+                  width: "100%", maxWidth: "640px", background: "var(--pub-n-00)",
                   border: `1px solid ${RULE}`, padding: "20px",
                 }}
               >
@@ -717,7 +784,7 @@ function Landing() {
             label — nothing here is invented, only re-laid-out.
           */}
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <Eyebrow>What a founder controls</Eyebrow>
+            <InstrumentLabel>What a founder controls</InstrumentLabel>
             <MetricGrid
               cells={[
                 { label: "Document access", value: "Founder → investor, after NDA" },
