@@ -266,8 +266,7 @@ function Stage2Panel({ isInvestor, dealRoomId, userId, founderName, workflow, on
     enabled: !!dealRoomId,
     queryFn: async () => {
       const { data } = await supabase.from("founder_documents")
-        .select("id, title, deal_room_stage, updated_at")
-        .eq("deal_room_stage", 1)
+        .select("id, title, updated_at")
         .eq("visibility", "deal_room")
         .in("status", ["complete", "ai_extracted", "needs_review"]);
       return data ?? [];

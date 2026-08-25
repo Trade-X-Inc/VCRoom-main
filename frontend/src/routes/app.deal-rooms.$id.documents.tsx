@@ -277,12 +277,11 @@ function DocumentsPage() {
   });
   const stage2Unlocked = drStageData?.stage2_unlocked ?? false;
 
-  const platformDocsSplit = isInvestor
-    ? {
-        stage1: (platformDocs as any[]).filter((d) => !d.deal_room_stage || d.deal_room_stage === 1),
-        stage2: (platformDocs as any[]).filter((d) => d.deal_room_stage === 2),
-      }
-    : { stage1: platformDocs as any[], stage2: [] };
+  // deal_room_stage was dropped 25 Aug 2026 as a dead column (zero writers;
+  // every row was stage 1, so the stage-2 branch below was unreachable).
+  // The list is no longer split. Stage2Gate/stage2Unlocked are unrelated —
+  // they read deal_rooms.stage2_unlocked, a different column.
+  const platformDocsSplit = { stage1: platformDocs as any[], stage2: [] as any[] };
 
   const visibleInvestorDocs = isFounder
     ? (investorDocs as any[]).filter((d) => d.visibility !== "private")
@@ -563,7 +562,7 @@ function DocumentsPage() {
             </div>
           )}
           {!isInvestor && (
-            <PlatformDocList docs={platformDocs as any[]} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} showStage />
+            <PlatformDocList docs={platformDocs as any[]} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} />
           )}
         </div>
       )}
@@ -1308,7 +1307,7 @@ function DocumentsPage() {
 // Presentation of a list already re-skinned onto v2; the data source itself is
 // unchanged. Extracted only to avoid repeating the three near-identical blocks
 // that existed in the original (stage1 / stage2 / non-investor).
-function PlatformDocList({ docs, onView, showStage }: { docs: any[]; onView: (doc: any) => void; showStage?: boolean }) {
+function PlatformDocList({ docs, onView }: { docs: any[]; onView: (doc: any) => void }) {
   return (
     <div className="space-y-2">
       {docs.map((doc: any) => (
@@ -1324,11 +1323,6 @@ function PlatformDocList({ docs, onView, showStage }: { docs: any[]; onView: (do
                   ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
                   : "Document"}
                 {" · "}Updated {formatRelativeTime(doc.updated_at)}
-                {showStage && (
-                  <> {" · "}<span className="font-medium text-v2-accent">
-                    Stage {(doc.deal_room_stage ?? 1) === 2 ? "2 — Full diligence" : "1 — Initial review"}
-                  </span></>
-                )}
               </p>
             </div>
           </div>
