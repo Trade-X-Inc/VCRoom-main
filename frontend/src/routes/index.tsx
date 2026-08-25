@@ -781,7 +781,6 @@ function Landing() {
             label="Where the mechanisms come from"
             head={["Mechanism", "Origin"]}
             rows={[
-              ["Single-notice diligence", <>Documentary credit examination — <span style={{ fontFamily: DATA, fontSize: "12px" }}>UCP 600</span></>],
               ["The conditions register", "Secured lending practice"],
               ["The evidence ladder", "Insurance underwriting practice"],
               ["Soft-circle tracking", "Syndicate practice"],
