@@ -9,6 +9,7 @@ import { AI_PAGES } from "./content/ai";
 import { GETTING_STARTED_PAGES } from "./content/getting-started";
 import { TOOLS_PAGES } from "./content/tools";
 import { PRICING_PAGES } from "./content/pricing";
+import { STANDARD_PAGES } from "./content/standard";
 
 const SECTIONS: Record<string, DocPage>[] = [
   GETTING_STARTED_PAGES,
@@ -20,6 +21,7 @@ const SECTIONS: Record<string, DocPage>[] = [
   TOOLS_PAGES,
   PRICING_PAGES,
   CHANGELOG_PAGES,
+  STANDARD_PAGES,
 ];
 
 export const DOCS_PAGES: Record<string, DocPage> = Object.assign({}, ...SECTIONS);

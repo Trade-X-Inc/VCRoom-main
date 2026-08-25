@@ -44,6 +44,12 @@
 # than building a second, thinner technology page.
 /sectors/technology /resources/schedule 301
 
+# Public-site migration Group 5 (25 Aug 2026) — same reasoning as
+# /sectors/technology above: /schedules/technology-seed is the
+# public-site-spec.html slug for the same one real published schedule.
+# Redirected rather than duplicating /resources/schedule a third time.
+/schedules/technology-seed /resources/schedule 301
+
 # P4: founder nav restructure — old pages consolidated into /app/prepare
 /app/profile      /app/prepare#profile        301
 /app/documents    /app/prepare#documents      301

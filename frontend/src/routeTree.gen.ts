@@ -15,6 +15,7 @@ import { Route as SubProcessorsRouteImport } from './routes/sub-processors'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SchedulesRouteImport } from './routes/schedules'
 import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -213,6 +214,11 @@ const SignUpRoute = SignUpRouteImport.update({
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchedulesRoute = SchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegistryRoute = RegistryRouteImport.update({
@@ -1126,6 +1132,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
+  '/schedules': typeof SchedulesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
@@ -1300,6 +1307,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
+  '/schedules': typeof SchedulesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
@@ -1477,6 +1485,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
+  '/schedules': typeof SchedulesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
@@ -1656,6 +1665,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/registry'
+    | '/schedules'
     | '/sign-in'
     | '/sign-up'
     | '/status'
@@ -1830,6 +1840,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/registry'
+    | '/schedules'
     | '/sign-in'
     | '/sign-up'
     | '/status'
@@ -2006,6 +2017,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/registry'
+    | '/schedules'
     | '/sign-in'
     | '/sign-up'
     | '/status'
@@ -2184,6 +2196,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RegistryRoute: typeof RegistryRoute
+  SchedulesRoute: typeof SchedulesRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   StatusRoute: typeof StatusRoute
@@ -2279,6 +2292,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedules': {
+      id: '/schedules'
+      path: '/schedules'
+      fullPath: '/schedules'
+      preLoaderRoute: typeof SchedulesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registry': {
@@ -3776,6 +3796,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RegistryRoute: RegistryRoute,
+  SchedulesRoute: SchedulesRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   StatusRoute: StatusRoute,
