@@ -114,12 +114,12 @@ export function Instrument({
   rows: React.ReactNode[][];
 }) {
   return (
-    <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55 }}>
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: UI, fontSize: "14px", lineHeight: 1.55 }}>
         <thead>
           <tr>
             {head.map((h) => (
-              <th key={h} scope="col" style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, textAlign: "start", padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`, whiteSpace: "nowrap" }}>
+              <th key={h} scope="col" style={{ fontSize: "13.5px", fontWeight: 700, letterSpacing: "0", textTransform: "none", color: INK, textAlign: "start", padding: "0 24px 14px", borderBottom: `1.5px solid ${INK}`, whiteSpace: "nowrap" }}>
                 {h}
               </th>
             ))}
@@ -127,9 +127,9 @@ export function Instrument({
         </thead>
         <tbody>
           {rows.map((r, ri) => (
-            <tr key={ri} style={{ borderBottom: ri === rows.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}>
+            <tr key={ri} style={{ background: ri % 2 === 1 ? "var(--pub-n-09)" : "transparent" }}>
               {r.map((cell, ci) => (
-                <td key={ci} style={{ padding: "14px 20px", color: ci === 0 ? INK : INK_2, fontWeight: ci === 0 ? 600 : 400, verticalAlign: "top" }}>
+                <td key={ci} style={{ padding: "18px 24px", color: ci === 0 ? INK : INK_2, fontWeight: ci === 0 ? 600 : 400, verticalAlign: "top" }}>
                   {cell}
                 </td>
               ))}

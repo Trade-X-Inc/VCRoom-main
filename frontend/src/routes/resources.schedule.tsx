@@ -344,11 +344,11 @@ function SchedulePage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <Eyebrow>Technology · Seed · v1 · Published 4 August 2026</Eyebrow>
-            <div style={{ background: PANEL, border: `1px solid ${RULE}`, overflowX: "auto" }}>
+            <div style={{ overflowX: "auto" }}>
               <table
                 style={{
                   width: "100%", borderCollapse: "collapse",
-                  fontFamily: UI, fontSize: "13.5px", lineHeight: 1.55,
+                  fontFamily: UI, fontSize: "14px", lineHeight: 1.55,
                 }}
               >
                 <thead>
@@ -358,9 +358,9 @@ function SchedulePage() {
                         key={h}
                         scope="col"
                         style={{
-                          fontSize: "11px", fontWeight: 500, letterSpacing: "0.09em",
-                          textTransform: "uppercase", color: INK_3, textAlign: "start",
-                          padding: "0 20px 12px", borderBottom: `1.5px solid ${INK}`,
+                          fontSize: "13.5px", fontWeight: 700, letterSpacing: "0",
+                          textTransform: "none", color: INK, textAlign: "start",
+                          padding: "0 24px 14px", borderBottom: `1.5px solid ${INK}`,
                           whiteSpace: "nowrap",
                         }}
                       >
@@ -373,9 +373,9 @@ function SchedulePage() {
                   {FIELDS.map((f, i) => (
                     <tr
                       key={f.id}
-                      style={{ borderBottom: i === FIELDS.length - 1 ? "none" : `1px solid ${RULE_LIGHT}` }}
+                      style={{ background: i % 2 === 1 ? "var(--pub-n-09)" : "transparent" }}
                     >
-                      <td style={{ padding: "14px 20px", color: INK, verticalAlign: "top" }}>
+                      <td style={{ padding: "18px 24px", color: INK, verticalAlign: "top" }}>
                         <div style={{ fontWeight: 600 }}>{f.label}</div>
                         <div
                           style={{
@@ -386,13 +386,13 @@ function SchedulePage() {
                           {f.id}
                         </div>
                       </td>
-                      <td style={{ padding: "14px 20px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "18px 24px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
                         {f.section}
                       </td>
-                      <td style={{ padding: "14px 20px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "18px 24px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
                         {VALUE_TYPE_LABEL[f.valueType]}
                       </td>
-                      <td style={{ padding: "14px 20px", verticalAlign: "top", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "18px 24px", verticalAlign: "top", whiteSpace: "nowrap" }}>
                         <span
                           style={{
                             fontFamily: UI, fontSize: "11px", fontWeight: 500, letterSpacing: "0.05em",
@@ -405,7 +405,7 @@ function SchedulePage() {
                           {RELEASE_LABEL[f.releaseClass]}
                         </div>
                       </td>
-                      <td style={{ padding: "14px 20px", color: INK_2, verticalAlign: "top", minWidth: "260px" }}>
+                      <td style={{ padding: "18px 24px", color: INK_2, verticalAlign: "top", minWidth: "260px" }}>
                         <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
                           <div>
                             <span style={{ color: INK_3, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Min · </span>
