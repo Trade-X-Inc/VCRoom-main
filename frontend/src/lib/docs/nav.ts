@@ -95,6 +95,16 @@ export const DOCS_NAV: DocsNavSection[] = [
     title: "Changelog",
     items: [{ slug: "changelog", title: "Changelog" }],
   },
+  {
+    slug: "standard",
+    title: "The standard",
+    items: [
+      { slug: "standard", title: "The disclosure standard" },
+      { slug: "record-format", title: "Record and reference format" },
+      { slug: "security-whitepaper", title: "Security whitepaper" },
+      { slug: "api", title: "API and MCP" },
+    ],
+  },
 ];
 
 // Flat ordered list for prev/next navigation
