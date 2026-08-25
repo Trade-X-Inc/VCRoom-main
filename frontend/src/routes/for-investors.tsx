@@ -19,17 +19,19 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // §15/§25). /investors now 301s to this page (public/_redirects, updated
 // in this commit).
 //
-// INSTRUMENT — a real record-chain excerpt, per the approved plan. Every
-// hash below is copied verbatim from a live query against
-// pack_v1.record_entry (four linked entries, room 957f9750-00c7-402a-b1ba-
-// d9c7a4e3ba2f, the pre-existing Atlas Robotics fixture — not the
-// specimen room, since this excerpt needed real production entries with
-// real prev_hash -> entry_hash links, not a synthetic chain). Genesis
-// entry's prev_hash is the real zero-string the schema uses, not a
-// placeholder. Actions shown are genuinely read-only (deal_room.getIdentity
-// / getWorkflowState) — the chain records every gateway call, not just
-// writes, which is itself worth stating plainly rather than implying only
-// dramatic moments get recorded.
+// INSTRUMENT — specimen record-chain excerpt, redacted 25 Aug 2026
+// (implementation-detail audit, founder-directed fix, ranked finding #1).
+// Previously rendered real production entries — real internal action-layer
+// method names, a real room ID, and real copied hash values — which is
+// HOW-level detail a public page must not carry (CLAUDE.md's public-surface
+// correctness standard: describe what the product does and why it's
+// trustworthy, never how in reproducible detail). Now clearly-fake
+// specimen data: hex strings that are not derived from any real entry,
+// plain-English action descriptions instead of literal method names, and
+// no source table or room ID named anywhere in this comment or the page.
+// The structural claim itself (each entry links to the one before it,
+// forward-only) is unchanged and still real — only the literal values and
+// method names were replaced.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const UI = "var(--font-v2-ui)";
@@ -317,15 +319,15 @@ function ForInvestorsPage() {
           </div>
 
           <Instrument
-            label="A real chained segment · Room 957f9750"
+            label="A chained segment · Specimen"
             head={["Seq", "Action", "Prev hash", "Entry hash"]}
             align={[]}
             rows={[
-              ["1", "deal_room.getIdentity", "0000000000…000000", "f237bf94b3…198230f"],
-              ["2", "deal_room.getWorkflowState", "f237bf94b3…198230f", "cedc568019…828edf6"],
-              ["3", "deal_room.getIdentity", "cedc568019…828edf6", "6fd1412541…0cc1b6a"],
+              ["1", "Room opened", "0000000000…000000", "a1c93f7e2d…4b08e651"],
+              ["2", "Status checked", "a1c93f7e2d…4b08e651", "7e29d4a810…c3f56a92"],
+              ["3", "Room opened", "7e29d4a810…c3f56a92", "d68b21f309…7a1ec4d5"],
             ]}
-            caption="Each entry's prev_hash is the entry before it's entry_hash — copied verbatim from a live query, not constructed for this page. Change an earlier entry and every hash after it stops matching, visibly, without trusting us to say so."
+            caption="Illustrative values, not a real room. Each entry's prev hash is the entry before it's entry hash — in a real chain, changing an earlier entry breaks every hash after it, visibly, without trusting us to say so."
           />
         </Section>
 

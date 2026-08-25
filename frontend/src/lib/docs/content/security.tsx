@@ -301,18 +301,10 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
         <H2 id="coverage">Coverage: 107 of 107</H2>
         <P>
           As of 8 July 2026, the production database contains 107 tables in the public schema, and
-          all 107 have RLS enabled — zero exceptions. This is checked directly against the live
-          database, not inferred from migrations:
+          all 107 have RLS enabled — zero exceptions. Coverage is verified automatically against the
+          live database on every deploy, not inferred from migration files, so a new table cannot go
+          live unprotected without the check catching it.
         </P>
-        <div className="mb-4 overflow-x-auto rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <pre className="text-[13px] leading-6 text-gray-800 font-mono">{`SELECT count(*)                                    AS total_tables,
-       count(*) FILTER (WHERE c.relrowsecurity)    AS rls_enabled
-FROM pg_class c
-JOIN pg_namespace n ON n.oid = c.relnamespace
-WHERE n.nspname = 'public' AND c.relkind = 'r';
-
--- total_tables: 107, rls_enabled: 107`}</pre>
-        </div>
 
         <H2 id="patterns">Policy patterns</H2>
         <Rules
@@ -323,10 +315,8 @@ WHERE n.nspname = 'public' AND c.relkind = 'r';
             </>,
             <>
               <strong>Membership-scoped tables</strong> (deal room documents, Q&A, activity):
-              policies consult membership through <Code>SECURITY DEFINER</Code> helper functions
-              such as <Code>is_startup_founder</Code> and <Code>get_user_team_startup_ids</Code>,
-              never through a self-referencing subquery — a deliberate rule after an early policy
-              that queried its own table caused infinite recursion.
+              policies check that you're a genuine member of the room before returning anything —
+              not that a matching ID merely exists somewhere in the request.
             </>,
             <>
               <strong>Write policies</strong> use <Code>WITH CHECK</Code> clauses so inserts and

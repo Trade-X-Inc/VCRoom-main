@@ -335,14 +335,14 @@ function TermStateDiagram() {
         <line x1={nodes.unset.x + 55} y1={nodes.unset.y} x2={nodes.proposed.x - 55} y2={nodes.proposed.y}
               stroke={INK_2} strokeWidth={1.5} markerEnd="url(#arrow-ink2)" />
         <text x={(nodes.unset.x + nodes.proposed.x) / 2} y={nodes.unset.y - 10} textAnchor="middle" fontFamily={UI} fontSize="10.5" fill={INK_3}>
-          proposeTerm
+          a value is proposed
         </text>
 
         {/* proposed -> accepted */}
         <line x1={nodes.proposed.x + 60} y1={nodes.proposed.y} x2={nodes.accepted.x - 60} y2={nodes.accepted.y}
               stroke={INK_2} strokeWidth={1.5} markerEnd="url(#arrow-ink2)" />
         <text x={(nodes.proposed.x + nodes.accepted.x) / 2} y={nodes.proposed.y - 10} textAnchor="middle" fontFamily={UI} fontSize="10.5" fill={INK_3}>
-          acceptTerm — one flag
+          one party accepts
         </text>
 
         {/* accepted -> locked */}

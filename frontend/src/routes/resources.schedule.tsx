@@ -22,14 +22,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // competitor publishes theirs"), and until this page, the one thing on that
 // list with no page of its own.
 //
-// Every field below is read directly from pack_v1.schedule_field for the one
-// published schedule (technology/seed, v1, id 11111111-1111-1111-1111-
-// 111111111111) — queried live, not paraphrased. Field IDs are turned into
-// sentence-case labels (tech.seed.problem_statement -> "Problem statement")
-// but the underlying key, section, value type, visibility tier, release
-// class, and full three-rung evidence ladder are all real values, copied
-// verbatim. Order matches the schedule's own sort_order — not re-grouped by
-// section, since that would impose an organization nobody actually chose.
+// Every field below is read directly from the one published schedule
+// (technology/seed, v1) — queried live, not paraphrased. Field IDs are
+// turned into sentence-case labels for display (e.g. "Problem statement")
+// and the underlying internal key is never rendered — an implementation
+// detail, not a public fact, per the public-surface correctness standard
+// (fixed 25 Aug 2026, audit finding #3; the raw key rendered alongside the
+// label until this pass). Section, value type, visibility tier, release
+// class, and the full three-rung evidence ladder are all real values,
+// copied verbatim. Order matches the schedule's own sort order — not
+// re-grouped by section, since that would impose an organization nobody
+// actually chose.
 //
 // Only one schedule exists today (CLAUDE.md §20.1 step 2d / the IA
 // investigation). This page states that plainly rather than implying a
@@ -388,14 +391,6 @@ function SchedulePage() {
                     >
                       <td style={{ padding: "18px 24px", color: INK, verticalAlign: "top" }}>
                         <div style={{ fontWeight: 600 }}>{f.label}</div>
-                        <div
-                          style={{
-                            fontFamily: DATA, fontSize: "11px", color: INK_3, marginTop: "2px",
-                            fontVariantNumeric: "tabular-nums",
-                          }}
-                        >
-                          {f.id}
-                        </div>
                       </td>
                       <td style={{ padding: "18px 24px", color: INK_2, verticalAlign: "top", whiteSpace: "nowrap" }}>
                         {f.section}
