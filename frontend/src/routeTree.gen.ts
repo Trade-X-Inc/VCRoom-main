@@ -47,6 +47,14 @@ import { Route as ToolsDilutionRouteImport } from './routes/tools/dilution'
 import { Route as ToolsCogsRouteImport } from './routes/tools/cogs'
 import { Route as ToolsCapTableRouteImport } from './routes/tools/cap-table'
 import { Route as ToolsBurnRateRouteImport } from './routes/tools/burn-rate'
+import { Route as SolutionsVentureCapitalRouteImport } from './routes/solutions.venture-capital'
+import { Route as SolutionsSyndicatesRouteImport } from './routes/solutions.syndicates'
+import { Route as SolutionsSpvsRouteImport } from './routes/solutions.spvs'
+import { Route as SolutionsPrivateEquityRouteImport } from './routes/solutions.private-equity'
+import { Route as SolutionsLimitedPartnersRouteImport } from './routes/solutions.limited-partners'
+import { Route as SolutionsFamilyOfficesRouteImport } from './routes/solutions.family-offices'
+import { Route as SolutionsAngelsRouteImport } from './routes/solutions.angels'
+import { Route as SolutionsAdvisorsRouteImport } from './routes/solutions.advisors'
 import { Route as RoastIdRouteImport } from './routes/roast.$id'
 import { Route as ResourcesScheduleRouteImport } from './routes/resources.schedule'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
@@ -350,6 +358,47 @@ const ToolsCapTableRoute = ToolsCapTableRouteImport.update({
 const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
   id: '/tools/burn-rate',
   path: '/tools/burn-rate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsVentureCapitalRoute = SolutionsVentureCapitalRouteImport.update({
+  id: '/solutions/venture-capital',
+  path: '/solutions/venture-capital',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsSyndicatesRoute = SolutionsSyndicatesRouteImport.update({
+  id: '/solutions/syndicates',
+  path: '/solutions/syndicates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsSpvsRoute = SolutionsSpvsRouteImport.update({
+  id: '/solutions/spvs',
+  path: '/solutions/spvs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsPrivateEquityRoute = SolutionsPrivateEquityRouteImport.update({
+  id: '/solutions/private-equity',
+  path: '/solutions/private-equity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsLimitedPartnersRoute =
+  SolutionsLimitedPartnersRouteImport.update({
+    id: '/solutions/limited-partners',
+    path: '/solutions/limited-partners',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SolutionsFamilyOfficesRoute = SolutionsFamilyOfficesRouteImport.update({
+  id: '/solutions/family-offices',
+  path: '/solutions/family-offices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsAngelsRoute = SolutionsAngelsRouteImport.update({
+  id: '/solutions/angels',
+  path: '/solutions/angels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsAdvisorsRoute = SolutionsAdvisorsRouteImport.update({
+  id: '/solutions/advisors',
+  path: '/solutions/advisors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoastIdRoute = RoastIdRouteImport.update({
@@ -1023,6 +1072,14 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
+  '/solutions/advisors': typeof SolutionsAdvisorsRoute
+  '/solutions/angels': typeof SolutionsAngelsRoute
+  '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
+  '/solutions/limited-partners': typeof SolutionsLimitedPartnersRoute
+  '/solutions/private-equity': typeof SolutionsPrivateEquityRoute
+  '/solutions/spvs': typeof SolutionsSpvsRoute
+  '/solutions/syndicates': typeof SolutionsSyndicatesRoute
+  '/solutions/venture-capital': typeof SolutionsVentureCapitalRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
@@ -1173,6 +1230,14 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
+  '/solutions/advisors': typeof SolutionsAdvisorsRoute
+  '/solutions/angels': typeof SolutionsAngelsRoute
+  '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
+  '/solutions/limited-partners': typeof SolutionsLimitedPartnersRoute
+  '/solutions/private-equity': typeof SolutionsPrivateEquityRoute
+  '/solutions/spvs': typeof SolutionsSpvsRoute
+  '/solutions/syndicates': typeof SolutionsSyndicatesRoute
+  '/solutions/venture-capital': typeof SolutionsVentureCapitalRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
@@ -1328,6 +1393,14 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
+  '/solutions/advisors': typeof SolutionsAdvisorsRoute
+  '/solutions/angels': typeof SolutionsAngelsRoute
+  '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
+  '/solutions/limited-partners': typeof SolutionsLimitedPartnersRoute
+  '/solutions/private-equity': typeof SolutionsPrivateEquityRoute
+  '/solutions/spvs': typeof SolutionsSpvsRoute
+  '/solutions/syndicates': typeof SolutionsSyndicatesRoute
+  '/solutions/venture-capital': typeof SolutionsVentureCapitalRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
@@ -1484,6 +1557,14 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/resources/schedule'
     | '/roast/$id'
+    | '/solutions/advisors'
+    | '/solutions/angels'
+    | '/solutions/family-offices'
+    | '/solutions/limited-partners'
+    | '/solutions/private-equity'
+    | '/solutions/spvs'
+    | '/solutions/syndicates'
+    | '/solutions/venture-capital'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
@@ -1634,6 +1715,14 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/resources/schedule'
     | '/roast/$id'
+    | '/solutions/advisors'
+    | '/solutions/angels'
+    | '/solutions/family-offices'
+    | '/solutions/limited-partners'
+    | '/solutions/private-equity'
+    | '/solutions/spvs'
+    | '/solutions/syndicates'
+    | '/solutions/venture-capital'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
@@ -1788,6 +1877,14 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/resources/schedule'
     | '/roast/$id'
+    | '/solutions/advisors'
+    | '/solutions/angels'
+    | '/solutions/family-offices'
+    | '/solutions/limited-partners'
+    | '/solutions/private-equity'
+    | '/solutions/spvs'
+    | '/solutions/syndicates'
+    | '/solutions/venture-capital'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
@@ -1924,6 +2021,14 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   ResourcesScheduleRoute: typeof ResourcesScheduleRoute
   RoastIdRoute: typeof RoastIdRoute
+  SolutionsAdvisorsRoute: typeof SolutionsAdvisorsRoute
+  SolutionsAngelsRoute: typeof SolutionsAngelsRoute
+  SolutionsFamilyOfficesRoute: typeof SolutionsFamilyOfficesRoute
+  SolutionsLimitedPartnersRoute: typeof SolutionsLimitedPartnersRoute
+  SolutionsPrivateEquityRoute: typeof SolutionsPrivateEquityRoute
+  SolutionsSpvsRoute: typeof SolutionsSpvsRoute
+  SolutionsSyndicatesRoute: typeof SolutionsSyndicatesRoute
+  SolutionsVentureCapitalRoute: typeof SolutionsVentureCapitalRoute
   ToolsBurnRateRoute: typeof ToolsBurnRateRoute
   ToolsCapTableRoute: typeof ToolsCapTableRoute
   ToolsCogsRoute: typeof ToolsCogsRoute
@@ -2203,6 +2308,62 @@ declare module '@tanstack/react-router' {
       path: '/tools/burn-rate'
       fullPath: '/tools/burn-rate'
       preLoaderRoute: typeof ToolsBurnRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/venture-capital': {
+      id: '/solutions/venture-capital'
+      path: '/solutions/venture-capital'
+      fullPath: '/solutions/venture-capital'
+      preLoaderRoute: typeof SolutionsVentureCapitalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/syndicates': {
+      id: '/solutions/syndicates'
+      path: '/solutions/syndicates'
+      fullPath: '/solutions/syndicates'
+      preLoaderRoute: typeof SolutionsSyndicatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/spvs': {
+      id: '/solutions/spvs'
+      path: '/solutions/spvs'
+      fullPath: '/solutions/spvs'
+      preLoaderRoute: typeof SolutionsSpvsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/private-equity': {
+      id: '/solutions/private-equity'
+      path: '/solutions/private-equity'
+      fullPath: '/solutions/private-equity'
+      preLoaderRoute: typeof SolutionsPrivateEquityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/limited-partners': {
+      id: '/solutions/limited-partners'
+      path: '/solutions/limited-partners'
+      fullPath: '/solutions/limited-partners'
+      preLoaderRoute: typeof SolutionsLimitedPartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/family-offices': {
+      id: '/solutions/family-offices'
+      path: '/solutions/family-offices'
+      fullPath: '/solutions/family-offices'
+      preLoaderRoute: typeof SolutionsFamilyOfficesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/angels': {
+      id: '/solutions/angels'
+      path: '/solutions/angels'
+      fullPath: '/solutions/angels'
+      preLoaderRoute: typeof SolutionsAngelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/advisors': {
+      id: '/solutions/advisors'
+      path: '/solutions/advisors'
+      fullPath: '/solutions/advisors'
+      preLoaderRoute: typeof SolutionsAdvisorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/roast/$id': {
@@ -3332,6 +3493,14 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   ResourcesScheduleRoute: ResourcesScheduleRoute,
   RoastIdRoute: RoastIdRoute,
+  SolutionsAdvisorsRoute: SolutionsAdvisorsRoute,
+  SolutionsAngelsRoute: SolutionsAngelsRoute,
+  SolutionsFamilyOfficesRoute: SolutionsFamilyOfficesRoute,
+  SolutionsLimitedPartnersRoute: SolutionsLimitedPartnersRoute,
+  SolutionsPrivateEquityRoute: SolutionsPrivateEquityRoute,
+  SolutionsSpvsRoute: SolutionsSpvsRoute,
+  SolutionsSyndicatesRoute: SolutionsSyndicatesRoute,
+  SolutionsVentureCapitalRoute: SolutionsVentureCapitalRoute,
   ToolsBurnRateRoute: ToolsBurnRateRoute,
   ToolsCapTableRoute: ToolsCapTableRoute,
   ToolsCogsRoute: ToolsCogsRoute,

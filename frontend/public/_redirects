@@ -29,6 +29,14 @@
 /solutions/raise-1m / 301
 /solutions/vc-deal-room / 301
 
+# Public-site migration Group 2 (25 Aug 2026) — /solutions/founders and
+# /solutions/investors are the public-site-spec.html audience-page slugs
+# for the same audiences /for-founders and /for-investors already serve,
+# shipped and register-compliant (PUBLIC-REGISTER.md v2.0, 23 Aug 2026).
+# Redirected rather than duplicated, per the confirmed integration decision.
+/solutions/founders /for-founders 301
+/solutions/investors /for-investors 301
+
 # P4: founder nav restructure — old pages consolidated into /app/prepare
 /app/profile      /app/prepare#profile        301
 /app/documents    /app/prepare#documents      301
