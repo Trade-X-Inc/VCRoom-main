@@ -9,6 +9,15 @@ import { SolutionAudiencePage } from "@/components/site/SolutionAudiencePage";
 // confirmed no angel-specific mechanic exists or is claimed here — the
 // generic flow genuinely IS what this page describes, so no hedge is
 // applied. See SolutionAudiencePage for the shared shape.
+//
+// CTA fixed 25 Aug 2026 (founder feedback — this was the one live,
+// unhedged page in the group with zero product-specific CTA anywhere,
+// since ctaTo was never set here). The other 7 solutions pages route the
+// same /sign-up?role=investor target to "Request early access", correct
+// for an unbuilt mechanic — wrong here, since the flow this page describes
+// is real today. Labeled "Create an account" instead, matching the
+// honest-because-it's-actually-live framing the rest of the page already
+// commits to.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute("/solutions/angels")({
@@ -31,6 +40,9 @@ export const Route = createFileRoute("/solutions/angels")({
       painBody="The Direct spine: brief, present, NDA, an eight-item checklist, one-page terms, sign, close. Built for the small, fast cheque."
       mechanism="Benefit"
       mechanismBody="A record you can point to at the next round, and a decision — invest, hold, decline — captured with a reason."
+      ctaTo="/sign-up"
+      ctaSearch={{ role: "investor" }}
+      ctaLabel="Create an account"
     />
   ),
 });
