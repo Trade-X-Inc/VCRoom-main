@@ -150,7 +150,7 @@ function InformationPage() {
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
-  const [noteVisibility, setNoteVisibility] = useState<"private" | "shared">("private");
+  const [noteVisibility, setNoteVisibility] = useState<"private" | "deal_room">("private");
   const [noteSaving, setNoteSaving] = useState(false);
   const [expandedNoteId, setExpandedNoteId] = useState<string | null>(null);
 
@@ -164,7 +164,7 @@ function InformationPage() {
         .eq("deal_room_id", dealRoomId)
         .order("created_at", { ascending: false });
       if (isInvestor) q = q.eq("user_id", userId);
-      else q = (q as any).eq("visibility", "shared");
+      else q = (q as any).eq("visibility", "deal_room");
       const { data } = await q;
       return data ?? [];
     },
@@ -622,11 +622,11 @@ function InformationPage() {
               <div className="flex items-center gap-3 flex-wrap">
                 <select
                   value={noteVisibility}
-                  onChange={(e) => setNoteVisibility(e.target.value as "private" | "shared")}
+                  onChange={(e) => setNoteVisibility(e.target.value as "private" | "deal_room")}
                   className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
                 >
                   <option value="private">Private (only me)</option>
-                  <option value="shared">Share with founder</option>
+                  <option value="deal_room">Share with founder</option>
                 </select>
                 <button
                   onClick={() => console.log("AI note generation — Claude Code will wire")}
@@ -672,11 +672,11 @@ function InformationPage() {
                       )}
                       <div className="mt-2 flex items-center gap-2">
                         <span className={cn("text-[10px] rounded-full px-2 py-0.5 font-medium",
-                          note.visibility === "shared"
+                          note.visibility === "deal_room"
                             ? "bg-green-50 text-green-700"
                             : "bg-gray-100 text-gray-500"
                         )}>
-                          {note.visibility === "shared" ? "Shared" : "Private"}
+                          {note.visibility === "deal_room" ? "Shared" : "Private"}
                         </span>
                         <span className="text-[10px] text-[#71717A]">
                           {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
