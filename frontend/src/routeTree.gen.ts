@@ -42,6 +42,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools/index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
+import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -71,6 +72,7 @@ import { Route as ResourcesScheduleRouteImport } from './routes/resources.schedu
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
+import { Route as GlossaryTermRouteImport } from './routes/glossary.$term'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as CompareIdealsRouteImport } from './routes/compare.ideals'
@@ -351,6 +353,11 @@ const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
   path: '/resources/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GlossaryIndexRoute = GlossaryIndexRouteImport.update({
+  id: '/glossary/',
+  path: '/glossary/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -495,6 +502,11 @@ const JoinInvestorTokenRoute = JoinInvestorTokenRouteImport.update({
 const ISlugRoute = ISlugRouteImport.update({
   id: '/i/$slug',
   path: '/i/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlossaryTermRoute = GlossaryTermRouteImport.update({
+  id: '/glossary/$term',
+  path: '/glossary/$term',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsSplatRoute = DocsSplatRouteImport.update({
@@ -1172,6 +1184,7 @@ export interface FileRoutesByFullPath {
   '/compare/ideals': typeof CompareIdealsRoute
   '/cv/$slug': typeof CvSlugRoute
   '/docs/$': typeof DocsSplatRoute
+  '/glossary/$term': typeof GlossaryTermRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
@@ -1201,6 +1214,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/compare/': typeof CompareIndexRoute
   '/docs/': typeof DocsIndexRoute
+  '/glossary/': typeof GlossaryIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -1346,6 +1360,7 @@ export interface FileRoutesByTo {
   '/compare/ideals': typeof CompareIdealsRoute
   '/cv/$slug': typeof CvSlugRoute
   '/docs/$': typeof DocsSplatRoute
+  '/glossary/$term': typeof GlossaryTermRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
@@ -1375,6 +1390,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/compare': typeof CompareIndexRoute
   '/docs': typeof DocsIndexRoute
+  '/glossary': typeof GlossaryIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/sectors': typeof SectorsIndexRoute
   '/tools': typeof ToolsIndexRoute
@@ -1525,6 +1541,7 @@ export interface FileRoutesById {
   '/compare/ideals': typeof CompareIdealsRoute
   '/cv/$slug': typeof CvSlugRoute
   '/docs/$': typeof DocsSplatRoute
+  '/glossary/$term': typeof GlossaryTermRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/p/$slug': typeof PSlugRoute
@@ -1554,6 +1571,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/compare/': typeof CompareIndexRoute
   '/docs/': typeof DocsIndexRoute
+  '/glossary/': typeof GlossaryIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -1705,6 +1723,7 @@ export interface FileRouteTypes {
     | '/compare/ideals'
     | '/cv/$slug'
     | '/docs/$'
+    | '/glossary/$term'
     | '/i/$slug'
     | '/join-investor/$token'
     | '/p/$slug'
@@ -1734,6 +1753,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/compare/'
     | '/docs/'
+    | '/glossary/'
     | '/resources/'
     | '/sectors/'
     | '/tools/'
@@ -1879,6 +1899,7 @@ export interface FileRouteTypes {
     | '/compare/ideals'
     | '/cv/$slug'
     | '/docs/$'
+    | '/glossary/$term'
     | '/i/$slug'
     | '/join-investor/$token'
     | '/p/$slug'
@@ -1908,6 +1929,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/compare'
     | '/docs'
+    | '/glossary'
     | '/resources'
     | '/sectors'
     | '/tools'
@@ -2057,6 +2079,7 @@ export interface FileRouteTypes {
     | '/compare/ideals'
     | '/cv/$slug'
     | '/docs/$'
+    | '/glossary/$term'
     | '/i/$slug'
     | '/join-investor/$token'
     | '/p/$slug'
@@ -2086,6 +2109,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/compare/'
     | '/docs/'
+    | '/glossary/'
     | '/resources/'
     | '/sectors/'
     | '/tools/'
@@ -2217,6 +2241,7 @@ export interface RootRouteChildren {
   CompareFirmexRoute: typeof CompareFirmexRoute
   CompareIdealsRoute: typeof CompareIdealsRoute
   CvSlugRoute: typeof CvSlugRoute
+  GlossaryTermRoute: typeof GlossaryTermRoute
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   PSlugRoute: typeof PSlugRoute
@@ -2243,6 +2268,7 @@ export interface RootRouteChildren {
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationRoute: typeof ToolsValuationRoute
   CompareIndexRoute: typeof CompareIndexRoute
+  GlossaryIndexRoute: typeof GlossaryIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   SectorsIndexRoute: typeof SectorsIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -2483,6 +2509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/glossary/': {
+      id: '/glossary/'
+      path: '/glossary'
+      fullPath: '/glossary/'
+      preLoaderRoute: typeof GlossaryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs/': {
       id: '/docs/'
       path: '/'
@@ -2684,6 +2717,13 @@ declare module '@tanstack/react-router' {
       path: '/i/$slug'
       fullPath: '/i/$slug'
       preLoaderRoute: typeof ISlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glossary/$term': {
+      id: '/glossary/$term'
+      path: '/glossary/$term'
+      fullPath: '/glossary/$term'
+      preLoaderRoute: typeof GlossaryTermRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs/$': {
@@ -3817,6 +3857,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompareFirmexRoute: CompareFirmexRoute,
   CompareIdealsRoute: CompareIdealsRoute,
   CvSlugRoute: CvSlugRoute,
+  GlossaryTermRoute: GlossaryTermRoute,
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   PSlugRoute: PSlugRoute,
@@ -3843,6 +3884,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationRoute: ToolsValuationRoute,
   CompareIndexRoute: CompareIndexRoute,
+  GlossaryIndexRoute: GlossaryIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   SectorsIndexRoute: SectorsIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
