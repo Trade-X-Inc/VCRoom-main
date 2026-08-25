@@ -472,7 +472,11 @@ img { max-width: 100%; height: auto; }
 }
 @media (min-width: 960px) {
   .pub-hero {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    /* Ratio flipped toward the image column 25 Aug 2026 (founder feedback —
+       the image needs to fill the section, not stay pinned to a narrow
+       column): was 1.15fr 1fr favoring text, now 1fr 1.35fr favoring the
+       image. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
     gap: 64px;
   }
 }
