@@ -153,13 +153,19 @@ export function SiteFooter() {
         { to: "/contact", label: "Contact" },
         { to: "/blog", label: "Blog" },
         { to: "/feedback", label: "Feedback" },
+        { to: "/status", label: "Status" },
+        { to: "/careers", label: "Careers" },
       ],
     },
     {
       heading: "Legal",
       links: [
+        { to: "/legal", label: "Legal" },
         { to: "/terms", label: "Terms" },
         { to: "/privacy", label: "Privacy" },
+        { to: "/dpa", label: "Data processing addendum" },
+        { to: "/sub-processors", label: "Sub-processors" },
+        { to: "/acceptable-use", label: "Acceptable use" },
       ],
     },
   ];
