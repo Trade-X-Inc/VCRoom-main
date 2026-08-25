@@ -62,7 +62,7 @@ function GlossaryIndexPage() {
             <p style={{ fontFamily: DATA, fontSize: "11px", lineHeight: 1.45, fontWeight: 500, letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3, margin: 0 }}>
               Ten terms
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1px", background: RULE, border: `1px solid ${RULE}` }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1px", background: RULE, border: `1px solid ${RULE}` }}>
               {GLOSSARY.map((e) => (
                 <Link
                   key={e.slug}
@@ -70,6 +70,7 @@ function GlossaryIndexPage() {
                   style={{
                     background: "var(--pub-n-00)", padding: "22px", textDecoration: "none",
                     display: "flex", flexDirection: "column", gap: "8px", color: INK,
+                    flex: "1 1 220px", minWidth: "220px",
                   }}
                 >
                   <span style={{ fontFamily: UI, fontSize: "15px", fontWeight: 600 }}>{e.term}</span>

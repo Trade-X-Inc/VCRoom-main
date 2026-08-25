@@ -165,12 +165,20 @@ export const Route = createRootRoute({
       // apex made EVERY subpage (/pricing, /tools/*, /blog/*) declare itself
       // a duplicate of the homepage — actively harmful for indexing. Routes
       // that want a canonical set their own (the landing page does).
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      // SVG icon and mask-icon intentionally omitted here (25 Aug 2026 brand
+      // refresh): the new mark's only source is a raster PNG/favicon file
+      // provided directly by the founder — no vector source exists to derive
+      // an accurate favicon.svg or mask-icon.svg from, and approximating one
+      // risked introducing shape drift from the real asset. The PNG/ICO set
+      // below is generated directly from that exact source file, pixel-
+      // accurate. mask-icon.svg was also a dead reference before this change
+      // (file never existed in public/) — removed rather than left 404ing.
+      { rel: "icon", type: "image/png", sizes: "512x512", href: "/favicon-512x512.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/favicon-192x192.png" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
       { rel: "shortcut icon", href: "/favicon.ico" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
-      { rel: "mask-icon", href: "/mask-icon.svg", color: "#1B3A63" },
     ],
   }),
   shellComponent: RootShell,

@@ -93,14 +93,31 @@ function NavDropdown({ label, links }: { label: string; links: NavDropdownLink[]
         <ChevronDown className="h-3.5 w-3.5" style={{ transform: open ? "rotate(180deg)" : undefined }} />
       </button>
       {open && (
-        <div
-          role="menu"
-          style={{
-            position: "absolute", top: "calc(100% + 8px)", left: 0,
-            width: "280px", background: PANEL, border: `1px solid ${RULE}`,
-            borderRadius: "2px", padding: "6px", zIndex: 50,
-          }}
-        >
+        <>
+          {/* Founder-reported 25 Aug 2026: the panel visually collided with
+              the hero H1 beneath it — a shadow alone wasn't enough, since the
+              panel still sat directly over the headline text. A dimming
+              backdrop (fixed, full-viewport, below the header) makes the
+              overlay state unambiguous: the page behind the menu recedes,
+              so the panel reads as clearly floating above content rather
+              than colliding with it. Click-outside-to-close (the existing
+              mousedown listener) already covers clicks on this backdrop. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "fixed", inset: 0, top: "56px", zIndex: 45,
+              background: "rgba(22, 24, 28, 0.28)",
+            }}
+          />
+          <div
+            role="menu"
+            style={{
+              position: "absolute", top: "calc(100% + 8px)", left: 0,
+              width: "280px", background: PANEL, border: `1px solid ${RULE}`,
+              borderRadius: "2px", padding: "6px", zIndex: 50,
+              boxShadow: "0 4px 16px rgba(22, 24, 28, 0.12)",
+            }}
+          >
           {links.map((l) => (
             <Link
               key={l.to}
@@ -118,7 +135,8 @@ function NavDropdown({ label, links }: { label: string; links: NavDropdownLink[]
               <div style={{ fontFamily: UI, fontSize: "12px", color: INK_3, marginTop: "1px" }}>{l.description}</div>
             </Link>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

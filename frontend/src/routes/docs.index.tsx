@@ -11,7 +11,11 @@ export const Route = createFileRoute("/docs/")({
 function DocsIndex() {
   const page = getDocPage("");
   if (!page) {
-    return <p className="text-sm text-gray-500">Documentation is being written. Check back soon.</p>;
+    return (
+      <p style={{ fontFamily: "var(--font-v2-ui)", fontSize: "13.5px", color: "var(--v2-ink-muted)" }}>
+        Documentation is being written. Check back soon.
+      </p>
+    );
   }
   return <DocArticle page={page} />;
 }

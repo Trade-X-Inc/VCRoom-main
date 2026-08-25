@@ -1,22 +1,27 @@
 import type { DocPage } from "./primitives";
 import { docFaqJsonLd, docJsonLd } from "./seo";
 
+const UI = "var(--font-v2-ui)";
+const DATA = "var(--font-v2-data)";
+const INK = "var(--v2-ink)";
+const INK_3 = "var(--v2-ink-muted)";
+
 export function DocArticle({ page }: { page: DocPage }) {
   const { meta, Body } = page;
   const jsonLd = docJsonLd(meta.slug);
   const faqLd = docFaqJsonLd(meta.slug);
   return (
-    <article className="max-w-3xl">
+    <article style={{ maxWidth: "48rem" }}>
       {jsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       )}
       {faqLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqLd }} />
       )}
-      <h1 className="mb-2 text-3xl font-bold text-gray-900" style={{ fontFamily: "Syne, sans-serif" }}>
+      <h1 className="pub-title" style={{ fontFamily: UI, color: INK, margin: "0 0 8px" }}>
         {meta.title}
       </h1>
-      <div className="mb-8 text-xs text-gray-500">
+      <div style={{ marginBottom: "32px", fontFamily: DATA, fontSize: "11.5px", color: INK_3 }}>
         Last updated{" "}
         <time dateTime={meta.updated}>
           {new Date(meta.updated + "T00:00:00Z").toLocaleDateString("en-GB", {

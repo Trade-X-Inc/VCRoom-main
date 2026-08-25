@@ -526,7 +526,19 @@ function Landing() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "28px", alignItems: "flex-start" }}>
-              <StructuralGraphic />
+              {/* Hero image swapped 25 Aug 2026, founder-directed brand asset,
+                  replacing the animated StructuralGraphic (kept below, unused,
+                  in case of a future revert — see its own comment for the
+                  original design rationale). Confirmed explicitly this is a
+                  deliberate departure from the abstract-device register the
+                  rest of the site follows, not an oversight. */}
+              <img
+                src="/marketing/hero-device.png"
+                alt="Wireframe technical rendering of a layered circular structure, representing the platform's structural precision"
+                width={900}
+                height={900}
+                style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto" }}
+              />
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <div style={{ borderInlineStart: `2px solid ${ACCENT}`, paddingInlineStart: "12px" }}>
                   <div
