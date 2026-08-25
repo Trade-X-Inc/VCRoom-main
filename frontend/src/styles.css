@@ -569,3 +569,52 @@ img { max-width: 100%; height: auto; }
     transform: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .pub-lattice — preserved from lengdon-public-site/styles.css's .lattice
+   device ahead of that folder's deletion (CLAUDE.md §12). NOT wired to any
+   route yet — extraction only, per the public-site migration's Group 1
+   report. Token values translated 1:1 from the SPA's flat palette to their
+   --pub-*/--v2-* equivalents (--rule -> --pub-n-24, --card -> --pub-n-00,
+   --accent -> --v2-accent, --font-mono -> the app's mono stack), verified
+   identical hex values, not just plausible substitutes. */
+.pub-lattice {
+  width: min(440px, 90%);
+  aspect-ratio: 1.25;
+  position: relative;
+  border: 1px solid var(--pub-n-24);
+  background-color: var(--pub-n-00);
+  background-image:
+    linear-gradient(to right, var(--pub-n-24) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--pub-n-24) 1px, transparent 1px);
+  background-size: 25% 33.333%;
+}
+.pub-lattice:before {
+  content: '';
+  position: absolute;
+  left: 25%;
+  top: 33%;
+  width: 50%;
+  height: 1px;
+  background: var(--v2-accent);
+  transform: rotate(15deg);
+  transform-origin: left;
+}
+.pub-lattice i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: var(--v2-accent);
+}
+.pub-lattice i:nth-child(1) { left: 24%; top: 30%; }
+.pub-lattice i:nth-child(2) { left: 48%; top: 36%; }
+.pub-lattice i:nth-child(3) { left: 72%; top: 54%; }
+.pub-lattice i:nth-child(4) { left: 48%; top: 73%; }
+.pub-lattice b {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font: 500 10px "JetBrains Mono", monospace;
+  letter-spacing: .1em;
+  color: var(--v2-accent);
+}
