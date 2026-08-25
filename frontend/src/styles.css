@@ -570,14 +570,14 @@ img { max-width: 100%; height: auto; }
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   .pub-lattice — preserved from lengdon-public-site/styles.css's .lattice
-   device ahead of that folder's deletion (CLAUDE.md §12). NOT wired to any
-   route yet — extraction only, per the public-site migration's Group 1
-   report. Token values translated 1:1 from the SPA's flat palette to their
-   --pub-*/--v2-* equivalents (--rule -> --pub-n-24, --card -> --pub-n-00,
-   --accent -> --v2-accent, --font-mono -> the app's mono stack), verified
-   identical hex values, not just plausible substitutes. */
+/* -----------------------------------------------------------------------
+   .pub-lattice: preserved from lengdon-public-site/styles.css .lattice
+   device, extracted ahead of that folder deletion (CLAUDE.md section 12).
+   NOT wired to any route yet, extraction only, per the public-site
+   migration Group 1 report. Token values translated 1:1 from the SPA flat
+   palette to the pub/v2 token equivalents (rule to pub-n-24, card to
+   pub-n-00, accent to v2-accent, font-mono to the app mono stack),
+   verified identical hex values, not just plausible substitutes. */
 .pub-lattice {
   width: min(440px, 90%);
   aspect-ratio: 1.25;
