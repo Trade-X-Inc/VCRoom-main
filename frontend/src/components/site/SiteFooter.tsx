@@ -137,6 +137,17 @@ export function SiteFooter() {
       ],
     },
     {
+      heading: "Compare",
+      links: [
+        { to: "/compare", label: "All comparisons" },
+        { to: "/compare/datasite", label: "vs Datasite" },
+        { to: "/compare/ideals", label: "vs iDeals" },
+        { to: "/compare/firmex", label: "vs Firmex" },
+        { to: "/compare/dealroom", label: "vs DealRoom" },
+        { to: "/compare/docsend", label: "vs DocSend" },
+      ],
+    },
+    {
       heading: "Resources",
       links: [
         { to: "/resources/schedule", label: "The disclosure schedule" },
