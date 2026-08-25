@@ -155,6 +155,7 @@ export function SiteFooter() {
         { to: "/docs", label: "Docs" },
         { to: "/docs/security", label: "Security" },
         { to: "/docs/changelog", label: "Changelog" },
+        { to: "/glossary", label: "Glossary" },
         { to: "/resources", label: "Resources hub" },
         { to: "/registry", label: "Company registry" },
       ],
