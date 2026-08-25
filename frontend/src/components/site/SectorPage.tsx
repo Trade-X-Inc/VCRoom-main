@@ -150,6 +150,18 @@ export function SectorPage({
             <Eyebrow>{blockLabel}</Eyebrow>
             <Title>{blockLabel}</Title>
             <Prose>{blockBody}</Prose>
+            {/* CTA audit, 25 Aug 2026: the four PLANNED sector pages
+                (property, brands-retail, healthcare, energy) previously had
+                zero action points at all, since ctaLabel is only set for
+                EARLY ACCESS pages. A hard sign-up push would contradict the
+                page's own honest "nothing built yet" framing, so this is
+                deliberately a lower-commitment action — tell us you need
+                it — rather than the sign-up flow used elsewhere. */}
+            {!ctaLabel ? (
+              <div>
+                <Action to="/contact">Tell us you need this schedule</Action>
+              </div>
+            ) : null}
           </div>
         </section>
       </main>

@@ -189,6 +189,23 @@ export function SolutionAudiencePage({
             <Eyebrow>{mechanism}</Eyebrow>
             <Title>{mechanism}</Title>
             <Prose>{mechanismBody}</Prose>
+            {/* CTA audit, 25 Aug 2026: previously only the fold carried a
+                CTA, leaving the rest of the page — including its close —
+                without one. Placed here rather than unconditionally after
+                `boundary` below: 7 of 8 solutions.*.tsx callers pack their
+                final content section into `mechanism` (often literally
+                labeled "Boundary" as the prop VALUE, e.g. spvs.tsx), with no
+                `boundary` prop set at all — a first version of this fix
+                only added the CTA to the `boundary` conditional and missed
+                those 7 pages entirely, caught by live-checking the actual
+                rendered page rather than trusting the diff. Rendering here
+                only when `boundary` is NOT also set avoids a duplicate CTA
+                on the one caller (syndicates.tsx) that uses both props. */}
+            {ctaTo && !boundary ? (
+              <div style={{ marginTop: "8px" }}>
+                <Action to={ctaTo} search={ctaSearch} variant="secondary">{ctaLabel ?? "Request access"}</Action>
+              </div>
+            ) : null}
           </div>
         </Section>
 
@@ -198,6 +215,11 @@ export function SolutionAudiencePage({
               <Eyebrow>{boundary}</Eyebrow>
               <Title>{boundary}</Title>
               <Prose>{boundaryBody}</Prose>
+              {ctaTo ? (
+                <div style={{ marginTop: "8px" }}>
+                  <Action to={ctaTo} search={ctaSearch} variant="secondary">{ctaLabel ?? "Request access"}</Action>
+                </div>
+              ) : null}
             </div>
           </Section>
         ) : null}

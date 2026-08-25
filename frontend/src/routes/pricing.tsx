@@ -343,28 +343,21 @@ function PricingPage() {
 
         {/* ── FEE SCHEDULE — treatment C, recessed ───────────────────────────
             This page's one load-bearing instrument — same role the closing
-            pipeline plays on /. */}
+            pipeline plays on /. Prose condensed 25 Aug 2026 (founder-
+            requested pricing-page pass): three paragraphs to one line plus
+            the table caption doing the explaining — the table itself is the
+            argument, not a preamble to it. CTA added directly beneath the
+            table (§ CTA audit): a reader who's just seen the real numbers
+            is at a decision point, not just at the top and bottom of the
+            page. */}
         <Section ground={G_RECESSED}>
           <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
             <Eyebrow>Fee / Schedule</Eyebrow>
             <Title>One fee, one event</Title>
             <Prose>
-              Most platforms in this category bill by consumption. Pages examined,
-              documents stored, seats occupied, a percentage of the round. Each of
-              those meters grows when your deal gets harder, which is exactly when
-              you can least afford it.
-            </Prose>
-            <Prose>
-              We charge a flat fee tied to a triggering event — the same
-              whether your round is USD 500,000 or USD 5,000,000.
-            </Prose>
-            <Prose>
-              <strong style={{ color: INK, fontWeight: 600 }}>
-                Rule 20.1 — fees never scale with round size, page count, or
-                storage volume.
-              </strong>{" "}
-              This is written into the document that governs what we build, not
-              into a pricing page we can quietly revise.
+              A flat fee tied to a triggering event, never to round size, page
+              count, or storage volume — the same whether you raise USD
+              500,000 or USD 5,000,000.
             </Prose>
           </div>
 
@@ -406,6 +399,10 @@ function PricingPage() {
               </>
             }
           />
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <Action to="/sign-up" search={{ role: "founder" }}>Start on the Direct tier</Action>
+            <Action to="/sign-up" search={{ role: "investor" }} variant="secondary">Get a deploying seat</Action>
+          </div>
         </Section>
 
         {/* ── TRIGGERING EVENTS — treatment A, base ──────────────────────────
@@ -416,16 +413,10 @@ function PricingPage() {
             <Eyebrow>Institutional / Scope</Eyebrow>
             <Title>Why institutional pricing isn&rsquo;t published</Title>
             <Prose>
-              An institutional buyer&rsquo;s requirements vary by fund size, seat
-              count, and how many raises they run at once. A single published
-              number would be wrong for most of them.
+              Requirements vary too much by fund size and seat count for one
+              number to fit — we scope it in a conversation instead of
+              guessing.
             </Prose>
-            <Prose>
-              So we scope it in a conversation instead of guessing at a price that
-              fits everyone. That conversation covers what you need confirmed
-              before you sign, and what determines where you land.
-            </Prose>
-            <Prose>Write to hello@lengdon.com to start it.</Prose>
           </div>
 
           <Instrument
@@ -440,6 +431,7 @@ function PricingPage() {
             ]}
             caption="Nothing in the right-hand column is ever billed."
           />
+          <Action to="/contact" variant="secondary">Scope institutional pricing</Action>
         </Section>
 
         {/* ── PROVENANCE — treatment B, panel ─────────────────────────────────
@@ -450,14 +442,9 @@ function PricingPage() {
             <Eyebrow>Method / Provenance</Eyebrow>
             <Title>Why the founder pays</Title>
             <Prose>
-              Fundraising infrastructure should answer to the founder using it. If
-              investors paid for this product, it would slowly become a product
-              that serves investors.
-            </Prose>
-            <Prose>
-              So the founder pays, and we sell nothing else. We do not sell your
-              data. We do not take a percentage of your round. We do not
-              introduce you to anyone for a fee.
+              If investors paid instead, the product would slowly start
+              serving them. So the founder pays, and we sell nothing else —
+              no data, no percentage of the round, no paid introductions.
             </Prose>
           </div>
 

@@ -526,19 +526,40 @@ function Landing() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "28px", alignItems: "flex-start" }}>
-              {/* Hero image swapped 25 Aug 2026, founder-directed brand asset,
-                  replacing the animated StructuralGraphic (kept below, unused,
-                  in case of a future revert — see its own comment for the
-                  original design rationale). Confirmed explicitly this is a
+              {/* Hero image, founder-directed brand asset, replacing the
+                  animated StructuralGraphic (kept below, unused, in case of
+                  a future revert — see its own comment for the original
+                  design rationale). Confirmed explicitly this is a
                   deliberate departure from the abstract-device register the
-                  rest of the site follows, not an oversight. */}
-              <img
-                src="/marketing/hero-device.png"
-                alt="Wireframe technical rendering of a layered circular structure, representing the platform's structural precision"
-                width={900}
-                height={900}
-                style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto" }}
-              />
+                  rest of the site follows, not an oversight.
+                  Swapped a second time 25 Aug 2026 (same session) to a
+                  different image — the founder replaced the file directly
+                  in public/ mid-session; see CLAUDE.md §4a on the
+                  concurrent-edit hazard this surfaced. The source image's
+                  own background samples as near-pure white (#FEFEFE-#FFFFFF
+                  at all four corners, confirmed by direct pixel sampling,
+                  not assumed) — placing it directly on the section's warm
+                  paper ground (--pub-n-06, #F5F4F1) would show a visible
+                  white rectangle seam. Wrapped in an explicit white panel
+                  card (--pub-n-00, #FFFFFF — an exact match, not an
+                  approximation) with the same border treatment already used
+                  for the reference-number specimen block below it, so the
+                  image reads as a deliberately bounded card rather than a
+                  mismatched background collision. */}
+              <div
+                style={{
+                  width: "100%", maxWidth: "480px", background: "var(--pub-n-00)",
+                  border: `1px solid ${RULE}`, padding: "20px",
+                }}
+              >
+                <img
+                  src="/marketing/hero-device.jpg"
+                  alt="Abstract layered architectural rendering of a stepped structure with connecting data streams, representing the platform's structural precision"
+                  width={900}
+                  height={604}
+                  style={{ display: "block", width: "100%", height: "auto" }}
+                />
+              </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <div style={{ borderInlineStart: `2px solid ${ACCENT}`, paddingInlineStart: "12px" }}>
                   <div

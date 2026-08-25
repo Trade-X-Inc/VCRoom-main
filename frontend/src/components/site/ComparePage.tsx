@@ -74,7 +74,8 @@ function Prose({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Action({ to, children }: { to: string; children: React.ReactNode }) {
+function Action({ to, children, variant = "primary" }: { to: string; children: React.ReactNode; variant?: "primary" | "secondary" }) {
+  const primary = variant === "primary";
   return (
     <Link
       to={to as any}
@@ -82,8 +83,9 @@ function Action({ to, children }: { to: string; children: React.ReactNode }) {
         display: "inline-flex", alignItems: "center", height: "40px",
         padding: "0 20px", borderRadius: "2px",
         fontFamily: UI, fontSize: "14px", fontWeight: 500,
-        background: "var(--v2-accent)", color: "#FFFFFF",
-        border: "1px solid var(--v2-accent)", textDecoration: "none",
+        background: primary ? "var(--v2-accent)" : "transparent",
+        color: primary ? "#FFFFFF" : INK,
+        border: `1px solid var(--v2-accent)`, textDecoration: "none",
       }}
     >
       {children}
@@ -203,6 +205,10 @@ export function ComparePage({
             head={["Dimension", competitor, "Lengdon"]}
             rows={structuralDiff.map(([dim, theirs, ours]) => [dim, theirs, ours])}
           />
+          {/* CTA audit, 25 Aug 2026: a reader who has just seen the exact
+              structural differences is at a real decision point, not only
+              at the fold or the very end of the page. */}
+          <Action to="/sign-up" variant="secondary">See pricing</Action>
         </Section>
 
         <Section ground={G_BASE}>
