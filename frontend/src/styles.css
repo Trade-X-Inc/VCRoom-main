@@ -478,30 +478,40 @@ img { max-width: 100%; height: auto; }
 }
 
 /* Metric grid — hairline-divided stat/fact cells (structural device, 23 Aug
-   2026). 1 column under 480px, 2 from 480px, up to 4 (component-supplied
-   count) from 720px — below 720px every cell's left rule is suppressed
-   since a wrapped grid would otherwise put dividers on top of cells rather
-   than between them. */
+   2026; no outer border/panel and value size keyed to content type, 25 Aug
+   2026 — Proposal D, see MetricGrid's own comment). 1 column under 480px,
+   2 from 480px, up to 4 (component-supplied count) from 720px — below
+   720px every cell's left rule is suppressed since a wrapped grid would
+   otherwise put dividers on top of cells rather than between them. Row
+   gap under 720px stands in for the missing horizontal divider. */
 .pub-metric-grid {
   grid-template-columns: 1fr !important;
+  row-gap: 20px !important;
 }
 .pub-metric-grid > div {
   border-inline-start: none !important;
+  padding-inline-start: 0 !important;
 }
 @media (min-width: 480px) {
   .pub-metric-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+  .pub-metric-grid > div:nth-child(2n) {
+    padding-inline-start: 24px !important;
+  }
 }
 @media (min-width: 720px) {
   .pub-metric-grid {
     grid-template-columns: var(--pub-metric-cols, repeat(4, 1fr)) !important;
+    row-gap: 0 !important;
   }
   .pub-metric-grid > div {
     border-inline-start: 1px solid var(--v2-rule) !important;
+    padding-inline-start: 24px !important;
   }
   .pub-metric-grid > div:nth-child(1) {
     border-inline-start: none !important;
+    padding-inline-start: 0 !important;
   }
 }
 

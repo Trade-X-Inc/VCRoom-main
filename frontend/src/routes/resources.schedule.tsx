@@ -109,6 +109,17 @@ function Caption({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** A table's own label — bigger/bolder than the §5.6 breadcrumb Eyebrow,
+ *  same grey ink, so it reads as a real sub-header above its table.
+ *  Founder feedback, 25 Aug 2026. */
+function InstrumentLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontFamily: UI, fontSize: "17px", lineHeight: 1.3, fontWeight: 700, color: INK_3, margin: 0 }}>
+      {children}
+    </p>
+  );
+}
+
 function Action({ to, search, children, variant = "primary" }: {
   to: string;
   search?: Record<string, unknown>;
@@ -343,7 +354,7 @@ function SchedulePage() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <Eyebrow>Technology · Seed · v1 · Published 4 August 2026</Eyebrow>
+            <InstrumentLabel>Technology · Seed · v1 · Published 4 August 2026</InstrumentLabel>
             <div style={{ overflowX: "auto" }}>
               <table
                 style={{

@@ -101,6 +101,17 @@ function Caption({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** A table's own label — bigger/bolder than the §5.6 breadcrumb Eyebrow,
+ *  same grey ink, so it reads as a real sub-header above its table.
+ *  Founder feedback, 25 Aug 2026. */
+function InstrumentLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontFamily: UI, fontSize: "17px", lineHeight: 1.3, fontWeight: 700, color: INK_3, margin: 0 }}>
+      {children}
+    </p>
+  );
+}
+
 function Instrument({
   label, head, rows, caption, align,
 }: {
@@ -113,7 +124,7 @@ function Instrument({
   const numeric = new Set(align ?? []);
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <Eyebrow>{label}</Eyebrow>
+      <InstrumentLabel>{label}</InstrumentLabel>
       <div style={{ overflowX: "auto" }}>
         <table
           style={{
