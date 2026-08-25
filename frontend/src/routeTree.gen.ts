@@ -36,6 +36,7 @@ import { Route as AcceptableUseRouteImport } from './routes/acceptable-use'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools/index'
+import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -55,6 +56,11 @@ import { Route as SolutionsLimitedPartnersRouteImport } from './routes/solutions
 import { Route as SolutionsFamilyOfficesRouteImport } from './routes/solutions.family-offices'
 import { Route as SolutionsAngelsRouteImport } from './routes/solutions.angels'
 import { Route as SolutionsAdvisorsRouteImport } from './routes/solutions.advisors'
+import { Route as SectorsPropertyRouteImport } from './routes/sectors.property'
+import { Route as SectorsManufacturingRouteImport } from './routes/sectors.manufacturing'
+import { Route as SectorsHealthcareRouteImport } from './routes/sectors.healthcare'
+import { Route as SectorsEnergyRouteImport } from './routes/sectors.energy'
+import { Route as SectorsBrandsRetailRouteImport } from './routes/sectors.brands-retail'
 import { Route as RoastIdRouteImport } from './routes/roast.$id'
 import { Route as ResourcesScheduleRouteImport } from './routes/resources.schedule'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
@@ -305,6 +311,11 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
   path: '/tools/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SectorsIndexRoute = SectorsIndexRouteImport.update({
+  id: '/sectors/',
+  path: '/sectors/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
   id: '/resources/',
   path: '/resources/',
@@ -399,6 +410,31 @@ const SolutionsAngelsRoute = SolutionsAngelsRouteImport.update({
 const SolutionsAdvisorsRoute = SolutionsAdvisorsRouteImport.update({
   id: '/solutions/advisors',
   path: '/solutions/advisors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SectorsPropertyRoute = SectorsPropertyRouteImport.update({
+  id: '/sectors/property',
+  path: '/sectors/property',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SectorsManufacturingRoute = SectorsManufacturingRouteImport.update({
+  id: '/sectors/manufacturing',
+  path: '/sectors/manufacturing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SectorsHealthcareRoute = SectorsHealthcareRouteImport.update({
+  id: '/sectors/healthcare',
+  path: '/sectors/healthcare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SectorsEnergyRoute = SectorsEnergyRouteImport.update({
+  id: '/sectors/energy',
+  path: '/sectors/energy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SectorsBrandsRetailRoute = SectorsBrandsRetailRouteImport.update({
+  id: '/sectors/brands-retail',
+  path: '/sectors/brands-retail',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoastIdRoute = RoastIdRouteImport.update({
@@ -1072,6 +1108,11 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
+  '/sectors/brands-retail': typeof SectorsBrandsRetailRoute
+  '/sectors/energy': typeof SectorsEnergyRoute
+  '/sectors/healthcare': typeof SectorsHealthcareRoute
+  '/sectors/manufacturing': typeof SectorsManufacturingRoute
+  '/sectors/property': typeof SectorsPropertyRoute
   '/solutions/advisors': typeof SolutionsAdvisorsRoute
   '/solutions/angels': typeof SolutionsAngelsRoute
   '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
@@ -1091,6 +1132,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
+  '/sectors/': typeof SectorsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1230,6 +1272,11 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
+  '/sectors/brands-retail': typeof SectorsBrandsRetailRoute
+  '/sectors/energy': typeof SectorsEnergyRoute
+  '/sectors/healthcare': typeof SectorsHealthcareRoute
+  '/sectors/manufacturing': typeof SectorsManufacturingRoute
+  '/sectors/property': typeof SectorsPropertyRoute
   '/solutions/advisors': typeof SolutionsAdvisorsRoute
   '/solutions/angels': typeof SolutionsAngelsRoute
   '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
@@ -1249,6 +1296,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/docs': typeof DocsIndexRoute
   '/resources': typeof ResourcesIndexRoute
+  '/sectors': typeof SectorsIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1393,6 +1441,11 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/resources/schedule': typeof ResourcesScheduleRoute
   '/roast/$id': typeof RoastIdRoute
+  '/sectors/brands-retail': typeof SectorsBrandsRetailRoute
+  '/sectors/energy': typeof SectorsEnergyRoute
+  '/sectors/healthcare': typeof SectorsHealthcareRoute
+  '/sectors/manufacturing': typeof SectorsManufacturingRoute
+  '/sectors/property': typeof SectorsPropertyRoute
   '/solutions/advisors': typeof SolutionsAdvisorsRoute
   '/solutions/angels': typeof SolutionsAngelsRoute
   '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
@@ -1412,6 +1465,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/resources/': typeof ResourcesIndexRoute
+  '/sectors/': typeof SectorsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1557,6 +1611,11 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/resources/schedule'
     | '/roast/$id'
+    | '/sectors/brands-retail'
+    | '/sectors/energy'
+    | '/sectors/healthcare'
+    | '/sectors/manufacturing'
+    | '/sectors/property'
     | '/solutions/advisors'
     | '/solutions/angels'
     | '/solutions/family-offices'
@@ -1576,6 +1635,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/docs/'
     | '/resources/'
+    | '/sectors/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1715,6 +1775,11 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/resources/schedule'
     | '/roast/$id'
+    | '/sectors/brands-retail'
+    | '/sectors/energy'
+    | '/sectors/healthcare'
+    | '/sectors/manufacturing'
+    | '/sectors/property'
     | '/solutions/advisors'
     | '/solutions/angels'
     | '/solutions/family-offices'
@@ -1734,6 +1799,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/docs'
     | '/resources'
+    | '/sectors'
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1877,6 +1943,11 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/resources/schedule'
     | '/roast/$id'
+    | '/sectors/brands-retail'
+    | '/sectors/energy'
+    | '/sectors/healthcare'
+    | '/sectors/manufacturing'
+    | '/sectors/property'
     | '/solutions/advisors'
     | '/solutions/angels'
     | '/solutions/family-offices'
@@ -1896,6 +1967,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/docs/'
     | '/resources/'
+    | '/sectors/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -2021,6 +2093,11 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   ResourcesScheduleRoute: typeof ResourcesScheduleRoute
   RoastIdRoute: typeof RoastIdRoute
+  SectorsBrandsRetailRoute: typeof SectorsBrandsRetailRoute
+  SectorsEnergyRoute: typeof SectorsEnergyRoute
+  SectorsHealthcareRoute: typeof SectorsHealthcareRoute
+  SectorsManufacturingRoute: typeof SectorsManufacturingRoute
+  SectorsPropertyRoute: typeof SectorsPropertyRoute
   SolutionsAdvisorsRoute: typeof SolutionsAdvisorsRoute
   SolutionsAngelsRoute: typeof SolutionsAngelsRoute
   SolutionsFamilyOfficesRoute: typeof SolutionsFamilyOfficesRoute
@@ -2037,6 +2114,7 @@ export interface RootRouteChildren {
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationRoute: typeof ToolsValuationRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
+  SectorsIndexRoute: typeof SectorsIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
@@ -2233,6 +2311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sectors/': {
+      id: '/sectors/'
+      path: '/sectors'
+      fullPath: '/sectors/'
+      preLoaderRoute: typeof SectorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources/': {
       id: '/resources/'
       path: '/resources'
@@ -2364,6 +2449,41 @@ declare module '@tanstack/react-router' {
       path: '/solutions/advisors'
       fullPath: '/solutions/advisors'
       preLoaderRoute: typeof SolutionsAdvisorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sectors/property': {
+      id: '/sectors/property'
+      path: '/sectors/property'
+      fullPath: '/sectors/property'
+      preLoaderRoute: typeof SectorsPropertyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sectors/manufacturing': {
+      id: '/sectors/manufacturing'
+      path: '/sectors/manufacturing'
+      fullPath: '/sectors/manufacturing'
+      preLoaderRoute: typeof SectorsManufacturingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sectors/healthcare': {
+      id: '/sectors/healthcare'
+      path: '/sectors/healthcare'
+      fullPath: '/sectors/healthcare'
+      preLoaderRoute: typeof SectorsHealthcareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sectors/energy': {
+      id: '/sectors/energy'
+      path: '/sectors/energy'
+      fullPath: '/sectors/energy'
+      preLoaderRoute: typeof SectorsEnergyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sectors/brands-retail': {
+      id: '/sectors/brands-retail'
+      path: '/sectors/brands-retail'
+      fullPath: '/sectors/brands-retail'
+      preLoaderRoute: typeof SectorsBrandsRetailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/roast/$id': {
@@ -3493,6 +3613,11 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   ResourcesScheduleRoute: ResourcesScheduleRoute,
   RoastIdRoute: RoastIdRoute,
+  SectorsBrandsRetailRoute: SectorsBrandsRetailRoute,
+  SectorsEnergyRoute: SectorsEnergyRoute,
+  SectorsHealthcareRoute: SectorsHealthcareRoute,
+  SectorsManufacturingRoute: SectorsManufacturingRoute,
+  SectorsPropertyRoute: SectorsPropertyRoute,
   SolutionsAdvisorsRoute: SolutionsAdvisorsRoute,
   SolutionsAngelsRoute: SolutionsAngelsRoute,
   SolutionsFamilyOfficesRoute: SolutionsFamilyOfficesRoute,
@@ -3509,6 +3634,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationRoute: ToolsValuationRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
+  SectorsIndexRoute: SectorsIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,

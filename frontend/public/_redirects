@@ -37,6 +37,13 @@
 /solutions/founders /for-founders 301
 /solutions/investors /for-investors 301
 
+# Public-site migration Group 3 (25 Aug 2026) — /sectors/technology is the
+# public-site-spec.html slug for the same content /resources/schedule
+# already serves in full (the real technology/seed disclosure schedule,
+# CLAUDE.md §20.1 step 2d — only schedule that exists). Redirected rather
+# than building a second, thinner technology page.
+/sectors/technology /resources/schedule 301
+
 # P4: founder nav restructure — old pages consolidated into /app/prepare
 /app/profile      /app/prepare#profile        301
 /app/documents    /app/prepare#documents      301
