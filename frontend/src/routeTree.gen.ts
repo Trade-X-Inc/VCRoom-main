@@ -10,11 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SubProcessorsRouteImport } from './routes/sub-processors'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
@@ -23,10 +26,13 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForInvestorsRouteImport } from './routes/for-investors'
 import { Route as ForFoundersRouteImport } from './routes/for-founders'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as DpaRouteImport } from './routes/dpa'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CareersRouteImport } from './routes/careers'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as AcceptableUseRouteImport } from './routes/acceptable-use'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools/index'
@@ -161,6 +167,16 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SubProcessorsRoute = SubProcessorsRouteImport.update({
+  id: '/sub-processors',
+  path: '/sub-processors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -184,6 +200,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoomRoute = JoinRoomRouteImport.update({
@@ -226,6 +247,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DpaRoute = DpaRouteImport.update({
+  id: '/dpa',
+  path: '/dpa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
@@ -236,6 +262,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
@@ -244,6 +275,11 @@ const BlogRoute = BlogRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceptableUseRoute = AcceptableUseRouteImport.update({
+  id: '/acceptable-use',
+  path: '/acceptable-use',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -930,10 +966,13 @@ const AppInvestorDiscoverPublicProfilePrivacySettingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/acceptable-use': typeof AcceptableUseRoute
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
+  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRouteWithChildren
+  '/dpa': typeof DpaRoute
   '/feedback': typeof FeedbackRoute
   '/for-founders': typeof ForFoundersRoute
   '/for-investors': typeof ForInvestorsRoute
@@ -942,11 +981,14 @@ export interface FileRoutesByFullPath {
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
+  '/legal': typeof LegalRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/status': typeof StatusRoute
+  '/sub-processors': typeof SubProcessorsRoute
   '/terms': typeof TermsRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
@@ -1078,7 +1120,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/acceptable-use': typeof AcceptableUseRoute
+  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/dpa': typeof DpaRoute
   '/feedback': typeof FeedbackRoute
   '/for-founders': typeof ForFoundersRoute
   '/for-investors': typeof ForInvestorsRoute
@@ -1087,11 +1132,14 @@ export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
+  '/legal': typeof LegalRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/status': typeof StatusRoute
+  '/sub-processors': typeof SubProcessorsRoute
   '/terms': typeof TermsRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
@@ -1223,10 +1271,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/acceptable-use': typeof AcceptableUseRoute
   '/app': typeof AppRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
+  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRouteWithChildren
+  '/dpa': typeof DpaRoute
   '/feedback': typeof FeedbackRoute
   '/for-founders': typeof ForFoundersRoute
   '/for-investors': typeof ForInvestorsRoute
@@ -1235,11 +1286,14 @@ export interface FileRoutesById {
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
+  '/legal': typeof LegalRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/registry': typeof RegistryRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/status': typeof StatusRoute
+  '/sub-processors': typeof SubProcessorsRoute
   '/terms': typeof TermsRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
@@ -1373,10 +1427,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/acceptable-use'
     | '/app'
     | '/blog'
+    | '/careers'
     | '/contact'
     | '/docs'
+    | '/dpa'
     | '/feedback'
     | '/for-founders'
     | '/for-investors'
@@ -1385,11 +1442,14 @@ export interface FileRouteTypes {
     | '/invite'
     | '/join'
     | '/join-room'
+    | '/legal'
     | '/pricing'
     | '/privacy'
     | '/registry'
     | '/sign-in'
     | '/sign-up'
+    | '/status'
+    | '/sub-processors'
     | '/terms'
     | '/api/admin'
     | '/api/admin-data'
@@ -1521,7 +1581,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/acceptable-use'
+    | '/careers'
     | '/contact'
+    | '/dpa'
     | '/feedback'
     | '/for-founders'
     | '/for-investors'
@@ -1530,11 +1593,14 @@ export interface FileRouteTypes {
     | '/invite'
     | '/join'
     | '/join-room'
+    | '/legal'
     | '/pricing'
     | '/privacy'
     | '/registry'
     | '/sign-in'
     | '/sign-up'
+    | '/status'
+    | '/sub-processors'
     | '/terms'
     | '/api/admin'
     | '/api/admin-data'
@@ -1665,10 +1731,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/acceptable-use'
     | '/app'
     | '/blog'
+    | '/careers'
     | '/contact'
     | '/docs'
+    | '/dpa'
     | '/feedback'
     | '/for-founders'
     | '/for-investors'
@@ -1677,11 +1746,14 @@ export interface FileRouteTypes {
     | '/invite'
     | '/join'
     | '/join-room'
+    | '/legal'
     | '/pricing'
     | '/privacy'
     | '/registry'
     | '/sign-in'
     | '/sign-up'
+    | '/status'
+    | '/sub-processors'
     | '/terms'
     | '/api/admin'
     | '/api/admin-data'
@@ -1814,10 +1886,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AcceptableUseRoute: typeof AcceptableUseRoute
   AppRoute: typeof AppRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
+  CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRouteWithChildren
+  DpaRoute: typeof DpaRoute
   FeedbackRoute: typeof FeedbackRoute
   ForFoundersRoute: typeof ForFoundersRoute
   ForInvestorsRoute: typeof ForInvestorsRoute
@@ -1826,11 +1901,14 @@ export interface RootRouteChildren {
   InviteRoute: typeof InviteRoute
   JoinRoute: typeof JoinRouteWithChildren
   JoinRoomRoute: typeof JoinRoomRoute
+  LegalRoute: typeof LegalRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RegistryRoute: typeof RegistryRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  StatusRoute: typeof StatusRoute
+  SubProcessorsRoute: typeof SubProcessorsRoute
   TermsRoute: typeof TermsRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
@@ -1868,6 +1946,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sub-processors': {
+      id: '/sub-processors'
+      path: '/sub-processors'
+      fullPath: '/sub-processors'
+      preLoaderRoute: typeof SubProcessorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign-up': {
       id: '/sign-up'
       path: '/sign-up'
@@ -1901,6 +1993,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join-room': {
@@ -1959,6 +2058,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dpa': {
+      id: '/dpa'
+      path: '/dpa'
+      fullPath: '/dpa'
+      preLoaderRoute: typeof DpaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
@@ -1973,6 +2079,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog': {
       id: '/blog'
       path: '/blog'
@@ -1985,6 +2098,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acceptable-use': {
+      id: '/acceptable-use'
+      path: '/acceptable-use'
+      fullPath: '/acceptable-use'
+      preLoaderRoute: typeof AcceptableUseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -3174,10 +3294,13 @@ const JoinRouteWithChildren = JoinRoute._addFileChildren(JoinRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AcceptableUseRoute: AcceptableUseRoute,
   AppRoute: AppRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
+  CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
   DocsRoute: DocsRouteWithChildren,
+  DpaRoute: DpaRoute,
   FeedbackRoute: FeedbackRoute,
   ForFoundersRoute: ForFoundersRoute,
   ForInvestorsRoute: ForInvestorsRoute,
@@ -3186,11 +3309,14 @@ const rootRouteChildren: RootRouteChildren = {
   InviteRoute: InviteRoute,
   JoinRoute: JoinRouteWithChildren,
   JoinRoomRoute: JoinRoomRoute,
+  LegalRoute: LegalRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RegistryRoute: RegistryRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  StatusRoute: StatusRoute,
+  SubProcessorsRoute: SubProcessorsRoute,
   TermsRoute: TermsRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
