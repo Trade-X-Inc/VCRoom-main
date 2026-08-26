@@ -27,6 +27,7 @@ import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/store";
+import { V2EmptyState } from "@/components/v2";
 
 interface SearchResult {
   id: string;
@@ -304,45 +305,56 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     : (startupData?.company_name || profile?.name || "");
 
   return (
-    <div className="h-screen bg-background flex overflow-hidden">
-      {/* Mobile overlay backdrop */}
+    <div className="h-screen flex overflow-hidden font-v2-ui" style={{ background: "var(--v2-surface)" }}>
+      {/* Mobile overlay backdrop — flat scrim per §4.3, no blur */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ background: "rgba(22,24,28,0.4)" }}
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      <aside className={cn(
-        "border-r border-border/60 bg-sidebar flex flex-col transition-all duration-200 z-50",
-        // Desktop: always visible, collapsible
-        "hidden md:flex",
-        collapsed ? "md:w-[68px]" : "md:w-[248px]",
-        // Mobile: fixed overlay, slides in
-        mobileOpen && "!flex fixed inset-y-0 left-0 w-[248px] shadow-xl",
-      )}>
-        <div className="h-14 md:h-16 flex items-center px-4 border-b border-border/60 shrink-0">
+      <aside
+        className={cn(
+          "flex flex-col transition-all duration-200 z-50",
+          // Desktop: always visible, collapsible
+          "hidden md:flex",
+          collapsed ? "md:w-[68px]" : "md:w-[248px]",
+          // Mobile: fixed overlay, slides in — no shadow (§4.3: depth is a
+          // rule, never a blur/shadow); the scrim behind it is the separation.
+          mobileOpen && "!flex fixed inset-y-0 left-0 w-[248px]",
+        )}
+        style={{ borderInlineEnd: "1px solid var(--v2-rule)", background: "var(--v2-panel)" }}
+      >
+        <div className="h-14 md:h-16 flex items-center px-4 shrink-0" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
           {/* Logo is an in-app home affordance while signed in — never the
               public marketing page (CLAUDE.md §9 logo auth branch). */}
           <Link to={(isInvestor ? "/app/investor" : "/app") as any} className="flex-1"><Logo withWordmark={showExpanded} /></Link>
           {/* Desktop collapse button */}
           {!collapsed && (
-            <button onClick={() => setCollapsed(true)} className="hidden md:block text-muted-foreground hover:text-foreground">
+            <button onClick={() => setCollapsed(true)} className="hidden md:block transition-colors" style={{ color: "var(--v2-ink-muted)" }}>
               <ChevronsLeft className="h-4 w-4" />
             </button>
           )}
           {/* Mobile close button */}
-          <button onClick={() => setMobileOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground">
+          <button onClick={() => setMobileOpen(false)} className="md:hidden transition-colors" style={{ color: "var(--v2-ink-muted)" }}>
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="px-3 py-3">
-          <div className={cn("flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-2.5 py-2", !showExpanded && "justify-center")}>
+          <div
+            className={cn("flex items-center gap-2 font-v2-ui", !showExpanded && "justify-center")}
+            style={{ border: "1px solid var(--v2-rule)", borderRadius: "var(--v2-radius)", background: "var(--v2-panel)", padding: "8px 10px" }}
+          >
             {profile?.logoDataUrl && !isInvestor ? (
-              <img src={profile.logoDataUrl} alt={workspaceName} className="h-6 w-6 rounded-md object-cover" />
+              <img src={profile.logoDataUrl} alt={workspaceName} className="h-6 w-6 object-cover" style={{ borderRadius: "var(--v2-radius)" }} />
             ) : (
-              <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-brand text-[10px] font-semibold text-brand-foreground">
+              <div
+                className="grid h-6 w-6 place-items-center text-[10px] font-semibold text-white"
+                style={{ borderRadius: "var(--v2-radius)", background: "var(--v2-accent)" }}
+              >
                 {user.fullName ? user.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : "VR"}
               </div>
             )}
@@ -350,13 +362,17 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               <div className="flex-1 min-w-0">
                 {workspaceName ? (
                   <>
-                    <div className="text-xs font-medium truncate">{workspaceName}</div>
-                    <div className="text-[10px] text-muted-foreground truncate">
+                    <div className="text-xs font-medium truncate" style={{ color: "var(--v2-ink)" }}>{workspaceName}</div>
+                    <div className="text-[10px] truncate" style={{ color: "var(--v2-ink-muted)" }}>
                       {isInvestor ? "Fund · Partner" : (startupData?.stage || profile?.stage || "Company")}
                     </div>
                   </>
                 ) : (
-                  <Link to={(isInvestor ? "/app/investor/profile" : "/app/profile") as any} className="text-xs font-medium text-brand hover:underline">
+                  <Link
+                    to={(isInvestor ? "/app/investor/profile" : "/app/profile") as any}
+                    className="text-xs font-medium hover:underline"
+                    style={{ color: "var(--v2-accent)" }}
+                  >
                     Set up your profile →
                   </Link>
                 )}
@@ -365,35 +381,25 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           </div>
         </div>
 
-        {/* Profile completeness banner — hidden when complete or sidebar collapsed */}
+        {/* Profile completeness — hidden when complete or sidebar collapsed.
+            Not a scored assessment (§13's "progress bars against invented
+            scores" doesn't apply): this is the founder's own literal form
+            completion, stated as a count per DESIGN.md's evidence-indicator
+            precedent (§6.4) rather than a percentage bar. */}
         {showExpanded && !shellCompleteness.isComplete && (
-          <div style={{
-            background: "rgba(124,58,237,0.06)",
-            border: "1px solid rgba(124,58,237,0.2)",
-            borderRadius: 8,
-            padding: "12px 14px",
-            margin: "0 12px 8px",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>
-                Profile {shellCompleteness.percent}% complete
-              </span>
+          <div
+            className="font-v2-ui"
+            style={{
+              border: "1px solid var(--v2-rule)",
+              borderInlineStart: "3px solid var(--v2-attention)",
+              padding: "10px 12px",
+              margin: "0 12px 8px",
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--v2-ink)", marginBottom: 4 }}>
+              Profile {shellCompleteness.percent}% complete
             </div>
-            <div className="h-1 rounded-sm overflow-hidden mb-2 bg-muted">
-              <div style={{
-                height: "100%",
-                width: `${shellCompleteness.percent}%`,
-                background: "var(--gradient-brand)",
-                borderRadius: 2,
-                transition: "width 0.3s",
-              }} />
-            </div>
-            <a href={resumeUrl} style={{
-              fontSize: 12,
-              color: "#A855F7",
-              fontWeight: 500,
-              textDecoration: "none",
-            }}>
+            <a href={resumeUrl} style={{ fontSize: 12, color: "var(--v2-accent)", fontWeight: 500, textDecoration: "none" }}>
               Finish it →
             </a>
           </div>
@@ -408,17 +414,18 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 onClick={() => setMobileOpen(false)}
                 data-testid="back-to-dashboard"
                 className={cn(
-                  "flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors",
+                  "flex items-center gap-2 font-v2-ui text-sm transition-colors",
                   !showExpanded && "justify-center px-0",
                 )}
+                style={{ borderRadius: "var(--v2-radius)", padding: "8px 10px", color: "var(--v2-ink-muted)" }}
               >
                 <ArrowLeft className="h-4 w-4" />
                 {showExpanded && <span>Back to Dashboard</span>}
               </Link>
               {showExpanded && (
                 <div
-                  className="px-2.5 pt-4 pb-1.5 font-semibold"
-                  style={{ fontFamily: "'Syne', sans-serif", fontSize: 13, color: "var(--foreground)" }}
+                  className="px-2.5 pt-4 pb-1.5 font-v2-ui font-semibold"
+                  style={{ fontSize: 13, color: "var(--v2-ink)" }}
                 >
                   {activeSection.label}
                 </div>
@@ -437,7 +444,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                           return next;
                         })}
                         data-testid={`l3-group-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                        className="w-full flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors text-left"
+                        className="w-full flex items-center gap-2 font-v2-ui text-sm transition-colors text-left"
+                        style={{ borderRadius: "var(--v2-radius)", padding: "8px 10px", color: "var(--v2-ink-muted)" }}
                       >
                         {expanded
                           ? <ChevronDown className="h-3.5 w-3.5 shrink-0" />
@@ -445,7 +453,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                         <span className="flex-1">{item.label}</span>
                       </button>
                       {expanded && (
-                        <div className="ml-[13px] pl-3 border-l border-border/60 space-y-0.5 mt-0.5 mb-1">
+                        <div className="ml-[13px] pl-3 space-y-0.5 mt-0.5 mb-1" style={{ borderInlineStart: "1px solid var(--v2-rule)" }}>
                           {item.children.map((leaf) => {
                             const leafActive = bestMatch === leaf.to;
                             return (
@@ -454,12 +462,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                                 to={leaf.to as any}
                                 preload="intent"
                                 onClick={() => setMobileOpen(false)}
-                                className={cn(
-                                  "block rounded-md px-2 py-1.5 text-[13px] transition-colors",
-                                  leafActive
-                                    ? "text-brand font-medium"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
-                                )}
+                                className="block text-[13px] font-v2-ui transition-colors"
+                                style={{
+                                  borderRadius: "var(--v2-radius)", padding: "6px 8px",
+                                  color: leafActive ? "var(--v2-accent)" : "var(--v2-ink-muted)",
+                                  fontWeight: leafActive ? 500 : 400,
+                                }}
                               >
                                 {leaf.label}
                               </Link>
@@ -478,15 +486,15 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                     to={item.to as any}
                     preload="intent"
                     onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      "relative flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors",
-                      leafActive
-                        ? "text-foreground font-medium"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
-                    )}
+                    className="relative flex items-center gap-2 font-v2-ui text-sm transition-colors"
+                    style={{
+                      borderRadius: "var(--v2-radius)", padding: "8px 10px",
+                      color: leafActive ? "var(--v2-ink)" : "var(--v2-ink-muted)",
+                      fontWeight: leafActive ? 500 : 400,
+                    }}
                   >
                     {leafActive && (
-                      <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full hs-gradient-static" />
+                      <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5" style={{ width: "2px", background: "var(--v2-accent)" }} />
                     )}
                     <span className="flex-1">{item.label}</span>
                   </Link>
@@ -507,20 +515,22 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   aria-label={s.label}
                   data-testid={`l2-${s.key}`}
                   className={cn(
-                    "relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
-                    active
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+                    "relative flex items-center gap-2.5 font-v2-ui text-sm transition-colors",
                     !showExpanded && "justify-center px-0",
                   )}
+                  style={{
+                    borderRadius: "var(--v2-radius)", padding: "8px 10px",
+                    color: active ? "var(--v2-ink)" : "var(--v2-ink-muted)",
+                    fontWeight: active ? 500 : 400,
+                  }}
                 >
                   {active && (
-                    <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full hs-gradient-static" />
+                    <span aria-hidden className="absolute left-0 top-1.5 bottom-1.5" style={{ width: "2px", background: "var(--v2-accent)" }} />
                   )}
-                  <s.icon className={cn("h-4 w-4", active && "text-brand")} />
+                  <s.icon className="h-4 w-4" style={{ color: active ? "var(--v2-accent)" : undefined }} />
                   {showExpanded && <span className="flex-1">{s.label}</span>}
                   {showExpanded && s.children && (
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+                    <ChevronRight className="h-3.5 w-3.5" style={{ color: "var(--v2-ink-muted)", opacity: 0.6 }} />
                   )}
                 </Link>
               );
@@ -529,12 +539,13 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
           {showExpanded && (
             <>
-              <div className="mx-2 mt-5 mb-2 hs-hairline-t" />
+              <div className="mx-2 mt-5 mb-2" style={{ borderTop: "1px solid var(--v2-rule-light)" }} />
               {isTeamMember && (
                 <Link
                   to={memberProfileNav.to as any}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                  className="flex items-center gap-2.5 font-v2-ui text-sm transition-colors"
+                  style={{ borderRadius: "var(--v2-radius)", padding: "8px 10px", color: "var(--v2-ink-muted)" }}
                 >
                   <memberProfileNav.icon className="h-4 w-4" />
                   <span>{memberProfileNav.label}</span>
@@ -544,7 +555,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                 to={"/app/feedback" as any}
                 onClick={() => setMobileOpen(false)}
                 aria-label="Feedback"
-                className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                className="w-full flex items-center gap-2.5 font-v2-ui text-sm transition-colors"
+                style={{ borderRadius: "var(--v2-radius)", padding: "8px 10px", color: "var(--v2-ink-muted)" }}
               >
                 <MessageCircle className="h-4 w-4" />
                 <span>Feedback</span>
@@ -553,36 +565,40 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           )}
         </nav>
 
-        <div className="p-3 border-t border-border/60">
+        <div className="p-3" style={{ borderTop: "1px solid var(--v2-rule-light)" }}>
           {!showExpanded ? (
             <>
-              {/* Percent ring when sidebar collapsed + profile incomplete */}
+              {/* Collapsed-sidebar completion indicator — a text badge naming
+                  the founder's own literal form-completion count, not a
+                  circular percentage ring (§13: no progress bars/rings
+                  against invented scores; this also isn't invented, but the
+                  ring visual itself reads as score-like, so it's dropped). */}
               {!shellCompleteness.isComplete && (
-                <a href={resumeUrl} title={`Profile ${shellCompleteness.percent}% complete — finish it`}
-                  className="mb-1 flex items-center justify-center">
-                  <svg width="32" height="32" viewBox="0 0 32 32">
-                    <circle cx="16" cy="16" r="13" fill="none" stroke="var(--color-muted)" strokeWidth="3" />
-                    <circle
-                      cx="16" cy="16" r="13" fill="none"
-                      stroke="var(--brand)" strokeWidth="3"
-                      strokeDasharray={`${2 * Math.PI * 13}`}
-                      strokeDashoffset={`${2 * Math.PI * 13 * (1 - shellCompleteness.percent / 100)}`}
-                      strokeLinecap="round"
-                      transform="rotate(-90 16 16)"
-                    />
-                    <text x="16" y="20" textAnchor="middle" fill="#A855F7" fontSize="8" fontWeight="600">
-                      {shellCompleteness.percent}%
-                    </text>
-                  </svg>
+                <a
+                  href={resumeUrl}
+                  title={`Profile ${shellCompleteness.percent}% complete — finish it`}
+                  className="mb-1 flex items-center justify-center font-v2-data"
+                  style={{
+                    width: 32, height: 32, margin: "0 auto 4px", borderRadius: "var(--v2-radius)",
+                    border: "1.5px solid var(--v2-attention)", color: "var(--v2-attention)",
+                    fontSize: 10, fontWeight: 600,
+                  }}
+                >
+                  {shellCompleteness.percent}%
                 </a>
               )}
               <Link
                 to={"/app/settings" as any}
-                className="flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                className="flex items-center justify-center p-2 transition-colors"
+                style={{ borderRadius: "var(--v2-radius)", color: "var(--v2-ink-muted)" }}
               >
                 <Settings className="h-4 w-4" />
               </Link>
-              <button onClick={() => setCollapsed(false)} className="mt-1 w-full grid place-items-center py-2 text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setCollapsed(false)}
+                className="mt-1 w-full grid place-items-center py-2 transition-colors"
+                style={{ color: "var(--v2-ink-muted)" }}
+              >
                 <ChevronsLeft className="h-4 w-4 rotate-180" />
               </button>
             </>
@@ -594,11 +610,15 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       <div className="flex-1 flex min-w-0 overflow-hidden">
         {/* Content column */}
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 md:h-16 border-b border-border/60 bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center px-3 md:px-6 gap-2 md:gap-3">
+          <header
+            className="h-14 md:h-16 sticky top-0 z-20 flex items-center px-3 md:px-6 gap-2 md:gap-3 font-v2-ui"
+            style={{ borderBottom: "1px solid var(--v2-rule)", background: "var(--v2-surface)" }}
+          >
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(true)}
-              className="md:hidden grid h-9 w-9 place-items-center rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground shrink-0"
+              className="md:hidden grid h-9 w-9 place-items-center transition-colors shrink-0"
+              style={{ borderRadius: "var(--v2-radius)", color: "var(--v2-ink-muted)" }}
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -607,24 +627,34 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
             <div className="hidden md:flex flex-1 max-w-md">
               <button
                 onClick={() => setSearchOpen(true)}
-                className="relative w-full flex items-center rounded-md border border-border/60 bg-background/60 pl-9 pr-12 py-2 text-sm text-muted-foreground hover:border-brand/40 hover:text-foreground transition-colors text-left"
+                className="relative w-full flex items-center pl-9 pr-12 py-2 text-sm text-left transition-colors"
+                style={{ borderRadius: "var(--v2-radius)", border: "1px solid var(--v2-rule)", background: "var(--v2-panel)", color: "var(--v2-ink-muted)" }}
               >
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--v2-ink-muted)" }} />
                 Search
-                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border border-border/60 rounded px-1.5 py-0.5">⌘K</kbd>
+                <kbd
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 font-v2-data"
+                  style={{ color: "var(--v2-ink-muted)", border: "1px solid var(--v2-rule)", borderRadius: "var(--v2-radius)" }}
+                >
+                  ⌘K
+                </kbd>
               </button>
             </div>
 
             <div className="ml-auto flex items-center gap-1.5 md:gap-2">
               {/* Ask AI — the panel's trigger lives here now (R9 decision),
-                  not on a right-edge rail. */}
+                  not on a right-edge rail. Secondary treatment, not primary:
+                  the AI panel isn't "the one most likely next action" on
+                  every screen (§6.2), and a solid-fill button here would
+                  compete with each screen's own primary action. */}
               <button
                 onClick={() => setAiOpen(true)}
                 data-testid="header-ask-ai"
                 aria-label="Ask AI"
-                className="inline-flex items-center gap-1.5 h-9 rounded-md px-3 text-sm font-medium text-white hs-gradient transition-opacity hover:opacity-90"
+                className="inline-flex items-center gap-1.5 h-9 text-sm font-medium transition-colors font-v2-ui"
+                style={{ borderRadius: "var(--v2-radius)", padding: "0 12px", border: "1px solid var(--v2-rule)", background: "var(--v2-panel)", color: "var(--v2-ink)" }}
               >
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-4 w-4" style={{ color: "var(--v2-accent)" }} />
                 <span className="hidden md:inline">Ask AI</span>
               </button>
               <NotificationBell />
@@ -674,67 +704,77 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4"
           onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          {/* Flat scrim, no blur — §4.3's one exception is a flat rgba(22,24,28,0.4) overlay */}
+          <div className="absolute inset-0" style={{ background: "rgba(22,24,28,0.4)" }} />
           <div
-            className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl bg-card border border-border/60"
+            className="relative w-full max-w-xl overflow-hidden font-v2-ui"
+            style={{ borderRadius: "var(--v2-radius)", background: "var(--v2-panel)", border: "1px solid var(--v2-rule)" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Input */}
-            <div className="flex items-center gap-3 p-4 border-b border-border/60">
-              <Search size={18} className="text-muted-foreground shrink-0" />
+            <div className="flex items-center gap-3 p-4" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
+              <Search size={18} className="shrink-0" style={{ color: "var(--v2-ink-muted)" }} />
               <input
                 autoFocus
                 type="text"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Search founders, investors, documents..."
-                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm"
+                className="flex-1 bg-transparent outline-none text-sm font-v2-ui"
+                style={{ color: "var(--v2-ink)" }}
               />
               {searching && (
-                <div className="w-4 h-4 border-2 border-muted border-t-brand rounded-full animate-spin shrink-0" />
+                <div className="w-4 h-4 shrink-0" style={{ border: "2px solid var(--v2-rule)", borderTopColor: "var(--v2-accent)", borderRadius: "50%", animation: "spin 0.6s linear infinite" }} />
               )}
-              <kbd className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">ESC</kbd>
+              <kbd
+                className="text-xs px-1.5 py-0.5 shrink-0 font-v2-data"
+                style={{ color: "var(--v2-ink-muted)", background: "var(--v2-surface)", borderRadius: "var(--v2-radius)" }}
+              >
+                ESC
+              </kbd>
             </div>
 
             {/* Results */}
             <div className="max-h-80 overflow-y-auto p-2">
               {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
-                <div className="py-8 text-center">
-                  <p className="text-sm text-muted-foreground">No results for "{searchQuery}"</p>
-                </div>
+                <V2EmptyState text={`No results for "${searchQuery}".`} />
               )}
               {searchQuery.length < 2 && (
                 <div className="py-6 text-center">
-                  <p className="text-xs text-muted-foreground">Search founders, investors, documents, deal rooms</p>
+                  <p className="text-xs" style={{ color: "var(--v2-ink-muted)" }}>Search founders, investors, documents, deal rooms</p>
                 </div>
               )}
               {(["startup", "investor", "deal_room", "document"] as const).map((type) => {
                 const typeResults = searchResults.filter((r) => r.type === type);
                 if (typeResults.length === 0) return null;
                 const typeLabel = { startup: "Founders", investor: "Investors", deal_room: "Deal Rooms", document: "Documents" }[type];
-                const typeIcon = { startup: "◎", investor: "✦", deal_room: "🏛", document: "≡" }[type];
                 return (
                   <div key={type} className="mb-3">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider px-3 mb-1">{typeIcon} {typeLabel}</p>
+                    <p className="text-xs uppercase tracking-wider px-3 mb-1" style={{ color: "var(--v2-ink-muted)" }}>{typeLabel}</p>
                     {typeResults.map((result) => (
                       <a
                         key={result.id}
                         href={result.url}
                         onClick={() => { setSearchOpen(false); setSearchQuery(""); setSearchResults([]); }}
-                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-accent transition-colors group"
+                        className="flex items-center justify-between px-3 py-2.5 transition-colors group"
+                        style={{ borderRadius: "var(--v2-radius)" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--v2-accent-wash)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-foreground group-hover:text-[#a78bfa] transition-colors truncate">{result.title}</p>
-                          {result.subtitle && <p className="text-xs text-muted-foreground truncate mt-0.5">{result.subtitle}</p>}
+                          <p className="text-sm font-medium truncate" style={{ color: "var(--v2-ink)" }}>{result.title}</p>
+                          {result.subtitle && <p className="text-xs truncate mt-0.5" style={{ color: "var(--v2-ink-muted)" }}>{result.subtitle}</p>}
                         </div>
                         <div className="flex items-center gap-1.5 ml-3 shrink-0">
                           {result.tag && (
-                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(124,58,237,0.15)", color: "#a78bfa" }}>
+                            <span className="text-xs px-2 py-0.5" style={{ borderRadius: "var(--v2-radius)", background: "var(--v2-accent-wash)", color: "var(--v2-accent)" }}>
                               {result.tag}
                             </span>
                           )}
                           {result.tag2 && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{result.tag2}</span>
+                            <span className="text-xs px-2 py-0.5" style={{ borderRadius: "var(--v2-radius)", background: "var(--v2-surface)", color: "var(--v2-ink-muted)" }}>
+                              {result.tag2}
+                            </span>
                           )}
                         </div>
                       </a>
@@ -746,9 +786,9 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
             {/* Footer */}
             {searchResults.length > 0 && (
-              <div className="px-4 py-2 border-t border-border flex items-center gap-3">
-                <span className="text-xs text-muted-foreground">{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</span>
-                <span className="text-xs text-muted-foreground ml-auto">↵ to open</span>
+              <div className="px-4 py-2 flex items-center gap-3" style={{ borderTop: "1px solid var(--v2-rule)" }}>
+                <span className="text-xs" style={{ color: "var(--v2-ink-muted)" }}>{searchResults.length} result{searchResults.length !== 1 ? "s" : ""}</span>
+                <span className="text-xs ml-auto" style={{ color: "var(--v2-ink-muted)" }}>↵ to open</span>
               </div>
             )}
           </div>
@@ -762,18 +802,23 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 // Shown at the top of every /app/* page. Not dismissible. Does NOT block
 // access — hard blocking arrives with Stripe.
 
+// Full-width coloured fills are prohibited (§2.4 — semantic colour is a rule
+// or a label, never a large background fill; §13's "coloured background
+// fills on large areas" bans this outright). Both states below are read
+// against the semantic vocabulary (§7.2): past-due is adverse, trial-expired
+// is attention — expressed as a top rule plus text, not a filled banner.
 function SubscriptionBanner() {
   const { trialExpired, isPastDue, trialEndsAt } = useSubscription();
 
   if (isPastDue) {
     return (
       <div
-        className="w-full px-4 py-2.5 text-center text-sm font-medium text-foreground shrink-0"
-        style={{ background: "#B45309" }}
+        className="w-full px-4 py-2.5 text-center text-sm font-medium font-v2-ui shrink-0"
+        style={{ borderTop: "3px solid var(--v2-adverse)", background: "var(--v2-adverse-wash)", color: "var(--v2-ink)" }}
         data-testid="subscription-banner-pastdue"
       >
         Your payment failed. Update your payment method to restore full access.{" "}
-        <Link to={"/pricing" as any} className="underline underline-offset-2 font-semibold">
+        <Link to={"/pricing" as any} className="underline underline-offset-2 font-semibold" style={{ color: "var(--v2-adverse)" }}>
           Update payment →
         </Link>
       </div>
@@ -786,12 +831,12 @@ function SubscriptionBanner() {
       : "recently";
     return (
       <div
-        className="w-full px-4 py-2.5 text-center text-sm font-medium text-foreground shrink-0"
-        style={{ background: "var(--gradient-brand)" }}
+        className="w-full px-4 py-2.5 text-center text-sm font-medium font-v2-ui shrink-0"
+        style={{ borderTop: "3px solid var(--v2-attention)", background: "var(--v2-attention-wash)", color: "var(--v2-ink)" }}
         data-testid="subscription-banner-trial"
       >
         Your free trial ended on {ended}. Choose a plan to keep access.{" "}
-        <Link to={"/pricing" as any} className="underline underline-offset-2 font-semibold">
+        <Link to={"/pricing" as any} className="underline underline-offset-2 font-semibold" style={{ color: "var(--v2-attention)" }}>
           View plans →
         </Link>
       </div>
