@@ -18,7 +18,7 @@ import {
   V2Button, LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
 } from "@/components/v2";
 import { Dropzone } from "@/components/app/Dropzone";
-import { Stage2Gate } from "@/components/app/DealRoomWorkflow";
+import { Stage2Gate } from "@/components/app/Stage2Gate";
 import { generateDocSummary } from "@/lib/ai-secure-fn";
 import { extractDocumentText } from "@/lib/document-extractor";
 import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
