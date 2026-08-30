@@ -313,8 +313,17 @@ function TermNegotiationPage() {
           bordered list, not a LedgerTable: LedgerTable rows can't expand
           into a form or history block, so forcing it there would lose
           real functionality. Same call as the founder room list's
-          expand-to-team-row pattern (surface 1). */}
-      <div className="mt-6 border border-v2-rule bg-v2-panel">
+          expand-to-team-row pattern (surface 1).
+
+          Card shape (8px radius, 0px 4px 12px 0px rgba(0,0,0,0.02) shadow)
+          extracted verbatim from Figma frame 55:1722 ("Canvas") per
+          CLAUDE.md §0a — the row-level structure (flex-wrap, inline
+          propose/counter/history expansion) stays exactly as documented
+          above; only the outer container's shape changed. */}
+      <div
+        className="mt-6 border border-v2-rule bg-v2-panel overflow-hidden"
+        style={{ borderRadius: "8px", boxShadow: "0px 4px 12px 0px rgba(0,0,0,0.02)" }}
+      >
         {allTerms.map((term) => {
           const chip = STATUS_CHIP[term.status] ?? STATUS_CHIP.unset;
           const mineAccepted = role === "founder" ? term.accepted_by_founder : term.accepted_by_investor;
