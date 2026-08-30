@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { UI_STAGE_ORDER, stageRank, workflowStageLabel, type DealRoomStageKey } from "@/lib/deal-room-stages";
 import { useDealRoom } from "@/hooks/useDealRoom";
-import { ReferenceLine, StatusLabel, V2Button, V2Skeleton, V2EmptyState, V2StatTile } from "@/components/v2";
+import { ReferenceLine, StatusLabel, V2Button, V2Skeleton, V2EmptyState } from "@/components/v2";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/overview")({
   component: OverviewPage,
@@ -186,21 +186,18 @@ function OverviewPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-8 py-8 font-v2-ui text-v2-ink">
-      {/* Bento-grid rebuild, 30 Aug 2026 — layout pattern borrowed from a
-          Figma design reference (dashboard bento arrangement + stat-tile
-          treatment); all data, logic, and workflow below are unchanged from
-          the prior single-column build. The reference's own content
-          (workflow labels, feature set) was not ported — only the visual
-          shape: a wide primary card beside a narrow stats rail, a full-width
-          row underneath. */}
+    <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui text-v2-ink">
+      {/* Fix 7 — dual company cards: founder's startup (left) + investor's fund
+          (right), each with logo/name/tagline and a compact team-photo strip.
+          Stats that used to live in the single-company header (days open,
+          workflow) move into a slim strip below the cards so they still read
+          at a glance without competing with either card. */}
       <ReferenceLine
         refNo={(dealRoom as any)?.reference_no}
         caption={dealRoom?.created_at ? `Deal room · opened ${format(new Date(dealRoom.created_at), "d MMMM yyyy")}` : null}
         className="mb-4"
       />
-
-      <section className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1fr_220px]">
+      <section className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Founder card */}
         <div className="bg-v2-panel border border-v2-rule p-4">
           <div className="mb-3 text-v2-accent uppercase font-medium" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Founder</div>
@@ -303,17 +300,20 @@ function OverviewPage() {
             <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>Investor not assigned</p>
           )}
         </div>
+      </section>
 
-        {/* Stats rail — third bento column, was previously a slim strip
-            below both cards. Days open + current workflow stage, at a
-            glance, without competing with either company card. */}
-        <div className="flex flex-row gap-4 lg:flex-col">
-          <V2StatTile label="Days open" value={daysOpen} className="flex-1 lg:flex-none" />
-          <V2StatTile
-            label="Workflow"
-            value={progressStages.find((s) => s.key === dealRoom?.workflow_stage)?.label ?? workflowStageLabel(dealRoom?.workflow_stage)}
-            className="flex-1 lg:flex-none"
-          />
+      {/* Slim stats strip — was previously part of the single-company header */}
+      <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
+        <div className="flex flex-wrap gap-6">
+          {[
+            ["Days open", daysOpen],
+            ["Workflow", workflowStageLabel(dealRoom?.workflow_stage)],
+          ].map(([label, value]) => (
+            <div key={label} className="min-w-[92px]">
+              <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{label}</div>
+              <div className="mt-1 text-v2-ink font-semibold" style={{ fontSize: "15px" }}>{value}</div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -326,18 +326,24 @@ function OverviewPage() {
           ran for every startup without a row, so removing this makes existing
           behaviour universal rather than introducing a new state. */}
 
-      <section className="mb-4">
+      <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
         <h3 className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Traction metrics</h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <V2StatTile label="Revenue" value={formatValue(startup?.revenue)} />
-          <V2StatTile label="Burn rate" value={formatMoney(startup?.burn_rate)} />
-          <V2StatTile label="Runway" value={formatValue(startup?.runway_months, "mo")} />
-          <V2StatTile label="Team size" value={formatValue(startup?.team_size)} />
+          {[
+            ["Revenue", formatValue(startup?.revenue)],
+            ["Burn rate", formatMoney(startup?.burn_rate)],
+            ["Runway", formatValue(startup?.runway_months, "mo")],
+            ["Team size", formatValue(startup?.team_size)],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{label}</div>
+              <div className="mt-1 text-v2-ink font-semibold font-v2-data" style={{ fontSize: "22px" }}>{value}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr] lg:items-start">
-        <div>
+      <section className="mb-4">
         <h3 className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>NDA and confidentiality</h3>
         <div className="bg-v2-panel border border-v2-rule p-5">
           <div className="flex items-start justify-between gap-4">
@@ -398,33 +404,6 @@ function OverviewPage() {
             </div>
           )}
         </div>
-        </div>
-
-        <div>
-        <h3 className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Recent activity</h3>
-        <div className="bg-v2-panel border border-v2-rule p-4 h-full">
-          {recentActivity.length === 0 ? (
-            <V2EmptyState text="No activity recorded for this room yet." />
-          ) : (
-            <div className="space-y-3">
-              {(recentActivity as any[]).map((activity) => (
-                <div key={activity.id} className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-v2-accent mt-1.5 flex-shrink-0" style={{ borderRadius: "50%" }} />
-                  <div className="min-w-0 text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>
-                    <div>
-                      <span className="font-semibold text-v2-ink">{activity.actor_name ?? "Someone"}</span>
-                      <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
-                    </div>
-                    <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>
-                      {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        </div>
       </section>
 
       {ndaModalOpen && ndaDoc && (
@@ -484,6 +463,28 @@ function OverviewPage() {
           </pre>
         </div>
       </div>
+
+      <section className="bg-v2-panel border border-v2-rule p-4 mb-4">
+        <h3 className="text-v2-ink-muted uppercase font-medium mb-4" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Recent activity</h3>
+        {recentActivity.length === 0 ? (
+          <V2EmptyState text="No activity recorded for this room yet." />
+        ) : (
+          <div className="space-y-3">
+            {(recentActivity as any[]).map((activity) => (
+              <div key={activity.id} className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 bg-v2-accent mt-1.5 flex-shrink-0" style={{ borderRadius: "50%" }} />
+                <div className="min-w-0 text-sm text-v2-ink-secondary">
+                  <span className="font-semibold text-v2-ink">{activity.actor_name ?? "Someone"}</span>
+                  <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
+                </div>
+                <div className="ml-auto whitespace-nowrap text-v2-ink-muted" style={{ fontSize: "11px" }}>
+                  {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="bg-v2-panel border border-v2-rule p-4" data-testid="stage-progress-bar">
         <div className="flex items-start">

@@ -54,7 +54,6 @@ do not invent one here.
 | `V2EmptyState` | §7.3 | Added 12 Aug 2026 (deal-room-core step 6). One sentence naming what would appear + one action, **no illustration** — replaces v1's illustrated `EmptyState` (`components/system/EmptyState.tsx`) on v2 surfaces. Narrower props than the v1 component (`text` + `action`, no `kind`/`description`) since §7.3 specifies exactly one sentence. |
 | `V2Skeleton` / `V2SkeletonRows` | §7.3 / §9 | Added 12 Aug 2026. Static muted blocks matching real table row geometry — §9 permits no loading animation beyond skeletons themselves, so no spinner, no shimmer sweep. |
 | `V2PageHeader` | §4.4 | Added 12 Aug 2026. Title/breadcrumb/actions block in v2 typography (`--text-lg` 19px, Archivo) — the v2-native replacement for v1's `PageFrame` (Syne 28px, v1 `design-tokens` colour module). Do not reuse `PageFrame` on a v2 surface. |
-| `V2StatTile` | §2.5 / §13 | Added 30 Aug 2026 (deal-room overview bento rebuild). Labelled metric card — label + large value, optional `StatusTone` on the value only (never the tile background — §13 bans large-area colour fill). Pattern borrowed from a Figma design reference's "Active Mandates"/"Evidence Completeness" tiles; the reference's literal content (workflow, labels) was not ported, only the tile shape. |
 
 ## RTL and locale
 
