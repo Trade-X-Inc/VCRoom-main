@@ -16,6 +16,22 @@ Conflicts resolve upward: Foundation wins on product, DESIGN wins on interface, 
 
 A rule in this file may only be changed by amending this file. "It seemed reasonable at the time" is not an amendment.
 
+**Amendment, 30 Aug 2026 — Figma supersedes DESIGN.md's prescriptive rules wherever they conflict with an actual Figma frame.** See §0a below. This is a narrow, explicit exception to "DESIGN wins on interface": DESIGN.md still governs anything with no matching Figma frame, but where a frame exists, the frame wins — including over §13's prohibitions, the primitive list, and the section-rhythm system.
+
+---
+
+## 0a. CC does not design
+
+**CC extracts and implements. CC does not design.**
+
+Every internal and external page follows the founder's Figma file EXACTLY — same layout, same component placement, same spacing, same structure — extracted via the Figma connector (`get_design_context`) or from provided frame code. Never approximated. Never "inspired by." Never rebuilt from a borrowed pattern, a remembered shape, or a judgment call about what would read better.
+
+**If a Figma frame doesn't exist for a screen, STOP and ask before inventing a layout.** Do not fill the gap with a design decision of your own, however small — report the gap and wait.
+
+**Content and workflow logic are NOT covered by this rule.** Copy, data bindings, business logic, and workflow sequencing come from the founder and from the real product's actual behaviour, separately from the Figma extraction — per the founder's explicit instruction, Figma for internal-app screens can carry the wrong workflow or invented content (see the "CapitalClose" template residue found 30 Aug 2026: wrong brand name, "Execute Settlement," "Liquidity," a "Worklist"/"Waiting on You" feature set that doesn't exist in the product). Only visual layout, structure, and design system are extracted verbatim. Never port a Figma frame's copy, feature set, or workflow assumptions — those are corrected or replaced with the real thing, same as the public-site content-correction pattern already in use (§2 below refers to the equivalent public-site rule).
+
+**Found the hard way, 30 Aug 2026:** a first pass at `app.deal-rooms.$id.overview.tsx` was rebuilt as a "bento-grid layout... borrowing the stat-tile and grid-arrangement pattern from a Figma design reference" — narrated as design-influenced, not copied. This was reverted (commit `6762891`, reverted `eb85d58`) specifically because "borrowed pattern" is not the standard. The correct process is: find the actual matching Figma frame, extract its exact layout via `get_design_context`, and implement that — not a layout CC judged to be inspired by it. Do not repeat this. A verification pass that only checks "does this look plausible against the general design language" is not sufficient — it must check against the specific frame.
+
 ---
 
 ## 1. The one rule
