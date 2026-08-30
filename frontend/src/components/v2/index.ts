@@ -9,3 +9,4 @@ export { StatusLabel, type StatusTone, type StatusLabelProps } from "./StatusLab
 export { V2EmptyState, type V2EmptyStateProps } from "./EmptyState";
 export { V2Skeleton, V2SkeletonRows } from "./Skeleton";
 export { V2PageHeader, type V2Crumb } from "./PageHeader";
+export { V2StatTile, type V2StatTileProps } from "./StatTile";
