@@ -34,7 +34,7 @@ const CAPABILITIES = [
   },
   {
     label: "Permanent fund record",
-    body: "At close, the sealed export goes into your fund's permanent records. LP reporting, audit support, and litigation defense all benefit from an immutable close record.",
+    body: "At close, the record goes into your fund's permanent files. LP reporting, audit support, and litigation defense all benefit from an append-only close record.",
   },
 ];
 

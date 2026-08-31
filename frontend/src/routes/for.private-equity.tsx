@@ -43,7 +43,7 @@ function PrivateEquity() {
           eyebrow="Who it's for · Private Equity"
           title="COMPLEX DEALS."
           titleOutline="CLEAN RECORD."
-          subtitle="Private equity transactions demand rigorous documentation and multi-party coordination. Lengdon enforces the process and produces an immutable audit trail — from first contact to sealed close."
+          subtitle="Private equity transactions demand rigorous documentation and multi-party coordination. Lengdon enforces the process and produces an append-only audit trail — from first contact to close."
           cta={{ label: "Talk to us", to: "/company/contact" }}
         />
 

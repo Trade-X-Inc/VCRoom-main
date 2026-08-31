@@ -3,8 +3,10 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/product/compare/Dealroom.tsx.
+// Content pass, 31 Aug 2026 — "Sealed dual-party export" row removed
+// (not a live capability, same standard as CLAUDE.md §12 Group 4).
+// Crypto vocabulary removed: "immutable"/"cryptographically sealed" ->
+// "append-only".
 //
 // NOT built from the shared CompetitorComparePage component — this
 // page's own intro section (a 4-column "transaction phases" diagram) is
@@ -19,8 +21,7 @@ const ROWS = [
   { feature: "Transaction closing sequence", lengdon: true, them: false, note: "Dealroom is a deal pipeline and portfolio management tool. It has no closing sequence." },
   { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "Dealroom manages deal flow — it doesn't bind individuals to NDAs in a transaction context." },
   { feature: "Gate-by-gate dual confirmation", lengdon: true, them: false, note: "Dealroom tracks pipeline stages but doesn't enforce bilateral confirmation at each gate." },
-  { feature: "Immutable close record", lengdon: true, them: false, note: "Dealroom activity is CRM-style logging. Lengdon's record is cryptographically sealed." },
-  { feature: "Sealed dual-party export", lengdon: true, them: false, note: "" },
+  { feature: "Append-only close record", lengdon: true, them: false, note: "Dealroom activity is CRM-style logging. Lengdon's record is append-only." },
   { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
   { feature: "Deal pipeline tracking", lengdon: false, them: true, note: "Lengdon is not a CRM or pipeline tool." },
   { feature: "Investor database and discovery", lengdon: false, them: true, note: "" },

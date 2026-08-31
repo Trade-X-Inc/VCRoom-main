@@ -54,9 +54,9 @@ const SECTIONS = [
     slug: "audit",
     icon: "04",
     articles: [
-      { title: "How the audit log works", desc: "Append-only, cryptographically linked. What that means." },
+      { title: "How the audit log works", desc: "Append-only, tamper-evident. What that means." },
       { title: "The sealed close export", desc: "What's in it, how to read it, how to store it." },
-      { title: "Registry verification", desc: "Verifying your export against the registry hash." },
+      { title: "Registry verification", desc: "Verifying your export against the registry reference." },
       { title: "Legal defensibility", desc: "How Lengdon records are used in disputes and audits." },
     ],
   },

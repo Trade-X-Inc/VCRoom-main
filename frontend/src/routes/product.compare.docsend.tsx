@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/product/compare/Docsend.tsx.
+// Content pass, 31 Aug 2026 — "Sealed dual-party export" row and the
+// "seal the record" prose claims removed/reworded (not a live
+// capability, same standard as CLAUDE.md §12 Group 4). Crypto
+// vocabulary removed: "immutable" -> "append-only".
 
 export const Route = createFileRoute("/product/compare/docsend")({
   component: CompareDocsend,
@@ -12,8 +14,7 @@ const ROWS = [
   { feature: "Enforced closing sequence (6 gates)", lengdon: true, them: false, note: "DocSend is a document analytics and sharing tool. It has no closing infrastructure." },
   { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "DocSend tracks who viewed a document. It does not enforce individual NDAs in a transaction context." },
   { feature: "Dual-party confirmation gate logic", lengdon: true, them: false, note: "DocSend is one-directional — sender pushes, receiver views. No bilateral confirmation." },
-  { feature: "Immutable audit trail", lengdon: true, them: false, note: "DocSend analytics show views and time spent — not a transaction audit record." },
-  { feature: "Sealed dual-party export", lengdon: true, them: false, note: "DocSend rooms are one-party controlled. Only Lengdon seals a record for both parties at close." },
+  { feature: "Append-only audit trail", lengdon: true, them: false, note: "DocSend analytics show views and time spent — not a transaction audit record." },
   { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
   { feature: "Document sharing with view tracking", lengdon: false, them: true, note: "DocSend excels at controlled document distribution with analytics." },
   { feature: "Pitch deck delivery and tracking", lengdon: false, them: true, note: "Lengdon is post-term-sheet infrastructure — not for early-stage pitching." },
@@ -32,10 +33,10 @@ function CompareDocsend() {
       competitorBlurbTitle={'"They spent 4 minutes on your financials slide."'}
       competitorBlurb="DocSend is optimized for the pre-deal phase — getting your documents in front of investors, understanding engagement, and controlling who can access what before terms are agreed. It's a distribution and analytics tool."
       lengdonBlurbTitle={'"Gate 4 confirmed. Both parties have signed."'}
-      lengdonBlurb="Lengdon begins after DocSend's work is done. Once terms are agreed and both parties are committed, Lengdon sequences the close, enforces each gate, and seals the record permanently."
+      lengdonBlurb="Lengdon begins after DocSend's work is done. Once terms are agreed and both parties are committed, Lengdon sequences the close, enforces each gate, and keeps an append-only record of every action."
       rows={ROWS}
       ctaTitle="They said yes. Now close it."
-      ctaSubtitle="DocSend got you to term sheet. Lengdon seals the close."
+      ctaSubtitle="DocSend got you to term sheet. Lengdon closes it, with a record."
     />
   );
 }

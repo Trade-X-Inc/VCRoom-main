@@ -13,6 +13,12 @@ import { PageHero } from "@/components/site/PageHero";
 // source files before building any of them). Reproducing it through the
 // shared component would have meant inventing a variant the source
 // doesn't have. Built standalone instead, same as Dealroom.
+//
+// Content pass, 31 Aug 2026 — "Dual sealed export at close" row and the
+// "sealed, dual-party export" claim removed/reworded (not a live
+// capability, same standard as CLAUDE.md §12 Group 4). Crypto
+// vocabulary removed: "immutable"/"cryptographically linked" ->
+// "append-only".
 
 export const Route = createFileRoute("/product/compare/firmex")({
   component: CompareFirmex,
@@ -22,8 +28,7 @@ const ROWS = [
   { feature: "Six-gate enforced close sequence", lengdon: true, them: false, note: "Firmex has no transaction sequencing. It's a document management platform." },
   { feature: "Per-person NDA, individually bound", lengdon: true, them: false, note: "Firmex NDA management is document-centric — not identity-level access binding." },
   { feature: "Bilateral confirmation per gate", lengdon: true, them: false, note: "Firmex doesn't require both parties to confirm anything. Documents are uploaded; access is granted." },
-  { feature: "Immutable audit log", lengdon: true, them: false, note: "Firmex activity logs are standard records — not sealed or cryptographically linked." },
-  { feature: "Dual sealed export at close", lengdon: true, them: false, note: "Firmex rooms are administrator-controlled. Lengdon gives both parties an identical sealed close record." },
+  { feature: "Append-only audit log", lengdon: true, them: false, note: "Firmex activity logs are standard records — not append-only or tamper-evident." },
   { feature: "Payment gate confirmation", lengdon: true, them: false, note: "" },
   { feature: "Document hosting", lengdon: true, them: true, note: "" },
   { feature: "Permission groups", lengdon: true, them: true, note: "Firmex permissions are group-based. Lengdon's are per-person and gate-scoped." },
@@ -49,7 +54,7 @@ function CompareFirmex() {
             {[
               { label: "Firmex says", text: "\"Done\" means the documents are uploaded and the deal team has access.", dim: true },
               { label: "Most people think", text: "\"Done\" means both parties reviewed, confirmed, signed, paid, and closed.", dim: false },
-              { label: "Lengdon delivers", text: "A sealed, dual-party export with every gate action permanently on record.", dim: false, dark: true },
+              { label: "Lengdon delivers", text: "Both parties confirmed, signed, paid, and closed — with every gate action permanently on record.", dim: false, dark: true },
             ].map((c, i) => (
               <div key={i} className={`p-10 ${i < 2 ? "border-r border-[#e6e9ef]" : ""} ${c.dark ? "bg-[#0a2540]" : ""}`}>
                 <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[11px] tracking-[2px] uppercase mb-4 ${c.dark ? "text-white/40" : "text-[#94a3b8]"}`}>{c.label}</div>
@@ -105,7 +110,7 @@ function CompareFirmex() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">
                 Close the deal properly.
               </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Firmex got you through diligence. Lengdon takes you to the sealed close.</p>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Firmex got you through diligence. Lengdon takes you to close, with a record.</p>
             </div>
             <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
               Open a room

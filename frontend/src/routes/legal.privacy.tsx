@@ -3,16 +3,17 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/legal/Privacy.tsx. Content (company
-// registration, GDPR sections, retention periods) is reproduced verbatim
-// per instruction — content/claim correctness against Foundation
-// Document rules was explicitly deferred for this task, not checked.
-// Worth flagging separately: this page states "Lengdon Limited... a
-// company incorporated in England and Wales (Company No. 14892031)" —
-// different jurisdiction/entity than the DIFC structure referenced
-// elsewhere in this repo's own governing documents. Not resolved here;
-// reproduced as instructed.
+// Content pass, 31 Aug 2026. Entity mismatch fixed: the source's
+// "Lengdon Limited, a company incorporated in England and Wales
+// (Company No. 14892031)" replaced with the repo's real, governing
+// entity detail (CLAUDE.md §0/§12, Foundation Document): Venture Tech
+// LLC, under incorporation, DIFC FinTech Hive — no UK entity, no
+// company number (does not exist yet), no London address. Crypto
+// vocabulary removed sitewide: "immutable" -> "append-only"/
+// "tamper-evident"; "sealed copy" -> "copy of the complete record" (the
+// underlying export/registry capability is not yet live — CLAUDE.md
+// §12/§20.6 — this page describes the record mechanism, which is real,
+// not the export delivery, which is not).
 
 export const Route = createFileRoute("/legal/privacy")({
   component: Privacy,
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/legal/privacy")({
 const SECTIONS = [
   {
     title: "Who we are",
-    content: `Lengdon Limited ("Lengdon", "we", "us") is a company incorporated in England and Wales (Company No. 14892031), registered at 20 Fenchurch Street, London EC3M 3BY.
+    content: `Lengdon ("we", "us") is operated by Venture Tech LLC, a company under incorporation in the DIFC FinTech Hive, Dubai, United Arab Emirates.
 
 We operate closing infrastructure for private capital transactions. We process personal data as a data controller in the course of operating the Lengdon platform.
 
@@ -33,7 +34,7 @@ For data protection enquiries: privacy@lengdon.com`,
 
 Identity data: Full name, as provided at account creation and NDA confirmation.
 Contact data: Email address and, where provided, a telephone number.
-Transaction data: Actions taken within a transaction room — confirmations, document accesses, signing events, payment confirmations. This data forms part of the immutable audit record.
+Transaction data: Actions taken within a transaction room — confirmations, document accesses, signing events, payment confirmations. This data forms part of the append-only audit record.
 Authentication data: Login events, MFA events, session data. We do not store passwords in plain text.
 Technical data: IP address, device type, browser type, and access timestamps. Collected for security and fraud prevention purposes.
 
@@ -43,7 +44,7 @@ We do not collect payment card data. We do not handle, process, or store financi
     title: "How we use your data",
     content: `We use personal data for the following purposes:
 
-To operate the Lengdon platform: Providing the transaction room infrastructure, enforcing the six-gate closing sequence, and generating the immutable audit record.
+To operate the Lengdon platform: Providing the transaction room infrastructure, enforcing the six-gate closing sequence, and generating the append-only audit record.
 To comply with legal obligations: Maintaining records as required under applicable law, including data protection law, anti-money laundering regulations, and contract law.
 To protect the security of the platform: Detecting and preventing fraud, unauthorised access, and abuse.
 To communicate with you: Responding to enquiries, sending transactional notifications (gate status, signatures required), and, where you have consented, sending product updates.
@@ -60,14 +61,14 @@ Legal obligation (Article 6(1)(c) UK GDPR): Compliance with applicable laws and 
 Consent (Article 6(1)(a) UK GDPR): Where you have opted in to receive product communications. Consent can be withdrawn at any time.`,
   },
   {
-    title: "The immutable audit record",
-    content: `A core feature of Lengdon is the immutable audit record — a cryptographically linked, append-only log of every action taken in a transaction room.
+    title: "The append-only audit record",
+    content: `A core feature of Lengdon is the append-only audit record — a tamper-evident log of every action taken in a transaction room.
 
 This record contains personal data (names, roles, timestamps, actions). It cannot be deleted or modified after creation — this is a fundamental design property, not a limitation.
 
-Both parties to a transaction receive a sealed copy of the full audit record at close. This is a contractual commitment, not optional behaviour.
+Both parties to a transaction receive a copy of the complete audit record at close. This is a contractual commitment, not optional behaviour.
 
-Because the audit record is immutable, we cannot fulfil requests to delete personal data contained within it where that data is part of the legally required closing record. We will inform you of this limitation before you enter a transaction room.
+Because the audit record is append-only, we cannot fulfil requests to delete personal data contained within it where that data is part of the legally required closing record. We will inform you of this limitation before you enter a transaction room.
 
 We retain audit records for a minimum of seven years following close, and for as long as reasonably required by applicable law.`,
   },
@@ -77,7 +78,7 @@ We retain audit records for a minimum of seven years following close, and for as
 
 Right of access: You may request a copy of the personal data we hold about you.
 Right to rectification: You may request correction of inaccurate personal data.
-Right to erasure: You may request deletion of personal data where we have no legal basis for continued processing. Note: this right does not apply to data contained in an immutable audit record (see above).
+Right to erasure: You may request deletion of personal data where we have no legal basis for continued processing. Note: this right does not apply to data contained in the append-only audit record (see above).
 Right to restrict processing: You may request that we limit our use of your data in certain circumstances.
 Right to data portability: You may request a machine-readable copy of data you have provided to us.
 Right to object: You may object to processing based on legitimate interests.

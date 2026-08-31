@@ -6,6 +6,15 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/Glossary.tsx. Search + letter-filter
 // state is the source's own real logic, unchanged.
+//
+// Content pass, 31 Aug 2026 — crypto vocabulary removed sitewide:
+// "cryptographically linked/closed" -> "append-only"/"tamper-evident".
+// Per CLAUDE.md §12's own precedent (Group 6), a glossary defines
+// vocabulary rather than claiming a product capability, so "Sealed
+// Record"/"Dual Export" as defined TERMS are kept (same distinction a
+// dictionary makes between defining a word and claiming to have built
+// the thing it names) — only the crypto-specific wording inside their
+// definitions was changed.
 
 export const Route = createFileRoute("/glossary/")({
   component: Glossary,
@@ -13,7 +22,7 @@ export const Route = createFileRoute("/glossary/")({
 
 const TERMS = [
   { term: "Acquisition Room", letter: "A", def: "A transaction room in Lengdon specifically configured for an M&A or business acquisition. The six-gate sequence is adapted for due diligence completion, regulatory approval, signing, and payment confirmation." },
-  { term: "Audit Log", letter: "A", def: "An append-only, timestamped record of every action taken by every party within a transaction room. In Lengdon, the audit log is cryptographically linked — each entry references the prior one — making retrospective modification detectable." },
+  { term: "Audit Log", letter: "A", def: "An append-only, timestamped record of every action taken by every party within a transaction room. In Lengdon, the audit log is tamper-evident — each entry references the prior one — making retrospective modification detectable." },
   { term: "Both-party Confirmation", letter: "B", def: "A gate requirement in Lengdon that requires explicit confirmation from both the room initiator and the invited party before progression. Neither party can advance a gate unilaterally." },
   { term: "Cap Table", letter: "C", def: "Capitalization table. A record of who owns what percentage of a company's equity, including founders, employees (via option pool), and all investors across rounds. Maintained independently of Lengdon but produced by the transactions Lengdon closes." },
   { term: "Close", letter: "C", def: "The final gate of a Lengdon transaction room. A close event requires both parties to confirm, triggers the audit log seal, and initiates the dual export of the complete transaction record." },
@@ -27,7 +36,7 @@ const TERMS = [
   { term: "Gate", letter: "G", def: "One of six sequential checkpoints in a Lengdon transaction room. Each gate has specific confirmation requirements that must be met by both parties before the transaction proceeds. Gates are: Counsel, Agreement, Conditions, Signing, Payment, Close." },
   { term: "Gate Sequence", letter: "G", def: "The enforced order of Lengdon's six gates. The sequence cannot be bypassed or reordered. Each gate must be confirmed by both parties before the next gate unlocks." },
   { term: "SAFE Note", letter: "S", def: "Simple Agreement for Future Equity. An instrument used in early-stage financing where an investor provides capital now in exchange for equity at a future priced round. SAFE notes can be closed through Lengdon's transaction room infrastructure." },
-  { term: "Sealed Record", letter: "S", def: "A transaction record that has been cryptographically closed at the completion of Gate 6. A sealed record cannot be modified, appended, or revoked. It is a permanent, standalone file that both parties receive at close." },
+  { term: "Sealed Record", letter: "S", def: "A transaction record that has been permanently closed at the completion of Gate 6. A sealed record cannot be modified, appended, or revoked. It is a permanent, standalone file that both parties receive at close." },
   { term: "SPV", letter: "S", def: "Special Purpose Vehicle. A legal entity created specifically to hold a single investment. SPV closes are a primary use case for Lengdon — the six-gate sequence handles counsel review, subscription documents, and payment confirmation for each LP in the vehicle." },
   { term: "Term Sheet", letter: "T", def: "A non-binding document outlining the key terms of a proposed investment. The term sheet precedes the Lengdon close process — Lengdon begins when both parties are committed to the terms and need to formally execute the transaction." },
   { term: "Transaction Room", letter: "T", def: "The primary unit of work in Lengdon. A transaction room is a sequenced, encrypted workspace that two parties use to formally close a private capital transaction. Each room has its own audit log, gate sequence, NDA enforcement, and sealed export at close." },

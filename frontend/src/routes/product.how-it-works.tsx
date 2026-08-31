@@ -44,17 +44,16 @@ const GATES = [
   {
     num: "06", title: "Close",
     party: "Both parties, independently",
-    desc: "Mutual confirmation seals the record permanently. Both parties export a signed copy of the complete immutable audit trail. The room is archived. Nothing in the record can be changed, amended, or deleted after this point.",
-    detail: "Both parties receive a sealed, signed copy of the complete record.",
+    desc: "Mutual confirmation closes the record permanently. The complete append-only audit trail stops accepting new entries. The room is archived. Nothing in the record can be changed, amended, or deleted after this point.",
+    detail: "The complete record is preserved, unchanged, for both parties.",
   },
 ];
 
 const PRINCIPLES = [
   { label: "Append-only", desc: "No entry in the audit record can be deleted or modified. The system only ever adds to the log." },
-  { label: "Encrypted links", desc: "Each record entry is cryptographically linked to the previous entry. Altering any earlier entry breaks every subsequent link visibly." },
+  { label: "Tamper-evident", desc: "Each record entry references the previous entry. Altering any earlier entry breaks that reference visibly." },
   { label: "Per-person, not per-company", desc: "Every NDA, every access grant, every signature is tied to a specific individual — not a company, not a role, not a team." },
   { label: "Dual confirmation", desc: "Critical events — agreement, close — require independent confirmation from both parties before proceeding." },
-  { label: "Sealed export", desc: "At close, both parties receive a signed, portable export of the full audit trail. The record lives with both parties, not just the platform." },
 ];
 
 function HowItWorks() {

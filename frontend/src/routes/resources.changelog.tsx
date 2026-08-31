@@ -86,7 +86,7 @@ const ENTRIES = [
     tag: "Launch",
     changes: [
       { type: "new", text: "Lengdon is live. The six-gate closing sequence — Counsel, Agreement, Conditions, Signing, Payment, Close — is available to all users." },
-      { type: "new", text: "Immutable audit record with cryptographic linking is active for all rooms." },
+      { type: "new", text: "Append-only audit record is active for all rooms." },
       { type: "new", text: "Per-person NDA enforcement is live." },
       { type: "new", text: "Sealed export at close is available for all completed transactions." },
     ],

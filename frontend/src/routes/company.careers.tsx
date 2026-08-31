@@ -22,7 +22,7 @@ const ROLES = [
     team: "Engineering",
     location: "London / Remote",
     type: "Full-time",
-    desc: "Own the core closing sequence engine — the system that enforces gate transitions, records audit events, and manages the cryptographic linking of the immutable record.",
+    desc: "Own the core closing sequence engine — the system that enforces gate transitions, records audit events, and manages the append-only record.",
   },
   {
     title: "Product Security Engineer",

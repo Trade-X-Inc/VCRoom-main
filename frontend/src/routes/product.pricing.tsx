@@ -3,19 +3,35 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/product/Pricing.tsx.
+// Content pass, 31 Aug 2026 — replaces the prior three-tier scheme
+// (£499/room, £2,400/month, custom) with the real four-tier fee-by-
+// event schedule per direct instruction: Direct (USD 499 once, at
+// first close), Standard (USD 799/month, active raise only), Deploying
+// seat (USD 3,999/seat/year), Institutional (scoped individually, no
+// published number). This does not resolve CLAUDE.md §20.2's separate,
+// still-BLOCKING mismatch against the pre-existing `plan_limits` table
+// (6 subscription-model tiers, a different axis entirely — role-based
+// subscription vs. fee-by-triggering-event) — that reconciliation still
+// needs a product decision and a migration, not a copy change. It does
+// mean the public marketing page and the Foundation Document's own
+// published schedule (§20.3/§20.4) now agree with each other, closing
+// the gap between "two different public/internal figures" that existed
+// before this pass. Card grid extended from 3 to 4 columns using the
+// same bordered-panel pattern already used elsewhere on the site (see
+// for.founders.tsx, registry.tsx) rather than a new layout. Crypto
+// vocabulary removed: "immutable" -> "append-only"; "sealed export" ->
+// "record export" (the export/registry delivery mechanism is not yet
+// live — CLAUDE.md §12/§20.6).
 //
-// FLAGGED, NOT CHANGED, per instruction (content-claim correctness
-// explicitly deferred for this task): the figures below (£499/room,
-// £2,400/month, custom) do not match either pricing scheme already on
-// record in this repo — CLAUDE.md §20.2 already tracks a BLOCKING,
-// unresolved mismatch between the pre-existing plan_limits table (6
-// subscription tiers) and the Foundation Document's 4-tier fee-by-event
-// schedule (Direct $499 once, Standard $400-800/mo, deploying seat
-// $2,500-6,000/yr, Institutional $25,000-120,000/yr). This page
-// introduces a THIRD figure set. Reproduced verbatim as instructed; not
-// reconciled against either existing scheme.
+// NOTE ON FIGURES: the instruction specified point prices (Standard
+// $799/mo, Deploying seat $3,999/seat/yr). CLAUDE.md §20.2's existing
+// record of the Foundation Document shows these as ranges instead
+// ($400-800/mo, $2,500-6,000/yr) — the point figures used here are
+// within both ranges, read as the founder finalizing a specific number
+// within the previously-published range, not a conflicting figure.
+// Flagged here rather than silently reconciled, since CLAUDE.md's own
+// text is the one that would need updating to match, and that's a
+// documentation change outside this task's scope.
 
 export const Route = createFileRoute("/product/pricing")({
   component: Pricing,
@@ -23,53 +39,61 @@ export const Route = createFileRoute("/product/pricing")({
 
 const PLANS = [
   {
-    name: "Close",
-    price: "£499",
-    period: "per room",
-    desc: "One transaction. One room. Full six-gate sequence, immutable record, and sealed export at close.",
+    name: "Direct",
+    price: "$499",
+    period: "once, at first close",
+    desc: "One transaction. One room. Full six-gate sequence and append-only record, billed once the deal closes.",
     features: [
       "One transaction room",
       "Six-gate enforced sequence",
       "Per-person NDA enforcement",
-      "Immutable audit record",
-      "Both-party sealed export at close",
-      "90-day archive access",
+      "Append-only audit record",
+      "Billed only on close — nothing due until then",
     ],
     cta: "Initialize room",
     href: "/sign-up",
     primary: false,
   },
   {
-    name: "Firm",
-    price: "£2,400",
-    period: "per month",
-    desc: "For funds, advisors, and firms running multiple transactions concurrently. Unlimited rooms, priority access, and dedicated infrastructure.",
+    name: "Standard",
+    price: "$799",
+    period: "per month, active raise only",
+    desc: "For a founder running a live raise across multiple prospective investors and rooms at once.",
     features: [
       "Unlimited concurrent rooms",
-      "All features in Close",
+      "All features in Direct",
+      "Billed only while a raise is active",
       "Team access management",
-      "Compliance-grade audit trail",
-      "Permanent record retention",
-      "Dedicated support",
-      "Custom branding",
+    ],
+    cta: "Get started",
+    href: "/sign-up",
+    primary: true,
+  },
+  {
+    name: "Deploying seat",
+    price: "$3,999",
+    period: "per seat, per year",
+    desc: "For investors, funds, and firms actively deploying capital across multiple transactions.",
+    features: [
+      "All features in Standard",
+      "Per-seat annual pricing",
+      "Priority support",
       "API access",
     ],
     cta: "Book a demo",
     href: "/company/contact",
-    primary: true,
+    primary: false,
   },
   {
     name: "Institutional",
-    price: "Custom",
-    period: "annual contract",
+    price: "Scoped individually",
+    period: "no published number",
     desc: "For large institutions with specific compliance, data residency, and integration requirements.",
     features: [
-      "All features in Firm",
+      "All features in Deploying seat",
       "Data residency options",
       "SSO & identity provider integration",
-      "Custom compliance reporting",
       "Dedicated account manager",
-      "SLA-backed infrastructure",
     ],
     cta: "Contact us",
     href: "/company/contact",
@@ -84,19 +108,19 @@ const FAQS = [
   },
   {
     q: "What happens to the room if the transaction falls through?",
-    a: "The room and its immutable audit record are preserved. Both parties can still export a copy of the record, which documents exactly what happened and where the transaction ended.",
+    a: "The room and its append-only audit record are preserved. Both parties can still export a copy of the record, which documents exactly what happened and where the transaction ended.",
   },
   {
-    q: "Can I run multiple transactions on the Close plan?",
-    a: "Each Close plan covers a single transaction room. If you're running concurrent transactions, the Firm plan is more cost-effective and gives you unlimited rooms.",
+    q: "When am I billed on the Direct plan?",
+    a: "Once — at first close. Nothing is due while the room is open. If the transaction doesn't close, you aren't charged.",
   },
   {
-    q: "How is pricing calculated for a transaction that spans multiple months?",
-    a: "The Close plan is a flat per-room fee — not a subscription. You pay once when the room is created and can use it until the transaction closes or is terminated.",
+    q: "What's the difference between Standard and Deploying seat?",
+    a: "Standard is for a founder running a live raise — billed monthly, only while the raise is active. Deploying seat is for an investor or firm actively deploying capital across multiple transactions — billed per seat, annually.",
   },
   {
-    q: "What is included in the sealed export at close?",
-    a: "Both parties receive a digitally signed PDF and structured JSON file containing the complete, verified audit trail — every action, every timestamp, every confirmation, every document reference.",
+    q: "How is Institutional pricing determined?",
+    a: "Institutional pricing is scoped individually based on transaction volume, compliance requirements, and integration needs. There's no published number — contact us for a quote.",
   },
 ];
 
@@ -109,11 +133,11 @@ function Pricing() {
           eyebrow="Product · Pricing"
           title="SIMPLE,"
           titleOutline="TRANSPARENT."
-          subtitle="One room, one transaction. Or unlimited rooms for firms that close at scale. No per-user seats, no data volume charges, no surprise invoices."
+          subtitle="Pay once when you close, monthly while you're raising, or per seat while you're deploying. No data volume charges, no surprise invoices."
         />
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}

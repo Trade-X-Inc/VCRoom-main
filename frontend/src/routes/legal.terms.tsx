@@ -3,8 +3,21 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/legal/Terms.tsx.
+// Content pass, 31 Aug 2026. Entity mismatch fixed, same correction as
+// legal/privacy: "Lengdon Limited... incorporated in England and Wales
+// (Company No. 14892031)" replaced with Venture Tech LLC, under
+// incorporation, DIFC FinTech Hive. Crypto vocabulary removed sitewide:
+// "immutable" -> "append-only"/"tamper-evident"; "sealed copy"/"sealed
+// export" -> "copy of the complete record" (the export/registry
+// delivery mechanism itself is not yet live — CLAUDE.md §12/§20.6 —
+// the append-only record it describes is real).
+//
+// FLAGGED, NOT CHANGED: "Governing law" (below) still names England and
+// Wales courts/law — this is a legal-substance decision (jurisdiction
+// clause), not an entity-name mechanical swap, and was outside the
+// instruction's scope ("fix the entity mismatch"). Now inconsistent
+// with the corrected DIFC entity above. Needs counsel/founder input on
+// the actual intended governing law before this is edited.
 
 export const Route = createFileRoute("/legal/terms")({
   component: Terms,
@@ -13,7 +26,7 @@ export const Route = createFileRoute("/legal/terms")({
 const SECTIONS = [
   {
     title: "Agreement to terms",
-    content: `These Terms of Service ("Terms") govern your access to and use of the Lengdon platform, operated by Lengdon Limited ("Lengdon", "we", "us"), a company incorporated in England and Wales (Company No. 14892031).
+    content: `These Terms of Service ("Terms") govern your access to and use of the Lengdon platform, operated by Venture Tech LLC ("Lengdon", "we", "us"), a company under incorporation in the DIFC FinTech Hive, Dubai, United Arab Emirates.
 
 By creating an account or participating in a transaction room, you agree to these Terms. If you do not agree, do not use the platform.
 
@@ -45,11 +58,11 @@ You must provide accurate information when creating your account. Providing fals
 
 Each Room is created by a room initiator and exists until the transaction closes, is terminated by mutual agreement, or is terminated by Lengdon for violation of these Terms.
 
-The immutable audit record of a Room is the permanent, append-only log of all actions taken in that Room. It cannot be modified or deleted. Both parties receive a sealed copy at close.
+The append-only audit record of a Room is the permanent log of all actions taken in that Room. It cannot be modified or deleted. Both parties receive a copy of the complete record at close.
 
 By participating in a Room, you acknowledge that:
-— Your actions in the Room will be recorded in the immutable audit record
-— Your personal data will be included in the sealed export received by both parties
+— Your actions in the Room will be recorded in the append-only audit record
+— Your personal data will be included in the record received by both parties
 — The audit record cannot be deleted after creation`,
   },
   {
@@ -67,11 +80,11 @@ Violation of these restrictions may result in immediate account termination and 
   },
   {
     title: "Intellectual property",
-    content: `The Lengdon platform, including its software, design, and documentation, is owned by Lengdon Limited and protected by applicable intellectual property laws.
+    content: `The Lengdon platform, including its software, design, and documentation, is owned by Venture Tech LLC and protected by applicable intellectual property laws.
 
 Your transaction data — the records of your actions, your documents, your confirmations — belongs to you and the other parties in your transaction. Lengdon does not claim ownership of transaction content.
 
-The immutable audit record is jointly owned by all parties to the transaction. Lengdon holds a copy as part of its record retention obligations.`,
+The append-only audit record is jointly owned by all parties to the transaction. Lengdon holds a copy as part of its record retention obligations.`,
   },
   {
     title: "Limitation of liability",
@@ -91,7 +104,7 @@ Nothing in these Terms limits our liability for death or personal injury caused 
 
 We may suspend or terminate your account if you violate these Terms, if we are required to do so by law, or if continued operation would create legal or regulatory risk for Lengdon.
 
-On termination, your access to the platform ceases. Any sealed exports already delivered to you remain yours.`,
+On termination, your access to the platform ceases. Any record copies already delivered to you remain yours.`,
   },
   {
     title: "Governing law",

@@ -275,32 +275,26 @@ function SectionLabel({ children }: { children: string }) {
   );
 }
 
-// ── THE IMMUTABLE RECORD ──────────────────────────────────
-const CHAIN_BLOCKS = [
+// ── THE APPEND-ONLY RECORD ──────────────────────────────────
+const RECORD_ENTRIES = [
   {
-    seq: "0017",
     ts: "2026-08-26 14:32:11 UTC",
     action: "Condition Precedent Met: Regulatory Approval",
-    ref: "enc-a8f9...2b1c",
-    prev: "000000...0000",
+    ref: "ATLS01-ROM-2026-000017-91",
   },
   {
-    seq: "0018",
     ts: "2026-08-26 15:45:00 UTC",
     action: "Term Accepted: Board Seat (Investor)",
-    ref: "enc-3c7d...8e9f",
-    prev: "enc-a8f9...2b1c",
+    ref: "ATLS01-ROM-2026-000018-88",
   },
   {
-    seq: "0019",
     ts: "2026-08-27 09:12:44 UTC",
     action: "Document Released: Cap Table (Pre-Money)",
-    ref: "enc-f1e2...d3c4",
-    prev: "enc-3c7d...8e9f",
+    ref: "ATLS01-ROM-2026-000019-85",
   },
 ];
 
-function ImmutableRecordSection() {
+function AppendOnlyRecordSection() {
   return (
     <section className="bg-white border-b border-[#e6e9ef] py-24 max-w-[1440px] mx-auto w-full overflow-hidden">
       <div className="px-12 lg:px-16">
@@ -310,19 +304,19 @@ function ImmutableRecordSection() {
             <div className="lg:w-[400px] shrink-0">
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3px] mb-8">
                 <span className="block text-[#0a2540] text-[80px]">THE</span>
-                <span className="block text-[#0a2540] text-[80px]">IMMUTABLE</span>
+                <span className="block text-[#0a2540] text-[80px]">APPEND-ONLY</span>
                 <span className="block text-[80px]"
                   style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
                   RECORD.
                 </span>
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] mb-8">
-                Every action is written to a permanent, append-only log where each entry is encrypted and linked to the one before it. Change an earlier entry and every subsequent link breaks visibly.
+                Every action is written to a permanent, append-only log where each entry references the one before it. Altering an earlier entry breaks that reference — visibly, and permanently.
               </p>
               <div className="flex flex-col gap-4 border-t border-[#e6e9ef] pt-6">
                 {[
                   { prop: "Append-only", desc: "No deletes. No edits. Additions only." },
-                  { prop: "Encrypted links", desc: "Each entry references its predecessor." },
+                  { prop: "Tamper-evident", desc: "Each entry references its predecessor." },
                   { prop: "Sealed export", desc: "Both parties receive a signed copy at close." },
                 ].map((item) => (
                   <div key={item.prop} className="flex gap-4">
@@ -344,8 +338,8 @@ function ImmutableRecordSection() {
                 </div>
 
                 <div className="flex flex-col gap-0">
-                  {CHAIN_BLOCKS.map((block, i) => (
-                    <Reveal key={block.seq} delay={i * 120}>
+                  {RECORD_ENTRIES.map((entry, i) => (
+                    <Reveal key={entry.ref} delay={i * 120}>
                       <div className="relative">
                         {i > 0 && (
                           <div className="flex items-center gap-4 px-6 py-2">
@@ -357,7 +351,7 @@ function ImmutableRecordSection() {
                               <div className="w-px h-3 bg-[#e6e9ef]" />
                             </div>
                             <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[0.5px]">
-                              links to: <span className="font-mono">{block.prev}</span>
+                              next entry in the record
                             </div>
                           </div>
                         )}
@@ -367,26 +361,22 @@ function ImmutableRecordSection() {
                           <div className="pl-6 pr-6 py-5">
                             <div className="flex items-start justify-between gap-4 mb-3">
                               <div className="flex items-center gap-3">
-                                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[1px]">
-                                  BLOCK #{block.seq}
-                                </span>
-                                <div className="w-1 h-1 rounded-full bg-[#c9d0db]" />
                                 <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[11px]">
-                                  {block.ts}
+                                  {entry.ts}
                                 </span>
                               </div>
                               <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-700 text-[10px] tracking-[0.5px]">VERIFIED</span>
+                                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-700 text-[10px] tracking-[0.5px]">RECORDED</span>
                               </div>
                             </div>
                             <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[16px] mb-3">
-                              {block.action}
+                              {entry.action}
                             </p>
                             <div className="flex items-center gap-2">
-                              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8] tracking-[0.3px]">ENCRYPTED REF:</span>
+                              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8] tracking-[0.3px]">REFERENCE:</span>
                               <span className="font-mono text-[12px] text-[#425466] bg-[#f8f9fb] px-2 py-0.5 border border-[#e6e9ef]">
-                                {block.ref}
+                                {entry.ref}
                               </span>
                             </div>
                           </div>
@@ -858,7 +848,7 @@ function SecuritySection() {
             SECURITY<br />&amp; TRUST
           </h2>
           <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] max-w-[400px] mb-10">
-            Encryption at rest and in transit; mandatory multi-factor authentication; role-scoped access; per-person NDAs; the immutable record; data residency; no money movement, no custody, no escrow.
+            Encryption at rest and in transit; mandatory multi-factor authentication; role-scoped access; per-person NDAs; the append-only record; data residency; no money movement, no custody, no escrow.
           </p>
           <Link to="/legal/privacy" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="flex items-center gap-2 text-[#0a2540] text-[14px] hover:opacity-60 transition-opacity">
             Read the Privacy Policy <span>→</span>
@@ -888,7 +878,7 @@ const AUDIENCES = [
     role: "Advisors & Agents",
     tag: "DEAL FACILITATION",
     desc: "You coordinate transactions between parties and need full visibility without being a principal. Lengdon gives you a neutral record of every action taken on both sides — without you holding the data.",
-    uses: ["Read-only observer access", "Immutable audit trail", "Multi-party coordination", "Neutral infrastructure"],
+    uses: ["Read-only observer access", "Append-only audit trail", "Multi-party coordination", "Neutral infrastructure"],
   },
   {
     role: "Angels",
@@ -900,7 +890,7 @@ const AUDIENCES = [
     role: "Legal",
     tag: "COUNSEL & COMPLIANCE",
     desc: "Your clients are on both sides of the transaction. Lengdon gives each counsel team a separate, encrypted view of the record — with no shared data room and no cross-party exposure before each gate is met.",
-    uses: ["Per-party confidentiality", "Gate-by-gate document release", "Immutable legal audit trail", "Encrypted party separation"],
+    uses: ["Per-party confidentiality", "Gate-by-gate document release", "Append-only legal audit trail", "Per-party access separation"],
   },
   {
     role: "Analyst",
@@ -1142,7 +1132,7 @@ function HomePage() {
       <SiteHeader />
       <main id="main-content">
         <HeroSection />
-        <ImmutableRecordSection />
+        <AppendOnlyRecordSection />
         <DemoSection />
         <ProcessSection />
         <InfrastructureBannerSection />

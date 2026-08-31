@@ -95,7 +95,7 @@ function LimitedPartners() {
                   { label: "Complete gate log", detail: "Every action by every party, timestamped and attributed" },
                   { label: "All signed agreements", detail: "NDA, term sheet, subscription docs — full set" },
                   { label: "Condition record", detail: "Each condition, who confirmed it, when" },
-                  { label: "Cryptographic seal", detail: "Hash of the complete record at time of close" },
+                  { label: "Sealed reference", detail: "Reference number for the complete record at time of close" },
                 ].map((r) => (
                   <div key={r.label} className="flex gap-4 pb-4 border-b border-[#e6e9ef] last:border-b-0 last:pb-0">
                     <div className="w-2 h-2 bg-[#0a2540] mt-1 shrink-0" />

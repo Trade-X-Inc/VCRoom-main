@@ -3,19 +3,18 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/product/Compare.tsx.
-//
-// FLAGGED, NOT CHANGED: this comparison table's checkmarks assert
-// "Immutable audit record", "Sealed exportable record at close" and
-// "Dual-party confirmation required" as live Lengdon capabilities.
-// CLAUDE.md §12 (Group 4, this repo's own prior public-site migration)
-// already found near-identical claims — "single-notice diligence",
-// "sealed export", "watermarked/logged release" — FALSE of the live
-// product, describing only the unpromoted pack_v1 schema (0 real rows),
-// and removed them from public copy for exactly that reason. This page
-// reintroduces the same claim shape. Reproduced verbatim per
-// instruction; content-claim correctness explicitly deferred.
+// Content pass, 31 Aug 2026 — applies the same standard CLAUDE.md §12
+// (Group 4) already used once: "sealed export" as a live, user-facing
+// capability is FALSE of the live product (the append-only record
+// mechanism itself is real and verified — CLAUDE.md §8.3 — but it
+// lives only in the unpromoted pack_v1 schema, 0 real rows, no
+// user-facing promotion yet). That row is removed. The enforced
+// six-gate sequence, per-person NDA enforcement, and dual-party
+// confirmation rows are kept — those describe the live, built product
+// (deal_rooms.status/workflow_stage, useStageTransition.ts), not the
+// unpromoted record system. Crypto/blockchain vocabulary also removed
+// per the sitewide rule: "immutable" -> "append-only", "cryptographically
+// linked" -> "tamper-evident".
 
 export const Route = createFileRoute("/product/compare/")({
   component: Compare,
@@ -35,7 +34,7 @@ const COMPARISON = [
     note: "Data rooms grant access at the company level. Lengdon binds access to individuals.",
   },
   {
-    feature: "Immutable audit record",
+    feature: "Append-only audit record",
     lengdon: true,
     dataRoom: false,
     note: "Most data room logs can be modified by administrators. Lengdon's record is append-only.",
@@ -45,12 +44,6 @@ const COMPARISON = [
     lengdon: true,
     dataRoom: false,
     note: "Data rooms are passive repositories. Lengdon actively requires both parties to confirm at each gate.",
-  },
-  {
-    feature: "Sealed exportable record at close",
-    lengdon: true,
-    dataRoom: false,
-    note: "A data room is controlled by one party. Lengdon gives both parties a sealed copy of the full record.",
   },
   {
     feature: "Payment confirmation workflow",
@@ -74,7 +67,7 @@ const COMPARISON = [
     feature: "Activity logging",
     lengdon: true,
     dataRoom: true,
-    note: "Lengdon's log is cryptographically linked. Traditional logs are mutable.",
+    note: "Lengdon's log is append-only and tamper-evident. Traditional logs can be edited.",
   },
   {
     feature: "No money movement",
@@ -95,7 +88,7 @@ const PRINCIPLES = [
   },
   {
     title: "The record belongs to both parties.",
-    body: "A traditional data room is controlled by whoever set it up — usually the seller. Lengdon's record is sealed and exported to both parties at close. Neither party can revoke the other's copy.",
+    body: "A traditional data room is controlled by whoever set it up — usually the seller. Lengdon's record is append-only and shared, not one party's private log.",
   },
 ];
 
