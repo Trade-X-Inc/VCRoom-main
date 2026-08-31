@@ -112,6 +112,7 @@ import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
 import { Route as AppGoLiveIndexRouteImport } from './routes/app.go-live.index'
 import { Route as AppDealRoomsIndexRouteImport } from './routes/app.deal-rooms.index'
+import { Route as AppAdvisorPreviewIndexRouteImport } from './routes/app.advisor-preview.index'
 import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
@@ -139,6 +140,8 @@ import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-
 import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
 import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
+import { Route as AppAdvisorPreviewRecordRouteImport } from './routes/app.advisor-preview.record'
+import { Route as AppAdvisorPreviewCompanyRouteImport } from './routes/app.advisor-preview.company'
 import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
 import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
@@ -704,6 +707,11 @@ const AppDealRoomsIndexRoute = AppDealRoomsIndexRouteImport.update({
   path: '/deal-rooms/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdvisorPreviewIndexRoute = AppAdvisorPreviewIndexRouteImport.update({
+  id: '/advisor-preview/',
+  path: '/advisor-preview/',
+  getParentRoute: () => AppRoute,
+} as any)
 const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
   id: '/team/$token',
   path: '/team/$token',
@@ -844,6 +852,17 @@ const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
   path: '/deal-rooms/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdvisorPreviewRecordRoute = AppAdvisorPreviewRecordRouteImport.update({
+  id: '/advisor-preview/record',
+  path: '/advisor-preview/record',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdvisorPreviewCompanyRoute =
+  AppAdvisorPreviewCompanyRouteImport.update({
+    id: '/advisor-preview/company',
+    path: '/advisor-preview/company',
+    getParentRoute: () => AppRoute,
+  } as any)
 const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
   id: '/api/internal/email-test',
   path: '/api/internal/email-test',
@@ -1220,6 +1239,8 @@ export interface FileRoutesByFullPath {
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/advisor-preview/company': typeof AppAdvisorPreviewCompanyRoute
+  '/app/advisor-preview/record': typeof AppAdvisorPreviewRecordRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
@@ -1247,6 +1268,7 @@ export interface FileRoutesByFullPath {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
+  '/app/advisor-preview/': typeof AppAdvisorPreviewIndexRoute
   '/app/deal-rooms/': typeof AppDealRoomsIndexRoute
   '/app/go-live/': typeof AppGoLiveIndexRoute
   '/app/investor/': typeof AppInvestorIndexRoute
@@ -1396,6 +1418,8 @@ export interface FileRoutesByTo {
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/advisor-preview/company': typeof AppAdvisorPreviewCompanyRoute
+  '/app/advisor-preview/record': typeof AppAdvisorPreviewRecordRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
@@ -1423,6 +1447,7 @@ export interface FileRoutesByTo {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
+  '/app/advisor-preview': typeof AppAdvisorPreviewIndexRoute
   '/app/deal-rooms': typeof AppDealRoomsIndexRoute
   '/app/go-live': typeof AppGoLiveIndexRoute
   '/app/investor': typeof AppInvestorIndexRoute
@@ -1577,6 +1602,8 @@ export interface FileRoutesById {
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/advisor-preview/company': typeof AppAdvisorPreviewCompanyRoute
+  '/app/advisor-preview/record': typeof AppAdvisorPreviewRecordRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
@@ -1604,6 +1631,7 @@ export interface FileRoutesById {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
+  '/app/advisor-preview/': typeof AppAdvisorPreviewIndexRoute
   '/app/deal-rooms/': typeof AppDealRoomsIndexRoute
   '/app/go-live/': typeof AppGoLiveIndexRoute
   '/app/investor/': typeof AppInvestorIndexRoute
@@ -1759,6 +1787,8 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/advisor-preview/company'
+    | '/app/advisor-preview/record'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
@@ -1786,6 +1816,7 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/join/team/$token'
+    | '/app/advisor-preview/'
     | '/app/deal-rooms/'
     | '/app/go-live/'
     | '/app/investor/'
@@ -1935,6 +1966,8 @@ export interface FileRouteTypes {
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/advisor-preview/company'
+    | '/app/advisor-preview/record'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
@@ -1962,6 +1995,7 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/join/team/$token'
+    | '/app/advisor-preview'
     | '/app/deal-rooms'
     | '/app/go-live'
     | '/app/investor'
@@ -2115,6 +2149,8 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/advisor-preview/company'
+    | '/app/advisor-preview/record'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
@@ -2142,6 +2178,7 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/join/team/$token'
+    | '/app/advisor-preview/'
     | '/app/deal-rooms/'
     | '/app/go-live/'
     | '/app/investor/'
@@ -2999,6 +3036,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/advisor-preview/': {
+      id: '/app/advisor-preview/'
+      path: '/advisor-preview'
+      fullPath: '/app/advisor-preview/'
+      preLoaderRoute: typeof AppAdvisorPreviewIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/join/team/$token': {
       id: '/join/team/$token'
       path: '/team/$token'
@@ -3186,6 +3230,20 @@ declare module '@tanstack/react-router' {
       path: '/deal-rooms/$id'
       fullPath: '/app/deal-rooms/$id'
       preLoaderRoute: typeof AppDealRoomsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/advisor-preview/record': {
+      id: '/app/advisor-preview/record'
+      path: '/advisor-preview/record'
+      fullPath: '/app/advisor-preview/record'
+      preLoaderRoute: typeof AppAdvisorPreviewRecordRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/advisor-preview/company': {
+      id: '/app/advisor-preview/company'
+      path: '/advisor-preview/company'
+      fullPath: '/app/advisor-preview/company'
+      preLoaderRoute: typeof AppAdvisorPreviewCompanyRouteImport
       parentRoute: typeof AppRoute
     }
     '/api/internal/email-test': {
@@ -3693,12 +3751,15 @@ interface AppRouteChildren {
   AppTeamChatRoute: typeof AppTeamChatRoute
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppAdvisorPreviewCompanyRoute: typeof AppAdvisorPreviewCompanyRoute
+  AppAdvisorPreviewRecordRoute: typeof AppAdvisorPreviewRecordRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
   AppDealRoomsMeetingsCalendarRoute: typeof AppDealRoomsMeetingsCalendarRoute
   AppDealRoomsPrepNotesRoute: typeof AppDealRoomsPrepNotesRoute
   AppDealRoomsReportsVaultRoute: typeof AppDealRoomsReportsVaultRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
+  AppAdvisorPreviewIndexRoute: typeof AppAdvisorPreviewIndexRoute
   AppDealRoomsIndexRoute: typeof AppDealRoomsIndexRoute
   AppGoLiveIndexRoute: typeof AppGoLiveIndexRoute
   AppMemberIndexRoute: typeof AppMemberIndexRoute
@@ -3740,12 +3801,15 @@ const AppRouteChildren: AppRouteChildren = {
   AppTeamChatRoute: AppTeamChatRoute,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
+  AppAdvisorPreviewCompanyRoute: AppAdvisorPreviewCompanyRoute,
+  AppAdvisorPreviewRecordRoute: AppAdvisorPreviewRecordRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
   AppDealRoomsMeetingsCalendarRoute: AppDealRoomsMeetingsCalendarRoute,
   AppDealRoomsPrepNotesRoute: AppDealRoomsPrepNotesRoute,
   AppDealRoomsReportsVaultRoute: AppDealRoomsReportsVaultRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
+  AppAdvisorPreviewIndexRoute: AppAdvisorPreviewIndexRoute,
   AppDealRoomsIndexRoute: AppDealRoomsIndexRoute,
   AppGoLiveIndexRoute: AppGoLiveIndexRoute,
   AppMemberIndexRoute: AppMemberIndexRoute,
