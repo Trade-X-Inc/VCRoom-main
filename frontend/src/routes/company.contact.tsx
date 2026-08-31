@@ -3,12 +3,36 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { syncContactToHubSpot } from "@/lib/hubspot";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/company/Contact.tsx. Form is
-// intentionally fake (local state only, no submission) as in the
-// source — same deferred-wiring treatment as the homepage demo form,
-// per instruction.
+// Wiring pass, 31 Aug 2026 — pixel-exact port of LENGDONPUBLIC-NEW's
+// src/pages/company/Contact.tsx, form now wired to HubSpot (portal
+// 148593751) per instruction, using the existing syncContactToHubSpot
+// server function (src/lib/hubspot.ts) — the same sanctioned path the
+// footer newsletter form and the onboarding flow already use, not a
+// new integration. Submits name/email/company as real contact
+// properties; reason + free-text message are combined into the
+// existing `message` property (a real, pre-existing HubSpot property
+// on this portal, confirmed via search_properties) rather than two
+// invented custom properties (`contact_reason`, `requested_demo_slot`)
+// that do NOT exist in this portal's schema — the first version of
+// this wiring used those two, and the mistake was caught only by
+// testing a real write against the actual portal, not by inspection.
+//
+// VERIFIED LIVE, not assumed: created a real test contact directly
+// against portal 148593751 via the HubSpot connector (id
+// 857209000126), confirmed every property landed exactly as sent on
+// read-back, then marked it as a test record (lifecyclestage=other,
+// hs_lead_status=UNQUALIFIED, message states it's a test) since no
+// delete tool was available in this session's HubSpot MCP toolset —
+// flagged for the founder to delete manually, not silently left
+// looking like a real lead.
+//
+// Real entity/address in the office block fixed to match the
+// corrected Terms/Privacy entity (Venture Tech LLC, DIFC FinTech Hive)
+// — was still "Lengdon Limited... 20 Fenchurch Street, London" from
+// the same source-entity-mismatch pattern already fixed elsewhere this
+// session.
 
 export const Route = createFileRoute("/company/contact")({
   component: Contact,
@@ -26,10 +50,35 @@ const REASONS = [
 function Contact() {
   const [form, setForm] = useState({ name: "", email: "", company: "", reason: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.name && form.email && form.reason) setSubmitted(true);
+    if (!form.name || !form.email || !form.reason || submitting) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      const [firstName, ...rest] = form.name.trim().split(" ");
+      await syncContactToHubSpot({
+        data: {
+          email: form.email.trim().toLowerCase(),
+          properties: {
+            firstname: firstName || "",
+            lastname: rest.join(" "),
+            company: form.company,
+            lifecyclestage: "lead",
+            hs_lead_status: "NEW",
+            message: `[${form.reason}] ${form.message}`.trim(),
+          },
+        },
+      });
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong sending your message. Please email us directly instead.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -71,10 +120,9 @@ function Contact() {
               <div className="mt-8 border-t border-[#e6e9ef] pt-8">
                 <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-3">Office</div>
                 <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">
-                  Lengdon Limited<br />
-                  20 Fenchurch Street<br />
-                  London EC3M 3BY<br />
-                  United Kingdom
+                  Venture Tech LLC<br />
+                  DIFC FinTech Hive<br />
+                  Dubai, United Arab Emirates
                 </p>
               </div>
             </div>
@@ -141,11 +189,16 @@ function Contact() {
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
                       className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors resize-none" />
                   </div>
+                  {error && (
+                    <div className="border border-red-200 bg-red-50 px-4 py-3">
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-red-700 text-[13px]">{error}</span>
+                    </div>
+                  )}
                   <button type="submit"
-                    disabled={!form.name || !form.email || !form.reason}
+                    disabled={!form.name || !form.email || !form.reason || submitting}
                     style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
                     className="bg-[#0a2540] hover:bg-[#13233a] disabled:opacity-40 text-white font-semibold text-[14px] py-4 transition-colors duration-200">
-                    Send message
+                    {submitting ? "Sending…" : "Send message"}
                   </button>
                 </form>
               )}

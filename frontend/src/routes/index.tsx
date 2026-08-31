@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { syncContactToHubSpot } from "@/lib/hubspot";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
 // LENGDONPUBLIC-NEW's src/App.tsx (the founder's Figma Make export,
@@ -13,27 +14,30 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // Tailwind arbitrary-font classes -> inline font-family, per this app's
 // existing convention throughout site/ components).
 //
-// TWO explicit, approved deviations from the source, neither a design
-// judgment call — both confirmed directly rather than assumed:
+// ONE explicit, approved deviation from the source, not a design
+// judgment call — confirmed directly rather than assumed:
 //
-//   1. IMAGES SELF-HOSTED. The source hotlinks 9 Unsplash stock photo
-//      URLs directly. Per instruction, all 9 were downloaded to
-//      public/images/homepage/ and are referenced locally below — no
-//      external image-host dependency. Placeholder photography; will be
-//      replaced with real photography later. public/_routes.json's
-//      exclude list was updated to add "/images/*" (CLAUDE.md's own
-//      recorded trap: a new public/ file 404s via the SSR worker unless
-//      excluded there).
+//   IMAGES SELF-HOSTED. The source hotlinks 9 Unsplash stock photo
+//   URLs directly. Per instruction, all 9 were downloaded to
+//   public/images/homepage/ and are referenced locally below — no
+//   external image-host dependency. Placeholder photography; will be
+//   replaced with real photography later. public/_routes.json's
+//   exclude list was updated to add "/images/*" (CLAUDE.md's own
+//   recorded trap: a new public/ file 404s via the SSR worker unless
+//   excluded there).
 //
-//   2. THE "BOOK A DEMO" FORM IS INTENTIONALLY FAKE, AS IN THE SOURCE.
-//      Local React state only; no real submission. Per instruction, real
-//      wiring (HubSpot/Notion) is deferred to a later session, not
-//      touched here.
-//
-// Per instruction, copy/content claims ("Sealed export", the stat tiles
-// presented as fact, etc.) are reproduced verbatim and were NOT checked
-// against Foundation Document content rules for this task — that check
-// is explicitly deferred, not skipped by oversight.
+// WIRING PASS, 31 Aug 2026: the "Book a private demo" form
+// (DemoSection) is no longer fake — it submits to HubSpot (portal
+// 148593751) via the existing syncContactToHubSpot server function,
+// same as the contact form and onboarding flow. This was the second
+// deviation logged here previously ("intentionally fake, deferred to
+// a later session") — that session is this one. Requested demo slot is
+// carried in the real `message` property, not an invented
+// `requested_demo_slot` custom property — a first version used two
+// custom properties that don't exist in this portal's schema, caught
+// only by testing a real write against the actual HubSpot connector
+// (see company.contact.tsx's header comment for the full verification
+// record, same fix applied here).
 //
 // Animation keyframes/classes live in src/styles.css under a `pub-`
 // prefix (see that file's header comment) to avoid a real collision
@@ -416,6 +420,8 @@ function AppendOnlyRecordSection() {
 function DemoSection() {
   const [formData, setFormData] = useState({ name: "", email: "", company: "", slot: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [playing, setPlaying] = useState(false);
 
   const slots = [
@@ -425,9 +431,32 @@ function DemoSection() {
     "Thursday, 2:00 PM GMT",
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.email && formData.slot) setSubmitted(true);
+    if (!formData.name || !formData.email || !formData.slot || submitting) return;
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const [firstName, ...rest] = formData.name.trim().split(" ");
+      await syncContactToHubSpot({
+        data: {
+          email: formData.email.trim().toLowerCase(),
+          properties: {
+            firstname: firstName || "",
+            lastname: rest.join(" "),
+            company: formData.company,
+            lifecyclestage: "lead",
+            hs_lead_status: "NEW",
+            message: `[Book a product demo] Requested slot: ${formData.slot}`,
+          },
+        },
+      });
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Something went wrong booking your demo. Please email sales@lengdon.com instead.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -574,11 +603,16 @@ function DemoSection() {
                         ))}
                       </div>
                     </div>
+                    {submitError && (
+                      <div className="border border-red-200 bg-red-50 px-4 py-3">
+                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-red-700 text-[13px]">{submitError}</span>
+                      </div>
+                    )}
                     <button type="submit"
                       style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
                       className="mt-auto bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] py-4 transition-colors duration-200 disabled:opacity-40"
-                      disabled={!formData.name || !formData.email || !formData.slot}>
-                      Confirm booking
+                      disabled={!formData.name || !formData.email || !formData.slot || submitting}>
+                      {submitting ? "Booking…" : "Confirm booking"}
                     </button>
                   </form>
                 </>
