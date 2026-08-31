@@ -1,939 +1,1155 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// / — the homepage, rebuilt under PUBLIC-REGISTER.md v2.0 (18 Aug 2026).
+// Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
+// LENGDONPUBLIC-NEW's src/App.tsx (the founder's Figma Make export,
+// cloned into lengdon-public-new/ this session). Binding rule: copy
+// exact spacing/color/type/structure, no interpretation of design
+// intent. Layout, copy, animation timings, and interaction behavior
+// below are the source file's values, translated only where the target
+// stack requires it (react-router Link -> @tanstack/react-router Link,
+// Tailwind arbitrary-font classes -> inline font-family, per this app's
+// existing convention throughout site/ components).
 //
-// This is the first page built under v2.0 and sets the pattern the rest of
-// the public surface follows. It is a VISUAL pass: every word of copy is
-// carried verbatim from the v1.0 build, which was approved separately and is
-// not re-litigated here. What changed is type scale, section grounds, the
-// hero, and the addition of a structural graphic.
+// TWO explicit, approved deviations from the source, neither a design
+// judgment call — both confirmed directly rather than assumed:
 //
-// WHY v1.0 LOOKED WRONG, in one line: it inherited DESIGN.md §13's
-// prohibitions (no gradient, no shadow, 2px radius, no coloured fills) which
-// govern the dense authenticated app and are wrong as marketing constraints.
-// DESIGN.md's scope section was corrected on 18 Aug 2026 to say so. See
-// PUBLIC-REGISTER.md §11 for the measured competitive evidence.
+//   1. IMAGES SELF-HOSTED. The source hotlinks 9 Unsplash stock photo
+//      URLs directly. Per instruction, all 9 were downloaded to
+//      public/images/homepage/ and are referenced locally below — no
+//      external image-host dependency. Placeholder photography; will be
+//      replaced with real photography later. public/_routes.json's
+//      exclude list was updated to add "/images/*" (CLAUDE.md's own
+//      recorded trap: a new public/ file 404s via the SSR worker unless
+//      excluded there).
 //
-// HERO ALIGNMENT — asymmetric, stated deliberately as §4 requires. The left
-// column carries eyebrow/display/lead/action; the right carries the
-// structural graphic with the reference-line specimen beneath it. Reason: the
-// specimen is this page's proof-of-artifact device, and an asymmetric split
-// gives it the same optical weight as the tagline instead of subordinating it
-// beneath a centred block.
+//   2. THE "BOOK A DEMO" FORM IS INTENTIONALLY FAKE, AS IN THE SOURCE.
+//      Local React state only; no real submission. Per instruction, real
+//      wiring (HubSpot/Notion) is deferred to a later session, not
+//      touched here.
 //
-// SECTION TREATMENTS — four, at §5.3.1's ceiling, never two adjacent alike:
-//   A  base      --pub-n-06   hero, founder-controls, close
-//   B  panel     --pub-n-00   term-sheet screenshot, provenance
-//   C  recessed  --pub-n-09   closing pipeline
-//   D  DEEP      --pub-n-0d   the refusals — ONE per page (§5.5), used as
-//                             punctuation: "what we refuse to build" is the
-//                             page's conviction moment and the one place
-//                             weight is earned rather than decorative.
+// Per instruction, copy/content claims ("Sealed export", the stat tiles
+// presented as fact, etc.) are reproduced verbatim and were NOT checked
+// against Foundation Document content rules for this task — that check
+// is explicitly deferred, not skipped by oversight.
 //
-// SIGNAL BLUE — field colour only (§5.4): the hero graphic's strokes and one
-// transition rule. Never chrome; buttons/links/reference line stay ledger
-// navy. No body prose sits on raw --pub-signal (5.04 = AA only, §10.1).
-// ─────────────────────────────────────────────────────────────────────────────
-
-const UI = "var(--font-v2-ui)";
-const DOC = "var(--font-v2-doc)";
-const DATA = "var(--font-v2-data)";
-
-const INK = "var(--v2-ink)";
-const INK_2 = "var(--v2-ink-secondary)";
-const INK_3 = "var(--v2-ink-muted)";
-const RULE = "var(--v2-rule)";
-const RULE_LIGHT = "var(--v2-rule-light)";
-const PANEL = "var(--pub-n-00)";
-const ACCENT = "var(--v2-accent)";
-
-// Section grounds (§5.2)
-const G_BASE = "var(--pub-n-06)";
-const G_PANEL = "var(--pub-n-00)";
-const G_RECESSED = "var(--pub-n-09)";
-const G_DEEP = "var(--pub-n-0d)";
-
-// Inverted ink for the deep section
-const DEEP_INK = "var(--pub-n-02)";
-const DEEP_INK_2 = "var(--pub-n-18)";
-// Muted ink for the deep section's SECONDARY table column. --pub-n-38 chosen
-// by measuring every ramp step against the table's own composited ground
-// (rgba(255,255,255,0.03) over --pub-n-0d = #141B27, not the raw ground):
-// 8.06 = AAA, with a 2.07 separation from the primary column's --pub-n-02.
-// --pub-n-52 gives more separation (3.44) but drops to AA (4.86), so it loses.
-// The hierarchy is the point — the refusal is the statement, the reason
-// supports it; equal weight on both reads as a wall of assertions.
-const DEEP_INK_MUTED = "var(--pub-n-38)";
-const DEEP_RULE = "#243040";
-
-const SIGNAL = "var(--pub-signal)";
-
-/** Measure cap for prose — 66–72 characters (§3.2). Applies to PROSE only. */
-const MEASURE = "34rem";
-const SHELL = "72rem";
-
-// ── Primitives ───────────────────────────────────────────────────────────────
-
-/** §5.6 eyebrow — TOPIC / SUBTOPIC, monospace, factual. Never theatrical. */
-function Eyebrow({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
-  return (
-    <p
-      style={{
-        fontFamily: DATA, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
-        letterSpacing: "0.09em", textTransform: "uppercase",
-        color: onDark ? DEEP_INK_2 : INK_3, margin: 0,
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function Title({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
-  return (
-    <h2 className="pub-title" style={{ fontFamily: UI, color: onDark ? DEEP_INK : INK, margin: 0 }}>
-      {children}
-    </h2>
-  );
-}
-
-function Prose({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
-  return (
-    <p
-      style={{
-        fontFamily: DOC, fontSize: "17px", lineHeight: 1.65,
-        color: onDark ? DEEP_INK_2 : INK_2, maxWidth: MEASURE, margin: 0,
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function Caption({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
-  return (
-    <p
-      style={{
-        fontFamily: UI, fontSize: "13px", lineHeight: 1.5,
-        color: onDark ? DEEP_INK_2 : INK_3, maxWidth: MEASURE, margin: 0,
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-/**
- * A table's own label ("The closing pipeline", "Where the mechanisms come
- * from") — distinct from the §5.6 breadcrumb Eyebrow it used to share,
- * which stayed 11px/letter-spaced by design and read as too small to
- * register as a real sub-header sitting directly above a table. Same grey
- * ink, larger and bolder so it's legible as a heading at a glance.
- * Founder feedback, 25 Aug 2026.
- */
-function InstrumentLabel({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
-  return (
-    <p
-      style={{
-        fontFamily: UI, fontSize: "17px", lineHeight: 1.3, fontWeight: 700,
-        color: onDark ? DEEP_INK_2 : INK_3, margin: 0,
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-/**
- * Section header — title beside a short lead line, row on desktop, per a
- * design reference's proximity pattern (reviewed 23 Aug 2026, structure
- * only — see MetricGrid's comment). NOT a content cut: `lead` is a short
- * line placed for visual rhythm alongside the title; every full approved
- * paragraph still renders in full immediately beneath, unchanged. `lead` is
- * additional framing text, never a substitute for the paragraphs below it.
- */
-function SectionHeader({
-  eyebrow, title, lead, onDark = false,
-}: {
-  eyebrow: React.ReactNode;
-  title: React.ReactNode;
-  lead: React.ReactNode;
-  onDark?: boolean;
-}) {
-  return (
-    <div
-      className="pub-section-header"
-      style={{
-        display: "flex", flexDirection: "column", gap: "20px",
-        paddingBottom: "20px",
-        borderBottom: `1px solid ${onDark ? DEEP_RULE : RULE}`,
-      }}
-    >
-      <Eyebrow onDark={onDark}>{eyebrow}</Eyebrow>
-      <div className="pub-section-header-row" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <Title onDark={onDark}>{title}</Title>
-        <p
-          style={{
-            fontFamily: DOC, fontSize: "15px", lineHeight: 1.55, fontStyle: "italic",
-            color: onDark ? DEEP_INK_2 : INK_3, maxWidth: "22rem", margin: 0,
-          }}
-        >
-          {lead}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Instrument block — a real table, roomier than application density (§6.2).
- * 13.5px, ~49px rows (14/20px cell padding, not a fixed height), 1.5px
- * header rule, no zebra, tabular figures. Sits on panel white inside
- * whichever section ground surrounds it, so tables stay legible on every
- * treatment including the deep one. Density raised 19 Aug 2026 — the prior
- * 36px fixed-height rows read as cramped against the generous type scale
- * around them.
- */
-function Instrument({
-  label, head, rows, caption, onDark = false, mutedFrom,
-}: {
-  label: string;
-  head: string[];
-  rows: React.ReactNode[][];
-  caption: React.ReactNode;
-  onDark?: boolean;
-  /** Column index at and beyond which cells render in the muted ink. Used to
-   *  keep a primary claim dominant and its supporting reason subordinate. */
-  mutedFrom?: number;
-}) {
-  const headRule = onDark ? DEEP_INK_2 : INK;
-  const cellInk = onDark ? DEEP_INK : INK;
-  const cellInkMuted = onDark ? DEEP_INK_MUTED : INK_2;
-  const headInk = onDark ? DEEP_INK : INK_3;
-  const zebraBg = onDark ? "rgba(255,255,255,0.04)" : "var(--pub-n-09)";
-
-  return (
-    <section style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <InstrumentLabel onDark={onDark}>{label}</InstrumentLabel>
-      <div style={{ overflowX: "auto" }}>
-        <table
-          style={{
-            width: "100%", borderCollapse: "collapse",
-            fontFamily: UI, fontSize: "14px", lineHeight: 1.55,
-          }}
-        >
-          <thead>
-            <tr>
-              {head.map((h) => (
-                <th
-                  key={h}
-                  scope="col"
-                  style={{
-                    fontSize: "13.5px", fontWeight: 700, letterSpacing: "0",
-                    textTransform: "none", color: headInk, textAlign: "start",
-                    padding: "0 24px 14px", borderBottom: `1.5px solid ${headRule}`,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, ri) => (
-              <tr key={ri} style={{ background: ri % 2 === 1 ? zebraBg : "transparent" }}>
-                {r.map((cell, ci) => {
-                  const muted = mutedFrom !== undefined && ci >= mutedFrom;
-                  return (
-                    <td
-                      key={ci}
-                      style={{
-                        padding: "18px 24px",
-                        color: muted ? cellInkMuted : cellInk,
-                        textAlign: "start", fontVariantNumeric: "tabular-nums",
-                        verticalAlign: "top",
-                      }}
-                    >
-                      {cell}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <Caption onDark={onDark}>{caption}</Caption>
-    </section>
-  );
-}
-
-/**
- * Metric grid — a row of hairline-divided cells (label + value), no card
- * chrome, no shadow. Structural device taken from a design reference
- * reviewed 23 Aug 2026 (structure only — its copy, brand, and all-caps mono
- * voice were not carried over, per instruction). Used where a section's
- * content is better read as a small set of facts than as another table —
- * breaks up what would otherwise be four consecutive Instrument tables.
- *
- * BINDING CONSTRAINT: every value here must be a real, derivable fact about
- * the mechanism (a literal count, a literal absence) — never an invented
- * statistic. Where no honest number exists for a cell, `value` takes a
- * structural label instead of a number. See call sites for the derivation
- * of each cell.
- */
-/**
- * A value reads as a genuine statistic (large numeral treatment) only when
- * it's short and numeral-led — "6", "2", "0". Anything longer (a sentence,
- * a structural label like "Server-enforced") is a fact, not a stat, and
- * gets a smaller, semibold UI-font size instead — sizing a value by its
- * pixel weight rather than its actual informational content is what made
- * "Server-enforced" and full sentences like "Founder → investor, after
- * NDA" read as oversized text with unclear meaning. Founder feedback,
- * 25 Aug 2026 (Proposal D).
- */
-function isStatValue(value: string): boolean {
-  return value.length <= 3 && /^\d/.test(value);
-}
-
-function MetricGrid({ cells }: { cells: { label: string; value: string }[] }) {
-  return (
-    <div
-      className="pub-metric-grid"
-      style={{
-        display: "grid",
-        ["--pub-metric-cols" as any]: `repeat(${cells.length}, 1fr)`,
-      }}
-    >
-      {cells.map((c) => {
-        const stat = isStatValue(c.value);
-        return (
-          <div key={c.label} style={{ paddingRight: "24px" }}>
-            <Eyebrow>{c.label}</Eyebrow>
-            {stat ? (
-              <div
-                style={{
-                  fontFamily: DATA, fontSize: "28px", fontWeight: 500,
-                  color: INK, marginTop: "10px", lineHeight: 1.15,
-                  fontVariantNumeric: "tabular-nums",
-                }}
-              >
-                {c.value}
-              </div>
-            ) : (
-              <div
-                style={{
-                  fontFamily: UI, fontSize: "15px", fontWeight: 600,
-                  color: INK, marginTop: "10px", lineHeight: 1.35,
-                }}
-              >
-                {c.value.split(/(\s*→\s*)/).map((part, i) =>
-                  part.trim() === "→" ? (
-                    <span key={i} style={{ color: INK_3, fontWeight: 400 }}>
-                      {" → "}
-                    </span>
-                  ) : (
-                    part
-                  )
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function Action({ to, search, children, variant = "primary" }: {
-  to: string;
-  search?: Record<string, unknown>;
-  children: React.ReactNode;
-  variant?: "primary" | "secondary";
-}) {
-  const primary = variant === "primary";
-  return (
-    <Link
-      to={to as any}
-      search={search as any}
-      style={{
-        display: "inline-flex", alignItems: "center", height: "40px",
-        padding: "0 20px", borderRadius: "2px",
-        fontFamily: UI, fontSize: "14px", fontWeight: 500,
-        background: primary ? ACCENT : "transparent",
-        color: primary ? "#FFFFFF" : INK,
-        border: primary ? `1px solid ${ACCENT}` : `1px solid ${RULE}`,
-        textDecoration: "none",
-      }}
-    >
-      {children}
-    </Link>
-  );
-}
-
-/** A full-bleed section: ground spans the viewport, content stays in the shell. */
-function Section({
-  ground, children, onDark = false, topRule = false,
-}: {
-  ground: string;
-  children: React.ReactNode;
-  onDark?: boolean;
-  topRule?: boolean;
-}) {
-  return (
-    <section
-      style={{
-        background: ground,
-        borderTop: topRule ? `2px solid ${SIGNAL}` : undefined,
-        color: onDark ? DEEP_INK : undefined,
-      }}
-    >
-      <div
-        style={{
-          maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
-          display: "flex", flexDirection: "column", gap: "56px",
-        }}
-      >
-        {children}
-      </div>
-    </section>
-  );
-}
-
-// ── Structural graphic (§6.1) ────────────────────────────────────────────────
-// A calm geometric field: layered, slightly offset squares converging toward
-// a shared centre, with corner alignment ticks — a registration mark, the
-// device used to check that layers of a physical document (or a printed
-// plate) are aligned. Drawn once on load and then still.
-//
-// REBUILT 19 AUG 2026 from the original concentric-rings version, which the
-// founder judged too plain relative to the type scale around it. Rejected two
-// alternatives before this one: a "ruled ledger fold" (a rule field with one
-// rule splitting into a confirmed pair) read as visually flat; a "sequential
-// confirmation" row of squares strengthening into one checked mark was
-// rejected outright under Rule 6.1.1 — it reads as a progress/step indicator,
-// which implies a completion or stage claim the same way the original
-// node-link version implied a relationship claim.
-//
-// DELIBERATELY NOT A NODE-LINK GRAPH, and not a progress indicator either.
-// Offset squares converging on a shared centre have no readable "entities,"
-// no "connections," and no implied sequence or completion state — there is
-// nothing here for a viewer to interpret as data. aria-hidden; reduced
-// motion renders the finished frame.
-
-function StructuralGraphic() {
-  const size = 380;
-  const c = size / 2;
-  // Each square is offset from centre by a shrinking amount as it nests
-  // inward, converging toward true registration at the centremost square —
-  // the visual idea is layers of the same record coming into alignment.
-  const squares = [
-    { half: 148, dx: -14, dy: 10 },
-    { half: 128, dx: 11, dy: -12 },
-    { half: 108, dx: -9, dy: -8 },
-    { half: 88, dx: 8, dy: 7 },
-    { half: 68, dx: -5, dy: 5 },
-    { half: 48, dx: 0, dy: 0 },
-  ];
-  const tickLen = 16;
-  const tickGap = 6;
-
-  return (
-    <svg
-      className="pub-graphic"
-      viewBox={`0 0 ${size} ${size}`}
-      width="100%"
-      aria-hidden="true"
-      focusable="false"
-      style={{ display: "block", maxWidth: "420px" }}
-    >
-      {/* offset squares, converging toward centre registration */}
-      {squares.map((sq, i) => {
-        const cx = c + sq.dx;
-        const cy = c + sq.dy;
-        const perimeter = sq.half * 8;
-        return (
-          <rect
-            key={`sq${i}`}
-            data-draw
-            x={cx - sq.half} y={cy - sq.half}
-            width={sq.half * 2} height={sq.half * 2}
-            fill="none"
-            stroke={i % 2 === 0 ? ACCENT : SIGNAL}
-            strokeWidth={i === squares.length - 1 ? 1.5 : 1}
-            opacity={0.16 + i * 0.11}
-            style={{
-              ["--pub-dash" as any]: perimeter,
-              animationDelay: `${0.1 + i * 0.12}s`,
-            }}
-          />
-        );
-      })}
-
-      {/* corner registration ticks — the alignment-mark device */}
-      {[
-        { x1: c, y1: c - 88 - tickGap - tickLen, x2: c, y2: c - 88 - tickGap },
-        { x1: c, y1: c + 88 + tickGap, x2: c, y2: c + 88 + tickGap + tickLen },
-        { x1: c - 88 - tickGap - tickLen, y1: c, x2: c - 88 - tickGap, y2: c },
-        { x1: c + 88 + tickGap, y1: c, x2: c + 88 + tickGap + tickLen, y2: c },
-      ].map((t, i) => (
-        <line
-          key={`tick${i}`}
-          data-node
-          x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
-          stroke={SIGNAL} strokeWidth={1.5} opacity={0.85}
-          style={{ animationDelay: `${0.75 + i * 0.06}s` }}
-        />
-      ))}
-
-      {/* a single centre mark — true registration, the one point of emphasis */}
-      <circle
-        data-node
-        cx={c} cy={c} r={4}
-        fill={SIGNAL}
-        opacity={0.9}
-        style={{ animationDelay: "0.9s" }}
-      />
-    </svg>
-  );
-}
-
-// ── Route ────────────────────────────────────────────────────────────────────
+// Animation keyframes/classes live in src/styles.css under a `pub-`
+// prefix (see that file's header comment) to avoid a real collision
+// found with an existing `pulse-glow` keyframe.
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Lengdon — Every deal leaves a record that holds" },
-      {
-        name: "description",
-        content:
-          "A deal room, a diligence checklist, and a term sheet that all point to the same reference number. Structured process from first contact to close.",
-      },
-      { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Lengdon — Every deal leaves a record that holds" },
-      { property: "og:description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://lengdon.com" },
-    ],
-    links: [{ rel: "canonical", href: "https://lengdon.com" }],
-  }),
-  component: Landing,
+  component: HomePage,
 });
 
-function Landing() {
+// ── Scroll Reveal ─────────────────────────────────────────
+function useReveal(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const root = document.documentElement;
-    const hadDark = root.classList.contains("dark");
-    root.classList.remove("dark");
-    root.setAttribute("data-theme", "light");
-    root.style.colorScheme = "light";
-    window.scrollTo(0, 0);
-    return () => {
-      if (hadDark) {
-        root.classList.add("dark");
-        root.setAttribute("data-theme", "dark");
-        root.style.colorScheme = "dark";
-      }
-    };
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, visible };
+}
+
+function Reveal({ children, className = "", delay = 0 }: {
+  children: React.ReactNode; className?: string; delay?: number;
+}) {
+  const { ref, visible } = useReveal();
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`pub-reveal ${visible ? "pub-reveal-visible" : "pub-reveal-hidden"} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ── Hero: Product UI Mockup Card ──────────────────────────
+const GATE_ROWS = [
+  { num: 1, name: "Counsel",    party: "Both parties",         done: true  },
+  { num: 2, name: "Agreement",  party: "Both parties",         done: true  },
+  { num: 3, name: "Conditions", party: "All 6 satisfied",      done: true  },
+  { num: 4, name: "Signing",    party: "Both parties",         done: true  },
+  { num: 5, name: "Payment",    party: "Confirmed",            done: true  },
+  { num: 6, name: "Close",      party: "Pending confirmation", done: false },
+];
+
+function ProductCard() {
+  const [newEvent, setNewEvent] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setNewEvent(true), 2400);
+    return () => clearTimeout(t);
   }, []);
 
   return (
-    <div style={{ background: G_BASE, minHeight: "100vh" }}>
-      <SiteHeader />
+    <div className="pub-card-float relative w-[420px] shrink-0">
+      <div className="absolute -inset-4 bg-gradient-to-br from-[#0a2540]/8 via-transparent to-[#0a2540]/4 blur-2xl rounded-2xl" />
 
-      <main id="main-content">
-        {/* ── HERO — treatment A, asymmetric (§4) ─────────────────────────── */}
-        {/* Rebuilt 25 Aug 2026, twice. First pass matched the card's own
-            background to the image but left it boxed in a bordered card with
-            padding, on a standard 72rem shell — screenshot feedback showed
-            the image still reading as small, surrounded by unused white
-            section space on a 2000px viewport. Second pass, per explicit
-            instruction ("even we have to make our hero section big do it"):
-            widened this section's own inner shell past the sitewide 72rem
-            cap (92rem, this section only — every other section keeps SHELL)
-            and shifted the column ratio toward the image (1fr 1.35fr, was
-            1.15fr 1fr) so the image genuinely fills more of the section
-            instead of being enlarged within the same narrow column. Do not
-            re-report this as fixed without a screenshot showing the image
-            actually filling the section at real viewport width — that is
-            the standard that was missed the first time. */}
-        <section style={{ background: "var(--pub-n-00)" }}>
-          <div
-            className="pub-hero"
-            style={{
-              maxWidth: "120rem", margin: "0 auto", padding: "72px 40px 96px",
-              display: "grid", alignItems: "center", gap: "48px",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <Eyebrow>Lengdon</Eyebrow>
-              <h1
-                className="pub-display"
-                style={{ fontFamily: UI, color: INK, margin: 0, maxWidth: "14ch" }}
-              >
-                Every deal leaves a record that holds.
-              </h1>
-              <p
-                style={{
-                  fontFamily: DOC, fontSize: "21px", lineHeight: 1.5, color: INK_2,
-                  maxWidth: MEASURE, margin: 0,
-                }}
-              >
-                A deal room, a diligence checklist, and a term sheet that all point
-                to the same reference number.
+      <div className="relative bg-white border border-[#e0e5ee] shadow-[0_24px_64px_rgba(10,37,64,0.12),0_4px_16px_rgba(10,37,64,0.06)] overflow-hidden">
+        <div className="bg-[#f8f9fb] border-b border-[#e6e9ef] px-4 py-3 flex items-center gap-3">
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
+          </div>
+          <div className="flex-1 bg-white border border-[#e6e9ef] rounded-sm px-3 py-1 text-center">
+            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[0.3px]">
+              app.lengdon.com/room/000042
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-[#0a2540] px-5 py-4 flex items-center justify-between">
+          <div>
+            <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[14px] tracking-[-0.2px]">
+              Transaction Room #000042
+            </div>
+            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[11px] mt-0.5 tracking-[0.3px]">
+              ROM Capital · Technology Sector
+            </div>
+          </div>
+          <div className="flex items-center gap-2 bg-emerald-500/15 border border-emerald-400/30 px-2.5 py-1 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 pub-pulse-glow" />
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-300 text-[10px] tracking-[0.8px]">ACTIVE</span>
+          </div>
+        </div>
+
+        <div className="px-5 py-2">
+          {GATE_ROWS.map((g, i) => (
+            <div key={g.num}
+              className={`flex items-center justify-between py-2.5 ${
+                i < GATE_ROWS.length - 1 ? "border-b border-[#f0f2f5]" : ""
+              }`}>
+              <div className="flex items-center gap-3">
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#c9d0db] w-4">{g.num}</span>
+                <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[13px] ${
+                  g.done ? "text-[#0a2540]" : "text-[#0a2540] font-semibold"
+                }`}>{g.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8]">{g.party}</span>
+                {g.done ? (
+                  <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                      <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="w-4 h-4 rounded-full border-2 border-[#0a2540] shrink-0 pub-pulse-glow" />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="border-t border-[#e6e9ef] bg-[#f8f9fb] px-5 py-3">
+          <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[1px] uppercase mb-2">
+            Latest Activity
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-3">
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[10px] w-10 shrink-0">14:32</span>
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[11px]">Condition Met: Regulatory Approval</span>
+            </div>
+            {newEvent && (
+              <div className="flex items-center gap-3" style={{ animation: "pub-data-in 0.5s ease-out" }}>
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[10px] w-10 shrink-0">15:45</span>
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[11px]">Term Accepted: Board Seat</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="ml-auto text-[9px] text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-sm tracking-[0.5px]">NEW</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute -right-2 top-[30%] bg-[#0a2540] px-3 py-2 shadow-lg"
+        style={{ animation: "pub-card-float 7s ease-in-out infinite 1.5s" }}>
+        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[9px] text-[#d4af37]/70 tracking-[1px] mb-1">AUDIT LOG</div>
+        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/60 font-mono">REF-0017</div>
+        <div className="w-px h-3 bg-white/20 mx-auto my-0.5" />
+        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/40 font-mono">REF-0018</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Hero Section ──────────────────────────────────────────
+function HeroSection() {
+  return (
+    <section className="bg-white min-h-screen flex flex-col relative overflow-hidden border-b border-[#e6e9ef]">
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "linear-gradient(transparent calc(100% - 1px), #f0f2f5 calc(100% - 1px))",
+          backgroundSize: "100% 80px",
+          opacity: 0.5
+        }} />
+
+      <div className="relative z-10 flex-1 flex items-center max-w-[1280px] mx-auto w-full px-10 pt-28 pb-12">
+        <div className="flex items-center justify-between gap-8 w-full">
+          <div className="flex flex-col gap-8 max-w-[600px]">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-px bg-[#0a2540]/40" />
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase">
+                Private Capital · Closing Infrastructure
+              </span>
+            </div>
+
+            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
+              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">INFRASTRUCTURE</span>
+              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">FOR PRIVATE</span>
+              <span className="block text-[clamp(64px,8vw,120px)]"
+                style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
+                CAPITAL.
+              </span>
+            </h1>
+
+            <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#425466] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
+              Lengdon closes private capital transactions. From room setup to sealed close — a sequenced, encrypted record of every action taken by both parties.
+            </p>
+
+            <div className="flex items-center gap-4">
+              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-9 py-4 transition-colors duration-200">
+                Initialize Account
+              </Link>
+              <Link to="/product/how-it-works" style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] hover:text-[#0a2540] text-[14px] px-9 py-4 transition-all duration-200">
+                See how it works →
+              </Link>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center justify-end flex-1">
+            <ProductCard />
+          </div>
+        </div>
+      </div>
+
+      <div className="relative z-10 bg-[#0a2540] py-2.5 border-t border-[#13233a]">
+        <div className="pub-ticker-wrap">
+          <div className="pub-ticker-inner">
+            {[
+              "000042 · Condition Met: Regulatory Approval · a8f9...2b1c",
+              "000018 · Term Accepted: Board Seat (Investor) · 3c7d...8e9f",
+              "000019 · Document Released: Cap Table · f1e2...d3c4",
+              "000020 · Signature Confirmed: Founder · 7a3b...1f2e",
+              "000021 · Payment Proof Uploaded · 9d4c...6b7a",
+              "000022 · Close Confirmed: Both Parties · 2e5f...0c9d",
+            ].concat([
+              "000042 · Condition Met: Regulatory Approval · a8f9...2b1c",
+              "000018 · Term Accepted: Board Seat (Investor) · 3c7d...8e9f",
+              "000019 · Document Released: Cap Table · f1e2...d3c4",
+              "000020 · Signature Confirmed: Founder · 7a3b...1f2e",
+              "000021 · Payment Proof Uploaded · 9d4c...6b7a",
+              "000022 · Close Confirmed: Both Parties · 2e5f...0c9d",
+            ]).map((ev, i) => (
+              <span key={i} style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] text-white/35 tracking-[0.5px] mx-8">
+                <span className="text-white/20 mr-2">▸</span>{ev}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Section Label ─────────────────────────────────────────
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <div className="w-5 h-px bg-[#0a2540]/30" />
+      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">
+        {children}
+      </span>
+    </div>
+  );
+}
+
+// ── THE IMMUTABLE RECORD ──────────────────────────────────
+const CHAIN_BLOCKS = [
+  {
+    seq: "0017",
+    ts: "2026-08-26 14:32:11 UTC",
+    action: "Condition Precedent Met: Regulatory Approval",
+    ref: "enc-a8f9...2b1c",
+    prev: "000000...0000",
+  },
+  {
+    seq: "0018",
+    ts: "2026-08-26 15:45:00 UTC",
+    action: "Term Accepted: Board Seat (Investor)",
+    ref: "enc-3c7d...8e9f",
+    prev: "enc-a8f9...2b1c",
+  },
+  {
+    seq: "0019",
+    ts: "2026-08-27 09:12:44 UTC",
+    action: "Document Released: Cap Table (Pre-Money)",
+    ref: "enc-f1e2...d3c4",
+    prev: "enc-3c7d...8e9f",
+  },
+];
+
+function ImmutableRecordSection() {
+  return (
+    <section className="bg-white border-b border-[#e6e9ef] py-24 max-w-[1440px] mx-auto w-full overflow-hidden">
+      <div className="px-12 lg:px-16">
+        <Reveal>
+          <SectionLabel>Architecture</SectionLabel>
+          <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-start">
+            <div className="lg:w-[400px] shrink-0">
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3px] mb-8">
+                <span className="block text-[#0a2540] text-[80px]">THE</span>
+                <span className="block text-[#0a2540] text-[80px]">IMMUTABLE</span>
+                <span className="block text-[80px]"
+                  style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
+                  RECORD.
+                </span>
+              </h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] mb-8">
+                Every action is written to a permanent, append-only log where each entry is encrypted and linked to the one before it. Change an earlier entry and every subsequent link breaks visibly.
               </p>
-              <div style={{ marginTop: "8px" }}>
-                <Action to="/sign-up">Create an account</Action>
+              <div className="flex flex-col gap-4 border-t border-[#e6e9ef] pt-6">
+                {[
+                  { prop: "Append-only", desc: "No deletes. No edits. Additions only." },
+                  { prop: "Encrypted links", desc: "Each entry references its predecessor." },
+                  { prop: "Sealed export", desc: "Both parties receive a signed copy at close." },
+                ].map((item) => (
+                  <div key={item.prop} className="flex gap-4">
+                    <div className="w-2 h-2 rounded-full bg-[#0a2540] mt-1.5 shrink-0" />
+                    <div>
+                      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px]">{item.prop} — </span>
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px]">{item.desc}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "28px", alignItems: "flex-start" }}>
-              {/* Hero image, founder-directed brand asset. No card, no
-                  border, no padding — the section itself is now the image's
-                  own white (--pub-n-00, #FFFFFF), confirmed against the
-                  image's own sampled border-region pixels (avg
-                  rgb(253,252,251)) — so the image sits directly on a
-                  same-color ground with nothing visually separating it from
-                  its background, and fills its full grid column width
-                  instead of a fixed cap. */}
+            <div className="flex-1 min-w-0">
+              <div className="relative">
+                <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#0a2540]/20 to-transparent"
+                    style={{ animation: "pub-scan-verify 4s ease-in-out infinite" }} />
+                </div>
+
+                <div className="flex flex-col gap-0">
+                  {CHAIN_BLOCKS.map((block, i) => (
+                    <Reveal key={block.seq} delay={i * 120}>
+                      <div className="relative">
+                        {i > 0 && (
+                          <div className="flex items-center gap-4 px-6 py-2">
+                            <div className="flex flex-col items-center gap-1 w-8 shrink-0">
+                              <div className="w-px h-3 bg-[#e6e9ef]" />
+                              <div className="w-4 h-4 rounded-full border-2 border-[#e6e9ef] flex items-center justify-center">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#c9d0db]" />
+                              </div>
+                              <div className="w-px h-3 bg-[#e6e9ef]" />
+                            </div>
+                            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[0.5px]">
+                              links to: <span className="font-mono">{block.prev}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="border border-[#e6e9ef] bg-white hover:border-[#0a2540]/20 transition-colors duration-300 relative group">
+                          <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#0a2540]" />
+                          <div className="pl-6 pr-6 py-5">
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                              <div className="flex items-center gap-3">
+                                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[1px]">
+                                  BLOCK #{block.seq}
+                                </span>
+                                <div className="w-1 h-1 rounded-full bg-[#c9d0db]" />
+                                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[11px]">
+                                  {block.ts}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-700 text-[10px] tracking-[0.5px]">VERIFIED</span>
+                              </div>
+                            </div>
+                            <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[16px] mb-3">
+                              {block.action}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8] tracking-[0.3px]">ENCRYPTED REF:</span>
+                              <span className="font-mono text-[12px] text-[#425466] bg-[#f8f9fb] px-2 py-0.5 border border-[#e6e9ef]">
+                                {block.ref}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Reveal>
+                  ))}
+
+                  <Reveal delay={400}>
+                    <div className="flex items-center gap-4 px-6 py-3">
+                      <div className="flex flex-col items-center gap-1 w-8 shrink-0">
+                        <div className="w-px h-4 bg-[#e6e9ef]" />
+                      </div>
+                      <div className="flex items-center gap-3 bg-[#0a2540] px-4 py-2">
+                        <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+                          <rect x="1" y="5" width="10" height="8" rx="1" stroke="white" strokeWidth="1.2"/>
+                          <path d="M3.5 5V3.5a2.5 2.5 0 0 1 5 0V5" stroke="white" strokeWidth="1.2"/>
+                          <circle cx="6" cy="9.5" r="1" fill="white"/>
+                        </svg>
+                        <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white text-[11px] tracking-[1px]">
+                          RECORD CONTINUES → SEALED AT CLOSE
+                        </span>
+                      </div>
+                    </div>
+                  </Reveal>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ── DEMO SECTION ──────────────────────────────────────────
+function DemoSection() {
+  const [formData, setFormData] = useState({ name: "", email: "", company: "", slot: "" });
+  const [submitted, setSubmitted] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  const slots = [
+    "Tomorrow, 10:00 AM GMT",
+    "Tomorrow, 3:00 PM GMT",
+    "Thursday, 9:00 AM GMT",
+    "Thursday, 2:00 PM GMT",
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name && formData.email && formData.slot) setSubmitted(true);
+  };
+
+  return (
+    <section className="bg-white border-b border-[#e6e9ef] py-24 max-w-[1440px] mx-auto w-full">
+      <div className="px-12 lg:px-16">
+        <Reveal>
+          <SectionLabel>Demo</SectionLabel>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[64px] lg:text-[80px] leading-[0.9] tracking-[-2.5px] mb-16">
+            SEE LENGDON CLOSE
+          </h2>
+        </Reveal>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          <Reveal className="flex-1">
+            <div
+              className="relative bg-[#0a2540] overflow-hidden cursor-pointer group h-full min-h-[420px]"
+              onClick={() => setPlaying(!playing)}
+            >
               <img
-                src="/marketing/hero-device.jpg"
-                alt="Abstract layered architectural rendering of a stepped structure with connecting data streams, representing the platform's structural precision"
-                width={900}
-                height={604}
-                style={{ display: "block", width: "100%", height: "auto" }}
+                src="/images/homepage/demo-video-poster.jpg"
+                alt="Lengdon product walkthrough"
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
+                  playing ? "opacity-20 scale-105" : "opacity-50 group-hover:opacity-60"
+                }`}
               />
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                <div style={{ borderInlineStart: `2px solid ${ACCENT}`, paddingInlineStart: "12px" }}>
-                  <div
-                    dir="ltr"
-                    style={{
-                      fontFamily: DATA, fontSize: "13px", lineHeight: 1.7, color: ACCENT,
-                      unicodeBidi: "isolate", fontVariantNumeric: "tabular-nums",
-                    }}
-                  >
-                    000003-ROM-2026-000001-68
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: UI, fontSize: "11px", lineHeight: 1.45, fontWeight: 500,
-                      letterSpacing: "0.09em", textTransform: "uppercase", color: INK_3,
-                    }}
-                  >
-                    Deal room · Specimen
-                  </div>
+              <div className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage: "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
+                  backgroundSize: "40px 40px"
+                }} />
+
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className={`w-20 h-20 rounded-full border-2 border-white/60 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:border-white ${
+                  playing ? "bg-white/20" : "bg-white/10"
+                }`}>
+                  {playing ? (
+                    <div className="flex gap-1.5">
+                      <div className="w-1.5 h-6 bg-white rounded-sm" />
+                      <div className="w-1.5 h-6 bg-white rounded-sm" />
+                    </div>
+                  ) : (
+                    <svg width="22" height="24" viewBox="0 0 22 24" fill="none" className="ml-1">
+                      <path d="M2 2L20 12L2 22V2Z" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round"/>
+                    </svg>
+                  )}
                 </div>
-                <Caption>
-                  Every object carries a reference number with a check digit. Read one
-                  aloud and a mistake shows immediately.
-                </Caption>
+              </div>
+
+              <div className="absolute bottom-0 left-0 right-0 p-7">
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[1px] mb-2">
+                  3:24 MIN
+                </div>
+                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[22px] tracking-[-0.5px]">
+                  The full transaction lifecycle
+                </div>
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/60 text-[14px] mt-1">
+                  Room setup → Engage → Close. No narration, just the product.
+                </div>
+              </div>
+
+              <div className="absolute top-5 right-5 flex flex-col gap-2">
+                {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch, i) => (
+                  <div key={ch} className="flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${playing && i === 2 ? "bg-white" : "bg-white/30"}`} />
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/40 text-[10px] tracking-[0.5px]">{ch}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        </section>
+          </Reveal>
 
-        {/* ── CLOSING PIPELINE — treatment C, recessed ─────────────────────── */}
-        <Section ground={G_RECESSED}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <SectionHeader
-              eyebrow="Closing / Pipeline"
-              title="What holds together"
-              lead="Six confirmed steps. Neither party can skip ahead."
-            />
-            <Prose>
-              A close is not a handshake and a wire transfer. It is six confirmed
-              steps, and neither party can skip ahead.
-            </Prose>
-            <Prose>
-              Each step needs the last one done first. The platform enforces the
-              order — not just in what the screen shows, but in what the server
-              will accept, regardless of what either party&rsquo;s browser sends.
-            </Prose>
-            <Prose>
-              Most steps need both parties to act. Signing happens off the
-              platform; so does payment. What the platform holds is the record of
-              each confirmation — the sequence, the timestamps, and the fact that
-              both sides agreed.
-            </Prose>
-          </div>
+          <Reveal delay={150} className="flex-1 max-w-[480px]">
+            <div className="border border-[#e6e9ef] p-8 lg:p-10 h-full flex flex-col">
+              {submitted ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 py-12">
+                  <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                    <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+                      <path d="M2 8L8 14L20 2" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] mb-2">Confirmed</div>
+                    <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.6]">
+                      Your demo is booked for <strong>{formData.slot}</strong>.<br />
+                      Expect a calendar invite at {formData.email}.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[26px] tracking-[-0.5px] mb-2">
+                      Book a private demo
+                    </h3>
+                    <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.6]">
+                      30 minutes. We'll show you a live transaction from Room setup to Close. No sales pressure — just the product.
+                    </p>
+                  </div>
 
-          {/* Stat strip — structural device from a design reference reviewed
-              23 Aug 2026 (structure only, see MetricGrid's own comment).
-              Every cell is a literal, derivable fact, not an invented
-              statistic — checked against the table immediately below it,
-              which is the source for the first two:
-                Gates: 6 — literal row count of the table beneath.
-                Parties: 2 — founder, investor; no third-party default path
-                  (verified against ClosingPipeline.tsx's role type, which is
-                  exactly "founder" | "investor").
-                Order: "Server-enforced" — a structural label, not a number,
-                  restating the prose claim two lines up (enforced in what
-                  the server accepts, not just what the screen shows) rather
-                  than inventing a count for something that isn't a count.
-                Funds held by platform: 0 — restates the table's own caption
-                  below ("it never holds money") as a fact, not a new claim. */}
-          <MetricGrid
-            cells={[
-              { label: "Gates", value: "6" },
-              { label: "Parties", value: "2" },
-              { label: "Order", value: "Server-enforced" },
-              { label: "Funds held by platform", value: "0" },
-            ]}
-          />
-
-          {/* Verified against app.deal-rooms.$id.close.tsx and ClosingPipeline.tsx
-              directly. Six gates render in the live product; a seventh ("terms
-              locked") is an internal precondition inside gate 2 with no
-              user-facing label, and does not appear here. Renumbered 1-6 — the
-              app's own on-screen numbering is an internal bug. CLAUDE.md §20.12. */}
-          <Instrument
-            label="The closing pipeline"
-            head={["Gate", "What happens", "Confirmed by"]}
-            rows={[
-              [
-                <strong style={{ fontWeight: 600 }}>1 · Legal counsel</strong>,
-                "Either party may bring counsel in, or both agree to proceed without",
-                "Both parties",
-              ],
-              [
-                <strong style={{ fontWeight: 600 }}>2 · Agreement</strong>,
-                "The closing agreement is accepted",
-                "Both parties, independently",
-              ],
-              [
-                <strong style={{ fontWeight: 600 }}>3 · Platform fee</strong>,
-                "The fee for this close is set and confirmed",
-                "Founder sets it, the paying party confirms",
-              ],
-              [
-                <strong style={{ fontWeight: 600 }}>4 · Signing</strong>,
-                "Each party uploads their own signed copy",
-                "Both parties, separately",
-              ],
-              [
-                <strong style={{ fontWeight: 600 }}>5 · Investment payment</strong>,
-                "Funds move directly between the parties; the platform records proof and confirmation",
-                "Investor uploads proof, founder confirms",
-              ],
-              [
-                <strong style={{ fontWeight: 600 }}>6 · Close</strong>,
-                "Both parties confirm delivery. The room becomes a permanent, read-only record",
-                "Both parties, independently",
-              ],
-            ]}
-            caption="Funds and signatures move directly between the two parties. The platform records each confirmation — it never holds money or signs on anyone's behalf."
-          />
-        </Section>
-
-        {/* ── FOUNDER CONTROLS — treatment A, base ─────────────────────────── */}
-        <Section ground={G_BASE}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <SectionHeader
-              eyebrow="Founder / Control"
-              title="For the founder side"
-              lead="The founder controls what the room contains."
-            />
-            <Prose>
-              The deploying side opens the room. The founder controls what it
-              contains.
-            </Prose>
-            <Prose>
-              One profile, one document vault, built once and reused across every
-              room a founder opens. Nothing is shared with an investor before the
-              founder grants access, and every grant is logged.
-            </Prose>
-            <Prose>
-              There is no fee until a raise on the Direct tier reaches its first
-              close.
-            </Prose>
-          </div>
-
-          {/*
-            Converted from a table to a hairline metric grid, 23 Aug 2026 —
-            structural device from the same design reference as the stat
-            strip above. Every "Set by / Visible to" pair is preserved, not
-            cut — compressed into a single "Set by → Visible to" value per
-            cell rather than dropped, since this is approved content and the
-            rebuild is a visual pass, not a content edit (matches the
-            reference's own → grammar for exactly this shape). Full detail
-            (the "after NDA" / "per disclosure" qualifiers) survives in the
-            caption immediately below, unchanged from the source table's own
-            caption plus the two qualifiers that don't fit an eyebrow-length
-            label — nothing here is invented, only re-laid-out.
-          */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <InstrumentLabel>What a founder controls</InstrumentLabel>
-            <MetricGrid
-              cells={[
-                { label: "Document access", value: "Founder → investor, after NDA" },
-                { label: "Financial detail", value: "Founder → investor, if granted" },
-                { label: "Team records", value: "Founder → investor, in-room only" },
-                { label: "Counsel access", value: "Either party → counsel, terms only" },
-              ]}
-            />
-            <Caption>
-              A lawyer invited at closing sees the term summary and the agreement. They do not see earlier diligence or negotiation history.
-            </Caption>
-          </div>
-        </Section>
-
-        {/* ── TERM SHEET SCREENSHOT — treatment B, panel (§6.2) ─────────────
-            Real screen, captured live from the seeded specimen room, never
-            mocked. SPECIMEN corner tag sits on the image itself so it
-            registers before the eye reaches the figures. */}
-        <section style={{ background: G_PANEL, borderTop: `1px solid ${RULE}`, borderBottom: `1px solid ${RULE}` }}>
-          <div
-            className="pub-split"
-            style={{
-              display: "grid", alignItems: "start", gap: "48px",
-              maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-              <Eyebrow>Product / Term sheet</Eyebrow>
-              <Title>Seeing it work</Title>
-              <Prose>
-                A term doesn&rsquo;t move from proposed to finalized because one
-                side declared it so. Each term carries its own status —
-                proposed, countered, accepted by one side, or locked once both
-                sides agree on the same value.
-              </Prose>
-              <Prose>
-                The room below shows all four states on one screen, mid-negotiation.
-              </Prose>
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-5 flex-1">
+                    <div className="flex flex-col gap-1.5">
+                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Full name</label>
+                      <input
+                        type="text" placeholder="Jane Thornton"
+                        value={formData.name}
+                        onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                        style={{ fontFamily: "'Inter:Regular', sans-serif" }}
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Work email</label>
+                      <input
+                        type="email" placeholder="jane@firm.com"
+                        value={formData.email}
+                        onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                        style={{ fontFamily: "'Inter:Regular', sans-serif" }}
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Company</label>
+                      <input
+                        type="text" placeholder="ROM Capital Partners"
+                        value={formData.company}
+                        onChange={e => setFormData(p => ({ ...p, company: e.target.value }))}
+                        style={{ fontFamily: "'Inter:Regular', sans-serif" }}
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Select a time</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {slots.map(slot => (
+                          <button type="button" key={slot}
+                            onClick={() => setFormData(p => ({ ...p, slot }))}
+                            className={`border px-3 py-2.5 text-left transition-all duration-150 ${
+                              formData.slot === slot
+                                ? "border-[#0a2540] bg-[#0a2540] text-white"
+                                : "border-[#e6e9ef] text-[#425466] hover:border-[#0a2540]/30"
+                            }`}>
+                            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[12px] leading-[1.4]">{slot}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button type="submit"
+                      style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
+                      className="mt-auto bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] py-4 transition-colors duration-200 disabled:opacity-40"
+                      disabled={!formData.name || !formData.email || !formData.slot}>
+                      Confirm booking
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
-              <div style={{ position: "relative", border: `1px solid ${RULE}`, lineHeight: 0 }}>
-                <img
-                  src="/marketing/term-sheet-specimen.png"
-                  alt="Specimen term negotiation screen with reserved placeholder data, showing seven deal terms in various states: finalized, accepted by one side, proposed, and counter-proposed."
-                  width={1212}
-                  height={720}
-                  style={{ display: "block", width: "100%", height: "auto" }}
-                />
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute", top: "12px", right: "12px",
-                    background: ACCENT, color: "#FFFFFF",
-                    fontFamily: UI, fontSize: "11px", fontWeight: 700,
-                    letterSpacing: "0.09em", textTransform: "uppercase",
-                    padding: "5px 10px", borderRadius: "2px",
-                  }}
+// ── PROCESS: PHASE ILLUSTRATIONS ─────────────────────────
+// (Illustrations dropped from this build — see the report to the founder:
+// the source's PROCESS_PHASES_V2 entries use real Unsplash photos, not
+// these SVG illustration components, so IllustrationCounsel through
+// IllustrationClose are dead code in the source itself, never rendered.
+// Confirmed by reading App() and ProcessSection() — neither references
+// them. Not ported, since porting dead code is not "pixel-exact
+// reproduction of what renders," it's reproducing an unused artifact.)
+
+const PROCESS_PHASES_V2 = [
+  {
+    num: "01", title: "COUNSEL",
+    party: "Both parties",
+    desc: "Both legal teams are brought in. Transaction parameters are formally established before any data is shared. No term sheet, no data room — only counsel.",
+    img: "/images/homepage/process-counsel.jpg",
+    imgAlt: "Formal boardroom with long conference table and chairs",
+    bg: "#0a2540",
+  },
+  {
+    num: "02", title: "AGREEMENT",
+    party: "Both parties, independently",
+    desc: "Each party independently confirms their intent to proceed. No single confirmation can trigger the next gate. Both must act; neither can force the other forward.",
+    img: "/images/homepage/process-agreement.jpg",
+    imgAlt: "Two people shaking hands over a signed document",
+    bg: "#0d1b2e",
+  },
+  {
+    num: "03", title: "CONDITIONS",
+    party: "Owner of each condition",
+    desc: "Each prerequisite is assigned to a named owner and tracked until satisfied. The system enforces completion order — conditions cannot be resequenced or skipped.",
+    img: "/images/homepage/process-conditions.jpg",
+    imgAlt: "Compliance checklist documentation",
+    bg: "#0a2540",
+  },
+  {
+    num: "04", title: "SIGNING",
+    party: "Both parties, separately",
+    desc: "Transaction documents are executed in sequence by each party. No joint session — each signs in their own time, in their own jurisdiction, with their own counsel present.",
+    img: "/images/homepage/process-signing.jpg",
+    imgAlt: "Person signing a formal document with pen",
+    bg: "#0d1b2e",
+  },
+  {
+    num: "05", title: "PAYMENT",
+    party: "Investor + Founder confirm",
+    desc: "Investor uploads verified proof of transfer. Founder confirms receipt. Both confirmations are required to proceed. The system records each action independently.",
+    img: "/images/homepage/process-payment.jpg",
+    imgAlt: "Person completing a financial transaction on laptop",
+    bg: "#0a2540",
+  },
+  {
+    num: "06", title: "CLOSE",
+    party: "Both parties, independently",
+    desc: "Mutual confirmation seals the record permanently. Both parties export a signed copy of the complete audit trail. The room is archived. Nothing changes after this point.",
+    img: "/images/homepage/process-close.jpg",
+    imgAlt: "Wooden wax seal stamp on a table",
+    bg: "#0d1b2e",
+  },
+];
+
+function ProcessSection() {
+  const [openPhase, setOpenPhase] = useState<string | null>("01");
+
+  const toggle = (num: string) => setOpenPhase(prev => prev === num ? null : num);
+
+  return (
+    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
+      <div className="flex" style={{ minHeight: "100vh" }}>
+        <div className="hidden lg:flex w-[480px] xl:w-[540px] shrink-0 sticky top-0 h-screen flex-col border-r border-[#e6e9ef] px-12 xl:px-16 py-20">
+          <div className="flex flex-col gap-6 flex-1">
+            <SectionLabel>Process</SectionLabel>
+
+            <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(64px, 6vw, 88px)" }} className="font-semibold text-[#0a2540] leading-[0.88] tracking-[-3.5px]">
+              PROCESS
+            </h2>
+
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75] max-w-[320px]">
+              Six sequential gates. Each requires the one before it. The order is enforced by the system — not by convention.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3">
+              {PROCESS_PHASES_V2.map((p) => (
+                <button
+                  key={p.num}
+                  onClick={() => toggle(p.num)}
+                  className={`flex items-center gap-3 text-left transition-all duration-200 group ${
+                    openPhase === p.num ? "opacity-100" : "opacity-40 hover:opacity-70"
+                  }`}
                 >
-                  Specimen
+                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${
+                    openPhase === p.num ? "bg-[#0a2540]" : "bg-[#c9d0db] group-hover:bg-[#0a2540]/40"
+                  }`} />
+                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.5px]">
+                    {p.num} — {p.title}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-[#c9d0db] text-[11px] tracking-[1px]" style={{ fontFamily: "'Inter:Regular', sans-serif" }}>
+            <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
+              <path d="M1 4H15M15 4L12 1M15 4L12 7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>Click a gate to expand</span>
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col">
+          {PROCESS_PHASES_V2.map((phase, i) => {
+            const isOpen = openPhase === phase.num;
+            const isLast = i === PROCESS_PHASES_V2.length - 1;
+
+            return (
+              <div
+                key={phase.num}
+                className={`group overflow-hidden cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isLast ? "border-b border-[#e6e9ef]" : ""}`}
+                style={{ height: isOpen ? 540 : 90 }}
+                onClick={() => toggle(phase.num)}
+              >
+                <div className="h-[90px] flex items-center px-8 lg:px-12 gap-6 select-none relative overflow-hidden">
+                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#c9d0db] text-[10px] tracking-[2px] w-5 shrink-0">
+                    {phase.num}
+                  </span>
+
+                  <span
+                    style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(60px, 5.5vw, 80px)", whiteSpace: "nowrap" }}
+                    className={`font-semibold leading-[90px] tracking-[-2.5px] overflow-hidden transition-colors duration-300 ${
+                      isOpen
+                        ? "text-[#0a2540]"
+                        : "text-[#0a2540]/70 group-hover:text-[#0a2540]"
+                    }`}
+                  >
+                    {phase.title}
+                  </span>
+
+                  <div className="ml-auto flex items-center gap-5 shrink-0">
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden md:block text-[#94a3b8] text-[11px] tracking-[0.3px]">
+                      {phase.party}
+                    </span>
+                    <svg
+                      width="18" height="10" viewBox="0 0 18 10" fill="none"
+                      className={`transition-transform duration-500 shrink-0 ${isOpen ? "rotate-180" : ""}`}
+                    >
+                      <path d="M1 1L9 9L17 1" stroke={isOpen ? "#0a2540" : "#94a3b8"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+
+                  <div className={`absolute bottom-0 left-0 h-px bg-[#0a2540]/8 transition-all duration-500 ${
+                    isOpen ? "w-full" : "w-0 group-hover:w-full"
+                  }`} />
+                </div>
+
+                <div
+                  className={`flex transition-opacity duration-500 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                  style={{ height: 450 }}
+                >
+                  <div className="w-[55%] lg:w-[58%] shrink-0 overflow-hidden relative bg-[#0a2540]">
+                    <img
+                      src={phase.img}
+                      alt={phase.imgAlt}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                      style={{ opacity: 0.88 }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0a2540]/30 pointer-events-none" />
+                    <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="absolute bottom-6 left-8 font-semibold text-white/12 text-[120px] leading-none tracking-[-5px] select-none pointer-events-none">
+                      {phase.num}
+                    </div>
+                  </div>
+
+                  <div
+                    className="flex-1 flex flex-col justify-between px-10 xl:px-14 py-10"
+                    style={{ background: phase.bg }}
+                  >
+                    <div className="flex flex-col gap-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-px bg-[#d4af37]/50" />
+                        <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#d4af37]/70 text-[10px] tracking-[2px] uppercase">
+                          Gate {phase.num} of 06
+                        </span>
+                      </div>
+
+                      <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[32px] xl:text-[38px] leading-[1.05] tracking-[-1px]">
+                        {phase.title}
+                      </h3>
+
+                      <div className="inline-flex items-center gap-2 border border-white/10 px-3.5 py-1.5 w-fit">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/70" />
+                        <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[0.8px] uppercase">
+                          {phase.party}
+                        </span>
+                      </div>
+
+                      <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/65 text-[14px] xl:text-[15px] leading-[1.75]">
+                        {phase.desc}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-4">
+                      {PROCESS_PHASES_V2.map((p) => (
+                        <div
+                          key={p.num}
+                          className={`transition-all duration-300 ${
+                            p.num === phase.num
+                              ? "w-6 h-1.5 bg-[#d4af37]/80"
+                              : parseInt(p.num) < parseInt(phase.num)
+                              ? "w-1.5 h-1.5 rounded-full bg-white/30"
+                              : "w-1.5 h-1.5 rounded-full bg-white/10"
+                          }`}
+                        />
+                      ))}
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
+                        {phase.num} / 06
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <Caption>
-                <strong style={{ color: INK, fontWeight: 600 }}>Term negotiation · Specimen.</strong>{" "}
-                Company, investor, and figures are placeholder data, reserved
-                for this purpose and never a real negotiation.
-              </Caption>
-            </figure>
-          </div>
-        </section>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* ── PROVENANCE — treatment B continues on panel ──────────────────── */}
-        <Section ground={G_PANEL}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <SectionHeader
-              eyebrow="Method / Provenance"
-              title="Why the mechanisms aren't ours"
-              lead="Each piece is adapted from a practice tested for decades elsewhere in finance."
-            />
-            <Prose>
-              None of this is a new invention. Each piece is adapted from a
-              practice that has been tested for decades in a different part of
-              finance.
-            </Prose>
-            <Prose>
-              We are naming the source deliberately. A mechanism with a checkable
-              origin does not ask to be trusted — it asks to be checked.
-            </Prose>
+// ── INFRASTRUCTURE, NOT PARTICIPANT ──────────────────────
+function InfrastructureBannerSection() {
+  return (
+    <Reveal>
+      <section className="bg-[#0d1b2e] py-20 px-12 lg:px-16 max-w-[1440px] mx-auto w-full border-b border-[#e6e9ef]">
+        <div className="flex flex-col lg:flex-row items-end justify-between gap-12">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(48px,6vw,96px)" }} className="font-semibold text-[#f9fcff] leading-[0.88] tracking-[-3px] max-w-[700px]">
+            INFRASTRUCTURE,<br />NOT PARTICIPANT
+          </h2>
+          <div className="lg:max-w-[400px]">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/65 text-[16px] leading-[1.7]">
+              Lengdon is closing infrastructure for private capital. It begins when two parties have already decided to talk, and ends when the transaction closes or is declined — leaving a permanent, verifiable record either way.
+            </p>
           </div>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
 
-          <Instrument
-            label="Where the mechanisms come from"
-            head={["Mechanism", "Origin"]}
-            rows={[
-              ["The conditions register", "Secured lending practice"],
-              ["The evidence ladder", "Insurance underwriting practice"],
-              ["Soft-circle tracking", "Syndicate practice"],
-              ["The check digit", <><span style={{ fontFamily: DATA, fontSize: "12px" }}>ISO 7064 MOD 97-10</span> — the IBAN algorithm</>],
-            ]}
-            caption="We adopt established process and name its source. Each of these is checkable against its own standard."
+// ── SECURITY & TRUST ──────────────────────────────────────
+function SecuritySection() {
+  return (
+    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
+      <div className="flex flex-col lg:flex-row">
+        <Reveal className="flex-1 px-12 lg:px-16 py-24 border-r border-[#e6e9ef]">
+          <SectionLabel>Trust</SectionLabel>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[64px] leading-[0.9] tracking-[-2px] mb-8">
+            SECURITY<br />&amp; TRUST
+          </h2>
+          <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] max-w-[400px] mb-10">
+            Encryption at rest and in transit; mandatory multi-factor authentication; role-scoped access; per-person NDAs; the immutable record; data residency; no money movement, no custody, no escrow.
+          </p>
+          <Link to="/legal/privacy" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="flex items-center gap-2 text-[#0a2540] text-[14px] hover:opacity-60 transition-opacity">
+            Read the Privacy Policy <span>→</span>
+          </Link>
+        </Reveal>
+        <Reveal delay={150} className="flex-1 overflow-hidden">
+          <img
+            src="/images/homepage/security-infrastructure.jpg"
+            alt="Security infrastructure"
+            className="w-full h-full object-cover min-h-[400px]"
           />
-        </Section>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
-        {/* ── REFUSALS — treatment D, THE ONE DARK SECTION (§5.5) ───────────
-            Punctuation, not a theme. This is the page's conviction moment:
-            refusals read as conviction precisely because they cost features,
-            and this is the one place weight is earned. Signal-blue top rule
-            marks the transition. Ink inverts; contrast measured, not assumed
-            (§10) — the "Why" column was checked in-browser against this exact
-            ground before shipping. */}
-        <section style={{ background: G_DEEP, borderTop: `2px solid ${SIGNAL}` }}>
-          <div
-            style={{
-              maxWidth: SHELL, margin: "0 auto", padding: "88px 24px",
-              display: "flex", flexDirection: "column", gap: "56px",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-              <SectionHeader
-                onDark
-                eyebrow="Position / Exclusions"
-                title="What we refuse to build"
-                lead="Some features are the standard shape for this category. We will not build them."
+// ── WHO IT'S FOR ──────────────────────────────────────────
+const AUDIENCES = [
+  {
+    role: "Founder",
+    tag: "RAISING CAPITAL",
+    desc: "You're raising from angels, syndicates, or funds. You need a sequenced process that protects you and your investor equally — and leaves a permanent, exportable record of every commitment made.",
+    uses: ["Structured data room by gate", "Per-person NDA enforcement", "Condition precedent tracking", "Signed close record you own"],
+  },
+  {
+    role: "Advisors & Agents",
+    tag: "DEAL FACILITATION",
+    desc: "You coordinate transactions between parties and need full visibility without being a principal. Lengdon gives you a neutral record of every action taken on both sides — without you holding the data.",
+    uses: ["Read-only observer access", "Immutable audit trail", "Multi-party coordination", "Neutral infrastructure"],
+  },
+  {
+    role: "Angels",
+    tag: "INDIVIDUAL INVESTOR",
+    desc: "You invest personally. You need a formal closing process that protects your capital and leaves a clear record — even when investing alongside others or into early-stage companies without legal teams.",
+    uses: ["Formal structure for informal deals", "Payment proof confirmation", "Independent signing workflow", "Exportable close record"],
+  },
+  {
+    role: "Legal",
+    tag: "COUNSEL & COMPLIANCE",
+    desc: "Your clients are on both sides of the transaction. Lengdon gives each counsel team a separate, encrypted view of the record — with no shared data room and no cross-party exposure before each gate is met.",
+    uses: ["Per-party confidentiality", "Gate-by-gate document release", "Immutable legal audit trail", "Encrypted party separation"],
+  },
+  {
+    role: "Analyst",
+    tag: "DUE DILIGENCE",
+    desc: "You evaluate deals. You need a data room that is consistent in structure, a diligence list that actually tracks ownership, and a record of every document accessed and every condition cleared.",
+    uses: ["Structured conditions checklist", "Document access log", "Consistent room architecture", "Exportable diligence record"],
+  },
+  {
+    role: "VC Firm",
+    tag: "VENTURE CAPITAL",
+    desc: "You deploy capital at scale. You need closing infrastructure that your legal, compliance, and ops teams can rely on — with consistent room structure, enforced sequencing, and a record that survives the fund's lifetime.",
+    uses: ["Portfolio-wide room consistency", "Compliance-grade audit trail", "Multi-party conditions enforcement", "Fund-level record retention"],
+  },
+  {
+    role: "PE Firm",
+    tag: "PRIVATE EQUITY",
+    desc: "Your transactions are complex, multi-party, and long-running. Lengdon enforces sequencing across all conditions, all signatories, and all confirmations — with a permanent record tied to each closing event.",
+    uses: ["Complex conditions management", "Multi-signatory coordination", "Long-duration room support", "Permanent sealed close record"],
+  },
+  {
+    role: "Syndicate Lead",
+    tag: "INVESTOR COORDINATION",
+    desc: "You coordinate groups of investors into a single closing. You need a room where each investor follows the same process, conditions are tracked collectively, and the record is shared with everyone at close.",
+    uses: ["Multi-investor room architecture", "Collective conditions tracking", "Payment confirmation per investor", "Shared exportable close record"],
+  },
+];
+
+function AudienceSection() {
+  const [active, setActive] = useState(0);
+  const current = AUDIENCES[active];
+
+  return (
+    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
+      <div className="px-12 lg:px-16 pt-24 pb-14 border-b border-[#e6e9ef]">
+        <Reveal>
+          <div className="flex flex-col lg:flex-row justify-between gap-8 items-end">
+            <div>
+              <SectionLabel>Audience</SectionLabel>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(52px,6vw,80px)" }} className="font-semibold text-[#0a2540] leading-[0.9] tracking-[-2.5px]">
+                WHO IT'S FOR
+              </h2>
+            </div>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75] max-w-[440px] pb-1">
+              Lengdon is built for every party in a private capital transaction — not just the two principals. Each role gets the access and record they need, separated by design.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+
+      <div className="flex min-h-[560px]">
+        <div className="w-[280px] xl:w-[320px] shrink-0 border-r border-[#e6e9ef] flex flex-col">
+          {AUDIENCES.map((a, i) => (
+            <button
+              key={a.role}
+              onClick={() => setActive(i)}
+              className={`group flex items-center justify-between px-8 py-4 border-b border-[#e6e9ef] text-left transition-all duration-200 last:border-b-0 ${
+                active === i
+                  ? "bg-[#0a2540]"
+                  : "bg-white hover:bg-[#f8f9fb]"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[#c9d0db]"}`}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[15px] tracking-[-0.2px] transition-colors ${active === i ? "text-white" : "text-[#0a2540] group-hover:text-[#0a2540]"}`}>
+                  {a.role}
+                </span>
+              </div>
+              <svg width="14" height="8" viewBox="0 0 14 8" fill="none"
+                className={`shrink-0 transition-opacity ${active === i ? "opacity-100" : "opacity-0 group-hover:opacity-30"}`}>
+                <path d="M1 4H13M13 4L10 1M13 4L10 7" stroke={active === i ? "white" : "#0a2540"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 flex flex-col lg:flex-row">
+          <div className="flex-1 px-12 xl:px-16 py-12 flex flex-col justify-between">
+            <div className="flex flex-col gap-7">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-px bg-[#d4af37]/60" />
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#d4af37]/80 text-[10px] tracking-[2px] uppercase">
+                  {current.tag}
+                </span>
+              </div>
+              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(36px,4vw,52px)" }} className="font-semibold text-[#0a2540] leading-[1.0] tracking-[-1.5px]">
+                {current.role}
+              </h3>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] xl:text-[16px] leading-[1.75] max-w-[480px]">
+                {current.desc}
+              </p>
+              <div className="flex flex-col gap-0 border-t border-[#e6e9ef] pt-6">
+                {current.uses.map((u, i) => (
+                  <div key={i} className={`flex items-center gap-4 py-3 ${i < current.uses.length - 1 ? "border-b border-[#f0f2f5]" : ""}`}>
+                    <div className="w-4 h-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                      <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
+                        <path d="M1 2.5L2.5 4L6 1" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px]">{u}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pt-8">
+              {AUDIENCES.map((_, i) => (
+                <button key={i} onClick={() => setActive(i)}
+                  className={`transition-all duration-300 ${i === active ? "w-5 h-1.5 bg-[#0a2540]" : "w-1.5 h-1.5 rounded-full bg-[#e6e9ef] hover:bg-[#c9d0db]"}`} />
+              ))}
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="ml-auto text-[#c9d0db] text-[11px] tracking-[0.5px]">
+                {String(active + 1).padStart(2, "0")} / {String(AUDIENCES.length).padStart(2, "0")}
+              </span>
+            </div>
+          </div>
+
+          <div className="hidden xl:flex w-[280px] shrink-0 border-l border-[#e6e9ef] bg-[#f8f9fb] flex-col items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
+              <span style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(80px, 10vw, 140px)", writingMode: "vertical-rl", transform: "rotate(180deg)" }} className="font-semibold text-[#0a2540]/5 leading-none tracking-[-4px]">
+                {current.role.toUpperCase()}
+              </span>
+            </div>
+            <div className="relative z-10 flex flex-col items-center gap-3">
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Role</span>
+              <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[56px] leading-none tracking-[-2px]">
+                {String(active + 1).padStart(2, "0")}
+              </span>
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── CTA SECTION ───────────────────────────────────────────
+function CTASection() {
+  return (
+    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full overflow-hidden">
+      <Reveal>
+        <div className="flex flex-col lg:flex-row">
+          <div className="flex-1 bg-[#0a2540] px-12 xl:px-20 py-24 lg:py-32 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+                backgroundSize: "60px 60px"
+              }} />
+            <div className="relative z-10 flex flex-col gap-10">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-emerald-400" style={{ animation: "pub-pulse-glow 2s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-400/70 text-[11px] tracking-[2px] uppercase">
+                  Infrastructure live
+                </span>
+              </div>
+
+              <div>
+                <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(64px, 8vw, 116px)" }} className="font-semibold text-white leading-[0.88] tracking-[-3.5px]">
+                  READY<br />TO CLOSE?
+                </h2>
+              </div>
+
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[440px]">
+                Initialize a room, invite both parties, and begin the six-gate process today. No integration, no setup call, no consultant required.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f5f0e8] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-all duration-200 active:scale-95">
+                  Initialize Account
+                </Link>
+                <Link to="/sign-in" search={{ redirect: "/app" }} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+                  Sign in →
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap gap-6 pt-2 border-t border-white/8">
+                {[
+                  "6-gate enforced sequence",
+                  "Per-person encryption",
+                  "Permanent audit record",
+                  "Both parties export at close",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-[#d4af37]/60" />
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/35 text-[12px] tracking-[0.3px]">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(120px, 18vw, 260px)" }} className="absolute bottom-0 right-0 font-semibold text-white/4 leading-none tracking-[-8px] select-none pointer-events-none">
+              06
+            </div>
+          </div>
+
+          <div className="lg:w-[420px] xl:w-[480px] shrink-0 flex flex-col">
+            <div className="flex-1 relative overflow-hidden bg-[#0d1b2e] min-h-[320px]">
+              <img
+                src="/images/homepage/cta-transaction.jpg"
+                alt="Two parties completing a private capital transaction"
+                className="w-full h-full object-cover opacity-70"
               />
-              <Prose onDark>
-                Some features are the standard shape for this category and we will
-                not build them.
-              </Prose>
-              <Prose onDark>
-                We do not score, rank, or match. We do not tell you who to fund or
-                who should fund you — that judgment belongs to the two parties in
-                the room, not to us.
-              </Prose>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540]/60 to-transparent pointer-events-none" />
+              <div className="absolute bottom-6 left-8 right-8">
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/40 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
+                <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-white/80 text-[13px] tracking-[-0.2px]">
+                  000042 · Conditions gate — 5 of 6 satisfied
+                </div>
+              </div>
             </div>
 
-            <Instrument
-              onDark
-              mutedFrom={1}
-              label="What we do not build"
-              head={["We do not build", "Why"]}
-              rows={[
-                [<strong style={{ fontWeight: 600 }}>Matching or recommendation</strong>, "The judgment belongs to the parties, not to an algorithm"],
-                [<strong style={{ fontWeight: 600 }}>Readiness scores</strong>, "An invented number is not evidence"],
-                [<strong style={{ fontWeight: 600 }}>Verification badges</strong>, "We record what a party asserts; we do not certify it"],
-                [<strong style={{ fontWeight: 600 }}>Escrow or custody</strong>, "We are not a bank, broker, or custodian"],
-                [<strong style={{ fontWeight: 600 }}>A social feed</strong>, "Nothing here is content"],
-              ]}
-              caption="Each of these is a deliberate decision, not a missing feature."
-            />
-          </div>
-        </section>
-
-        {/* ── CLOSE — treatment A, base ─────────────────────────────────────── */}
-        <Section ground={G_BASE}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            <Eyebrow>Start / Direct tier</Eyebrow>
-            <Title>Start on the Direct tier</Title>
-            <Prose>No card, no trial clock.</Prose>
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
-              <Action to="/sign-up">Create an account</Action>
-              <Action to="/pricing" variant="secondary">See pricing</Action>
+            <div className="grid grid-cols-2 border-t border-[#e6e9ef]">
+              {[
+                { val: "6",     label: "Sequential gates",        accent: false },
+                { val: "1:1",   label: "Per-person confidentiality", accent: true  },
+                { val: "100%",  label: "Append-only record",      accent: false },
+                { val: "∞",     label: "Sealed at every close",   accent: true  },
+              ].map((s, i) => (
+                <div key={i} className={`px-8 py-7 flex flex-col gap-1 border-[#e6e9ef] ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b" : ""}`}>
+                  <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[36px] leading-none tracking-[-1.5px]">
+                    {s.val}
+                  </span>
+                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] leading-[1.4]">
+                    {s.label}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-        </Section>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+function HomePage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <SiteHeader />
+      <main id="main-content">
+        <HeroSection />
+        <ImmutableRecordSection />
+        <DemoSection />
+        <ProcessSection />
+        <InfrastructureBannerSection />
+        <SecuritySection />
+        <AudienceSection />
+        <CTASection />
       </main>
-
       <SiteFooter />
     </div>
   );

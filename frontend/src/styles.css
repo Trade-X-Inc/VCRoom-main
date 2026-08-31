@@ -632,3 +632,101 @@ img { max-width: 100%; height: auto; }
   letter-spacing: .1em;
   color: var(--v2-accent);
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Public-site rebuild, 31 Aug 2026 — animations pixel-copied from
+   LENGDONPUBLIC-NEW's src/index.css (the founder's Figma Make export).
+   Everything below is prefixed `pub-` per the established convention
+   (see .pub-lattice, ported 25 Aug 2026, CLAUDE.md §12) so it can never
+   collide with an existing app keyframe/class of the same shape. One
+   real collision was found and is why the prefix matters here:
+   @keyframes pulse-glow already exists in this file (line ~308, used by
+   .animate-pulse-glow) with different values (0.6/1 opacity, no
+   box-shadow) — importing the source's identically-named keyframe
+   unprefixed would have silently changed that existing animation's
+   behavior depending on cascade order. Values below are the source
+   file's values, unchanged, only the identifiers are prefixed.
+   ───────────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Geist:SemiBold";
+  src: url("https://static.figma.com/font/Geist_wght__1") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Geist:Regular";
+  src: url("https://static.figma.com/font/Geist_wght__1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Inter:Regular";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Inter:Medium";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+}
+
+@keyframes pub-ticker-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes pub-card-float {
+  0%, 100% { transform: translateY(0px) rotate(-1.5deg); }
+  50%       { transform: translateY(-14px) rotate(1deg); }
+}
+@keyframes pub-data-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pub-pulse-glow {
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 4px currentColor; }
+  50%       { opacity: 1;   box-shadow: 0 0 10px currentColor; }
+}
+.pub-pulse-glow { animation: pub-pulse-glow 2s ease-in-out infinite; }
+
+@keyframes pub-bar-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes pub-sig-draw {
+  from { stroke-dashoffset: 260; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes pub-particle-fall {
+  0%   { transform: translateY(-8px); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(130px); opacity: 0; }
+}
+@keyframes pub-seal-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes pub-intersect-glow {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1; }
+}
+@keyframes pub-scan-verify {
+  0%   { top: 0%;   opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.pub-card-float { animation: pub-card-float 6s ease-in-out infinite; }
+
+.pub-ticker-wrap { overflow: hidden; }
+.pub-ticker-inner { display: flex; animation: pub-ticker-x 36s linear infinite; white-space: nowrap; }
+
+.pub-reveal {
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.pub-reveal-hidden { opacity: 0; transform: translateY(48px); }
+.pub-reveal-visible { opacity: 1; transform: translateY(0); }

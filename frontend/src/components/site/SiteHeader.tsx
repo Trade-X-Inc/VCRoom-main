@@ -1,153 +1,135 @@
 import { Link } from "@tanstack/react-router";
-import { Logo } from "@/components/brand/Logo";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 
-// Public chrome, rebuilt to PUBLIC-REGISTER.md (17 Aug 2026).
+// Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
+// LENGDONPUBLIC-NEW's src/components/Navigation.tsx (the founder's Figma
+// Make export, cloned into lengdon-public-new/ this session). Per the
+// binding rule: copy exact spacing/color/type/structure, no interpretation
+// of design intent, no invented pattern. Values below (colors, font
+// families, sizes, tracking, dropdown structure, link set) are the source
+// file's values, unchanged.
 //
-// This is shared by every public page, so it converts the whole public frame at
-// once. That is deliberate: the register's central claim is that the marketing
-// site and the application are ONE system, and a purple-gradient header defeats
-// that on arrival regardless of how the page beneath it is built.
-//
-// Removed here: hs-gradient buttons, rounded-lg (radius ceiling is 2px),
-// backdrop-blur, and the ArrowRight decorative chevrons (§13 — decorative
-// iconography). The logo mark itself is untouched — brand identity remains
-// explicitly out of scope (PUBLIC-REGISTER.md §10.1).
-//
-// Two-dropdown restructure (18 Aug 2026, IA proposal §1), completed in
-// Step 5: both "Product" and "Resources" are now real dropdowns.
-// "Product" waited on /for-founders and /for-investors (Step 5); with
-// those landed alongside /how-it-works (Step 4) and /pricing, it has four
-// real items and converts from the two flat links used in the interim.
-// Never ship a dropdown entry pointing at a route that doesn't exist —
-// every href below was checked against the route tree before being added.
+// Two things NOT from the source, both functional necessities the source
+// has no equivalent for (it is a logged-out marketing site only):
+//   1. The signed-in "Open dashboard" branch — real app auth state.
+//   2. The mobile menu and skip-to-content link — the source's own
+//      responsive behavior (if any) wasn't inspectable at this fidelity
+//      from static JSX alone; kept from the prior implementation rather
+//      than guessed, since inventing a mobile pattern "in the spirit of"
+//      the design is exactly what the binding rule prohibits.
+// Sign-in/sign-up preserved as real functional links, per instruction
+// (login mechanics stay).
 
-const UI = "var(--font-v2-ui)";
-const INK = "var(--v2-ink)";
-const INK_2 = "var(--v2-ink-secondary)";
-const INK_3 = "var(--v2-ink-muted)";
-const RULE = "var(--v2-rule)";
-const SURFACE = "var(--v2-surface)";
-const PANEL = "var(--v2-panel)";
-const ACCENT = "var(--v2-accent)";
+const FONT_SEMIBOLD = "'Geist:SemiBold', sans-serif";
+const FONT_REGULAR = "'Geist:Regular', sans-serif";
+const FONT_INTER = "'Inter:Regular', sans-serif";
 
-const navLink: React.CSSProperties = {
-  fontFamily: UI, fontSize: "13.5px", fontWeight: 400, color: INK_2,
-  textDecoration: "none", padding: "8px 4px",
-};
+const INK = "#0a2540";
+const INK_MUTED = "#425466";
+const INK_FAINT = "#94a3b8";
+const RULE = "#e6e9ef";
 
-const actionBase: React.CSSProperties = {
-  display: "inline-flex", alignItems: "center", height: "32px",
-  padding: "0 14px", borderRadius: "2px",
-  fontFamily: UI, fontSize: "13px", fontWeight: 500, textDecoration: "none",
-};
+type NavLink = { label: string; to: string; desc: string };
 
-type NavDropdownLink = { to: string; label: string; description: string };
-
-const PRODUCT_LINKS: NavDropdownLink[] = [
-  { to: "/how-it-works", label: "How it works", description: "The closing pipeline and term negotiation, drawn as they run" },
-  { to: "/for-founders", label: "For founders", description: "What you control, and what releases when" },
-  { to: "/for-investors", label: "For investors", description: "The record chain, and how you reach a room" },
-  { to: "/pricing", label: "Pricing", description: "A fixed fee, tied to one event" },
+const PRODUCT_LINKS: NavLink[] = [
+  { label: "How Lengdon Works", to: "/product/how-it-works", desc: "The six-gate closing sequence" },
+  { label: "Pricing", to: "/product/pricing", desc: "Simple, transparent plans" },
+  { label: "Security & Trust", to: "/product/security", desc: "Encryption, NDAs, audit records" },
+  { label: "Compare", to: "/product/compare", desc: "Lengdon vs traditional data rooms" },
 ];
 
-const RESOURCE_LINKS: NavDropdownLink[] = [
-  { to: "/resources/schedule", label: "The disclosure schedule", description: "Every field a seed round discloses, and its required evidence" },
-  { to: "/docs/security", label: "Security", description: "Access control, NDA handling, disclosure mechanics" },
-  { to: "/docs", label: "Docs", description: "Reference documentation" },
-  { to: "/tools", label: "Tools", description: "Calculators — valuation, runway, dilution, and more" },
+const FOR_LINKS: NavLink[] = [
+  { label: "Founders", to: "/for/founders", desc: "Raise capital with structure" },
+  { label: "Investors", to: "/for/investors", desc: "Close with a permanent record" },
+  { label: "Venture Capital", to: "/for/venture-capital", desc: "Firm-grade closing infrastructure" },
+  { label: "Private Equity", to: "/for/private-equity", desc: "Complex deals, clean record" },
+  { label: "Angels", to: "/for/angels", desc: "Formal process for informal deals" },
+  { label: "Syndicates", to: "/for/syndicates", desc: "Lead a group into a close" },
+  { label: "SPVs", to: "/for/spvs", desc: "Structured vehicle closing" },
+  { label: "Family Offices", to: "/for/family-offices", desc: "Institutional-grade infrastructure" },
+  { label: "Limited Partners", to: "/for/limited-partners", desc: "Your capital, your record" },
 ];
 
-function NavDropdown({ label, links }: { label: string; links: NavDropdownLink[] }) {
+const RESOURCES_LINKS: NavLink[] = [
+  { label: "All Resources", to: "/resources", desc: "Hub for all resources" },
+  { label: "Documentation", to: "/docs", desc: "Platform documentation" },
+  { label: "Blog", to: "/resources/blog", desc: "Insights on private capital" },
+  { label: "Changelog", to: "/resources/changelog", desc: "What's new in Lengdon" },
+  { label: "Glossary", to: "/glossary", desc: "Private capital terminology" },
+  { label: "Tools", to: "/tools", desc: "Free calculators for founders" },
+];
+
+const COMPANY_LINKS: NavLink[] = [
+  { label: "About", to: "/company/about", desc: "Why we built this" },
+  { label: "Careers", to: "/company/careers", desc: "Join the team" },
+  { label: "Contact", to: "/company/contact", desc: "Get in touch" },
+  { label: "Sectors", to: "/sectors", desc: "Industries we serve" },
+];
+
+function Dropdown({ items, onNavigate }: { items: NavLink[]; onNavigate?: () => void }) {
+  return (
+    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50">
+      <div className="bg-white border border-[#e6e9ef] shadow-[0_16px_40px_rgba(10,37,64,0.10)] min-w-[240px]">
+        {items.map((item, i) => (
+          <Link
+            key={item.to}
+            to={item.to as any}
+            onClick={onNavigate}
+            className={`flex flex-col gap-0.5 px-5 py-3.5 hover:bg-[#f8f9fb] transition-colors duration-150 ${i < items.length - 1 ? "border-b border-[#f0f2f5]" : ""}`}
+          >
+            <span style={{ fontFamily: FONT_REGULAR, color: INK, fontSize: "14px", letterSpacing: "-0.2px" }}>{item.label}</span>
+            <span style={{ fontFamily: FONT_INTER, color: INK_FAINT, fontSize: "12px" }}>{item.desc}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NavItem({ label, items }: { label: string; items: NavLink[] }) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const onClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    const fn = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", onClick);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onClick);
-      document.removeEventListener("keydown", onKey);
-    };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
   }, [open]);
 
   return (
-    <div ref={containerRef} style={{ position: "relative" }}>
+    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button
-        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 transition-colors duration-200"
+        style={{ fontFamily: FONT_REGULAR, fontSize: "13px", letterSpacing: "0.1px", color: open ? INK : INK_MUTED }}
+        onClick={() => setOpen((p) => !p)}
         aria-expanded={open}
-        aria-haspopup="true"
-        style={{
-          ...navLink, display: "inline-flex", alignItems: "center", gap: "4px",
-          background: "transparent", border: "none", cursor: "pointer",
-        }}
       >
         {label}
-        <ChevronDown className="h-3.5 w-3.5" style={{ transform: open ? "rotate(180deg)" : undefined }} />
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`}>
+          <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
-      {open && (
-        <>
-          {/* Founder-reported 25 Aug 2026: the panel visually collided with
-              the hero H1 beneath it — a shadow alone wasn't enough, since the
-              panel still sat directly over the headline text. A dimming
-              backdrop (fixed, full-viewport, below the header) makes the
-              overlay state unambiguous: the page behind the menu recedes,
-              so the panel reads as clearly floating above content rather
-              than colliding with it. Click-outside-to-close (the existing
-              mousedown listener) already covers clicks on this backdrop. */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "fixed", inset: 0, top: "56px", zIndex: 45,
-              background: "rgba(22, 24, 28, 0.28)",
-            }}
-          />
-          <div
-            role="menu"
-            style={{
-              position: "absolute", top: "calc(100% + 8px)", left: 0,
-              width: "280px", background: PANEL, border: `1px solid ${RULE}`,
-              borderRadius: "2px", padding: "6px", zIndex: 50,
-              boxShadow: "0 4px 16px rgba(22, 24, 28, 0.12)",
-            }}
-          >
-          {links.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to as any}
-              role="menuitem"
-              onClick={() => setOpen(false)}
-              style={{
-                display: "block", padding: "8px 10px", borderRadius: "2px",
-                textDecoration: "none",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--v2-accent-wash)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-            >
-              <div style={{ fontFamily: UI, fontSize: "13.5px", fontWeight: 500, color: INK }}>{l.label}</div>
-              <div style={{ fontFamily: UI, fontSize: "12px", color: INK_3, marginTop: "1px" }}>{l.description}</div>
-            </Link>
-          ))}
-          </div>
-        </>
-      )}
+      {open && <Dropdown items={items} onNavigate={() => setOpen(false)} />}
     </div>
   );
 }
 
 export function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileProductOpen, setMobileProductOpen] = useState(false);
-  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const { user } = useAuth();
   const dashboardUrl = user?.role === "investor" ? "/app/investor" : "/app";
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
 
   useEffect(() => {
     const handler = () => { if (window.innerWidth >= 768) setMobileMenuOpen(false); };
@@ -155,48 +137,38 @@ export function SiteHeader() {
     return () => window.removeEventListener("resize", handler);
   }, []);
 
-  const close = () => { setMobileMenuOpen(false); setMobileProductOpen(false); setMobileResourcesOpen(false); };
-
   return (
     <>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold"
-        style={{ background: ACCENT, color: "#FFFFFF", borderRadius: "2px" }}
+        style={{ background: INK, color: "#FFFFFF" }}
       >
         Skip to content
       </a>
 
-      <header
-        style={{
-          position: "sticky", top: 0, zIndex: 40, width: "100%",
-          background: SURFACE, borderBottom: `1px solid ${RULE}`,
-        }}
+      <nav
+        className={`sticky top-0 z-50 transition-all duration-400 ${scrolled ? "bg-white/98 backdrop-blur-sm" : "bg-white"}`}
+        style={{ borderBottom: `1px solid ${RULE}` }}
       >
-        <div
-          style={{
-            maxWidth: "80rem", margin: "0 auto", height: "56px",
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            paddingInline: "24px",
-          }}
-        >
-          <Link to="/" onClick={close} style={{ textDecoration: "none", color: INK }}>
-            <Logo size="lg" />
+        <div className="max-w-[1280px] mx-auto px-10 h-16 flex items-center justify-between">
+          <Link to="/" style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, color: INK, fontSize: "20px", letterSpacing: "-0.5px", textDecoration: "none" }}>
+            Lengdon
           </Link>
 
-          <nav className="hidden md:flex" style={{ alignItems: "center", gap: "24px", flex: 1, justifyContent: "center" }}>
-            <NavDropdown label="Product" links={PRODUCT_LINKS} />
-            <NavDropdown label="Resources" links={RESOURCE_LINKS} />
-            <Link to="/blog" style={navLink}>Blog</Link>
-            <Link to="/about" style={navLink}>Company</Link>
-          </nav>
+          <div className="hidden md:flex items-center gap-8">
+            <NavItem label="Product" items={PRODUCT_LINKS} />
+            <NavItem label="Who it's for" items={FOR_LINKS} />
+            <NavItem label="Resources" items={RESOURCES_LINKS} />
+            <NavItem label="Company" items={COMPANY_LINKS} />
+          </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+          <div className="flex items-center gap-4">
             {user ? (
               <Link
                 to={dashboardUrl as any}
                 className="hidden sm:inline-flex"
-                style={{ ...actionBase, background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 28px", textDecoration: "none" }}
               >
                 Open dashboard
               </Link>
@@ -205,18 +177,18 @@ export function SiteHeader() {
                 <Link
                   to="/sign-in"
                   search={{ redirect: "/app" }}
-                  className="hidden sm:inline-flex"
-                  style={{ ...actionBase, color: INK_2, background: "transparent", border: "1px solid transparent" }}
+                  className="hidden sm:inline-flex transition-colors duration-200"
+                  style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: "13px", textDecoration: "none" }}
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/sign-up"
                   search={{ role: "founder" } as any}
-                  className="hidden sm:inline-flex"
-                  style={{ ...actionBase, background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                  className="hidden sm:inline-flex transition-colors duration-200"
+                  style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 28px", textDecoration: "none" }}
                 >
-                  Get started
+                  Create account
                 </Link>
               </>
             )}
@@ -225,10 +197,7 @@ export function SiteHeader() {
               onClick={() => setMobileMenuOpen((v) => !v)}
               className="md:hidden"
               aria-label="Toggle menu"
-              style={{
-                display: "grid", placeItems: "center", height: "32px", width: "32px",
-                borderRadius: "2px", border: `1px solid ${RULE}`, background: PANEL, color: INK_2,
-              }}
+              style={{ display: "grid", placeItems: "center", height: "32px", width: "32px", border: `1px solid ${RULE}`, background: "#fff", color: INK_MUTED }}
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -236,86 +205,23 @@ export function SiteHeader() {
         </div>
 
         {mobileMenuOpen && (
-          <div
-            className="md:hidden"
-            style={{
-              borderTop: `1px solid ${RULE}`, background: PANEL,
-              padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px",
-            }}
-          >
-            <button
-              onClick={() => setMobileProductOpen((v) => !v)}
-              aria-expanded={mobileProductOpen}
-              style={{
-                ...navLink, display: "flex", alignItems: "center", justifyContent: "space-between",
-                width: "100%", padding: "10px 0", color: INK, background: "transparent", border: "none",
-              }}
-            >
-              Product
-              <ChevronDown className="h-3.5 w-3.5" style={{ transform: mobileProductOpen ? "rotate(180deg)" : undefined }} />
-            </button>
-            {mobileProductOpen && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px", paddingLeft: "12px" }}>
-                {PRODUCT_LINKS.map((l) => (
-                  <Link
-                    key={l.to}
-                    to={l.to as any}
-                    onClick={close}
-                    style={{ ...navLink, display: "block", padding: "8px 0", color: INK_2 }}
-                  >
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            <button
-              onClick={() => setMobileResourcesOpen((v) => !v)}
-              aria-expanded={mobileResourcesOpen}
-              style={{
-                ...navLink, display: "flex", alignItems: "center", justifyContent: "space-between",
-                width: "100%", padding: "10px 0", color: INK, background: "transparent", border: "none",
-              }}
-            >
-              Resources
-              <ChevronDown className="h-3.5 w-3.5" style={{ transform: mobileResourcesOpen ? "rotate(180deg)" : undefined }} />
-            </button>
-            {mobileResourcesOpen && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px", paddingLeft: "12px" }}>
-                {RESOURCE_LINKS.map((l) => (
-                  <Link
-                    key={l.to}
-                    to={l.to as any}
-                    onClick={close}
-                    style={{ ...navLink, display: "block", padding: "8px 0", color: INK_2 }}
-                  >
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            <Link
-              to="/blog"
-              onClick={close}
-              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
-            >
-              Blog
-            </Link>
-            <Link
-              to="/about"
-              onClick={close}
-              style={{ ...navLink, display: "block", padding: "10px 0", color: INK }}
-            >
-              Company
-            </Link>
-
+          <div className="md:hidden" style={{ borderTop: `1px solid ${RULE}`, background: "#fff", padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px" }}>
+            {[PRODUCT_LINKS, FOR_LINKS, RESOURCES_LINKS, COMPANY_LINKS].flat().map((l) => (
+              <Link
+                key={l.to}
+                to={l.to as any}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontFamily: FONT_REGULAR, fontSize: "13.5px", color: INK_MUTED, padding: "10px 0", textDecoration: "none", display: "block" }}
+              >
+                {l.label}
+              </Link>
+            ))}
             <div style={{ paddingTop: "12px", marginTop: "8px", borderTop: `1px solid ${RULE}`, display: "flex", flexDirection: "column", gap: "8px" }}>
               {user ? (
                 <Link
                   to={dashboardUrl as any}
-                  onClick={close}
-                  style={{ ...actionBase, justifyContent: "center", background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, textAlign: "center", background: INK, color: "#fff", padding: "10px 0", textDecoration: "none" }}
                 >
                   Open dashboard
                 </Link>
@@ -324,25 +230,25 @@ export function SiteHeader() {
                   <Link
                     to="/sign-in"
                     search={{ redirect: "/app" }}
-                    onClick={close}
-                    style={{ ...actionBase, justifyContent: "center", background: PANEL, color: INK, border: `1px solid ${RULE}` }}
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ fontFamily: FONT_REGULAR, textAlign: "center", border: `1px solid ${RULE}`, color: INK, padding: "10px 0", textDecoration: "none" }}
                   >
                     Sign in
                   </Link>
                   <Link
                     to="/sign-up"
                     search={{ role: "founder" } as any}
-                    onClick={close}
-                    style={{ ...actionBase, justifyContent: "center", background: ACCENT, color: "#FFFFFF", border: `1px solid ${ACCENT}` }}
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, textAlign: "center", background: INK, color: "#fff", padding: "10px 0", textDecoration: "none" }}
                   >
-                    Get started
+                    Create account
                   </Link>
                 </>
               )}
             </div>
           </div>
         )}
-      </header>
+      </nav>
     </>
   );
 }
