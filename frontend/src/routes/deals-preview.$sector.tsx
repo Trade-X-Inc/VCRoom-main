@@ -15,7 +15,7 @@ import {
   LcsButton,
   type LcsStatus,
 } from "@/components/lcs";
-import { getSandboxDeals, resetSandboxDeals, type LcsDealListStatus } from "@/lib/lcs-sandbox";
+import { getSandboxDeals, resetSandboxDeals, daysInStage, type LcsDealListStatus } from "@/lib/lcs-sandbox";
 
 // Deals hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox data
 // only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase calls,
@@ -68,9 +68,15 @@ function SectorDeals() {
   const [deals, setDeals] = useState<ReturnType<typeof getSandboxDeals>>([]);
   const [hydrated, setHydrated] = useState(false);
   const [resetting, setResetting] = useState(false);
+  // "Days in stage" depends on Date.now(), which differs between SSR and
+  // client hydration by however many ms elapsed between them — same
+  // hydration-mismatch class as everything else on this page. Computed
+  // once, client-side, after mount, alongside the sandbox data itself.
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
     setDeals(getSandboxDeals());
+    setNow(Date.now());
     setHydrated(true);
   }, []);
 
@@ -192,8 +198,11 @@ function SectorDeals() {
                 <LcsTableHead>
                   <LcsTh>Ref</LcsTh>
                   <LcsTh>Company</LcsTh>
+                  <LcsTh>Counterparty</LcsTh>
                   <LcsTh>Owner</LcsTh>
                   <LcsTh>Stage</LcsTh>
+                  <LcsTh numeric>Days in Stage</LcsTh>
+                  <LcsTh>Last Activity</LcsTh>
                   <LcsTh>Status</LcsTh>
                 </LcsTableHead>
                 <LcsTableBody>
@@ -201,8 +210,11 @@ function SectorDeals() {
                     <LcsTr key={d.id} onClick={() => navigate({ to: "/deals-preview/$sector/$dealId", params: { sector, dealId: d.id } })}>
                       <LcsTd mono>{d.ref}</LcsTd>
                       <LcsTd>{d.companyName}</LcsTd>
+                      <LcsTd>{d.counterparty}</LcsTd>
                       <LcsTd>{d.owner}</LcsTd>
                       <LcsTd>{STAGE_LABEL[d.stage]}</LcsTd>
+                      <LcsTd numeric>{now !== null ? daysInStage(d, now) : ""}</LcsTd>
+                      <LcsTd>{d.lastActivity.text}</LcsTd>
                       <LcsTd>
                         <LcsStatusPill status={STATUS_TO_PILL[d.listStatus]} label={TABS.find((t) => t.key === d.listStatus)?.label} />
                       </LcsTd>

@@ -142,7 +142,17 @@ export function LcsPageShell({
         </header>
 
         <main className="flex-1 overflow-auto">
-          <div className="max-w-[1120px] p-6">{children}</div>
+          {/* No max-width cap — fills available width. The PDF's page-2
+              caption ("content region — 24px padding, max-width 1120px")
+              describes that one example screenshot's rendered dimensions
+              in the design tool; the primitive's own written spec text
+              names no max-width at all. A hardcoded 1120px cap here left
+              280px of dead space on a 1600px viewport (growing on wider
+              screens) while the table inside it was already using its
+              full available width correctly — a real, structural defect
+              found live, not a per-screen styling nitpick, since every
+              screen built on this shell inherited it. */}
+          <div className="p-6">{children}</div>
         </main>
       </div>
     </div>
