@@ -27,6 +27,7 @@ import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as LegalIndexRouteImport } from './routes/legal.index'
 import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
+import { Route as DealsPreviewIndexRouteImport } from './routes/deals-preview.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ToolsValuationCalculatorRouteImport } from './routes/tools.valuation-calculator'
 import { Route as ToolsSafeNoteRouteImport } from './routes/tools.safe-note'
@@ -58,6 +59,7 @@ import { Route as ForFoundersRouteImport } from './routes/for.founders'
 import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
 import { Route as ForAngelsRouteImport } from './routes/for.angels'
 import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
+import { Route as DealsPreviewSectorRouteImport } from './routes/deals-preview.$sector'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as CompanyContactRouteImport } from './routes/company.contact'
 import { Route as CompanyCareersRouteImport } from './routes/company.careers'
@@ -270,6 +272,11 @@ const GlossaryIndexRoute = GlossaryIndexRouteImport.update({
   path: '/glossary/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DealsPreviewIndexRoute = DealsPreviewIndexRouteImport.update({
+  id: '/deals-preview/',
+  path: '/deals-preview/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -424,6 +431,11 @@ const ForAngelsRoute = ForAngelsRouteImport.update({
 const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
   id: '/for/advisors',
   path: '/for/advisors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewSectorRoute = DealsPreviewSectorRouteImport.update({
+  id: '/deals-preview/$sector',
+  path: '/deals-preview/$sector',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CvSlugRoute = CvSlugRouteImport.update({
@@ -1116,6 +1128,7 @@ export interface FileRoutesByFullPath {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/deals-preview/$sector': typeof DealsPreviewSectorRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1147,6 +1160,7 @@ export interface FileRoutesByFullPath {
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app/': typeof AppIndexRoute
+  '/deals-preview/': typeof DealsPreviewIndexRoute
   '/glossary/': typeof GlossaryIndexRoute
   '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
@@ -1286,6 +1300,7 @@ export interface FileRoutesByTo {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/deals-preview/$sector': typeof DealsPreviewSectorRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1317,6 +1332,7 @@ export interface FileRoutesByTo {
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app': typeof AppIndexRoute
+  '/deals-preview': typeof DealsPreviewIndexRoute
   '/glossary': typeof GlossaryIndexRoute
   '/legal': typeof LegalIndexRoute
   '/resources': typeof ResourcesIndexRoute
@@ -1459,6 +1475,7 @@ export interface FileRoutesById {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/deals-preview/$sector': typeof DealsPreviewSectorRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1490,6 +1507,7 @@ export interface FileRoutesById {
   '/tools/safe-note': typeof ToolsSafeNoteRoute
   '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app/': typeof AppIndexRoute
+  '/deals-preview/': typeof DealsPreviewIndexRoute
   '/glossary/': typeof GlossaryIndexRoute
   '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
@@ -1633,6 +1651,7 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
+    | '/deals-preview/$sector'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1664,6 +1683,7 @@ export interface FileRouteTypes {
     | '/tools/safe-note'
     | '/tools/valuation-calculator'
     | '/app/'
+    | '/deals-preview/'
     | '/glossary/'
     | '/legal/'
     | '/resources/'
@@ -1803,6 +1823,7 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
+    | '/deals-preview/$sector'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1834,6 +1855,7 @@ export interface FileRouteTypes {
     | '/tools/safe-note'
     | '/tools/valuation-calculator'
     | '/app'
+    | '/deals-preview'
     | '/glossary'
     | '/legal'
     | '/resources'
@@ -1975,6 +1997,7 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
+    | '/deals-preview/$sector'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2006,6 +2029,7 @@ export interface FileRouteTypes {
     | '/tools/safe-note'
     | '/tools/valuation-calculator'
     | '/app/'
+    | '/deals-preview/'
     | '/glossary/'
     | '/legal/'
     | '/resources/'
@@ -2131,6 +2155,7 @@ export interface RootRouteChildren {
   CompanyCareersRoute: typeof CompanyCareersRoute
   CompanyContactRoute: typeof CompanyContactRoute
   CvSlugRoute: typeof CvSlugRoute
+  DealsPreviewSectorRoute: typeof DealsPreviewSectorRoute
   ForAdvisorsRoute: typeof ForAdvisorsRoute
   ForAngelsRoute: typeof ForAngelsRoute
   ForFamilyOfficesRoute: typeof ForFamilyOfficesRoute
@@ -2161,6 +2186,7 @@ export interface RootRouteChildren {
   ToolsRunwayRoute: typeof ToolsRunwayRoute
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
   ToolsValuationCalculatorRoute: typeof ToolsValuationCalculatorRoute
+  DealsPreviewIndexRoute: typeof DealsPreviewIndexRoute
   GlossaryIndexRoute: typeof GlossaryIndexRoute
   LegalIndexRoute: typeof LegalIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
@@ -2304,6 +2330,13 @@ declare module '@tanstack/react-router' {
       path: '/glossary'
       fullPath: '/glossary/'
       preLoaderRoute: typeof GlossaryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/': {
+      id: '/deals-preview/'
+      path: '/deals-preview'
+      fullPath: '/deals-preview/'
+      preLoaderRoute: typeof DealsPreviewIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -2521,6 +2554,13 @@ declare module '@tanstack/react-router' {
       path: '/for/advisors'
       fullPath: '/for/advisors'
       preLoaderRoute: typeof ForAdvisorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/$sector': {
+      id: '/deals-preview/$sector'
+      path: '/deals-preview/$sector'
+      fullPath: '/deals-preview/$sector'
+      preLoaderRoute: typeof DealsPreviewSectorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cv/$slug': {
@@ -3666,6 +3706,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyCareersRoute: CompanyCareersRoute,
   CompanyContactRoute: CompanyContactRoute,
   CvSlugRoute: CvSlugRoute,
+  DealsPreviewSectorRoute: DealsPreviewSectorRoute,
   ForAdvisorsRoute: ForAdvisorsRoute,
   ForAngelsRoute: ForAngelsRoute,
   ForFamilyOfficesRoute: ForFamilyOfficesRoute,
@@ -3696,6 +3737,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRunwayRoute: ToolsRunwayRoute,
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
   ToolsValuationCalculatorRoute: ToolsValuationCalculatorRoute,
+  DealsPreviewIndexRoute: DealsPreviewIndexRoute,
   GlossaryIndexRoute: GlossaryIndexRoute,
   LegalIndexRoute: LegalIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
