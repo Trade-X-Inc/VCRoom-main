@@ -203,12 +203,12 @@ function NdaGatePanel({ transaction }: { transaction: LcsSandboxTransaction }) {
     <LcsCard title="NDA signatures" count={(transaction.nda.founderSignedAt ? 1 : 0) + (transaction.nda.investorSignedAt ? 1 : 0)}>
       <LcsTable>
         <LcsTableHead>
-          <LcsTh>Party</LcsTh>
+          <LcsTh sticky>Party</LcsTh>
           <LcsTh>Status</LcsTh>
         </LcsTableHead>
         <LcsTableBody>
           <LcsTr>
-            <LcsTd>{transaction.owner} (founder)</LcsTd>
+            <LcsTd sticky>{transaction.owner} (founder)</LcsTd>
             <LcsTd>
               <LcsStatusPill
                 status={transaction.nda.founderSignedAt ? "satisfied" : "pending"}
@@ -217,7 +217,7 @@ function NdaGatePanel({ transaction }: { transaction: LcsSandboxTransaction }) {
             </LcsTd>
           </LcsTr>
           <LcsTr>
-            <LcsTd>{transaction.counterparty} (investor)</LcsTd>
+            <LcsTd sticky>{transaction.counterparty} (investor)</LcsTd>
             <LcsTd>
               <LcsStatusPill
                 status={transaction.nda.investorSignedAt ? "satisfied" : "pending"}
@@ -255,14 +255,14 @@ function DocumentVaultPanel({ transaction }: { transaction: LcsSandboxTransactio
       ) : (
         <LcsTable>
           <LcsTableHead>
-            <LcsTh>Name</LcsTh>
+            <LcsTh sticky>Name</LcsTh>
             <LcsTh>Category</LcsTh>
             <LcsTh>Visible to</LcsTh>
           </LcsTableHead>
           <LcsTableBody>
             {transaction.documents.map((doc) => (
               <LcsTr key={doc.id}>
-                <LcsTd>{doc.name}</LcsTd>
+                <LcsTd sticky>{doc.name}</LcsTd>
                 <LcsTd>{doc.category}</LcsTd>
                 <LcsTd>
                   <LcsStatusPill
@@ -299,14 +299,14 @@ function DueDiligencePanel({ transaction }: { transaction: LcsSandboxTransaction
       ) : (
         <LcsTable>
           <LcsTableHead>
-            <LcsTh>Item</LcsTh>
+            <LcsTh sticky>Item</LcsTh>
             <LcsTh>Owner</LcsTh>
             <LcsTh>Status</LcsTh>
           </LcsTableHead>
           <LcsTableBody>
             {transaction.diligenceItems.map((item) => (
               <LcsTr key={item.id}>
-                <LcsTd>{item.label}</LcsTd>
+                <LcsTd sticky>{item.label}</LcsTd>
                 <LcsTd>{item.owner}</LcsTd>
                 <LcsTd>
                   <LcsStatusPill
@@ -353,14 +353,14 @@ function NegotiationPanel({ transaction }: { transaction: LcsSandboxTransaction 
       ) : (
         <LcsTable>
           <LcsTableHead>
-            <LcsTh>Term</LcsTh>
+            <LcsTh sticky>Term</LcsTh>
             <LcsTh>Value</LcsTh>
             <LcsTh>Status</LcsTh>
           </LcsTableHead>
           <LcsTableBody>
             {transaction.terms.map((term) => (
               <LcsTr key={term.id}>
-                <LcsTd>{term.label}</LcsTd>
+                <LcsTd sticky>{term.label}</LcsTd>
                 <LcsTd>{term.value}</LcsTd>
                 <LcsTd>
                   <LcsStatusPill status={TERM_STATUS_TO_PILL[term.status]} label={TERM_STATUS_LABEL[term.status]} />

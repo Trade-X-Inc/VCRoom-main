@@ -10,7 +10,16 @@ import { type ReactNode, useState, useEffect } from "react";
  * logical properties (order in the flex row follows document direction
  * automatically — no hardcoded left/right), collapse toggle and all
  * disclosure carets use text arrows that the caller must mirror per
- * direction, not baked into this shell. */
+ * direction, not baked into this shell.
+ *
+ * Responsive, added 1 Sep 2026 (see PRIMITIVES.md's "Responsive" section
+ * for the full rationale — a real spec, confirmed before building, not
+ * inherited from the PDF): below `md` (768px) the sidebar stops reserving
+ * permanent width and becomes an off-canvas drawer, closed by default,
+ * opened via a hamburger button that appears in the top bar only at this
+ * width. The desktop expand/collapse toggle and its localStorage
+ * persistence are untouched above 768px — the drawer is a separate mode,
+ * not a third state of the same toggle. */
 
 const SIDEBAR_KEY = "lcs-sidebar-collapsed";
 
@@ -35,6 +44,7 @@ export function LcsPageShell({
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -43,6 +53,16 @@ export function LcsPageShell({
       /* private-window / storage blocked — default to expanded */
     }
   }, []);
+
+  // Escape closes the drawer, same pattern as Modal's own Escape handler
+  // — keyboard users have no other way to dismiss an overlay drawer once
+  // opened, since the scrim click-to-close only works for a mouse.
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDrawerOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [drawerOpen]);
 
   const toggle = () => {
     setCollapsed((c) => {
@@ -56,13 +76,37 @@ export function LcsPageShell({
     });
   };
 
+  const sidebarContent = (
+    <>
+      <div className="flex-1 overflow-y-auto">
+        {typeof sidebar === "function" ? sidebar(collapsed) : sidebar}
+      </div>
+      <button
+        type="button"
+        onClick={toggle}
+        className="h-9 hidden md:flex items-center px-3 text-[12px] shrink-0"
+        style={{
+          color: "var(--lcs-ink-muted)",
+          borderTop: "1px solid var(--lcs-line)",
+          justifyContent: collapsed ? "center" : "flex-start",
+        }}
+      >
+        {collapsed ? "»" : "« Collapse"}
+      </button>
+    </>
+  );
+
   return (
     <div
       className="flex min-h-screen"
       style={{ background: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
     >
+      {/* Desktop sidebar (>= md) — unchanged expand/collapse behavior,
+          hidden entirely below md in favor of the drawer rendered further
+          down. See PRIMITIVES.md's "Responsive" section: the drawer is a
+          separate mode below 768px, not a third state of this toggle. */}
       <aside
-        className="shrink-0 flex flex-col justify-between"
+        className="shrink-0 hidden md:flex flex-col justify-between"
         style={{
           width: collapsed ? 52 : 200,
           background: "var(--lcs-surface)",
@@ -70,28 +114,50 @@ export function LcsPageShell({
           transition: "width 150ms",
         }}
       >
-        <div className="flex-1 overflow-y-auto">
-          {typeof sidebar === "function" ? sidebar(collapsed) : sidebar}
-        </div>
-        <button
-          type="button"
-          onClick={toggle}
-          className="h-9 flex items-center px-3 text-[12px] shrink-0"
-          style={{
-            color: "var(--lcs-ink-muted)",
-            borderTop: "1px solid var(--lcs-line)",
-            justifyContent: collapsed ? "center" : "flex-start",
-          }}
-        >
-          {collapsed ? "»" : "« Collapse"}
-        </button>
+        {sidebarContent}
       </aside>
+
+      {/* Mobile drawer (< md) — off-canvas, closed by default, opened via
+          the hamburger button in the top bar. Always rendered at full
+          200px width (never the collapsed icon rail — collapse is a
+          desktop density optimization that doesn't apply once the sidebar
+          isn't permanently occupying screen space). */}
+      {drawerOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex">
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(26,26,25,0.4)" }}
+            onClick={() => setDrawerOpen(false)}
+          />
+          <aside
+            className="relative flex flex-col justify-between h-full"
+            style={{
+              width: 200,
+              background: "var(--lcs-surface)",
+              borderInlineEnd: "1px solid var(--lcs-line)",
+            }}
+          >
+            <div className="flex-1 overflow-y-auto" onClick={() => setDrawerOpen(false)}>
+              {typeof sidebar === "function" ? sidebar(false) : sidebar}
+            </div>
+          </aside>
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col min-w-0">
         <header
           className="h-12 flex items-center gap-4 px-4 shrink-0"
           style={{ borderBottom: "1px solid var(--lcs-line)" }}
         >
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open navigation"
+            className="md:hidden shrink-0 size-8 flex items-center justify-center text-[16px]"
+            style={{ color: "var(--lcs-ink)" }}
+          >
+            <span aria-hidden="true">☰</span>
+          </button>
           <button
             type="button"
             onClick={onSearchOpen}
@@ -106,7 +172,7 @@ export function LcsPageShell({
             <span aria-hidden="true">○</span>
             <span className="truncate flex-1">{searchPlaceholder}</span>
             <span
-              className="text-[11px] shrink-0"
+              className="text-[11px] shrink-0 hidden sm:inline"
               style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink-muted)" }}
             >
               ⌘K

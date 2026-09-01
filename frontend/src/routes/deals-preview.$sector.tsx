@@ -191,8 +191,8 @@ function SectorTransactions() {
             <div className="border" style={{ borderColor: "var(--lcs-line)" }}>
               <LcsTable>
                 <LcsTableHead>
+                  <LcsTh sticky>Company</LcsTh>
                   <LcsTh>Ref</LcsTh>
-                  <LcsTh>Company</LcsTh>
                   <LcsTh>Counterparty</LcsTh>
                   <LcsTh>Owner</LcsTh>
                   <LcsTh>Stage</LcsTh>
@@ -203,8 +203,8 @@ function SectorTransactions() {
                 <LcsTableBody>
                   {filtered.map((d) => (
                     <LcsTr key={d.id} onClick={() => navigate({ to: "/deals-preview/$sector/$dealId", params: { sector, dealId: d.id } })}>
+                      <LcsTd sticky>{d.companyName}</LcsTd>
                       <LcsTd mono>{d.ref}</LcsTd>
-                      <LcsTd>{d.companyName}</LcsTd>
                       <LcsTd>{d.counterparty}</LcsTd>
                       <LcsTd>{d.owner}</LcsTd>
                       <LcsTd>{STAGE_LABEL[d.stage]}</LcsTd>

@@ -6,13 +6,25 @@ import { type ReactNode, useState } from "react";
  * header (header sits on a tinted band). Hover is a subtle tint only — no
  * border or shadow change. RTL: uses logical text-align (start), not
  * hardcoded left/right; a numeric column stays end-aligned in both
- * directions (tabular figures, not mirrored). */
+ * directions (tabular figures, not mirrored).
+ *
+ * Responsive, added 1 Sep 2026 (see PRIMITIVES.md's "Responsive" section
+ * for the full rationale): below `md` (768px), LcsTable's wrapper scrolls
+ * horizontally instead of reflowing into stacked cards — every table in
+ * this build has a small, independently-scannable, directly-comparable
+ * column set, and stacking would destroy that. LcsTh/LcsTd's first-column
+ * variant (`sticky`) stays visible during that scroll, so row identity is
+ * never lost. Callers mark their first column with `sticky` on both the
+ * LcsTh and every LcsTd in that position — the primitive can't infer which
+ * column is "first" from inside a plain `<tr>` composition. */
 
 export function LcsTable({ children }: { children: ReactNode }) {
   return (
-    <table className="w-full border-collapse" style={{ fontFamily: "var(--font-lcs-ui)" }}>
-      {children}
-    </table>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+        {children}
+      </table>
+    </div>
   );
 }
 
@@ -27,16 +39,31 @@ export function LcsTableHead({ children }: { children: ReactNode }) {
 export function LcsTh({
   children,
   numeric = false,
+  sticky = false,
 }: {
   children: ReactNode;
   numeric?: boolean;
+  /** Marks this as the table's frozen first column below `md` (768px) —
+   * see this file's header comment. Only meaningful below md; above it,
+   * the table doesn't scroll horizontally, so sticky positioning has no
+   * visible effect and is left on unconditionally rather than gated on a
+   * media query in JS (a CSS-only concern, cheaper and SSR-safe). */
+  sticky?: boolean;
 }) {
   return (
     <th
       className={`h-[34px] px-3 text-[11px] font-medium uppercase tracking-wide ${
         numeric ? "text-end" : "text-start"
-      }`}
-      style={{ color: "var(--lcs-ink-muted)", letterSpacing: "0.04em" }}
+      } ${sticky ? "sticky z-10" : ""}`}
+      style={{
+        color: "var(--lcs-ink-muted)",
+        letterSpacing: "0.04em",
+        background: sticky ? "var(--lcs-surface)" : undefined,
+        // Logical property via inline style, matching this codebase's
+        // existing convention (PageShell's borderInlineEnd, NavItem's
+        // borderInlineStart) rather than a Tailwind utility class.
+        ...(sticky ? { insetInlineStart: 0 } : {}),
+      }}
     >
       {children}
     </th>
@@ -101,17 +128,28 @@ export function LcsTd({
   children,
   numeric = false,
   mono = false,
+  sticky = false,
 }: {
   children: ReactNode;
   numeric?: boolean;
   mono?: boolean;
+  /** Marks this as the table's frozen first column below `md` — see
+   * LcsTable's header comment. Needs its own opaque background to occlude
+   * scrolling content behind it; this means a sticky cell doesn't pick up
+   * LcsTr's own hover tint (which is set directly on the <tr>, invisible
+   * behind an opaque sticky <td>) — a known, accepted cosmetic gap rather
+   * than plumbing hover state through props for a purely visual polish
+   * item. */
+  sticky?: boolean;
 }) {
   return (
     <td
-      className={`h-[34px] px-3 text-[13px] ${numeric ? "text-end" : "text-start"}`}
+      className={`h-[34px] px-3 text-[13px] ${numeric ? "text-end" : "text-start"} ${sticky ? "sticky z-10" : ""}`}
       style={{
         color: "var(--lcs-ink)",
         fontFamily: mono || numeric ? "var(--font-lcs-data)" : "var(--font-lcs-ui)",
+        background: sticky ? "var(--lcs-white)" : undefined,
+        ...(sticky ? { insetInlineStart: 0 } : {}),
       }}
     >
       {children}

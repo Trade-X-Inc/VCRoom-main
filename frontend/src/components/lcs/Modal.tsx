@@ -6,7 +6,16 @@ import { type ReactNode, useEffect } from "react";
  * primary/destructive action, in that order). Slide-over variant: same
  * anatomy, anchored to the inline-end edge, full-height, for longer
  * single-task flows. RTL: slide-over anchors to inline-end (right in LTR,
- * left in RTL), not hardcoded to the physical right edge. */
+ * left in RTL), not hardcoded to the physical right edge.
+ *
+ * Responsive, added 1 Sep 2026 (see PRIMITIVES.md's "Responsive" section
+ * for the full rationale): below `sm` (640px), centered and slide-over
+ * render identically — full viewport, no margin, no max-width, same
+ * header/body/footer anatomy. The two variants' visual distinction only
+ * reads at a width where there's room for either affordance to look like
+ * what it's named; at full-viewport width a "slide-over" is visually
+ * indistinguishable from "centered" full-screen, so collapsing them here
+ * is the correct simplification, not a compromise. */
 
 export function LcsModal({
   title,
@@ -31,16 +40,19 @@ export function LcsModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex ${isSlideOver ? "justify-end" : "items-center justify-center p-6"}`}
+      className={`fixed inset-0 z-50 flex p-0 ${isSlideOver ? "justify-end" : "sm:items-center sm:justify-center sm:p-6"}`}
       style={{ background: "rgba(26,26,25,0.4)" }}
       onClick={onClose}
     >
+      {/* Below sm (640px), both variants collapse to an identical
+          full-viewport sheet — see this file's header comment. Above sm,
+          each variant's own width/height/border behavior is unchanged. */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[var(--lcs-white)] flex flex-col ${
-          isSlideOver ? "h-full w-full max-w-[420px]" : "w-full max-w-[440px]"
+        className={`bg-[var(--lcs-white)] flex flex-col w-full h-full sm:h-auto ${
+          isSlideOver ? "sm:w-full sm:max-w-[420px] sm:h-full" : "sm:max-w-[440px] sm:border"
         }`}
-        style={{ border: isSlideOver ? "none" : "1px solid var(--lcs-line)" }}
+        style={{ borderColor: isSlideOver ? undefined : "var(--lcs-line)" }}
       >
         <div
           className="h-11 flex items-center px-4 shrink-0"

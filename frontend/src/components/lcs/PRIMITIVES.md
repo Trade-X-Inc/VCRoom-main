@@ -84,3 +84,92 @@ rule §0a already states for layout.
   `▾`) are placeholder text arrows pending a real icon set — flagged here
   as needing RTL mirroring (`«`→`»` swap) when a real icon component
   replaces them; not yet wired to `dir` detection.
+
+## Responsive — real spec, added 1 Sep 2026, not inherited from the PDF
+
+The approved Component System PDF documents every primitive as a fixed-
+pixel desktop layout (200px sidebar, 34px table rows, fixed card grids)
+with no breakpoint behavior specified anywhere. Per CLAUDE.md §0a, an
+undesigned surface is something to flag and design deliberately, not
+extrapolate — this section is that deliberate design, confirmed with the
+founder before any code was written, not an improvisation to work around
+the PDF's silence. Breakpoints use Tailwind's existing default scale
+(`sm`=640px, `md`=768px, `lg`=1024px), already in use elsewhere in this
+build (the sector-picker grid), rather than a new scale invented for this
+addendum alone.
+
+**Sidebar (`PageShell`) — drawer below `md` (768px).** Below 768px the
+sidebar stops reserving permanent width and becomes an off-canvas drawer,
+closed by default, opened via a hamburger icon replacing the search bar's
+leading position in the 48px top bar; opening it overlays content with the
+same scrim `Modal` already uses (`rgba(26,26,25,0.4)`), slides in from the
+inline-start edge, and closes on nav-item selection. **Why drawer over the
+existing always-visible 52px icon rail:** the icon rail is a desktop
+density optimization — more content width while nav stays reachable. At
+phone width, 52px of permanent icon-only rail is a much larger fraction of
+the screen and still forces horizontal scrolling on wide tables underneath
+it; an overlay reclaims full width for content, which matters more at this
+size than permanent nav visibility does. Above 768px, unchanged.
+
+**Tables (`Table.tsx`) — horizontal scroll with a frozen first column
+below `md` (768px), NOT stacked cards.** The table's wrapper gets
+`overflow-x-auto`; the first column (whichever is the row's primary
+identifier — ref, name, term) gets `position: sticky; inset-inline-start:
+0` with the table's own background, so it stays visible while the rest
+scrolls. **Why scroll+frozen-column over stacking into label/value cards:**
+every table in this build (transaction list, NDA signatures, documents,
+diligence checklist, terms) has a small, fixed, independently-scannable
+column set where columns are meant to be directly compared across rows —
+stacking into cards would destroy that comparability and roughly double
+vertical scroll length for the same information. A frozen key column
+solves the actual failure mode of naive horizontal scroll alone (losing
+row identity once scrolled past column 1) without giving up
+side-by-side comparison. `LcsExpandableRow`'s detail strip needs no
+change — it's already a flex-wrap label/value list, not tabular, so it
+already reflows correctly. Above 768px, unchanged.
+
+**Forms (`FormField.tsx`) — no change needed.** Every field primitive
+(`LcsTextField`/`LcsSelectField`/`LcsTextareaField`/`LcsDropzone`) is
+already single-column and `w-full`; there's no breakpoint-dependent
+layout to break, since no caller currently arranges multiple fields in a
+row. If a future screen needs a multi-field-per-row form layout, that
+layout should default to `grid-cols-1 md:grid-cols-2` at the call site —
+noted here as forward guidance, not built preemptively.
+
+**Modals (`Modal.tsx`) — full-screen sheet below `sm` (640px).** Below
+640px, both `variant="centered"` and `variant="slide-over"` render
+identically: full viewport (`inset-0`, no margin, no `max-w`), same
+header/body/footer anatomy. **Why collapse the two variants instead of
+keeping them visually distinct:** the centered-vs-slide-over distinction
+only reads differently when there's room for either affordance to look
+like what it's named — a "slide-over" that fills the entire narrow
+viewport is visually indistinguishable from "centered" full-screen, so
+preserving the distinction at this width would be maintaining a difference
+nobody can perceive. Collapsing them is the correct simplification, not a
+compromise. Above 640px, unchanged.
+
+**Closing sequence (six gates) — vertical stepper below `md` (768px),
+current gate expanded, others collapsed to one line.** This screen is
+deliberately NOT governed by the generic table rule above, even though it
+could technically render as a 6-column table. Below 768px, gates render as
+a vertical list in `CLOSING_GATE_ORDER`; the gate matching the
+transaction's actual position (first `not-started`/`in-progress`, or the
+last `done` if all are complete) renders fully expanded; every other gate
+collapses to one row (number, name, `StatusPill` only), tappable to expand
+— one gate open at a time, accordion-style. **Why a stepper instead of
+inheriting the table pattern:** the table rule assumes rows that are
+independently meaningful and worth comparing side-by-side — true for a
+documents list, false here. The six gates are strictly sequential and
+mutually dependent (Counsel → Agreement → Conditions → Signing → Payment →
+Close, per the real product's closing-gate model this build follows); the
+real question at any moment is "what's the current gate's state and what's
+next," not "let me compare gate 3 against gate 5." A wide scrolling table
+would present the gates as parallel/comparable when they aren't, and would
+force Gate 1's actual content (real form fields for the counsel/
+accountant-onboarding flow, not just a status) into a cramped fixed-width
+cell — a worse fit than a full-width expanded row. **Desktop equivalent
+(above 768px) is deliberately left open** — likely a horizontal six-segment
+progress indicator with the active gate's content below it, following the
+same expand-current/collapse-others logic sideways — but that's the
+closing-checkpoint content build's own decision against real gate content,
+not a responsive-only-pass decision to lock in now.
