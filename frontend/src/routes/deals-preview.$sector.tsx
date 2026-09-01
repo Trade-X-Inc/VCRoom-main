@@ -15,7 +15,7 @@ import {
   LcsButton,
   type LcsStatus,
 } from "@/components/lcs";
-import { getSandboxDeals, resetSandboxDeals, daysInStage, type LcsDealListStatus } from "@/lib/lcs-sandbox";
+import { getSandboxDeals, resetSandboxDeals, daysInStage, STAGE_LABEL, SECTOR_LABEL, type LcsDealListStatus } from "@/lib/lcs-sandbox";
 
 // Deals hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox data
 // only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase calls,
@@ -26,16 +26,6 @@ import { getSandboxDeals, resetSandboxDeals, daysInStage, type LcsDealListStatus
 export const Route = createFileRoute("/deals-preview/$sector")({
   component: SectorDeals,
 });
-
-// Matches §1's exact sector names — a raw slug->title-case conversion
-// would be wrong for "spv" (-> "Spv", not "SPV") and "syndicate-lead".
-const SECTOR_LABEL: Record<string, string> = {
-  technology: "Technology",
-  "real-estate": "Real Estate",
-  manufacturing: "Manufacturing",
-  spv: "SPV",
-  "syndicate-lead": "Syndicate Lead",
-};
 
 const TABS: { key: LcsDealListStatus; label: string }[] = [
   { key: "active", label: "Active" },
@@ -229,13 +219,3 @@ function SectorDeals() {
     </LcsPageShell>
   );
 }
-
-const STAGE_LABEL: Record<string, string> = {
-  initiation: "Initiation",
-  nda_gate: "NDA gate",
-  company_profile: "Company profile",
-  document_vault: "Document vault",
-  due_diligence: "Due diligence",
-  negotiation: "Negotiation",
-  closing: "Closing",
-};
