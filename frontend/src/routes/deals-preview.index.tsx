@@ -5,19 +5,26 @@ import {
   LcsPageHeader,
 } from "@/components/lcs";
 
-// Deals hub §1 — sector selector, 1 Sep 2026. UI only, mock/static data,
-// no backend wiring (per instruction) — every count below is either the
-// real number of published pack_v1.schedule rows for that sector (queried
-// live: technology/seed is the only published row, confirmed via
+// Transactions hub §1 — sector selector, 1 Sep 2026. UI only, mock/static
+// data, no backend wiring (per instruction) — every count below is either
+// the real number of published pack_v1.schedule rows for that sector
+// (queried live: technology/seed is the only published row, confirmed via
 // execute_sql against the real project this session) or explicitly absent
 // where no real schedule exists, never a fabricated figure. Same honesty
 // standard as the public site's own "no fabricated deal counts" rule.
 //
 // Route placement: outside /app/* deliberately — see CLAUDE.md's 1 Sep
 // 2026 entry. This is temporary placement pending the real shell cutover.
+//
+// "Deals" was renamed to "Transactions" as UI-facing terminology, 1 Sep
+// 2026, per direct instruction. Sidebar label, page titles, and internal
+// type/function/variable names updated throughout this route tree; the
+// deals-preview URL prefix and $dealId route param are deliberately left
+// unrenamed here — they're folded into the upcoming sitemap restructure
+// instead of being churned twice.
 
 export const Route = createFileRoute("/deals-preview/")({
-  component: DealsHub,
+  component: TransactionsHub,
 });
 
 type Sector = {
@@ -37,10 +44,10 @@ const SECTORS: Sector[] = [
   { id: "syndicate-lead", name: "Syndicate Lead", status: "coming-soon" },
 ];
 
-function DealsHub() {
+function TransactionsHub() {
   return (
     <LcsPageShell
-      searchPlaceholder="Search deals, LPs, requests"
+      searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
       sidebar={(collapsed) => (
@@ -51,7 +58,7 @@ function DealsHub() {
             </div>
           )}
           <LcsNavItem to="/deals-preview" label="Home" collapsed={collapsed} icon="H" />
-          <LcsNavItem to="/deals-preview" label="Deals" active collapsed={collapsed} icon="D" />
+          <LcsNavItem to="/deals-preview" label="Transactions" active collapsed={collapsed} icon="T" />
           <LcsNavItem to="/deals-preview" label="Requests" collapsed={collapsed} icon="R" />
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
@@ -61,7 +68,7 @@ function DealsHub() {
       )}
     >
       <LcsPageHeader
-        title="Deals"
+        title="Transactions"
         description="Choose a sector to view its pipeline."
       />
 

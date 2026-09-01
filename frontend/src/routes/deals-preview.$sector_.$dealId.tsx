@@ -17,17 +17,17 @@ import {
   type LcsStatus,
 } from "@/components/lcs";
 import {
-  getSandboxDeal,
+  getSandboxTransaction,
   daysInStage,
   STAGE_ORDER,
   STAGE_LABEL,
   SECTOR_LABEL,
-  type LcsDealStage,
-  type LcsSandboxDeal,
-  type LcsDealListStatus,
+  type LcsTransactionStage,
+  type LcsSandboxTransaction,
+  type LcsTransactionListStatus,
 } from "@/lib/lcs-sandbox";
 
-// Deals hub §3 — single-deal lifecycle, 1 Sep 2026.
+// Transactions hub §3 — single-transaction lifecycle, 1 Sep 2026.
 // Checkpoint 1: shell + seven-state stage bar scaffolded.
 // Checkpoint 2: NDA gate + Document vault real content.
 // Checkpoint 3 (this pass): Due diligence + Negotiation real content.
@@ -35,34 +35,40 @@ import {
 // own checkpoint.
 // UI only, sandbox data only (src/lib/lcs-sandbox.ts) — same standard as
 // §1/§2: lcs/ primitives only, no backend wiring.
+//
+// "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep 2026
+// — see deals-preview.index.tsx's header comment for the full scope
+// note. The route param ($dealId) and the deals-preview URL prefix are
+// deliberately left unrenamed — folded into the upcoming sitemap
+// restructure instead of being churned twice.
 
 export const Route = createFileRoute("/deals-preview/$sector_/$dealId")({
-  component: DealLifecycle,
+  component: TransactionLifecycle,
 });
 
-const STATUS_TO_PILL: Record<LcsDealListStatus, LcsStatus> = {
+const STATUS_TO_PILL: Record<LcsTransactionListStatus, LcsStatus> = {
   active: "in-progress",
   "in-progress": "in-progress",
   "pending-action": "attention",
   closed: "satisfied",
 };
 
-function DealLifecycle() {
+function TransactionLifecycle() {
   const { sector, dealId } = Route.useParams();
-  const [deal, setDeal] = useState<LcsSandboxDeal | null | undefined>(undefined);
-  const [activeStage, setActiveStage] = useState<LcsDealStage>("initiation");
+  const [transaction, setTransaction] = useState<LcsSandboxTransaction | null | undefined>(undefined);
+  const [activeStage, setActiveStage] = useState<LcsTransactionStage>("initiation");
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    const d = getSandboxDeal(dealId);
-    setDeal(d ?? null);
-    setActiveStage(d?.stage ?? "initiation");
+    const t = getSandboxTransaction(dealId);
+    setTransaction(t ?? null);
+    setActiveStage(t?.stage ?? "initiation");
     setNow(Date.now());
   }, [dealId]);
 
   return (
     <LcsPageShell
-      searchPlaceholder="Search deals, LPs, requests"
+      searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
       sidebar={(collapsed) => (
@@ -73,7 +79,7 @@ function DealLifecycle() {
             </div>
           )}
           <LcsNavItem to="/deals-preview" label="Home" collapsed={collapsed} icon="H" />
-          <LcsNavItem to="/deals-preview" label="Deals" active collapsed={collapsed} icon="D" />
+          <LcsNavItem to="/deals-preview" label="Transactions" active collapsed={collapsed} icon="T" />
           <LcsNavItem to="/deals-preview" label="Requests" collapsed={collapsed} icon="R" />
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
@@ -82,12 +88,12 @@ function DealLifecycle() {
         </nav>
       )}
     >
-      {deal === undefined ? (
+      {transaction === undefined ? (
         <div aria-hidden="true" style={{ minHeight: 300 }} />
-      ) : deal === null ? (
+      ) : transaction === null ? (
         <LcsEmptyState
-          title="Deal not found"
-          text="This deal doesn't exist in the sandbox — it may have been reset."
+          title="Transaction not found"
+          text="This transaction doesn't exist in the sandbox — it may have been reset."
           action={
             <Link to="/deals-preview/$sector" params={{ sector }}>
               <LcsButton variant="text-link">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
@@ -99,25 +105,26 @@ function DealLifecycle() {
           <LcsPageHeader
             title={
               <span className="flex items-center gap-3">
-                <span>{deal.companyName}</span>
+                <span>{transaction.companyName}</span>
                 <span
                   className="text-[13px] font-normal"
                   style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink-muted)" }}
                 >
-                  {deal.ref}
+                  {transaction.ref}
                 </span>
               </span>
             }
-            description={`${deal.counterparty} · Owner ${deal.owner}`}
-            action={<LcsStatusPill status={STATUS_TO_PILL[deal.listStatus]} label={deal.listStatus === "in-progress" ? "In Progress" : deal.listStatus === "pending-action" ? "Pending Action" : deal.listStatus === "closed" ? "Closed" : "Active"} />}
+            description={`${transaction.counterparty} · Owner ${transaction.owner}`}
+            action={<LcsStatusPill status={STATUS_TO_PILL[transaction.listStatus]} label={transaction.listStatus === "in-progress" ? "In Progress" : transaction.listStatus === "pending-action" ? "Pending Action" : transaction.listStatus === "closed" ? "Closed" : "Active"} />}
           />
 
           {/* Seven-state stage bar — checkpoint 1's target. Clicking a
-              stage switches the content panel below; the deal's real
-              current stage (from stageEnteredAt) is preselected on load. */}
+              stage switches the content panel below; the transaction's
+              real current stage (from stageEnteredAt) is preselected on
+              load. */}
           <div className="flex items-center gap-1 mb-6 flex-wrap" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
             {STAGE_ORDER.map((s, i) => {
-              const currentIndex = STAGE_ORDER.indexOf(deal.stage);
+              const currentIndex = STAGE_ORDER.indexOf(transaction.stage);
               const reached = i <= currentIndex;
               return (
                 <button
@@ -146,7 +153,7 @@ function DealLifecycle() {
             })}
           </div>
 
-          <StagePanel deal={deal} stage={activeStage} now={now} />
+          <StagePanel transaction={transaction} stage={activeStage} now={now} />
         </>
       )}
     </LcsPageShell>
@@ -157,21 +164,21 @@ function DealLifecycle() {
  * NDA gate, Document vault; checkpoint 3: Due diligence, Negotiation);
  * Closing still shows the checkpoint-1 placeholder until its own
  * checkpoint. */
-function StagePanel({ deal, stage, now }: { deal: LcsSandboxDeal; stage: LcsDealStage; now: number | null }) {
-  if (stage === "nda_gate") return <NdaGatePanel deal={deal} />;
-  if (stage === "document_vault") return <DocumentVaultPanel deal={deal} />;
-  if (stage === "due_diligence") return <DueDiligencePanel deal={deal} />;
-  if (stage === "negotiation") return <NegotiationPanel deal={deal} />;
-  return <StagePlaceholder deal={deal} stage={stage} now={now} />;
+function StagePanel({ transaction, stage, now }: { transaction: LcsSandboxTransaction; stage: LcsTransactionStage; now: number | null }) {
+  if (stage === "nda_gate") return <NdaGatePanel transaction={transaction} />;
+  if (stage === "document_vault") return <DocumentVaultPanel transaction={transaction} />;
+  if (stage === "due_diligence") return <DueDiligencePanel transaction={transaction} />;
+  if (stage === "negotiation") return <NegotiationPanel transaction={transaction} />;
+  return <StagePlaceholder transaction={transaction} stage={stage} now={now} />;
 }
 
-function StagePlaceholder({ deal, stage, now }: { deal: LcsSandboxDeal; stage: LcsDealStage; now: number | null }) {
+function StagePlaceholder({ transaction, stage, now }: { transaction: LcsSandboxTransaction; stage: LcsTransactionStage; now: number | null }) {
   return (
     <div className="border p-8" style={{ borderColor: "var(--lcs-line)" }}>
       <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)", fontSize: 13 }}>
         {STAGE_LABEL[stage]} — content built in a later checkpoint of this section.
-        {stage === deal.stage && now !== null && (
-          <> This deal has been in this stage for {daysInStage(deal, now)} days.</>
+        {stage === transaction.stage && now !== null && (
+          <> This transaction has been in this stage for {daysInStage(transaction, now)} days.</>
         )}
       </p>
     </div>
@@ -190,10 +197,10 @@ function formatSignedAt(iso: string | null): string {
  * two independent rows rather than a single "signed/unsigned" toggle,
  * since the two parties sign independently and asymmetric state (one
  * signed, one not) is a real, common, and non-error state to represent. */
-function NdaGatePanel({ deal }: { deal: LcsSandboxDeal }) {
-  const bothSigned = !!deal.nda.founderSignedAt && !!deal.nda.investorSignedAt;
+function NdaGatePanel({ transaction }: { transaction: LcsSandboxTransaction }) {
+  const bothSigned = !!transaction.nda.founderSignedAt && !!transaction.nda.investorSignedAt;
   return (
-    <LcsCard title="NDA signatures" count={(deal.nda.founderSignedAt ? 1 : 0) + (deal.nda.investorSignedAt ? 1 : 0)}>
+    <LcsCard title="NDA signatures" count={(transaction.nda.founderSignedAt ? 1 : 0) + (transaction.nda.investorSignedAt ? 1 : 0)}>
       <LcsTable>
         <LcsTableHead>
           <LcsTh>Party</LcsTh>
@@ -201,20 +208,20 @@ function NdaGatePanel({ deal }: { deal: LcsSandboxDeal }) {
         </LcsTableHead>
         <LcsTableBody>
           <LcsTr>
-            <LcsTd>{deal.owner} (founder)</LcsTd>
+            <LcsTd>{transaction.owner} (founder)</LcsTd>
             <LcsTd>
               <LcsStatusPill
-                status={deal.nda.founderSignedAt ? "satisfied" : "pending"}
-                label={formatSignedAt(deal.nda.founderSignedAt)}
+                status={transaction.nda.founderSignedAt ? "satisfied" : "pending"}
+                label={formatSignedAt(transaction.nda.founderSignedAt)}
               />
             </LcsTd>
           </LcsTr>
           <LcsTr>
-            <LcsTd>{deal.counterparty} (investor)</LcsTd>
+            <LcsTd>{transaction.counterparty} (investor)</LcsTd>
             <LcsTd>
               <LcsStatusPill
-                status={deal.nda.investorSignedAt ? "satisfied" : "pending"}
-                label={formatSignedAt(deal.nda.investorSignedAt)}
+                status={transaction.nda.investorSignedAt ? "satisfied" : "pending"}
+                label={formatSignedAt(transaction.nda.investorSignedAt)}
               />
             </LcsTd>
           </LcsTr>
@@ -223,10 +230,10 @@ function NdaGatePanel({ deal }: { deal: LcsSandboxDeal }) {
       <div className="px-3 py-3 flex items-center justify-between gap-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
         <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)", fontSize: 12 }}>
           {bothSigned
-            ? "Both parties have signed. This deal can proceed to the company profile."
-            : "Both parties must sign before this deal can proceed."}
+            ? "Both parties have signed. This transaction can proceed to the company profile."
+            : "Both parties must sign before this transaction can proceed."}
         </p>
-        {!deal.nda.founderSignedAt && <LcsButton variant="secondary">Sign as founder</LcsButton>}
+        {!transaction.nda.founderSignedAt && <LcsButton variant="secondary">Sign as founder</LcsButton>}
       </div>
     </LcsCard>
   );
@@ -240,10 +247,10 @@ function NdaGatePanel({ deal }: { deal: LcsSandboxDeal }) {
  * but the scope is shown explicitly via the status pill rather than
  * hidden — so the screen documents the real access model instead of
  * silently simulating enforcement it can't actually perform. */
-function DocumentVaultPanel({ deal }: { deal: LcsSandboxDeal }) {
+function DocumentVaultPanel({ transaction }: { transaction: LcsSandboxTransaction }) {
   return (
-    <LcsCard title="Documents" count={deal.documents.length}>
-      {deal.documents.length === 0 ? (
+    <LcsCard title="Documents" count={transaction.documents.length}>
+      {transaction.documents.length === 0 ? (
         <LcsEmptyState text="No documents uploaded yet." />
       ) : (
         <LcsTable>
@@ -253,7 +260,7 @@ function DocumentVaultPanel({ deal }: { deal: LcsSandboxDeal }) {
             <LcsTh>Visible to</LcsTh>
           </LcsTableHead>
           <LcsTableBody>
-            {deal.documents.map((doc) => (
+            {transaction.documents.map((doc) => (
               <LcsTr key={doc.id}>
                 <LcsTd>{doc.name}</LcsTd>
                 <LcsTd>{doc.category}</LcsTd>
@@ -283,11 +290,11 @@ function DocumentVaultPanel({ deal }: { deal: LcsSandboxDeal }) {
  * complete (e.g. a reference call), and conflating the two would misstate
  * who's actually blocking progress. Count badge shows outstanding, not
  * total, since "how many are left" is the load-bearing number here. */
-function DueDiligencePanel({ deal }: { deal: LcsSandboxDeal }) {
-  const outstanding = deal.diligenceItems.filter((i) => !i.satisfied).length;
+function DueDiligencePanel({ transaction }: { transaction: LcsSandboxTransaction }) {
+  const outstanding = transaction.diligenceItems.filter((i) => !i.satisfied).length;
   return (
     <LcsCard title="Diligence checklist" count={outstanding}>
-      {deal.diligenceItems.length === 0 ? (
+      {transaction.diligenceItems.length === 0 ? (
         <LcsEmptyState text="No diligence items requested yet." />
       ) : (
         <LcsTable>
@@ -297,7 +304,7 @@ function DueDiligencePanel({ deal }: { deal: LcsSandboxDeal }) {
             <LcsTh>Status</LcsTh>
           </LcsTableHead>
           <LcsTableBody>
-            {deal.diligenceItems.map((item) => (
+            {transaction.diligenceItems.map((item) => (
               <LcsTr key={item.id}>
                 <LcsTd>{item.label}</LcsTd>
                 <LcsTd>{item.owner}</LcsTd>
@@ -335,13 +342,13 @@ const TERM_STATUS_LABEL: Record<"proposed" | "countered" | "accepted", string> =
  * the real product's two-sided ratchet exactly (lcs-sandbox.ts's own
  * note: this is the one part of the fragmented stage-vocabulary landscape
  * CLAUDE.md already documents as genuinely well-built). No aggregate
- * "deal status" derived here — each term's state stands on its own, same
- * as the real product; a single rolled-up label would invent a summary
- * the underlying model doesn't produce. */
-function NegotiationPanel({ deal }: { deal: LcsSandboxDeal }) {
+ * "transaction status" derived here — each term's state stands on its
+ * own, same as the real product; a single rolled-up label would invent a
+ * summary the underlying model doesn't produce. */
+function NegotiationPanel({ transaction }: { transaction: LcsSandboxTransaction }) {
   return (
-    <LcsCard title="Terms" count={deal.terms.length}>
-      {deal.terms.length === 0 ? (
+    <LcsCard title="Terms" count={transaction.terms.length}>
+      {transaction.terms.length === 0 ? (
         <LcsEmptyState text="No terms proposed yet." />
       ) : (
         <LcsTable>
@@ -351,7 +358,7 @@ function NegotiationPanel({ deal }: { deal: LcsSandboxDeal }) {
             <LcsTh>Status</LcsTh>
           </LcsTableHead>
           <LcsTableBody>
-            {deal.terms.map((term) => (
+            {transaction.terms.map((term) => (
               <LcsTr key={term.id}>
                 <LcsTd>{term.label}</LcsTd>
                 <LcsTd>{term.value}</LcsTd>

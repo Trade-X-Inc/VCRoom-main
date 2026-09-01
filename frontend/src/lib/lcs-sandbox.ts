@@ -18,10 +18,11 @@
 // as the Advisor Dashboard preview (CLAUDE.md §20.15's §7.4 lesson: a
 // plausible placeholder is how invented content quietly ships as real).
 
-/** The five sectors from Deals hub §1. Matches §1's exact sector names —
- * a raw slug->title-case conversion would be wrong for "spv" (-> "Spv",
- * not "SPV") and "syndicate-lead". Moved here from §2's own local const
- * so §3 (the single-deal lifecycle) doesn't need a third duplicate copy. */
+/** The five sectors from Transactions hub §1. Matches §1's exact sector
+ * names — a raw slug->title-case conversion would be wrong for "spv"
+ * (-> "Spv", not "SPV") and "syndicate-lead". Moved here from §2's own
+ * local const so §3 (the single-transaction lifecycle) doesn't need a
+ * third duplicate copy. */
 export const SECTOR_LABEL: Record<string, string> = {
   technology: "Technology",
   "real-estate": "Real Estate",
@@ -30,7 +31,7 @@ export const SECTOR_LABEL: Record<string, string> = {
   "syndicate-lead": "Syndicate Lead",
 };
 
-export type LcsDealStage =
+export type LcsTransactionStage =
   | "initiation"
   | "nda_gate"
   | "company_profile"
@@ -40,8 +41,8 @@ export type LcsDealStage =
   | "closing";
 
 /** Order matters — drives the stage tab bar / progress indicator on the
- * single-deal lifecycle screen (Deals hub §3). */
-export const STAGE_ORDER: LcsDealStage[] = [
+ * single-transaction lifecycle screen (Transactions hub §3). */
+export const STAGE_ORDER: LcsTransactionStage[] = [
   "initiation",
   "nda_gate",
   "company_profile",
@@ -51,7 +52,7 @@ export const STAGE_ORDER: LcsDealStage[] = [
   "closing",
 ];
 
-export const STAGE_LABEL: Record<LcsDealStage, string> = {
+export const STAGE_LABEL: Record<LcsTransactionStage, string> = {
   initiation: "Initiation",
   nda_gate: "NDA gate",
   company_profile: "Company profile",
@@ -88,31 +89,32 @@ export const CLOSING_GATE_LABEL: Record<LcsClosingGate, string> = {
   close: "Close",
 };
 
-export type LcsDealListStatus = "active" | "closed" | "in-progress" | "pending-action";
+export type LcsTransactionListStatus = "active" | "closed" | "in-progress" | "pending-action";
 
-export interface LcsSandboxDeal {
+export interface LcsSandboxTransaction {
   id: string;
   ref: string;
   companyName: string;
   sector: "technology";
   owner: string;
-  /** The investor/counterparty in this deal — real column added 1 Sep
-   * 2026 after the Deals hub §2 review found the table wasn't using its
-   * available width; per instruction, filled with real columns already
-   * in the workflow spec rather than widening cells or adding decoration. */
+  /** The investor/counterparty in this transaction — real column added
+   * 1 Sep 2026 after the Transactions hub §2 review found the table
+   * wasn't using its available width; per instruction, filled with real
+   * columns already in the workflow spec rather than widening cells or
+   * adding decoration. */
   counterparty: string;
-  stage: LcsDealStage;
-  listStatus: LcsDealListStatus;
+  stage: LcsTransactionStage;
+  listStatus: LcsTransactionListStatus;
   createdAt: string;
-  /** When the deal entered its CURRENT stage — distinct from createdAt.
-   * "Days in stage" is computed from this at render time, not stored as a
-   * stale number, so it stays correct as real time passes. */
+  /** When the transaction entered its CURRENT stage — distinct from
+   * createdAt. "Days in stage" is computed from this at render time, not
+   * stored as a stale number, so it stays correct as real time passes. */
   stageEnteredAt: string;
   /** Most recent activity description + timestamp, same shape as the
    * PDF's own "Recent Transaction Log" example content. */
   lastActivity: { text: string; at: string };
 
-  // ── Deals hub §3 fields — single-deal lifecycle ──────────────────────
+  // ── Transactions hub §3 fields — single-transaction lifecycle ────────
   /** NDA gate. `null` = not yet signed by that party. */
   nda: { founderSignedAt: string | null; investorSignedAt: string | null };
   /** Company profile — the minimal shareable-brief-level fields per the
@@ -138,7 +140,7 @@ export interface LcsSandboxDeal {
 }
 
 // Real bug found live, 1 Sep 2026: this module has no schema-version
-// check, so widening LcsSandboxDeal's shape (adding counterparty/
+// check, so widening LcsSandboxTransaction's shape (adding counterparty/
 // stageEnteredAt/lastActivity for the §2 review's column additions) left
 // already-persisted localStorage from the OLD shape in place — reading it
 // back and rendering `d.lastActivity.text` crashed the whole route
@@ -147,7 +149,13 @@ export interface LcsSandboxDeal {
 // simply invisible to the new code and gets reseeded, rather than
 // partially deserializing into an incompatible shape.
 // v3 (1 Sep 2026): added nda/profile/documents/diligenceItems/terms/
-// closingGates for Deals hub §3 (single-deal lifecycle).
+// closingGates for Transactions hub §3 (single-transaction lifecycle).
+//
+// "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep 2026
+// — see deals-preview.index.tsx's header comment for the full scope
+// note. Storage key NOT bumped for this rename alone: the on-disk shape
+// (field names, JSON structure) is unchanged, only TypeScript-level
+// type/function names changed, which localStorage never sees.
 const STORAGE_KEY = "lcs-sandbox-v3";
 
 const NO_GATES_STARTED: Record<LcsClosingGate, "not-started" | "in-progress" | "done"> = {
@@ -159,10 +167,10 @@ const NO_GATES_STARTED: Record<LcsClosingGate, "not-started" | "in-progress" | "
   close: "not-started",
 };
 
-function seedDeals(): LcsSandboxDeal[] {
+function seedTransactions(): LcsSandboxTransaction[] {
   return [
     {
-      id: "sbx-1", ref: "DL-3001", companyName: "Nimbus Analytics", sector: "technology", owner: "R. Mehta",
+      id: "sbx-1", ref: "TX-3001", companyName: "Nimbus Analytics", sector: "technology", owner: "R. Mehta",
       counterparty: "Blue Horizon Ventures", stage: "negotiation", listStatus: "active",
       createdAt: "2026-08-05T10:00:00Z", stageEnteredAt: "2026-08-20T10:00:00Z",
       lastActivity: { text: "Term sheet counter-proposed", at: "2026-08-24T14:32:00Z" },
@@ -186,7 +194,7 @@ function seedDeals(): LcsSandboxDeal[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-2", ref: "DL-3002", companyName: "Havenlight Systems", sector: "technology", owner: "S. Cole",
+      id: "sbx-2", ref: "TX-3002", companyName: "Havenlight Systems", sector: "technology", owner: "S. Cole",
       counterparty: "Apex Meridian Capital", stage: "due_diligence", listStatus: "in-progress",
       createdAt: "2026-07-28T10:00:00Z", stageEnteredAt: "2026-08-18T10:00:00Z",
       lastActivity: { text: "Data room access extended", at: "2026-08-23T09:15:00Z" },
@@ -205,7 +213,7 @@ function seedDeals(): LcsSandboxDeal[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-3", ref: "DL-3003", companyName: "Redstone Cloud", sector: "technology", owner: "S. Cole",
+      id: "sbx-3", ref: "TX-3003", companyName: "Redstone Cloud", sector: "technology", owner: "S. Cole",
       counterparty: "Starlight Holdings", stage: "document_vault", listStatus: "pending-action",
       createdAt: "2026-07-20T10:00:00Z", stageEnteredAt: "2026-08-15T10:00:00Z",
       lastActivity: { text: "Cap table upload requested", at: "2026-08-21T11:05:00Z" },
@@ -219,7 +227,7 @@ function seedDeals(): LcsSandboxDeal[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-4", ref: "DL-3004", companyName: "Vantage Robotics Software", sector: "technology", owner: "R. Mehta",
+      id: "sbx-4", ref: "TX-3004", companyName: "Vantage Robotics Software", sector: "technology", owner: "R. Mehta",
       counterparty: "Vanguard Technologies", stage: "closing", listStatus: "closed",
       createdAt: "2026-06-10T10:00:00Z", stageEnteredAt: "2026-07-30T10:00:00Z",
       lastActivity: { text: "Close confirmed by both parties", at: "2026-07-31T16:00:00Z" },
@@ -241,7 +249,7 @@ function seedDeals(): LcsSandboxDeal[] {
       closingGates: { counsel: "done", agreement: "done", conditions: "done", signing: "done", payment: "done", close: "done" },
     },
     {
-      id: "sbx-5", ref: "DL-3005", companyName: "Fieldstone Data", sector: "technology", owner: "R. Mehta",
+      id: "sbx-5", ref: "TX-3005", companyName: "Fieldstone Data", sector: "technology", owner: "R. Mehta",
       counterparty: "Corvex Special Situations", stage: "company_profile", listStatus: "pending-action",
       createdAt: "2026-08-22T10:00:00Z", stageEnteredAt: "2026-08-22T10:00:00Z",
       lastActivity: { text: "Profile submitted for review", at: "2026-08-22T10:05:00Z" },
@@ -253,7 +261,7 @@ function seedDeals(): LcsSandboxDeal[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-6", ref: "DL-3006", companyName: "Anchorpoint AI", sector: "technology", owner: "S. Cole",
+      id: "sbx-6", ref: "TX-3006", companyName: "Anchorpoint AI", sector: "technology", owner: "S. Cole",
       counterparty: "Northbridge Capital Fund IV", stage: "nda_gate", listStatus: "active",
       createdAt: "2026-08-25T10:00:00Z", stageEnteredAt: "2026-08-25T10:00:00Z",
       lastActivity: { text: "NDA sent for signature", at: "2026-08-25T10:10:00Z" },
@@ -273,7 +281,7 @@ function seedDeals(): LcsSandboxDeal[] {
  * the key again). Checks the fields the crash actually depended on rather
  * than a full shape validator, since this is a sandbox, not production
  * data needing strict validation. */
-function looksLikeCurrentShape(value: unknown): value is LcsSandboxDeal[] {
+function looksLikeCurrentShape(value: unknown): value is LcsSandboxTransaction[] {
   return (
     Array.isArray(value) &&
     value.every(
@@ -294,18 +302,18 @@ function looksLikeCurrentShape(value: unknown): value is LcsSandboxDeal[] {
   );
 }
 
-function readAll(): LcsSandboxDeal[] {
-  if (typeof window === "undefined") return seedDeals();
+function readAll(): LcsSandboxTransaction[] {
+  if (typeof window === "undefined") return seedTransactions();
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const seeded = seedDeals();
+      const seeded = seedTransactions();
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
       return seeded;
     }
     const parsed = JSON.parse(raw);
     if (!looksLikeCurrentShape(parsed)) {
-      const seeded = seedDeals();
+      const seeded = seedTransactions();
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
       return seeded;
     }
@@ -313,36 +321,36 @@ function readAll(): LcsSandboxDeal[] {
   } catch {
     // Private window, storage blocked, or corrupt JSON — fall back to a
     // fresh in-memory seed rather than throwing.
-    return seedDeals();
+    return seedTransactions();
   }
 }
 
-export function getSandboxDeals(): LcsSandboxDeal[] {
+export function getSandboxTransactions(): LcsSandboxTransaction[] {
   return readAll();
 }
 
-export function getSandboxDeal(id: string): LcsSandboxDeal | undefined {
+export function getSandboxTransaction(id: string): LcsSandboxTransaction | undefined {
   return readAll().find((d) => d.id === id);
 }
 
-/** Days elapsed since a deal entered its current stage, computed from the
- * real stored timestamp against a caller-supplied "now" — never Date.now()
- * called internally. This function runs during SSR (this route is server-
- * rendered), and Date.now() differs between the server render and the
- * client hydration render by however many milliseconds elapsed between
- * them — the exact same class of hydration-mismatch bug already found and
- * fixed once this session (deals-preview.$sector.tsx's sandbox-loading
- * state, and this session's earlier /status fix). Callers must compute
- * `now` once, client-side only, after mount — see deals-preview.$sector.tsx
- * for the pattern. */
-export function daysInStage(deal: LcsSandboxDeal, now: number): number {
-  const ms = now - new Date(deal.stageEnteredAt).getTime();
+/** Days elapsed since a transaction entered its current stage, computed
+ * from the real stored timestamp against a caller-supplied "now" — never
+ * Date.now() called internally. This function runs during SSR (this route
+ * is server-rendered), and Date.now() differs between the server render
+ * and the client hydration render by however many milliseconds elapsed
+ * between them — the exact same class of hydration-mismatch bug already
+ * found and fixed once this session (deals-preview.$sector.tsx's
+ * sandbox-loading state, and this session's earlier /status fix). Callers
+ * must compute `now` once, client-side only, after mount — see
+ * deals-preview.$sector.tsx for the pattern. */
+export function daysInStage(transaction: LcsSandboxTransaction, now: number): number {
+  const ms = now - new Date(transaction.stageEnteredAt).getTime();
   return Math.max(0, Math.floor(ms / 86_400_000));
 }
 
 /** Clears and reseeds the sandbox. Returns the fresh seed set. */
-export function resetSandboxDeals(): LcsSandboxDeal[] {
-  const seeded = seedDeals();
+export function resetSandboxTransactions(): LcsSandboxTransaction[] {
+  const seeded = seedTransactions();
   if (typeof window !== "undefined") {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));

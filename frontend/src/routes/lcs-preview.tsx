@@ -27,17 +27,22 @@ import {
 // this new shell inside the old v2 shell, defeating the point of the
 // preview. No nav entry, direct-URL-only, same containment as the
 // advisor-preview screens (CLAUDE.md §20.15). Not a real product screen —
-// delete once Group 1 (Deals hub) is verified and this has served its
-// purpose.
+// delete once Group 1 (Transactions hub) is verified and this has
+// served its purpose.
+//
+// "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep
+// 2026 — this throwaway route's strings updated for consistency only;
+// it stays out of scope otherwise since it's already marked for
+// deletion above.
 
 export const Route = createFileRoute("/lcs-preview")({
   component: LcsPreview,
 });
 
-const DEALS = [
-  { ref: "DL-2291", deal: "Northbridge Capital Fund IV", owner: "R. Mehta", status: "pending" as const },
-  { ref: "DL-2288", deal: "Alder Street Growth II", owner: "S. Cole", status: "in-progress" as const },
-  { ref: "DL-2260", deal: "Corvex Special Situations", owner: "S. Cole", status: "attention" as const },
+const TRANSACTIONS = [
+  { ref: "TX-2291", transaction: "Northbridge Capital Fund IV", owner: "R. Mehta", status: "pending" as const },
+  { ref: "TX-2288", transaction: "Alder Street Growth II", owner: "S. Cole", status: "in-progress" as const },
+  { ref: "TX-2260", transaction: "Corvex Special Situations", owner: "S. Cole", status: "attention" as const },
 ];
 
 const REQUESTS = [
@@ -52,7 +57,7 @@ function LcsPreview() {
 
   return (
     <LcsPageShell
-      searchPlaceholder="Search deals, LPs, requests"
+      searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
       sidebar={(collapsed) => (
@@ -63,7 +68,7 @@ function LcsPreview() {
             </div>
           )}
           <LcsNavItem to="/lcs-preview" label="Home" active collapsed={collapsed} icon="H" />
-          <LcsNavItem to="/lcs-preview" label="Deals" collapsed={collapsed} icon="D" />
+          <LcsNavItem to="/lcs-preview" label="Transactions" collapsed={collapsed} icon="T" />
           <LcsNavItem to="/lcs-preview" label="Requests" collapsed={collapsed} icon="R" />
           <LcsNavItem to="/lcs-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/lcs-preview" label="Documents" collapsed={collapsed} icon="D" />
@@ -74,23 +79,23 @@ function LcsPreview() {
     >
       <LcsPageHeader
         title="Home"
-        description="Deals, requests, and documents awaiting your action."
+        description="Transactions, requests, and documents awaiting your action."
       />
 
       <div className="flex flex-col gap-6">
-        <LcsCard title="Deals in your pipeline" count={DEALS.length} onViewAll={() => {}}>
+        <LcsCard title="Transactions in your pipeline" count={TRANSACTIONS.length} onViewAll={() => {}}>
           <LcsTable>
             <LcsTableHead>
               <LcsTh>Ref</LcsTh>
-              <LcsTh>Deal</LcsTh>
+              <LcsTh>Transaction</LcsTh>
               <LcsTh>Owner</LcsTh>
               <LcsTh>Status</LcsTh>
             </LcsTableHead>
             <LcsTableBody>
-              {DEALS.map((d) => (
+              {TRANSACTIONS.map((d) => (
                 <LcsTr key={d.ref} onClick={() => d.status === "attention" && setDeclineOpen(true)}>
                   <LcsTd mono>{d.ref}</LcsTd>
-                  <LcsTd>{d.deal}</LcsTd>
+                  <LcsTd>{d.transaction}</LcsTd>
                   <LcsTd>{d.owner}</LcsTd>
                   <LcsTd>
                     <LcsStatusPill status={d.status} />
@@ -124,7 +129,7 @@ function LcsPreview() {
 
       {declineOpen && (
         <LcsModal
-          title="Decline this deal"
+          title="Decline this transaction"
           onClose={() => setDeclineOpen(false)}
           footer={
             <>
@@ -132,17 +137,17 @@ function LcsPreview() {
                 Cancel
               </LcsButton>
               <LcsButton variant="destructive" onClick={() => setDeclineOpen(false)}>
-                Decline deal
+                Decline transaction
               </LcsButton>
             </>
           }
         >
           <p className="text-[13px]" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)" }}>
-            Northbridge Capital Fund IV — DL-2291
+            Northbridge Capital Fund IV — TX-2291
           </p>
           <LcsTextareaField
             label="Reason (required)"
-            placeholder="Explain why this deal is being declined"
+            placeholder="Explain why this transaction is being declined"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />

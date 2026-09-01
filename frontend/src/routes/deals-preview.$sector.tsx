@@ -15,47 +15,52 @@ import {
   LcsButton,
   type LcsStatus,
 } from "@/components/lcs";
-import { getSandboxDeals, resetSandboxDeals, daysInStage, STAGE_LABEL, SECTOR_LABEL, type LcsDealListStatus } from "@/lib/lcs-sandbox";
+import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, type LcsTransactionListStatus } from "@/lib/lcs-sandbox";
 
-// Deals hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox data
-// only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase calls,
-// confirmed by grep; never the real deal_rooms table). Real production
-// deal_rooms has exactly 4 rows, all test/adversarial fixtures (Playwright
-// Test Co x2, Atlas Robotics) — none are used here, per direct instruction.
+// Transactions hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox
+// data only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase
+// calls, confirmed by grep; never the real deal_rooms table). Real
+// production deal_rooms has exactly 4 rows, all test/adversarial fixtures
+// (Playwright Test Co x2, Atlas Robotics) — none are used here, per direct
+// instruction.
+//
+// "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep 2026 —
+// see deals-preview.index.tsx's header comment for the full scope note.
 
 export const Route = createFileRoute("/deals-preview/$sector")({
-  component: SectorDeals,
+  component: SectorTransactions,
 });
 
-const TABS: { key: LcsDealListStatus; label: string }[] = [
+const TABS: { key: LcsTransactionListStatus; label: string }[] = [
   { key: "active", label: "Active" },
   { key: "in-progress", label: "In Progress" },
   { key: "pending-action", label: "Pending Action" },
   { key: "closed", label: "Closed" },
 ];
 
-const STATUS_TO_PILL: Record<LcsDealListStatus, LcsStatus> = {
+const STATUS_TO_PILL: Record<LcsTransactionListStatus, LcsStatus> = {
   active: "in-progress",
   "in-progress": "in-progress",
   "pending-action": "attention",
   closed: "satisfied",
 };
 
-function SectorDeals() {
+function SectorTransactions() {
   const { sector } = Route.useParams();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<LcsDealListStatus>("active");
+  const [tab, setTab] = useState<LcsTransactionListStatus>("active");
   // Real bug found live (not by inspection): initializing this from
-  // getSandboxDeals() directly caused an SSR/client hydration mismatch,
-  // same class as this session's earlier /status fix. getSandboxDeals()
-  // reads localStorage, which doesn't exist during SSR (the module falls
-  // back to a fresh in-memory seed there) but DOES exist on the client,
-  // where it can hold a different value from a prior session — the two
-  // renders disagreed and React discarded the SSR tree. Fixed the same
-  // way: render a deterministic value on first paint (the seed function's
-  // own shape, computed lazily so it's stable across server and client),
-  // then swap in the real persisted value only after mount.
-  const [deals, setDeals] = useState<ReturnType<typeof getSandboxDeals>>([]);
+  // getSandboxTransactions() directly caused an SSR/client hydration
+  // mismatch, same class as this session's earlier /status fix.
+  // getSandboxTransactions() reads localStorage, which doesn't exist
+  // during SSR (the module falls back to a fresh in-memory seed there)
+  // but DOES exist on the client, where it can hold a different value
+  // from a prior session — the two renders disagreed and React discarded
+  // the SSR tree. Fixed the same way: render a deterministic value on
+  // first paint (the seed function's own shape, computed lazily so it's
+  // stable across server and client), then swap in the real persisted
+  // value only after mount.
+  const [transactions, setTransactions] = useState<ReturnType<typeof getSandboxTransactions>>([]);
   const [hydrated, setHydrated] = useState(false);
   const [resetting, setResetting] = useState(false);
   // "Days in stage" depends on Date.now(), which differs between SSR and
@@ -65,31 +70,31 @@ function SectorDeals() {
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    setDeals(getSandboxDeals());
+    setTransactions(getSandboxTransactions());
     setNow(Date.now());
     setHydrated(true);
   }, []);
 
   const isTechnology = sector === "technology";
 
-  const filtered = useMemo(() => deals.filter((d) => d.listStatus === tab), [deals, tab]);
+  const filtered = useMemo(() => transactions.filter((d) => d.listStatus === tab), [transactions, tab]);
   const counts = useMemo(() => {
-    const c: Record<LcsDealListStatus, number> = { active: 0, "in-progress": 0, "pending-action": 0, closed: 0 };
-    for (const d of deals) c[d.listStatus]++;
+    const c: Record<LcsTransactionListStatus, number> = { active: 0, "in-progress": 0, "pending-action": 0, closed: 0 };
+    for (const d of transactions) c[d.listStatus]++;
     return c;
-  }, [deals]);
+  }, [transactions]);
 
   const handleReset = () => {
     if (resetting) return;
     setResetting(true);
-    const fresh = resetSandboxDeals();
-    setDeals(fresh);
+    const fresh = resetSandboxTransactions();
+    setTransactions(fresh);
     setResetting(false);
   };
 
   return (
     <LcsPageShell
-      searchPlaceholder="Search deals, LPs, requests"
+      searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
       sidebar={(collapsed) => (
@@ -100,7 +105,7 @@ function SectorDeals() {
             </div>
           )}
           <LcsNavItem to="/deals-preview" label="Home" collapsed={collapsed} icon="H" />
-          <LcsNavItem to="/deals-preview" label="Deals" active collapsed={collapsed} icon="D" />
+          <LcsNavItem to="/deals-preview" label="Transactions" active collapsed={collapsed} icon="T" />
           <LcsNavItem to="/deals-preview" label="Requests" collapsed={collapsed} icon="R" />
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
@@ -113,7 +118,7 @@ function SectorDeals() {
         title={SECTOR_LABEL[sector] ?? sector}
         description={
           isTechnology
-            ? "Sandbox pipeline — fictional demo data, not live deals."
+            ? "Sandbox pipeline — fictional demo data, not live transactions."
             : "This sector is not yet active."
         }
         action={
@@ -123,7 +128,7 @@ function SectorDeals() {
             </LcsButton>
           ) : (
             <Link to="/deals-preview">
-              <LcsButton variant="secondary">Back to Deals</LcsButton>
+              <LcsButton variant="secondary">Back to Transactions</LcsButton>
             </Link>
           )
         }
@@ -135,18 +140,18 @@ function SectorDeals() {
           text={`No schedule is published for this sector yet.`}
           action={
             <Link to="/deals-preview">
-              <LcsButton variant="text-link">Back to Deals</LcsButton>
+              <LcsButton variant="text-link">Back to Transactions</LcsButton>
             </Link>
           }
         />
       ) : !hydrated ? (
         // Deliberately blank rather than rendering the pre-hydration []
         // state's tab counts/empty-state text — that content is real
-        // enough to look final, and showing "0 deals" for a moment before
-        // the real sandbox data loads is the exact "plausible-looking
-        // empty state that isn't real" shape CLAUDE.md's §7.4 warns
-        // about, even though here it's a genuine race rather than a
-        // swallowed error.
+        // enough to look final, and showing "0 transactions" for a
+        // moment before the real sandbox data loads is the exact
+        // "plausible-looking empty state that isn't real" shape
+        // CLAUDE.md's §7.4 warns about, even though here it's a genuine
+        // race rather than a swallowed error.
         <div aria-hidden="true" style={{ minHeight: 300 }} />
       ) : (
         <div className="flex flex-col gap-4">
@@ -181,7 +186,7 @@ function SectorDeals() {
           </div>
 
           {filtered.length === 0 ? (
-            <LcsEmptyState text={`No deals in ${TABS.find((t) => t.key === tab)?.label}.`} />
+            <LcsEmptyState text={`No transactions in ${TABS.find((t) => t.key === tab)?.label}.`} />
           ) : (
             <div className="border" style={{ borderColor: "var(--lcs-line)" }}>
               <LcsTable>
