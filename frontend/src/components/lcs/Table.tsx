@@ -56,10 +56,31 @@ export function LcsTr({
   onClick?: () => void;
   expandable?: boolean;
 }) {
+  const interactive = !!onClick || expandable;
   return (
     <tr
       onClick={onClick}
-      className={onClick || expandable ? "cursor-pointer" : ""}
+      // A clickable <tr> with only a mouse handler is invisible to
+      // keyboard/screen-reader users — found live on first build (the row
+      // rendered as plain, non-interactive StaticText in the accessibility
+      // tree, same class of defect as the earlier collapsed-nav-link
+      // missing-aria-label bug). role="button" + tabIndex + Enter/Space
+      // handling makes the row a real interactive control when it has a
+      // click handler, matching the "no meaning conveyed by icon/mouse-only
+      // interaction alone" rule this build is held to.
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={
+        interactive
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
+      className={interactive ? "cursor-pointer" : ""}
       style={{
         borderBottom: "1px solid var(--lcs-line)",
         transition: "background-color 120ms",

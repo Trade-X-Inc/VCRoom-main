@@ -1,13 +1,229 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import {
+  LcsPageShell,
+  LcsNavItem,
+  LcsPageHeader,
+  LcsTable,
+  LcsTableHead,
+  LcsTh,
+  LcsTableBody,
+  LcsTr,
+  LcsTd,
+  LcsStatusPill,
+  LcsEmptyState,
+  LcsButton,
+  type LcsStatus,
+} from "@/components/lcs";
+import { getSandboxDeals, resetSandboxDeals, type LcsDealListStatus } from "@/lib/lcs-sandbox";
 
-// Placeholder stub, 1 Sep 2026 — exists only so Deals hub §1's sector-card
-// links resolve under TanStack's typed router (a route must exist for
-// `to="/deals-preview/$sector"` to type-check). Real content is Deals hub
-// §2 (filtered list view: Active/Closed/In Progress/Pending Action tabs),
-// built as its own separately-reported section per the build order — not
-// yet built as of this commit. Do not treat this file as §2's
-// implementation.
+// Deals hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox data
+// only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase calls,
+// confirmed by grep; never the real deal_rooms table). Real production
+// deal_rooms has exactly 4 rows, all test/adversarial fixtures (Playwright
+// Test Co x2, Atlas Robotics) — none are used here, per direct instruction.
 
 export const Route = createFileRoute("/deals-preview/$sector")({
-  component: () => null,
+  component: SectorDeals,
 });
+
+// Matches §1's exact sector names — a raw slug->title-case conversion
+// would be wrong for "spv" (-> "Spv", not "SPV") and "syndicate-lead".
+const SECTOR_LABEL: Record<string, string> = {
+  technology: "Technology",
+  "real-estate": "Real Estate",
+  manufacturing: "Manufacturing",
+  spv: "SPV",
+  "syndicate-lead": "Syndicate Lead",
+};
+
+const TABS: { key: LcsDealListStatus; label: string }[] = [
+  { key: "active", label: "Active" },
+  { key: "in-progress", label: "In Progress" },
+  { key: "pending-action", label: "Pending Action" },
+  { key: "closed", label: "Closed" },
+];
+
+const STATUS_TO_PILL: Record<LcsDealListStatus, LcsStatus> = {
+  active: "in-progress",
+  "in-progress": "in-progress",
+  "pending-action": "attention",
+  closed: "satisfied",
+};
+
+function SectorDeals() {
+  const { sector } = Route.useParams();
+  const navigate = useNavigate();
+  const [tab, setTab] = useState<LcsDealListStatus>("active");
+  // Real bug found live (not by inspection): initializing this from
+  // getSandboxDeals() directly caused an SSR/client hydration mismatch,
+  // same class as this session's earlier /status fix. getSandboxDeals()
+  // reads localStorage, which doesn't exist during SSR (the module falls
+  // back to a fresh in-memory seed there) but DOES exist on the client,
+  // where it can hold a different value from a prior session — the two
+  // renders disagreed and React discarded the SSR tree. Fixed the same
+  // way: render a deterministic value on first paint (the seed function's
+  // own shape, computed lazily so it's stable across server and client),
+  // then swap in the real persisted value only after mount.
+  const [deals, setDeals] = useState<ReturnType<typeof getSandboxDeals>>([]);
+  const [hydrated, setHydrated] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  useEffect(() => {
+    setDeals(getSandboxDeals());
+    setHydrated(true);
+  }, []);
+
+  const isTechnology = sector === "technology";
+
+  const filtered = useMemo(() => deals.filter((d) => d.listStatus === tab), [deals, tab]);
+  const counts = useMemo(() => {
+    const c: Record<LcsDealListStatus, number> = { active: 0, "in-progress": 0, "pending-action": 0, closed: 0 };
+    for (const d of deals) c[d.listStatus]++;
+    return c;
+  }, [deals]);
+
+  const handleReset = () => {
+    if (resetting) return;
+    setResetting(true);
+    const fresh = resetSandboxDeals();
+    setDeals(fresh);
+    setResetting(false);
+  };
+
+  return (
+    <LcsPageShell
+      searchPlaceholder="Search deals, LPs, requests"
+      userInitials="RM"
+      userLabel="R. Mehta"
+      sidebar={(collapsed) => (
+        <nav className="flex flex-col gap-0.5 p-2">
+          {!collapsed && (
+            <div className="px-2 py-2 text-[15px] font-semibold" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>
+              Lengdon
+            </div>
+          )}
+          <LcsNavItem to="/deals-preview" label="Home" collapsed={collapsed} icon="H" />
+          <LcsNavItem to="/deals-preview" label="Deals" active collapsed={collapsed} icon="D" />
+          <LcsNavItem to="/deals-preview" label="Requests" collapsed={collapsed} icon="R" />
+          <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
+          <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
+          <LcsNavItem to="/deals-preview" label="Reporting" collapsed={collapsed} icon="R" />
+          <LcsNavItem to="/deals-preview" label="Settings" collapsed={collapsed} icon="S" />
+        </nav>
+      )}
+    >
+      <LcsPageHeader
+        title={SECTOR_LABEL[sector] ?? sector}
+        description={
+          isTechnology
+            ? "Sandbox pipeline — fictional demo data, not live deals."
+            : "This sector is not yet active."
+        }
+        action={
+          isTechnology ? (
+            <LcsButton variant="secondary" onClick={handleReset} disabled={resetting}>
+              {resetting ? "Resetting…" : "Reset demo data"}
+            </LcsButton>
+          ) : (
+            <Link to="/deals-preview">
+              <LcsButton variant="secondary">Back to Deals</LcsButton>
+            </Link>
+          )
+        }
+      />
+
+      {!isTechnology ? (
+        <LcsEmptyState
+          title="Coming soon"
+          text={`No schedule is published for this sector yet.`}
+          action={
+            <Link to="/deals-preview">
+              <LcsButton variant="text-link">Back to Deals</LcsButton>
+            </Link>
+          }
+        />
+      ) : !hydrated ? (
+        // Deliberately blank rather than rendering the pre-hydration []
+        // state's tab counts/empty-state text — that content is real
+        // enough to look final, and showing "0 deals" for a moment before
+        // the real sandbox data loads is the exact "plausible-looking
+        // empty state that isn't real" shape CLAUDE.md's §7.4 warns
+        // about, even though here it's a genuine race rather than a
+        // swallowed error.
+        <div aria-hidden="true" style={{ minHeight: 300 }} />
+      ) : (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-1" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className="px-3 h-9 text-[13px] flex items-center gap-1.5 -mb-px"
+                style={{
+                  fontFamily: "var(--font-lcs-ui)",
+                  fontWeight: tab === t.key ? 500 : 400,
+                  color: tab === t.key ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                  borderBottom: tab === t.key ? "2px solid var(--lcs-accent)" : "2px solid transparent",
+                }}
+              >
+                {t.label}
+                <span
+                  className="text-[11px] px-1.5"
+                  style={{
+                    fontFamily: "var(--font-lcs-data)",
+                    color: "var(--lcs-ink-muted)",
+                    background: "var(--lcs-surface)",
+                    borderRadius: "var(--radius-lcs-control)",
+                  }}
+                >
+                  {counts[t.key]}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {filtered.length === 0 ? (
+            <LcsEmptyState text={`No deals in ${TABS.find((t) => t.key === tab)?.label}.`} />
+          ) : (
+            <div className="border" style={{ borderColor: "var(--lcs-line)" }}>
+              <LcsTable>
+                <LcsTableHead>
+                  <LcsTh>Ref</LcsTh>
+                  <LcsTh>Company</LcsTh>
+                  <LcsTh>Owner</LcsTh>
+                  <LcsTh>Stage</LcsTh>
+                  <LcsTh>Status</LcsTh>
+                </LcsTableHead>
+                <LcsTableBody>
+                  {filtered.map((d) => (
+                    <LcsTr key={d.id} onClick={() => navigate({ to: "/deals-preview/$sector/$dealId", params: { sector, dealId: d.id } })}>
+                      <LcsTd mono>{d.ref}</LcsTd>
+                      <LcsTd>{d.companyName}</LcsTd>
+                      <LcsTd>{d.owner}</LcsTd>
+                      <LcsTd>{STAGE_LABEL[d.stage]}</LcsTd>
+                      <LcsTd>
+                        <LcsStatusPill status={STATUS_TO_PILL[d.listStatus]} label={TABS.find((t) => t.key === d.listStatus)?.label} />
+                      </LcsTd>
+                    </LcsTr>
+                  ))}
+                </LcsTableBody>
+              </LcsTable>
+            </div>
+          )}
+        </div>
+      )}
+    </LcsPageShell>
+  );
+}
+
+const STAGE_LABEL: Record<string, string> = {
+  initiation: "Initiation",
+  nda_gate: "NDA gate",
+  company_profile: "Company profile",
+  document_vault: "Document vault",
+  due_diligence: "Due diligence",
+  negotiation: "Negotiation",
+  closing: "Closing",
+};
