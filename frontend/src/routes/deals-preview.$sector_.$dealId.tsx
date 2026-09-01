@@ -29,9 +29,10 @@ import {
 
 // Deals hub §3 — single-deal lifecycle, 1 Sep 2026.
 // Checkpoint 1: shell + seven-state stage bar scaffolded.
-// Checkpoint 2 (this pass): NDA gate + Document vault real content.
-// Remaining stages (Due diligence/Negotiation, Closing) stay on the
-// checkpoint-1 placeholder until their own checkpoints.
+// Checkpoint 2: NDA gate + Document vault real content.
+// Checkpoint 3 (this pass): Due diligence + Negotiation real content.
+// Closing (six gates) stays on the checkpoint-1 placeholder until its
+// own checkpoint.
 // UI only, sandbox data only (src/lib/lcs-sandbox.ts) — same standard as
 // §1/§2: lcs/ primitives only, no backend wiring.
 
@@ -153,11 +154,14 @@ function DealLifecycle() {
 }
 
 /** Dispatches to real per-stage content where it's been built (checkpoint 2:
- * NDA gate, Document vault); everything else still shows the checkpoint-1
- * placeholder until its own checkpoint. */
+ * NDA gate, Document vault; checkpoint 3: Due diligence, Negotiation);
+ * Closing still shows the checkpoint-1 placeholder until its own
+ * checkpoint. */
 function StagePanel({ deal, stage, now }: { deal: LcsSandboxDeal; stage: LcsDealStage; now: number | null }) {
   if (stage === "nda_gate") return <NdaGatePanel deal={deal} />;
   if (stage === "document_vault") return <DocumentVaultPanel deal={deal} />;
+  if (stage === "due_diligence") return <DueDiligencePanel deal={deal} />;
+  if (stage === "negotiation") return <NegotiationPanel deal={deal} />;
   return <StagePlaceholder deal={deal} stage={stage} now={now} />;
 }
 
@@ -266,6 +270,101 @@ function DocumentVaultPanel({ deal }: { deal: LcsSandboxDeal }) {
       )}
       <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
         <LcsButton variant="secondary">Upload document</LcsButton>
+      </div>
+    </LcsCard>
+  );
+}
+
+/** Due diligence — checklist items, each with a single owner (the party
+ * responsible for satisfying it, matching the real product's dd_categories/
+ * dd_checklist_items shape in spirit) and a satisfied/outstanding state.
+ * Owner is deliberately a single party per item, not a shared checkbox —
+ * an item is either the founder's to provide or the investor's to
+ * complete (e.g. a reference call), and conflating the two would misstate
+ * who's actually blocking progress. Count badge shows outstanding, not
+ * total, since "how many are left" is the load-bearing number here. */
+function DueDiligencePanel({ deal }: { deal: LcsSandboxDeal }) {
+  const outstanding = deal.diligenceItems.filter((i) => !i.satisfied).length;
+  return (
+    <LcsCard title="Diligence checklist" count={outstanding}>
+      {deal.diligenceItems.length === 0 ? (
+        <LcsEmptyState text="No diligence items requested yet." />
+      ) : (
+        <LcsTable>
+          <LcsTableHead>
+            <LcsTh>Item</LcsTh>
+            <LcsTh>Owner</LcsTh>
+            <LcsTh>Status</LcsTh>
+          </LcsTableHead>
+          <LcsTableBody>
+            {deal.diligenceItems.map((item) => (
+              <LcsTr key={item.id}>
+                <LcsTd>{item.label}</LcsTd>
+                <LcsTd>{item.owner}</LcsTd>
+                <LcsTd>
+                  <LcsStatusPill
+                    status={item.satisfied ? "satisfied" : "pending"}
+                    label={item.satisfied ? "Satisfied" : "Outstanding"}
+                  />
+                </LcsTd>
+              </LcsTr>
+            ))}
+          </LcsTableBody>
+        </LcsTable>
+      )}
+      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+        <LcsButton variant="secondary">Request item</LcsButton>
+      </div>
+    </LcsCard>
+  );
+}
+
+const TERM_STATUS_TO_PILL: Record<"proposed" | "countered" | "accepted", LcsStatus> = {
+  proposed: "pending",
+  countered: "attention",
+  accepted: "satisfied",
+};
+
+const TERM_STATUS_LABEL: Record<"proposed" | "countered" | "accepted", string> = {
+  proposed: "Proposed",
+  countered: "Countered",
+  accepted: "Accepted",
+};
+
+/** Negotiation — per-term state (proposed/countered/accepted), matching
+ * the real product's two-sided ratchet exactly (lcs-sandbox.ts's own
+ * note: this is the one part of the fragmented stage-vocabulary landscape
+ * CLAUDE.md already documents as genuinely well-built). No aggregate
+ * "deal status" derived here — each term's state stands on its own, same
+ * as the real product; a single rolled-up label would invent a summary
+ * the underlying model doesn't produce. */
+function NegotiationPanel({ deal }: { deal: LcsSandboxDeal }) {
+  return (
+    <LcsCard title="Terms" count={deal.terms.length}>
+      {deal.terms.length === 0 ? (
+        <LcsEmptyState text="No terms proposed yet." />
+      ) : (
+        <LcsTable>
+          <LcsTableHead>
+            <LcsTh>Term</LcsTh>
+            <LcsTh>Value</LcsTh>
+            <LcsTh>Status</LcsTh>
+          </LcsTableHead>
+          <LcsTableBody>
+            {deal.terms.map((term) => (
+              <LcsTr key={term.id}>
+                <LcsTd>{term.label}</LcsTd>
+                <LcsTd>{term.value}</LcsTd>
+                <LcsTd>
+                  <LcsStatusPill status={TERM_STATUS_TO_PILL[term.status]} label={TERM_STATUS_LABEL[term.status]} />
+                </LcsTd>
+              </LcsTr>
+            ))}
+          </LcsTableBody>
+        </LcsTable>
+      )}
+      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+        <LcsButton variant="secondary">Propose term</LcsButton>
       </div>
     </LcsCard>
   );
