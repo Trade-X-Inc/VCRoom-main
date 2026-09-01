@@ -22,6 +22,21 @@
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 @import "@fontsource/jetbrains-mono/700.css";
+/* Lengdon Component System (LCS) — the approved 10-primitive internal
+   design system (CLAUDE.md §0, amendment 1 Sep 2026), superseding
+   Design Constitution v2 above for the authenticated app. v2 fonts are
+   NOT removed — AppShell/MemberShell/NotificationBell/UserMenu still
+   run on v2 (Archivo/Source Serif 4) until their own explicitly-scoped
+   reconciliation pass; this is a third, deliberately temporary,
+   self-hosted face set, same "app is intentionally mixed during
+   migration" posture v2's own header comment already establishes for
+   v1/v2. IBM Plex Sans 400/500/600 (all UI text and headings), IBM
+   Plex Mono 400/500 (reference codes, IDs, tabular figures). */
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
 @plugin "@tailwindcss/typography";
 
 /* ── Mobile globals ──────────────────────────────────────────────── */
@@ -43,6 +58,12 @@ img { max-width: 100%; height: auto; }
   --radius-2xl: 0px;
   --radius-3xl: 0px;
   --radius-control: 2px;
+  /* LCS controls (buttons, inputs, status pills) — "sharp corners" per the
+     Component System PDF's form-field spec; the status-pill/count-badge
+     renders in the PDF show a small radius, not a full pill shape, so this
+     is deliberately not --radius-full. Cards, table containers, and modals
+     use 0px (sharp) per the PDF's "flat, no rounding beyond a hairline". */
+  --radius-lcs-control: 3px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -111,6 +132,30 @@ img { max-width: 100%; height: auto; }
   --text-sm--line-height: 1.25rem;
   --text-base: 0.875rem;
   --text-base--line-height: 1.375rem;
+
+  /* ── Lengdon Component System (LCS) — exposed as Tailwind utilities ──────
+     Every LCS token is prefixed --lcs-* for the same reason the v2 layer is
+     prefixed --v2-*: guaranteed no collision with v1 OR v2 tokens as all
+     three coexist during migration. Values are the approved Component
+     System PDF verbatim (palette, 4px base unit, 2px-max control radius via
+     --lcs-radius, four status colours only). See
+     src/components/lcs/PRIMITIVES.md for the full component register. */
+  --color-lcs-white: var(--lcs-white);
+  --color-lcs-surface: var(--lcs-surface);
+  --color-lcs-line: var(--lcs-line);
+  --color-lcs-ink-muted: var(--lcs-ink-muted);
+  --color-lcs-ink: var(--lcs-ink);
+  --color-lcs-accent: var(--lcs-accent);
+  --color-lcs-pending: var(--lcs-pending);
+  --color-lcs-pending-wash: var(--lcs-pending-wash);
+  --color-lcs-progress: var(--lcs-progress);
+  --color-lcs-progress-wash: var(--lcs-progress-wash);
+  --color-lcs-satisfied: var(--lcs-satisfied);
+  --color-lcs-satisfied-wash: var(--lcs-satisfied-wash);
+  --color-lcs-attention: var(--lcs-attention);
+  --color-lcs-attention-wash: var(--lcs-attention-wash);
+  --font-lcs-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --font-lcs-data: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 :root {
@@ -202,6 +247,33 @@ img { max-width: 100%; height: auto; }
   --v2-attention-wash: #F8F0E0;
   --v2-adverse: #7A2E2A;
   --v2-adverse-wash: #F7EAE9;
+
+  /* ── Lengdon Component System (LCS) token values, approved PDF verbatim ──
+     Base palette + accent are exact values from the PDF. The four status
+     colours' SOLID values are exact (pill swatches: neutral gray, accent
+     blue, green, amber). The four "-wash" (light background tint) values
+     are NOT given literal hex codes anywhere in the PDF — it shows the
+     wash as a rendered pill fill but specifies no number. Derived here as
+     a light tint of each solid tone, following the exact same solid->wash
+     relationship already established for v2 above (each wash is a ~90%
+     lightened step of its solid, holding hue) rather than inventing an
+     unrelated colour. Flagged, not silently presented as spec: if the
+     founder supplies exact wash hex values later, replace these. */
+  --lcs-white: #FFFFFF;
+  --lcs-surface: #F6F5F2;
+  --lcs-line: #DDDBD6;
+  --lcs-ink-muted: #57544E;
+  --lcs-ink: #1A1A19;
+  --lcs-accent: #1F4E8C;
+  --lcs-pending: #57544E;
+  --lcs-pending-wash: #F1F0ED;
+  --lcs-progress: #1F4E8C;
+  --lcs-progress-wash: #E9EFF7;
+  --lcs-satisfied: #1E6B47;
+  --lcs-satisfied-wash: #E7F1EC;
+  --lcs-attention: #A15C00;
+  --lcs-attention-wash: #FAF0E1;
+
   /* Public register §3.6.5 — diagram/data-viz palette ONLY. Never interface
      chrome (buttons, links, badges), which stays single-accent per §3.5.1.
      Each tone is an existing token's hue at a different position, not a new

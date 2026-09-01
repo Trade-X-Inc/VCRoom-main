@@ -13,6 +13,7 @@ import { Route as StatusRouteImport } from './routes/status'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as RegistryRouteImport } from './routes/registry'
+import { Route as LcsPreviewRouteImport } from './routes/lcs-preview'
 import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
@@ -197,6 +198,11 @@ const SignInRoute = SignInRouteImport.update({
 const RegistryRoute = RegistryRouteImport.update({
   id: '/registry',
   path: '/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LcsPreviewRoute = LcsPreviewRouteImport.update({
+  id: '/lcs-preview',
+  path: '/lcs-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoomRoute = JoinRoomRouteImport.update({
@@ -1076,6 +1082,7 @@ export interface FileRoutesByFullPath {
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
+  '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -1246,6 +1253,7 @@ export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
+  '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -1417,6 +1425,7 @@ export interface FileRoutesById {
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
+  '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -1590,6 +1599,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/join'
     | '/join-room'
+    | '/lcs-preview'
     | '/registry'
     | '/sign-in'
     | '/sign-up'
@@ -1760,6 +1770,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/join'
     | '/join-room'
+    | '/lcs-preview'
     | '/registry'
     | '/sign-in'
     | '/sign-up'
@@ -1930,6 +1941,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/join'
     | '/join-room'
+    | '/lcs-preview'
     | '/registry'
     | '/sign-in'
     | '/sign-up'
@@ -2102,6 +2114,7 @@ export interface RootRouteChildren {
   InviteRoute: typeof InviteRoute
   JoinRoute: typeof JoinRouteWithChildren
   JoinRoomRoute: typeof JoinRoomRoute
+  LcsPreviewRoute: typeof LcsPreviewRoute
   RegistryRoute: typeof RegistryRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
@@ -2193,6 +2206,13 @@ declare module '@tanstack/react-router' {
       path: '/registry'
       fullPath: '/registry'
       preLoaderRoute: typeof RegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lcs-preview': {
+      id: '/lcs-preview'
+      path: '/lcs-preview'
+      fullPath: '/lcs-preview'
+      preLoaderRoute: typeof LcsPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join-room': {
@@ -3629,6 +3649,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteRoute: InviteRoute,
   JoinRoute: JoinRouteWithChildren,
   JoinRoomRoute: JoinRoomRoute,
+  LcsPreviewRoute: LcsPreviewRoute,
   RegistryRoute: RegistryRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
