@@ -7,6 +7,13 @@ import {
   LcsStatusPill,
   LcsButton,
   LcsEmptyState,
+  LcsCard,
+  LcsTable,
+  LcsTableHead,
+  LcsTh,
+  LcsTableBody,
+  LcsTr,
+  LcsTd,
   type LcsStatus,
 } from "@/components/lcs";
 import {
@@ -20,9 +27,11 @@ import {
   type LcsDealListStatus,
 } from "@/lib/lcs-sandbox";
 
-// Deals hub §3 — single-deal lifecycle, 1 Sep 2026 (checkpoint 1: shell +
-// seven-state stage bar scaffolded; per-stage content built in later
-// checkpoints per the same file, each verified live before the next).
+// Deals hub §3 — single-deal lifecycle, 1 Sep 2026.
+// Checkpoint 1: shell + seven-state stage bar scaffolded.
+// Checkpoint 2 (this pass): NDA gate + Document vault real content.
+// Remaining stages (Due diligence/Negotiation, Closing) stay on the
+// checkpoint-1 placeholder until their own checkpoints.
 // UI only, sandbox data only (src/lib/lcs-sandbox.ts) — same standard as
 // §1/§2: lcs/ primitives only, no backend wiring.
 
@@ -143,12 +152,16 @@ function DealLifecycle() {
   );
 }
 
-/** Checkpoint-1 placeholder — each stage gets real content in a later
- * checkpoint of this same build, reported separately per the instruction
- * (NDA gate + document vault next, then diligence/negotiation, then
- * closing gates). Structural scaffold only right now, so the stage bar
- * itself is verifiable before the larger content build continues. */
+/** Dispatches to real per-stage content where it's been built (checkpoint 2:
+ * NDA gate, Document vault); everything else still shows the checkpoint-1
+ * placeholder until its own checkpoint. */
 function StagePanel({ deal, stage, now }: { deal: LcsSandboxDeal; stage: LcsDealStage; now: number | null }) {
+  if (stage === "nda_gate") return <NdaGatePanel deal={deal} />;
+  if (stage === "document_vault") return <DocumentVaultPanel deal={deal} />;
+  return <StagePlaceholder deal={deal} stage={stage} now={now} />;
+}
+
+function StagePlaceholder({ deal, stage, now }: { deal: LcsSandboxDeal; stage: LcsDealStage; now: number | null }) {
   return (
     <div className="border p-8" style={{ borderColor: "var(--lcs-line)" }}>
       <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)", fontSize: 13 }}>
@@ -158,5 +171,102 @@ function StagePanel({ deal, stage, now }: { deal: LcsSandboxDeal; stage: LcsDeal
         )}
       </p>
     </div>
+  );
+}
+
+function formatSignedAt(iso: string | null): string {
+  if (!iso) return "Not yet signed";
+  const d = new Date(iso);
+  return `Signed ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+}
+
+/** NDA gate — two-party signature state (founder, investor/counterparty),
+ * matching the sandbox's `nda: { founderSignedAt, investorSignedAt }`
+ * shape exactly. Both must be signed to advance past this gate — shown as
+ * two independent rows rather than a single "signed/unsigned" toggle,
+ * since the two parties sign independently and asymmetric state (one
+ * signed, one not) is a real, common, and non-error state to represent. */
+function NdaGatePanel({ deal }: { deal: LcsSandboxDeal }) {
+  const bothSigned = !!deal.nda.founderSignedAt && !!deal.nda.investorSignedAt;
+  return (
+    <LcsCard title="NDA signatures" count={(deal.nda.founderSignedAt ? 1 : 0) + (deal.nda.investorSignedAt ? 1 : 0)}>
+      <LcsTable>
+        <LcsTableHead>
+          <LcsTh>Party</LcsTh>
+          <LcsTh>Status</LcsTh>
+        </LcsTableHead>
+        <LcsTableBody>
+          <LcsTr>
+            <LcsTd>{deal.owner} (founder)</LcsTd>
+            <LcsTd>
+              <LcsStatusPill
+                status={deal.nda.founderSignedAt ? "satisfied" : "pending"}
+                label={formatSignedAt(deal.nda.founderSignedAt)}
+              />
+            </LcsTd>
+          </LcsTr>
+          <LcsTr>
+            <LcsTd>{deal.counterparty} (investor)</LcsTd>
+            <LcsTd>
+              <LcsStatusPill
+                status={deal.nda.investorSignedAt ? "satisfied" : "pending"}
+                label={formatSignedAt(deal.nda.investorSignedAt)}
+              />
+            </LcsTd>
+          </LcsTr>
+        </LcsTableBody>
+      </LcsTable>
+      <div className="px-3 py-3 flex items-center justify-between gap-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+        <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)", fontSize: 12 }}>
+          {bothSigned
+            ? "Both parties have signed. This deal can proceed to the company profile."
+            : "Both parties must sign before this deal can proceed."}
+        </p>
+        {!deal.nda.founderSignedAt && <LcsButton variant="secondary">Sign as founder</LcsButton>}
+      </div>
+    </LcsCard>
+  );
+}
+
+/** Document vault — per-document visibility scope, matching the real
+ * product's per-document (not per-gate, not per-role-only) model, per
+ * lcs-sandbox.ts's own note tracing this to the live deal-room-documents
+ * action layer. "Founder-only" documents are visible in this list to
+ * both roles in this sandbox (there's no real auth/role switching here),
+ * but the scope is shown explicitly via the status pill rather than
+ * hidden — so the screen documents the real access model instead of
+ * silently simulating enforcement it can't actually perform. */
+function DocumentVaultPanel({ deal }: { deal: LcsSandboxDeal }) {
+  return (
+    <LcsCard title="Documents" count={deal.documents.length}>
+      {deal.documents.length === 0 ? (
+        <LcsEmptyState text="No documents uploaded yet." />
+      ) : (
+        <LcsTable>
+          <LcsTableHead>
+            <LcsTh>Name</LcsTh>
+            <LcsTh>Category</LcsTh>
+            <LcsTh>Visible to</LcsTh>
+          </LcsTableHead>
+          <LcsTableBody>
+            {deal.documents.map((doc) => (
+              <LcsTr key={doc.id}>
+                <LcsTd>{doc.name}</LcsTd>
+                <LcsTd>{doc.category}</LcsTd>
+                <LcsTd>
+                  <LcsStatusPill
+                    status={doc.visibleTo === "both" ? "satisfied" : "pending"}
+                    label={doc.visibleTo === "both" ? "Both parties" : "Founder only"}
+                  />
+                </LcsTd>
+              </LcsTr>
+            ))}
+          </LcsTableBody>
+        </LcsTable>
+      )}
+      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+        <LcsButton variant="secondary">Upload document</LcsButton>
+      </div>
+    </LcsCard>
   );
 }
