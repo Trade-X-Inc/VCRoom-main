@@ -15,7 +15,7 @@ import {
   LcsButton,
   type LcsStatus,
 } from "@/components/lcs";
-import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, type LcsTransactionListStatus } from "@/lib/lcs-sandbox";
+import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsTransactionListStatus, type LcsInstrumentType } from "@/lib/lcs-sandbox";
 
 // Transactions hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox
 // data only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase
@@ -26,8 +26,31 @@ import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LA
 //
 // "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep 2026 —
 // see deals-preview.index.tsx's header comment for the full scope note.
+//
+// Sector-layer restructure, checkpoint 2 (1 Sep 2026) — renamed from
+// deals-preview.$sector.tsx to add the instrument-type param. Route was
+// previously /deals-preview/$sector; the sector-only path now resolves
+// to the new instrument picker (deals-preview.$sector.index.tsx) instead
+// of this list directly. This file's own content is otherwise unchanged
+// from before the restructure — same tabs, same table, same columns —
+// plus the new instrumentType filter and the "back" target updated to
+// point at the instrument picker instead of straight back to the
+// sector list.
+//
+// Real bug found live during this same checkpoint, not by inspection:
+// the row-click navigation originally targeted
+// /deals-preview/$sector/$dealId (2 segments) — the EXACT same URL
+// shape as this page's own route (/deals-preview/$sector/$instrument,
+// also 2 segments). TanStack resolved every click to this page's own
+// route instead of the transaction detail page (clicking a row just
+// reloaded a broken version of this same screen with the transaction id
+// misinterpreted as an instrument type). Fixed by adding a third segment
+// to the detail route (deals-preview.$sector_.$instrument.$dealId.tsx,
+// now /deals-preview/$sector/$instrument/$dealId) so the two routes are
+// no longer the same shape — see that file's own header comment for the
+// full trace.
 
-export const Route = createFileRoute("/deals-preview/$sector")({
+export const Route = createFileRoute("/deals-preview/$sector/$instrument")({
   component: SectorTransactions,
 });
 
@@ -46,7 +69,7 @@ const STATUS_TO_PILL: Record<LcsTransactionListStatus, LcsStatus> = {
 };
 
 function SectorTransactions() {
-  const { sector } = Route.useParams();
+  const { sector, instrument } = Route.useParams();
   const navigate = useNavigate();
   const [tab, setTab] = useState<LcsTransactionListStatus>("active");
   // Real bug found live (not by inspection): initializing this from
@@ -76,13 +99,18 @@ function SectorTransactions() {
   }, []);
 
   const isTechnology = sector === "technology";
+  const instrumentType = instrument as LcsInstrumentType;
 
-  const filtered = useMemo(() => transactions.filter((d) => d.listStatus === tab), [transactions, tab]);
+  const bySector = useMemo(
+    () => transactions.filter((d) => d.sector === sector && d.instrumentType === instrumentType),
+    [transactions, sector, instrumentType]
+  );
+  const filtered = useMemo(() => bySector.filter((d) => d.listStatus === tab), [bySector, tab]);
   const counts = useMemo(() => {
     const c: Record<LcsTransactionListStatus, number> = { active: 0, "in-progress": 0, "pending-action": 0, closed: 0 };
-    for (const d of transactions) c[d.listStatus]++;
+    for (const d of bySector) c[d.listStatus]++;
     return c;
-  }, [transactions]);
+  }, [bySector]);
 
   const handleReset = () => {
     if (resetting) return;
@@ -115,7 +143,7 @@ function SectorTransactions() {
       )}
     >
       <LcsPageHeader
-        title={SECTOR_LABEL[sector] ?? sector}
+        title={`${SECTOR_LABEL[sector] ?? sector} · ${INSTRUMENT_LABEL[instrumentType] ?? instrument}`}
         description={
           isTechnology
             ? "Sandbox pipeline — fictional demo data, not live transactions."
@@ -127,8 +155,8 @@ function SectorTransactions() {
               {resetting ? "Resetting…" : "Reset demo data"}
             </LcsButton>
           ) : (
-            <Link to="/deals-preview">
-              <LcsButton variant="secondary">Back to Transactions</LcsButton>
+            <Link to="/deals-preview/$sector" params={{ sector }}>
+              <LcsButton variant="secondary">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
             </Link>
           )
         }
@@ -139,8 +167,8 @@ function SectorTransactions() {
           title="Coming soon"
           text={`No schedule is published for this sector yet.`}
           action={
-            <Link to="/deals-preview">
-              <LcsButton variant="text-link">Back to Transactions</LcsButton>
+            <Link to="/deals-preview/$sector" params={{ sector }}>
+              <LcsButton variant="text-link">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
             </Link>
           }
         />
@@ -202,7 +230,7 @@ function SectorTransactions() {
                 </LcsTableHead>
                 <LcsTableBody>
                   {filtered.map((d) => (
-                    <LcsTr key={d.id} onClick={() => navigate({ to: "/deals-preview/$sector/$dealId", params: { sector, dealId: d.id } })}>
+                    <LcsTr key={d.id} onClick={() => navigate({ to: "/deals-preview/$sector/$instrument/$dealId", params: { sector, instrument, dealId: d.id } })}>
                       <LcsTd sticky>{d.companyName}</LcsTd>
                       <LcsTd mono>{d.ref}</LcsTd>
                       <LcsTd>{d.counterparty}</LcsTd>

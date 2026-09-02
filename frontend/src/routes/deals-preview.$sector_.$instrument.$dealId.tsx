@@ -30,7 +30,7 @@ import {
 // Transactions hub §3 — single-transaction lifecycle, 1 Sep 2026.
 // Checkpoint 1: shell + seven-state stage bar scaffolded.
 // Checkpoint 2: NDA gate + Document vault real content.
-// Checkpoint 3 (this pass): Due diligence + Negotiation real content.
+// Checkpoint 3: Due diligence + Negotiation real content.
 // Closing (six gates) stays on the checkpoint-1 placeholder until its
 // own checkpoint.
 // UI only, sandbox data only (src/lib/lcs-sandbox.ts) — same standard as
@@ -38,11 +38,26 @@ import {
 //
 // "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep 2026
 // — see deals-preview.index.tsx's header comment for the full scope
-// note. The route param ($dealId) and the deals-preview URL prefix are
-// deliberately left unrenamed — folded into the upcoming sitemap
-// restructure instead of being churned twice.
+// note.
+//
+// Sector-layer restructure, checkpoint 2 (1 Sep 2026) — renamed from
+// deals-preview.$sector_.$dealId.tsx (was /deals-preview/$sector/$dealId)
+// to add the instrument segment: /deals-preview/$sector/$instrument/$dealId.
+// REAL BUG found live, not by inspection: with the instrument picker's
+// route (deals-preview.$sector.$instrument.tsx) also occupying the
+// two-dynamic-segment shape /deals-preview/$sector/<x>, this file's old
+// path collided with it — TanStack has no way to tell "$instrument" from
+// "$dealId" apart from the URL alone, both are just two segments after
+// $sector, and it resolved every transaction-detail click to the
+// instrument picker instead (rendering "Technology · sbx-1" with the
+// sandbox id misinterpreted as an instrument type, "0 transactions"
+// everywhere). Adding the $instrument segment here removes the
+// ambiguity: the picker is 2 segments, this route is 3. The trailing
+// underscore on $sector_ is unchanged and still means what it always
+// did — this route opts out of nesting under any $sector.* layout route,
+// same as before the restructure.
 
-export const Route = createFileRoute("/deals-preview/$sector_/$dealId")({
+export const Route = createFileRoute("/deals-preview/$sector_/$instrument/$dealId")({
   component: TransactionLifecycle,
 });
 
@@ -54,7 +69,7 @@ const STATUS_TO_PILL: Record<LcsTransactionListStatus, LcsStatus> = {
 };
 
 function TransactionLifecycle() {
-  const { sector, dealId } = Route.useParams();
+  const { sector, instrument, dealId } = Route.useParams();
   const [transaction, setTransaction] = useState<LcsSandboxTransaction | null | undefined>(undefined);
   const [activeStage, setActiveStage] = useState<LcsTransactionStage>("initiation");
   const [now, setNow] = useState<number | null>(null);
@@ -95,7 +110,7 @@ function TransactionLifecycle() {
           title="Transaction not found"
           text="This transaction doesn't exist in the sandbox — it may have been reset."
           action={
-            <Link to="/deals-preview/$sector" params={{ sector }}>
+            <Link to="/deals-preview/$sector/$instrument" params={{ sector, instrument }}>
               <LcsButton variant="text-link">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
             </Link>
           }

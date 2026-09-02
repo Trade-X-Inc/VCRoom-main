@@ -59,7 +59,6 @@ import { Route as ForFoundersRouteImport } from './routes/for.founders'
 import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
 import { Route as ForAngelsRouteImport } from './routes/for.angels'
 import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
-import { Route as DealsPreviewSectorRouteImport } from './routes/deals-preview.$sector'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as CompanyContactRouteImport } from './routes/company.contact'
 import { Route as CompanyCareersRouteImport } from './routes/company.careers'
@@ -91,6 +90,7 @@ import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
 import { Route as ApiAdminRouteImport } from './routes/api.admin'
 import { Route as ResourcesBlogIndexRouteImport } from './routes/resources.blog.index'
 import { Route as ProductCompareIndexRouteImport } from './routes/product.compare.index'
+import { Route as DealsPreviewSectorIndexRouteImport } from './routes/deals-preview.$sector.index'
 import { Route as AppRoastIndexRouteImport } from './routes/app.roast.index'
 import { Route as AppPrepareIndexRouteImport } from './routes/app.prepare.index'
 import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
@@ -105,7 +105,7 @@ import { Route as ProductCompareDocsendRouteImport } from './routes/product.comp
 import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
 import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
 import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
-import { Route as DealsPreviewSectorDealIdRouteImport } from './routes/deals-preview.$sector_.$dealId'
+import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
 import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
@@ -139,6 +139,7 @@ import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
 import { Route as AppInvestorDiscoverIndexRouteImport } from './routes/app.investor.discover.index'
 import { Route as AppInvestorDealRoomsIndexRouteImport } from './routes/app.investor.deal-rooms.index'
+import { Route as DealsPreviewSectorInstrumentDealIdRouteImport } from './routes/deals-preview.$sector_.$instrument.$dealId'
 import { Route as AppRoastIdLiveRouteImport } from './routes/app.roast.$id.live'
 import { Route as AppRoastIdAnswersRouteImport } from './routes/app.roast.$id.answers'
 import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/app.prepare.profile-builder.team-cards'
@@ -434,11 +435,6 @@ const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
   path: '/for/advisors',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DealsPreviewSectorRoute = DealsPreviewSectorRouteImport.update({
-  id: '/deals-preview/$sector',
-  path: '/deals-preview/$sector',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CvSlugRoute = CvSlugRouteImport.update({
   id: '/cv/$slug',
   path: '/cv/$slug',
@@ -594,6 +590,11 @@ const ProductCompareIndexRoute = ProductCompareIndexRouteImport.update({
   path: '/product/compare/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DealsPreviewSectorIndexRoute = DealsPreviewSectorIndexRouteImport.update({
+  id: '/deals-preview/$sector/',
+  path: '/deals-preview/$sector/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoastIndexRoute = AppRoastIndexRouteImport.update({
   id: '/roast/',
   path: '/roast/',
@@ -664,10 +665,10 @@ const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
   path: '/team/$token',
   getParentRoute: () => JoinRoute,
 } as any)
-const DealsPreviewSectorDealIdRoute =
-  DealsPreviewSectorDealIdRouteImport.update({
-    id: '/deals-preview/$sector_/$dealId',
-    path: '/deals-preview/$sector/$dealId',
+const DealsPreviewSectorInstrumentRoute =
+  DealsPreviewSectorInstrumentRouteImport.update({
+    id: '/deals-preview/$sector/$instrument',
+    path: '/deals-preview/$sector/$instrument',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
@@ -842,6 +843,12 @@ const AppInvestorDealRoomsIndexRoute =
     id: '/deal-rooms/',
     path: '/deal-rooms/',
     getParentRoute: () => AppInvestorRoute,
+  } as any)
+const DealsPreviewSectorInstrumentDealIdRoute =
+  DealsPreviewSectorInstrumentDealIdRouteImport.update({
+    id: '/deals-preview/$sector_/$instrument/$dealId',
+    path: '/deals-preview/$sector/$instrument/$dealId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AppRoastIdLiveRoute = AppRoastIdLiveRouteImport.update({
   id: '/roast/$id/live',
@@ -1135,7 +1142,6 @@ export interface FileRoutesByFullPath {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/deals-preview/$sector': typeof DealsPreviewSectorRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1203,7 +1209,7 @@ export interface FileRoutesByFullPath {
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
-  '/deals-preview/$sector/$dealId': typeof DealsPreviewSectorDealIdRoute
+  '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
@@ -1218,6 +1224,7 @@ export interface FileRoutesByFullPath {
   '/app/member/': typeof AppMemberIndexRoute
   '/app/prepare/': typeof AppPrepareIndexRoute
   '/app/roast/': typeof AppRoastIndexRoute
+  '/deals-preview/$sector/': typeof DealsPreviewSectorIndexRoute
   '/product/compare/': typeof ProductCompareIndexRoute
   '/resources/blog/': typeof ResourcesBlogIndexRoute
   '/app/deal-rooms/$id/activity': typeof AppDealRoomsIdActivityRoute
@@ -1253,6 +1260,7 @@ export interface FileRoutesByFullPath {
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
+  '/deals-preview/$sector/$instrument/$dealId': typeof DealsPreviewSectorInstrumentDealIdRoute
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
@@ -1308,7 +1316,6 @@ export interface FileRoutesByTo {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/deals-preview/$sector': typeof DealsPreviewSectorRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1376,7 +1383,7 @@ export interface FileRoutesByTo {
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
-  '/deals-preview/$sector/$dealId': typeof DealsPreviewSectorDealIdRoute
+  '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
@@ -1391,6 +1398,7 @@ export interface FileRoutesByTo {
   '/app/member': typeof AppMemberIndexRoute
   '/app/prepare': typeof AppPrepareIndexRoute
   '/app/roast': typeof AppRoastIndexRoute
+  '/deals-preview/$sector': typeof DealsPreviewSectorIndexRoute
   '/product/compare': typeof ProductCompareIndexRoute
   '/resources/blog': typeof ResourcesBlogIndexRoute
   '/app/deal-rooms/$id/activity': typeof AppDealRoomsIdActivityRoute
@@ -1426,6 +1434,7 @@ export interface FileRoutesByTo {
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
+  '/deals-preview/$sector/$instrument/$dealId': typeof DealsPreviewSectorInstrumentDealIdRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis': typeof AppInvestorThesisIndexRoute
@@ -1484,7 +1493,6 @@ export interface FileRoutesById {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/deals-preview/$sector': typeof DealsPreviewSectorRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1552,7 +1560,7 @@ export interface FileRoutesById {
   '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
-  '/deals-preview/$sector_/$dealId': typeof DealsPreviewSectorDealIdRoute
+  '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
@@ -1567,6 +1575,7 @@ export interface FileRoutesById {
   '/app/member/': typeof AppMemberIndexRoute
   '/app/prepare/': typeof AppPrepareIndexRoute
   '/app/roast/': typeof AppRoastIndexRoute
+  '/deals-preview/$sector/': typeof DealsPreviewSectorIndexRoute
   '/product/compare/': typeof ProductCompareIndexRoute
   '/resources/blog/': typeof ResourcesBlogIndexRoute
   '/app/deal-rooms/$id/activity': typeof AppDealRoomsIdActivityRoute
@@ -1602,6 +1611,7 @@ export interface FileRoutesById {
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
+  '/deals-preview/$sector_/$instrument/$dealId': typeof DealsPreviewSectorInstrumentDealIdRoute
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
@@ -1661,7 +1671,6 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
-    | '/deals-preview/$sector'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1729,7 +1738,7 @@ export interface FileRouteTypes {
     | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
-    | '/deals-preview/$sector/$dealId'
+    | '/deals-preview/$sector/$instrument'
     | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
@@ -1744,6 +1753,7 @@ export interface FileRouteTypes {
     | '/app/member/'
     | '/app/prepare/'
     | '/app/roast/'
+    | '/deals-preview/$sector/'
     | '/product/compare/'
     | '/resources/blog/'
     | '/app/deal-rooms/$id/activity'
@@ -1779,6 +1789,7 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/team-cards'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
+    | '/deals-preview/$sector/$instrument/$dealId'
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
@@ -1834,7 +1845,6 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
-    | '/deals-preview/$sector'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1902,7 +1912,7 @@ export interface FileRouteTypes {
     | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
-    | '/deals-preview/$sector/$dealId'
+    | '/deals-preview/$sector/$instrument'
     | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
@@ -1917,6 +1927,7 @@ export interface FileRouteTypes {
     | '/app/member'
     | '/app/prepare'
     | '/app/roast'
+    | '/deals-preview/$sector'
     | '/product/compare'
     | '/resources/blog'
     | '/app/deal-rooms/$id/activity'
@@ -1952,6 +1963,7 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/team-cards'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
+    | '/deals-preview/$sector/$instrument/$dealId'
     | '/app/investor/deal-rooms'
     | '/app/investor/discover'
     | '/app/investor/thesis'
@@ -2009,7 +2021,6 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
-    | '/deals-preview/$sector'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2077,7 +2088,7 @@ export interface FileRouteTypes {
     | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
-    | '/deals-preview/$sector_/$dealId'
+    | '/deals-preview/$sector/$instrument'
     | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
@@ -2092,6 +2103,7 @@ export interface FileRouteTypes {
     | '/app/member/'
     | '/app/prepare/'
     | '/app/roast/'
+    | '/deals-preview/$sector/'
     | '/product/compare/'
     | '/resources/blog/'
     | '/app/deal-rooms/$id/activity'
@@ -2127,6 +2139,7 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/team-cards'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
+    | '/deals-preview/$sector_/$instrument/$dealId'
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
@@ -2168,7 +2181,6 @@ export interface RootRouteChildren {
   CompanyCareersRoute: typeof CompanyCareersRoute
   CompanyContactRoute: typeof CompanyContactRoute
   CvSlugRoute: typeof CvSlugRoute
-  DealsPreviewSectorRoute: typeof DealsPreviewSectorRoute
   ForAdvisorsRoute: typeof ForAdvisorsRoute
   ForAngelsRoute: typeof ForAngelsRoute
   ForFamilyOfficesRoute: typeof ForFamilyOfficesRoute
@@ -2207,15 +2219,17 @@ export interface RootRouteChildren {
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
-  DealsPreviewSectorDealIdRoute: typeof DealsPreviewSectorDealIdRoute
+  DealsPreviewSectorInstrumentRoute: typeof DealsPreviewSectorInstrumentRoute
   ProductCompareDatasiteRoute: typeof ProductCompareDatasiteRoute
   ProductCompareDealroomRoute: typeof ProductCompareDealroomRoute
   ProductCompareDocsendRoute: typeof ProductCompareDocsendRoute
   ProductCompareFirmexRoute: typeof ProductCompareFirmexRoute
   ProductCompareIdealsRoute: typeof ProductCompareIdealsRoute
   ResourcesBlogSlugRoute: typeof ResourcesBlogSlugRoute
+  DealsPreviewSectorIndexRoute: typeof DealsPreviewSectorIndexRoute
   ProductCompareIndexRoute: typeof ProductCompareIndexRoute
   ResourcesBlogIndexRoute: typeof ResourcesBlogIndexRoute
+  DealsPreviewSectorInstrumentDealIdRoute: typeof DealsPreviewSectorInstrumentDealIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2570,13 +2584,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForAdvisorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/deals-preview/$sector': {
-      id: '/deals-preview/$sector'
-      path: '/deals-preview/$sector'
-      fullPath: '/deals-preview/$sector'
-      preLoaderRoute: typeof DealsPreviewSectorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cv/$slug': {
       id: '/cv/$slug'
       path: '/cv/$slug'
@@ -2794,6 +2801,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductCompareIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deals-preview/$sector/': {
+      id: '/deals-preview/$sector/'
+      path: '/deals-preview/$sector'
+      fullPath: '/deals-preview/$sector/'
+      preLoaderRoute: typeof DealsPreviewSectorIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/roast/': {
       id: '/app/roast/'
       path: '/roast'
@@ -2892,11 +2906,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinTeamTokenRouteImport
       parentRoute: typeof JoinRoute
     }
-    '/deals-preview/$sector_/$dealId': {
-      id: '/deals-preview/$sector_/$dealId'
-      path: '/deals-preview/$sector/$dealId'
-      fullPath: '/deals-preview/$sector/$dealId'
-      preLoaderRoute: typeof DealsPreviewSectorDealIdRouteImport
+    '/deals-preview/$sector/$instrument': {
+      id: '/deals-preview/$sector/$instrument'
+      path: '/deals-preview/$sector/$instrument'
+      fullPath: '/deals-preview/$sector/$instrument'
+      preLoaderRoute: typeof DealsPreviewSectorInstrumentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/settings/security': {
@@ -3129,6 +3143,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/investor/deal-rooms/'
       preLoaderRoute: typeof AppInvestorDealRoomsIndexRouteImport
       parentRoute: typeof AppInvestorRoute
+    }
+    '/deals-preview/$sector_/$instrument/$dealId': {
+      id: '/deals-preview/$sector_/$instrument/$dealId'
+      path: '/deals-preview/$sector/$instrument/$dealId'
+      fullPath: '/deals-preview/$sector/$instrument/$dealId'
+      preLoaderRoute: typeof DealsPreviewSectorInstrumentDealIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/roast/$id/live': {
       id: '/app/roast/$id/live'
@@ -3727,7 +3748,6 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyCareersRoute: CompanyCareersRoute,
   CompanyContactRoute: CompanyContactRoute,
   CvSlugRoute: CvSlugRoute,
-  DealsPreviewSectorRoute: DealsPreviewSectorRoute,
   ForAdvisorsRoute: ForAdvisorsRoute,
   ForAngelsRoute: ForAngelsRoute,
   ForFamilyOfficesRoute: ForFamilyOfficesRoute,
@@ -3766,15 +3786,18 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
-  DealsPreviewSectorDealIdRoute: DealsPreviewSectorDealIdRoute,
+  DealsPreviewSectorInstrumentRoute: DealsPreviewSectorInstrumentRoute,
   ProductCompareDatasiteRoute: ProductCompareDatasiteRoute,
   ProductCompareDealroomRoute: ProductCompareDealroomRoute,
   ProductCompareDocsendRoute: ProductCompareDocsendRoute,
   ProductCompareFirmexRoute: ProductCompareFirmexRoute,
   ProductCompareIdealsRoute: ProductCompareIdealsRoute,
   ResourcesBlogSlugRoute: ResourcesBlogSlugRoute,
+  DealsPreviewSectorIndexRoute: DealsPreviewSectorIndexRoute,
   ProductCompareIndexRoute: ProductCompareIndexRoute,
   ResourcesBlogIndexRoute: ResourcesBlogIndexRoute,
+  DealsPreviewSectorInstrumentDealIdRoute:
+    DealsPreviewSectorInstrumentDealIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
