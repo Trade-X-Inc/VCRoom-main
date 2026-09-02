@@ -31,6 +31,28 @@ export const SECTOR_LABEL: Record<string, string> = {
   "syndicate-lead": "Syndicate Lead",
 };
 
+/** Instrument-type picker labels, added for the sector-layer restructure
+ * (1 Sep 2026) — the level inserted between Sector and the stage-filtered
+ * list. */
+export const INSTRUMENT_LABEL: Record<LcsInstrumentType, string> = {
+  equity: "Equity",
+  debt: "Debt",
+};
+
+/** Sandbox-only viewer role for the restructure's role-scoped entry
+ * points. Deliberately NOT the real auth Role type (src/lib/auth.tsx,
+ * "founder" | "investor") — this build has no backend wiring and no real
+ * session, so a third sandbox-only value ("advisor") would be a type
+ * error against the real type if reused, and conflating the two would
+ * misrepresent this as touching real auth when it doesn't. */
+export type LcsViewerRole = "founder" | "investor" | "advisor";
+
+export const VIEWER_ROLE_LABEL: Record<LcsViewerRole, string> = {
+  founder: "Founder",
+  investor: "Investor",
+  advisor: "Advisor",
+};
+
 export type LcsTransactionStage =
   | "initiation"
   | "nda_gate"
@@ -91,11 +113,21 @@ export const CLOSING_GATE_LABEL: Record<LcsClosingGate, string> = {
 
 export type LcsTransactionListStatus = "active" | "closed" | "in-progress" | "pending-action";
 
+/** Sector → Instrument type → Stage hierarchy, added 1 Sep 2026 per direct
+ * instruction. Debt has zero seeded transactions — every transaction this
+ * sandbox already has represents a priced equity round (liquidation
+ * preference terms, board seats, valuation), so all 6 get "equity" rather
+ * than fabricating debt data to populate the other branch. The debt
+ * instrument's own list view renders correctly with zero items via the
+ * same empty-state pattern already used everywhere else in this build. */
+export type LcsInstrumentType = "debt" | "equity";
+
 export interface LcsSandboxTransaction {
   id: string;
   ref: string;
   companyName: string;
   sector: "technology";
+  instrumentType: LcsInstrumentType;
   owner: string;
   /** The investor/counterparty in this transaction — real column added
    * 1 Sep 2026 after the Transactions hub §2 review found the table
@@ -156,7 +188,12 @@ export interface LcsSandboxTransaction {
 // note. Storage key NOT bumped for this rename alone: the on-disk shape
 // (field names, JSON structure) is unchanged, only TypeScript-level
 // type/function names changed, which localStorage never sees.
-const STORAGE_KEY = "lcs-sandbox-v3";
+//
+// v4 (1 Sep 2026): added instrumentType for the sector-layer restructure
+// (Sector → Instrument → Stage). This DOES change the on-disk shape, so
+// the key bumps — old v3 data is simply invisible to the new code and
+// gets reseeded, same as every prior version bump.
+const STORAGE_KEY = "lcs-sandbox-v4";
 
 const NO_GATES_STARTED: Record<LcsClosingGate, "not-started" | "in-progress" | "done"> = {
   counsel: "not-started",
@@ -170,7 +207,7 @@ const NO_GATES_STARTED: Record<LcsClosingGate, "not-started" | "in-progress" | "
 function seedTransactions(): LcsSandboxTransaction[] {
   return [
     {
-      id: "sbx-1", ref: "TX-3001", companyName: "Nimbus Analytics", sector: "technology", owner: "R. Mehta",
+      id: "sbx-1", ref: "TX-3001", companyName: "Nimbus Analytics", sector: "technology", instrumentType: "equity", owner: "R. Mehta",
       counterparty: "Blue Horizon Ventures", stage: "negotiation", listStatus: "active",
       createdAt: "2026-08-05T10:00:00Z", stageEnteredAt: "2026-08-20T10:00:00Z",
       lastActivity: { text: "Term sheet counter-proposed", at: "2026-08-24T14:32:00Z" },
@@ -194,7 +231,7 @@ function seedTransactions(): LcsSandboxTransaction[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-2", ref: "TX-3002", companyName: "Havenlight Systems", sector: "technology", owner: "S. Cole",
+      id: "sbx-2", ref: "TX-3002", companyName: "Havenlight Systems", sector: "technology", instrumentType: "equity", owner: "S. Cole",
       counterparty: "Apex Meridian Capital", stage: "due_diligence", listStatus: "in-progress",
       createdAt: "2026-07-28T10:00:00Z", stageEnteredAt: "2026-08-18T10:00:00Z",
       lastActivity: { text: "Data room access extended", at: "2026-08-23T09:15:00Z" },
@@ -213,7 +250,7 @@ function seedTransactions(): LcsSandboxTransaction[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-3", ref: "TX-3003", companyName: "Redstone Cloud", sector: "technology", owner: "S. Cole",
+      id: "sbx-3", ref: "TX-3003", companyName: "Redstone Cloud", sector: "technology", instrumentType: "equity", owner: "S. Cole",
       counterparty: "Starlight Holdings", stage: "document_vault", listStatus: "pending-action",
       createdAt: "2026-07-20T10:00:00Z", stageEnteredAt: "2026-08-15T10:00:00Z",
       lastActivity: { text: "Cap table upload requested", at: "2026-08-21T11:05:00Z" },
@@ -227,7 +264,7 @@ function seedTransactions(): LcsSandboxTransaction[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-4", ref: "TX-3004", companyName: "Vantage Robotics Software", sector: "technology", owner: "R. Mehta",
+      id: "sbx-4", ref: "TX-3004", companyName: "Vantage Robotics Software", sector: "technology", instrumentType: "equity", owner: "R. Mehta",
       counterparty: "Vanguard Technologies", stage: "closing", listStatus: "closed",
       createdAt: "2026-06-10T10:00:00Z", stageEnteredAt: "2026-07-30T10:00:00Z",
       lastActivity: { text: "Close confirmed by both parties", at: "2026-07-31T16:00:00Z" },
@@ -249,7 +286,7 @@ function seedTransactions(): LcsSandboxTransaction[] {
       closingGates: { counsel: "done", agreement: "done", conditions: "done", signing: "done", payment: "done", close: "done" },
     },
     {
-      id: "sbx-5", ref: "TX-3005", companyName: "Fieldstone Data", sector: "technology", owner: "R. Mehta",
+      id: "sbx-5", ref: "TX-3005", companyName: "Fieldstone Data", sector: "technology", instrumentType: "equity", owner: "R. Mehta",
       counterparty: "Corvex Special Situations", stage: "company_profile", listStatus: "pending-action",
       createdAt: "2026-08-22T10:00:00Z", stageEnteredAt: "2026-08-22T10:00:00Z",
       lastActivity: { text: "Profile submitted for review", at: "2026-08-22T10:05:00Z" },
@@ -261,7 +298,7 @@ function seedTransactions(): LcsSandboxTransaction[] {
       closingGates: NO_GATES_STARTED,
     },
     {
-      id: "sbx-6", ref: "TX-3006", companyName: "Anchorpoint AI", sector: "technology", owner: "S. Cole",
+      id: "sbx-6", ref: "TX-3006", companyName: "Anchorpoint AI", sector: "technology", instrumentType: "equity", owner: "S. Cole",
       counterparty: "Northbridge Capital Fund IV", stage: "nda_gate", listStatus: "active",
       createdAt: "2026-08-25T10:00:00Z", stageEnteredAt: "2026-08-25T10:00:00Z",
       lastActivity: { text: "NDA sent for signature", at: "2026-08-25T10:10:00Z" },
@@ -297,7 +334,8 @@ function looksLikeCurrentShape(value: unknown): value is LcsSandboxTransaction[]
         Array.isArray(d.diligenceItems) &&
         Array.isArray(d.terms) &&
         d.closingGates &&
-        typeof d.closingGates.counsel === "string"
+        typeof d.closingGates.counsel === "string" &&
+        typeof d.instrumentType === "string"
     )
   );
 }
