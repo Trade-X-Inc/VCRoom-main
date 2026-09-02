@@ -26,6 +26,8 @@ import {
   CLOSING_GATE_ORDER,
   CLOSING_GATE_LABEL,
   TEAM_MEMBERS,
+  buildSandboxNdaText,
+  signSandboxNda,
   type LcsTransactionStage,
   type LcsSandboxTransaction,
   type LcsTransactionListStatus,
@@ -202,7 +204,13 @@ function TransactionLifecycle() {
             })}
           </div>
 
-          <StagePanel transaction={transaction} stage={activeStage} now={now} />
+          <StagePanel
+            transaction={transaction}
+            stage={activeStage}
+            now={now}
+            role={role}
+            onRefresh={() => setTransaction(getSandboxTransaction(dealId))}
+          />
         </>
       )}
     </LcsPageShell>
@@ -213,9 +221,11 @@ function TransactionLifecycle() {
  * (checkpoint 2: NDA gate, Document vault; checkpoint 3: Due diligence,
  * Negotiation; Closing built in its own follow-up pass after checkpoint 5,
  * per direct instruction, using the vertical-accordion mobile treatment
- * already speced in the responsive addendum's PRIMITIVES.md). */
-function StagePanel({ transaction, stage, now }: { transaction: LcsSandboxTransaction; stage: LcsTransactionStage; now: number | null }) {
-  if (stage === "nda_gate") return <NdaGatePanel transaction={transaction} />;
+ * already speced in the responsive addendum's PRIMITIVES.md; NDA gate
+ * reskinned from the real app.deal-rooms.$id.nda.tsx in the real-screen
+ * extraction pass after checkpoint 5). */
+function StagePanel({ transaction, stage, now, role, onRefresh }: { transaction: LcsSandboxTransaction; stage: LcsTransactionStage; now: number | null; role: LcsViewerRole | undefined; onRefresh: () => void }) {
+  if (stage === "nda_gate") return <NdaGatePanel transaction={transaction} role={role} onRefresh={onRefresh} />;
   if (stage === "document_vault") return <DocumentVaultPanel transaction={transaction} />;
   if (stage === "due_diligence") return <DueDiligencePanel transaction={transaction} />;
   if (stage === "negotiation") return <NegotiationPanel transaction={transaction} />;
@@ -242,14 +252,51 @@ function formatSignedAt(iso: string | null): string {
   return `Signed ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
 }
 
-/** NDA gate — two-party signature state (founder, investor/counterparty),
- * matching the sandbox's `nda: { founderSignedAt, investorSignedAt }`
- * shape exactly. Both must be signed to advance past this gate — shown as
- * two independent rows rather than a single "signed/unsigned" toggle,
- * since the two parties sign independently and asymmetric state (one
- * signed, one not) is a real, common, and non-error state to represent. */
-function NdaGatePanel({ transaction }: { transaction: LcsSandboxTransaction }) {
+/** NDA gate — real screen extraction (2 Sep 2026). Source:
+ * app.deal-rooms.$id.nda.tsx, confirmed clean by the research pass (no
+ * discovery-layer residue). Real content: the full 10-clause mutual NDA
+ * text (buildSandboxNdaText, ported verbatim from the real
+ * buildPreviewNdaText — every clause, the DIFC/DIAC arbitration
+ * sub-clauses, the watermarking/monitoring clause, word for word), a
+ * scrollable agreement box, one checkbox acknowledgment with the real
+ * product's exact copy, and a real "Accept & Enter Deal Room" action.
+ *
+ * Two-party signature state (founder, investor/counterparty) — a
+ * deliberate, real simplification of the real product's per-signer
+ * nda_acceptances table: this sandbox has no multi-role/lawyer concept
+ * flowing through the transaction lifecycle screen, so a founder/
+ * investor pair (matching the sandbox's own `nda: {founderSignedAt,
+ * investorSignedAt}` shape from checkpoint 1) is the honest equivalent,
+ * not an arbitrary signer array. Signing is gated by the current
+ * RoleSwitcher role — Founder role can only "Sign as founder", Investor
+ * role can only "Sign as investor" — matching the real page's own
+ * role-scoped signerCompany resolution (fetched from the room-scoped
+ * membership, never a global identity, per the real file's own §5
+ * privilege-escalation comment, which this sandbox has no equivalent
+ * risk for but is worth noting as the real reasoning this shape traces
+ * back to). Once a role has signed, its own accept UI is replaced by its
+ * signed status — matching the real page's own "already accepted ->
+ * redirect away" behavior, adapted to an inline panel instead of a
+ * separate route. */
+function NdaGatePanel({ transaction, role, onRefresh }: { transaction: LcsSandboxTransaction; role: LcsViewerRole | undefined; onRefresh: () => void }) {
   const bothSigned = !!transaction.nda.founderSignedAt && !!transaction.nda.investorSignedAt;
+  const [agreed, setAgreed] = useState(false);
+
+  const canSignAsFounder = role === "founder" && !transaction.nda.founderSignedAt;
+  const canSignAsInvestor = role === "investor" && !transaction.nda.investorSignedAt;
+  const canSign = canSignAsFounder || canSignAsInvestor;
+
+  const signerName = role === "founder" ? transaction.owner : role === "investor" ? transaction.counterparty : "";
+  const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const ndaText = buildSandboxNdaText(transaction.companyName, transaction.owner, signerName, today);
+
+  const handleAccept = () => {
+    if (!canSign) return;
+    signSandboxNda(transaction.id, canSignAsFounder ? "founder" : "investor");
+    setAgreed(false);
+    onRefresh();
+  };
+
   return (
     <LcsCard title="NDA signatures" count={(transaction.nda.founderSignedAt ? 1 : 0) + (transaction.nda.investorSignedAt ? 1 : 0)}>
       <LcsTable>
@@ -278,13 +325,58 @@ function NdaGatePanel({ transaction }: { transaction: LcsSandboxTransaction }) {
           </LcsTr>
         </LcsTableBody>
       </LcsTable>
-      <div className="px-3 py-3 flex items-center justify-between gap-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+
+      {canSign && (
+        <div className="p-4 flex flex-col gap-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+          <div className="grid sm:grid-cols-3 gap-3 text-[12px]">
+            <div className="border p-3" style={{ borderColor: "var(--lcs-line)" }}>
+              <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)" }}>Company</p>
+              <p style={{ fontFamily: "var(--font-lcs-ui)", fontWeight: 500, color: "var(--lcs-ink)" }}>{transaction.companyName}</p>
+            </div>
+            <div className="border p-3" style={{ borderColor: "var(--lcs-line)" }}>
+              <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)" }}>Signing as</p>
+              <p style={{ fontFamily: "var(--font-lcs-ui)", fontWeight: 500, color: "var(--lcs-ink)" }}>{signerName}</p>
+            </div>
+            <div className="border p-3" style={{ borderColor: "var(--lcs-line)" }}>
+              <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)" }}>Version</p>
+              <p style={{ fontFamily: "var(--font-lcs-ui)", fontWeight: 500, color: "var(--lcs-ink)" }}>v1.0 · {today}</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-1.5" style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)" }}>AGREEMENT TEXT</p>
+            <div
+              className="h-64 overflow-y-auto p-3 whitespace-pre-wrap"
+              style={{ border: "1px solid var(--lcs-line)", fontFamily: "var(--font-lcs-ui)", fontSize: 11, lineHeight: 1.6, color: "var(--lcs-ink-muted)" }}
+            >
+              {ndaText}
+            </div>
+          </div>
+
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5" />
+            <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 12, color: "var(--lcs-ink)" }}>
+              I have read and agree to the terms of this Non-Disclosure Agreement. I understand this is a legally binding agreement executed electronically.
+            </span>
+          </label>
+
+          <div>
+            <LcsButton variant="primary" onClick={handleAccept} disabled={!agreed}>
+              Accept & Enter Deal Room
+            </LcsButton>
+          </div>
+          <p style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 11, color: "var(--lcs-ink-muted)" }}>
+            Your acceptance is timestamped and logged.
+          </p>
+        </div>
+      )}
+
+      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
         <p style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)", fontSize: 12 }}>
           {bothSigned
             ? "Both parties have signed. This transaction can proceed to the company profile."
             : "Both parties must sign before this transaction can proceed."}
         </p>
-        {!transaction.nda.founderSignedAt && <LcsButton variant="secondary">Sign as founder</LcsButton>}
       </div>
     </LcsCard>
   );
