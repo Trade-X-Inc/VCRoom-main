@@ -165,12 +165,22 @@ export function LcsPageShell({
             className="md:hidden shrink-0 size-8 flex items-center justify-center text-[16px]"
             style={{ color: "var(--lcs-ink)" }}
           >
+            {/* The search button below needs `min-w-0` (not just `flex-1`)
+                to actually shrink at narrow widths — a flex item's default
+                min-width is its content's intrinsic width, not 0, so
+                without it the button refuses to shrink past that and
+                overflows the header once headerExtra is populated (found
+                live, checkpoint 4, at 375px with the role switcher
+                present: hamburger + search + switcher + user block
+                together exceeded viewport width). `truncate` on the
+                placeholder text only works once the button can actually
+                shrink below its content's natural width. */}
             <span aria-hidden="true">☰</span>
           </button>
           <button
             type="button"
             onClick={onSearchOpen}
-            className="flex-1 max-w-[420px] flex items-center gap-2 h-8 px-3 text-start"
+            className="flex-1 min-w-0 max-w-[420px] flex items-center gap-2 h-8 px-3 text-start"
             style={{
               border: "1px solid var(--lcs-line)",
               color: "var(--lcs-ink-muted)",

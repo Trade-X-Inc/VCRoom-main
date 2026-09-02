@@ -144,6 +144,9 @@ function TransactionsHub() {
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
           <LcsNavItem to="/deals-preview" label="Reporting" collapsed={collapsed} icon="R" />
+          {role === "advisor" && (
+            <LcsNavItem to="/deals-preview/team" label="Team" collapsed={collapsed} icon="P" />
+          )}
           <LcsNavItem to="/deals-preview" label="Settings" collapsed={collapsed} icon="S" />
         </nav>
       )}

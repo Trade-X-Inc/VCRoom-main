@@ -16,7 +16,7 @@ import {
   LcsTd,
   type LcsStatus,
 } from "@/components/lcs";
-import { RoleSwitcher } from "@/components/deals-preview/RoleSwitcher";
+import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
 import {
   getSandboxTransaction,
   daysInStage,
@@ -26,7 +26,10 @@ import {
   type LcsTransactionStage,
   type LcsSandboxTransaction,
   type LcsTransactionListStatus,
+  type LcsViewerRole,
 } from "@/lib/lcs-sandbox";
+
+const VIEWER_ROLE_KEY = "lcs-viewer-role";
 
 // Transactions hub §3 — single-transaction lifecycle, 1 Sep 2026.
 // Checkpoint 1: shell + seven-state stage bar scaffolded.
@@ -74,6 +77,7 @@ function TransactionLifecycle() {
   const [transaction, setTransaction] = useState<LcsSandboxTransaction | null | undefined>(undefined);
   const [activeStage, setActiveStage] = useState<LcsTransactionStage>("initiation");
   const [now, setNow] = useState<number | null>(null);
+  const [role, setRole] = useState<LcsViewerRole | undefined>(undefined);
 
   useEffect(() => {
     const t = getSandboxTransaction(dealId);
@@ -81,6 +85,24 @@ function TransactionLifecycle() {
     setActiveStage(t?.stage ?? "initiation");
     setNow(Date.now());
   }, [dealId]);
+
+  // Nav's "Team" entry is Advisor-only — same event-based re-read as
+  // every other deals-preview screen; see deals-preview.index.tsx's
+  // checkpoint-3 header comment for why a mount-only read isn't enough.
+  useEffect(() => {
+    const readRole = () => {
+      let stored: string | null = null;
+      try {
+        stored = localStorage.getItem(VIEWER_ROLE_KEY);
+      } catch {
+        /* private window / storage blocked — default to founder */
+      }
+      setRole(stored === "founder" || stored === "investor" || stored === "advisor" ? stored : "founder");
+    };
+    readRole();
+    window.addEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
+    return () => window.removeEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
+  }, []);
 
   return (
     <LcsPageShell
@@ -101,6 +123,9 @@ function TransactionLifecycle() {
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
           <LcsNavItem to="/deals-preview" label="Reporting" collapsed={collapsed} icon="R" />
+          {role === "advisor" && (
+            <LcsNavItem to="/deals-preview/team" label="Team" collapsed={collapsed} icon="P" />
+          )}
           <LcsNavItem to="/deals-preview" label="Settings" collapsed={collapsed} icon="S" />
         </nav>
       )}

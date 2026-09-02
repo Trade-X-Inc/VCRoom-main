@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LcsPageShell, LcsNavItem, LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
-import { RoleSwitcher } from "@/components/deals-preview/RoleSwitcher";
-import { getSandboxTransactions, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsInstrumentType } from "@/lib/lcs-sandbox";
+import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
+import { getSandboxTransactions, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
 
 // Sector-layer restructure, checkpoint 2 (1 Sep 2026) — the instrument-
 // type picker inserted between the sector selector (§1) and the
@@ -24,9 +24,12 @@ export const Route = createFileRoute("/deals-preview/$sector/")({
 
 const INSTRUMENTS: LcsInstrumentType[] = ["equity", "debt"];
 
+const VIEWER_ROLE_KEY = "lcs-viewer-role";
+
 function InstrumentPicker() {
   const { sector } = Route.useParams();
   const [counts, setCounts] = useState<Record<LcsInstrumentType, number> | null>(null);
+  const [role, setRole] = useState<LcsViewerRole | undefined>(undefined);
 
   // Same hydration-safe pattern as every other sandbox-reading screen in
   // this build: localStorage doesn't exist during SSR, so compute counts
@@ -38,6 +41,23 @@ function InstrumentPicker() {
     for (const t of all) c[t.instrumentType]++;
     setCounts(c);
   }, [sector]);
+
+  // Nav's "Team" entry is Advisor-only — see deals-preview.team.tsx's own
+  // header comment for why this event-based re-read exists, not just [].
+  useEffect(() => {
+    const readRole = () => {
+      let stored: string | null = null;
+      try {
+        stored = localStorage.getItem(VIEWER_ROLE_KEY);
+      } catch {
+        /* private window / storage blocked — default to founder */
+      }
+      setRole(stored === "founder" || stored === "investor" || stored === "advisor" ? stored : "founder");
+    };
+    readRole();
+    window.addEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
+    return () => window.removeEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
+  }, []);
 
   const isTechnology = sector === "technology";
 
@@ -60,6 +80,9 @@ function InstrumentPicker() {
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
           <LcsNavItem to="/deals-preview" label="Reporting" collapsed={collapsed} icon="R" />
+          {role === "advisor" && (
+            <LcsNavItem to="/deals-preview/team" label="Team" collapsed={collapsed} icon="P" />
+          )}
           <LcsNavItem to="/deals-preview" label="Settings" collapsed={collapsed} icon="S" />
         </nav>
       )}

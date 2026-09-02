@@ -53,6 +53,39 @@ export const VIEWER_ROLE_LABEL: Record<LcsViewerRole, string> = {
   advisor: "Advisor",
 };
 
+/** Advisor team-management screen (checkpoint 4), 2 Sep 2026. A flat
+ * roster of an advisory firm's own analysts/counsel/accountants — the one
+ * piece of checkpoint 3's role model with no precedent to lean on (the
+ * Advisor Dashboard preview, CLAUDE.md §20.15, models a portfolio rollup
+ * and a sealed record, not team management). Read-only: no reset, no
+ * mutation, so a plain const is sufficient — unlike transactions, there's
+ * no "reset demo data" affordance planned for this screen. */
+export type LcsTeamMemberRole = "analyst" | "counsel" | "accountant";
+
+export const TEAM_MEMBER_ROLE_LABEL: Record<LcsTeamMemberRole, string> = {
+  analyst: "Analyst",
+  counsel: "Counsel",
+  accountant: "Accountant",
+};
+
+export interface LcsSandboxTeamMember {
+  id: string;
+  name: string;
+  role: LcsTeamMemberRole;
+  /** Real company names from the seed transactions above (companyName),
+   * never invented ones — so "client companies" is a genuine cross-
+   * reference against data that already exists, matching this build's
+   * standing no-fabricated-count discipline (sector schedule counts,
+   * instrument counts). */
+  clientCompanies: string[];
+}
+
+export const TEAM_MEMBERS: LcsSandboxTeamMember[] = [
+  { id: "team-1", name: "J. Okafor", role: "analyst", clientCompanies: ["Nimbus Analytics", "Vantage Robotics Software", "Fieldstone Data"] },
+  { id: "team-2", name: "L. Fenwick", role: "counsel", clientCompanies: ["Havenlight Systems", "Redstone Cloud"] },
+  { id: "team-3", name: "M. Delacroix", role: "accountant", clientCompanies: ["Anchorpoint AI"] },
+];
+
 export type LcsTransactionStage =
   | "initiation"
   | "nda_gate"

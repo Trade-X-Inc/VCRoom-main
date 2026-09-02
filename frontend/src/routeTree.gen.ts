@@ -59,6 +59,7 @@ import { Route as ForFoundersRouteImport } from './routes/for.founders'
 import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
 import { Route as ForAngelsRouteImport } from './routes/for.angels'
 import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
+import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as CompanyContactRouteImport } from './routes/company.contact'
 import { Route as CompanyCareersRouteImport } from './routes/company.careers'
@@ -433,6 +434,11 @@ const ForAngelsRoute = ForAngelsRouteImport.update({
 const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
   id: '/for/advisors',
   path: '/for/advisors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewTeamRoute = DealsPreviewTeamRouteImport.update({
+  id: '/deals-preview/team',
+  path: '/deals-preview/team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CvSlugRoute = CvSlugRouteImport.update({
@@ -1142,6 +1148,7 @@ export interface FileRoutesByFullPath {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1316,6 +1323,7 @@ export interface FileRoutesByTo {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1493,6 +1501,7 @@ export interface FileRoutesById {
   '/company/careers': typeof CompanyCareersRoute
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
+  '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1671,6 +1680,7 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
+    | '/deals-preview/team'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1845,6 +1855,7 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
+    | '/deals-preview/team'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2021,6 +2032,7 @@ export interface FileRouteTypes {
     | '/company/careers'
     | '/company/contact'
     | '/cv/$slug'
+    | '/deals-preview/team'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2181,6 +2193,7 @@ export interface RootRouteChildren {
   CompanyCareersRoute: typeof CompanyCareersRoute
   CompanyContactRoute: typeof CompanyContactRoute
   CvSlugRoute: typeof CvSlugRoute
+  DealsPreviewTeamRoute: typeof DealsPreviewTeamRoute
   ForAdvisorsRoute: typeof ForAdvisorsRoute
   ForAngelsRoute: typeof ForAngelsRoute
   ForFamilyOfficesRoute: typeof ForFamilyOfficesRoute
@@ -2582,6 +2595,13 @@ declare module '@tanstack/react-router' {
       path: '/for/advisors'
       fullPath: '/for/advisors'
       preLoaderRoute: typeof ForAdvisorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/team': {
+      id: '/deals-preview/team'
+      path: '/deals-preview/team'
+      fullPath: '/deals-preview/team'
+      preLoaderRoute: typeof DealsPreviewTeamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cv/$slug': {
@@ -3748,6 +3768,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyCareersRoute: CompanyCareersRoute,
   CompanyContactRoute: CompanyContactRoute,
   CvSlugRoute: CvSlugRoute,
+  DealsPreviewTeamRoute: DealsPreviewTeamRoute,
   ForAdvisorsRoute: ForAdvisorsRoute,
   ForAngelsRoute: ForAngelsRoute,
   ForFamilyOfficesRoute: ForFamilyOfficesRoute,

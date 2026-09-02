@@ -15,7 +15,7 @@ import {
   LcsButton,
   type LcsStatus,
 } from "@/components/lcs";
-import { RoleSwitcher } from "@/components/deals-preview/RoleSwitcher";
+import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
 import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsTransactionListStatus, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
 
 const VIEWER_ROLE_KEY = "lcs-viewer-role";
@@ -111,12 +111,29 @@ function SectorTransactions() {
     setTransactions(getSandboxTransactions());
     setNow(Date.now());
     setHydrated(true);
-    try {
-      const stored = localStorage.getItem(VIEWER_ROLE_KEY);
+  }, []);
+
+  // Re-reads on mount AND on VIEWER_ROLE_CHANGE_EVENT, not just once — see
+  // deals-preview.index.tsx's checkpoint-3 header comment for the live bug
+  // this pattern fixes (a mount-only read goes stale when the switcher is
+  // used without a route change, e.g. while already parked on this exact
+  // screen watching the owner-filtered list). Split into its own effect
+  // from the sandbox-data load above since this one also needs to
+  // re-subscribe/unsubscribe the event listener, which a single combined
+  // effect couldn't cleanly do without re-running the data load too.
+  useEffect(() => {
+    const readRole = () => {
+      let stored: string | null = null;
+      try {
+        stored = localStorage.getItem(VIEWER_ROLE_KEY);
+      } catch {
+        /* private window / storage blocked — default to founder */
+      }
       setRole(stored === "founder" || stored === "investor" || stored === "advisor" ? stored : "founder");
-    } catch {
-      setRole("founder");
-    }
+    };
+    readRole();
+    window.addEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
+    return () => window.removeEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
   }, []);
 
   const isTechnology = sector === "technology";
@@ -167,6 +184,9 @@ function SectorTransactions() {
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview" label="Documents" collapsed={collapsed} icon="D" />
           <LcsNavItem to="/deals-preview" label="Reporting" collapsed={collapsed} icon="R" />
+          {role === "advisor" && (
+            <LcsNavItem to="/deals-preview/team" label="Team" collapsed={collapsed} icon="P" />
+          )}
           <LcsNavItem to="/deals-preview" label="Settings" collapsed={collapsed} icon="S" />
         </nav>
       )}
