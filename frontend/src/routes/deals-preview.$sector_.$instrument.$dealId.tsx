@@ -23,10 +23,14 @@ import {
   STAGE_ORDER,
   STAGE_LABEL,
   sectorLabel,
+  CLOSING_GATE_ORDER,
+  CLOSING_GATE_LABEL,
+  TEAM_MEMBERS,
   type LcsTransactionStage,
   type LcsSandboxTransaction,
   type LcsTransactionListStatus,
   type LcsViewerRole,
+  type LcsClosingGate,
 } from "@/lib/lcs-sandbox";
 
 const VIEWER_ROLE_KEY = "lcs-viewer-role";
@@ -202,15 +206,17 @@ function TransactionLifecycle() {
   );
 }
 
-/** Dispatches to real per-stage content where it's been built (checkpoint 2:
- * NDA gate, Document vault; checkpoint 3: Due diligence, Negotiation);
- * Closing still shows the checkpoint-1 placeholder until its own
- * checkpoint. */
+/** Dispatches to real per-stage content — all seven stages now built
+ * (checkpoint 2: NDA gate, Document vault; checkpoint 3: Due diligence,
+ * Negotiation; Closing built in its own follow-up pass after checkpoint 5,
+ * per direct instruction, using the vertical-accordion mobile treatment
+ * already speced in the responsive addendum's PRIMITIVES.md). */
 function StagePanel({ transaction, stage, now }: { transaction: LcsSandboxTransaction; stage: LcsTransactionStage; now: number | null }) {
   if (stage === "nda_gate") return <NdaGatePanel transaction={transaction} />;
   if (stage === "document_vault") return <DocumentVaultPanel transaction={transaction} />;
   if (stage === "due_diligence") return <DueDiligencePanel transaction={transaction} />;
   if (stage === "negotiation") return <NegotiationPanel transaction={transaction} />;
+  if (stage === "closing") return <ClosingPanel transaction={transaction} />;
   return <StagePlaceholder transaction={transaction} stage={stage} now={now} />;
 }
 
@@ -414,6 +420,192 @@ function NegotiationPanel({ transaction }: { transaction: LcsSandboxTransaction 
       )}
       <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
         <LcsButton variant="secondary">Propose term</LcsButton>
+      </div>
+    </LcsCard>
+  );
+}
+
+const CLOSING_STATUS_TO_PILL: Record<"not-started" | "in-progress" | "done", LcsStatus> = {
+  "not-started": "pending",
+  "in-progress": "in-progress",
+  done: "satisfied",
+};
+
+const CLOSING_STATUS_LABEL: Record<"not-started" | "in-progress" | "done", string> = {
+  "not-started": "Not started",
+  "in-progress": "In progress",
+  done: "Done",
+};
+
+/** The gate treated as "current" — the first not-started/in-progress gate
+ * in sequence, or the last gate if every gate is done. Matches
+ * PRIMITIVES.md's Responsive section exactly: "the gate matching the
+ * transaction's actual position (first not-started/in-progress, or the
+ * last done if all are complete)". */
+function currentClosingGate(gates: Record<LcsClosingGate, "not-started" | "in-progress" | "done">): LcsClosingGate {
+  const firstOpen = CLOSING_GATE_ORDER.find((g) => gates[g] !== "done");
+  return firstOpen ?? CLOSING_GATE_ORDER[CLOSING_GATE_ORDER.length - 1];
+}
+
+/** Gate 1 (Counsel) content — cross-references TEAM_MEMBERS (checkpoint 4's
+ * roster) by clientCompanies rather than inventing a separate counsel-
+ * assignment field, same no-fabrication discipline as every other real
+ * cross-reference in this build (checkpoint 4's client-company counts,
+ * checkpoint 5's scheduleCount). "No counsel assigned" is itself a
+ * legitimate, real value here — the gate's own definition (lcs-sandbox.ts)
+ * is "either party may bring counsel in, or both agree to proceed
+ * without," so an unassigned transaction isn't a missing-data gap. */
+function CounselGateContent({ transaction }: { transaction: LcsSandboxTransaction }) {
+  const assignedCounsel = TEAM_MEMBERS.filter(
+    (m) => m.role === "counsel" && m.clientCompanies.includes(transaction.companyName)
+  );
+  return (
+    <div className="p-4" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+      {assignedCounsel.length === 0 ? (
+        <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)" }}>
+          No counsel has been brought in for this transaction. Either party may bring counsel in, or both may agree
+          to proceed without.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {assignedCounsel.map((m) => (
+            <div key={m.id} className="flex items-center justify-between gap-3 border p-3" style={{ borderColor: "var(--lcs-line)" }}>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 500, color: "var(--lcs-ink)" }}>{m.name}</p>
+                <p style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Counsel</p>
+              </div>
+              <LcsStatusPill status="satisfied" label="Onboarded" />
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="mt-3">
+        <LcsButton variant="secondary">Add counsel</LcsButton>
+      </div>
+    </div>
+  );
+}
+
+/** Gates 2-6 have no richer sandbox content than a status today — an
+ * honest, minimal factual description of what each gate represents,
+ * rather than inventing sub-checklists/documents/payment line items the
+ * data model doesn't have. */
+const GATE_DESCRIPTION: Record<Exclude<LcsClosingGate, "counsel">, string> = {
+  agreement: "The definitive agreement is drafted and circulated for review by both parties.",
+  conditions: "Any conditions precedent to closing (regulatory, financing, third-party consents) are satisfied.",
+  signing: "Both parties execute the signed agreement.",
+  payment: "Funds are transferred per the agreed terms.",
+  close: "The transaction is confirmed closed by both parties.",
+};
+
+function ClosingGateContent({ transaction, gate }: { transaction: LcsSandboxTransaction; gate: LcsClosingGate }) {
+  if (gate === "counsel") return <CounselGateContent transaction={transaction} />;
+  const status = transaction.closingGates[gate];
+  return (
+    <div className="p-4" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+      <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)" }}>{GATE_DESCRIPTION[gate]}</p>
+      {status !== "done" && (
+        <div className="mt-3">
+          <LcsButton variant="secondary">
+            {status === "not-started" ? `Start ${CLOSING_GATE_LABEL[gate].toLowerCase()}` : "Mark complete"}
+          </LcsButton>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Closing — six sequential, mutually-dependent gates, deliberately NOT
+ * rendered as a generic comparable-rows table (PRIMITIVES.md's Responsive
+ * section explains why at length: the real question is "what's the
+ * current gate's state and what's next," not row-to-row comparison).
+ *
+ * Below `md` (768px): vertical accordion exactly as speced — one row per
+ * gate (number, name, StatusPill), current gate auto-expanded, every
+ * other gate collapsed, tap to expand one at a time.
+ *
+ * `md` and above: the addendum explicitly left the desktop layout open,
+ * suggesting "a horizontal six-segment progress indicator with the active
+ * gate's content below it, following the same expand-current/collapse-
+ * others logic sideways" — built here exactly that way, reusing the same
+ * segmented-button visual language as the seven-state stage bar above
+ * this panel (number + label, current gate underlined) rather than
+ * inventing a second progress-indicator style in the same screen. */
+function ClosingPanel({ transaction }: { transaction: LcsSandboxTransaction }) {
+  const current = currentClosingGate(transaction.closingGates);
+  const [openGate, setOpenGate] = useState<LcsClosingGate>(current);
+
+  return (
+    <LcsCard title="Closing">
+      {/* Desktop: horizontal segmented progress indicator, same visual
+          language as the stage bar above (number + label, active segment
+          underlined), with the selected gate's content rendered below it.
+          Real bug found live at 768px (just above the md breakpoint where
+          this becomes visible): six segments each carrying number + label
+          + a full StatusPill (per StatusPill's own "dot + label, never
+          colour alone" design principle, CLAUDE.md §0 — no compact
+          dot-only variant exists or should be invented here) genuinely
+          don't fit one row at this width (996px of content in 518px
+          available), and the row's default overflow silently clipped
+          segments 4-6 rather than making them reachable. `document.
+          documentElement.scrollWidth` alone didn't catch it — the clipping
+          happened inside the card, not at the page level — caught by
+          checking the row's own scrollWidth/clientWidth directly, not
+          visual inspection alone. Fixed with the same "horizontal scroll,
+          not shrink/clip" pattern the responsive addendum already
+          establishes for tables — `overflow-x-auto` on the row itself. */}
+      <div className="hidden md:block">
+        <div className="flex items-center gap-1 px-3 overflow-x-auto" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
+          {CLOSING_GATE_ORDER.map((g, i) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setOpenGate(g)}
+              className="h-10 px-3 text-[13px] flex items-center gap-1.5 -mb-px shrink-0"
+              style={{
+                fontFamily: "var(--font-lcs-ui)",
+                fontWeight: openGate === g ? 500 : 400,
+                color: openGate === g ? "var(--lcs-accent)" : "var(--lcs-ink)",
+                borderBottom: openGate === g ? "2px solid var(--lcs-accent)" : "2px solid transparent",
+              }}
+            >
+              <span aria-hidden="true" className="text-[10px]" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink-muted)" }}>
+                {i + 1}
+              </span>
+              {CLOSING_GATE_LABEL[g]}
+              <LcsStatusPill status={CLOSING_STATUS_TO_PILL[transaction.closingGates[g]]} label={CLOSING_STATUS_LABEL[transaction.closingGates[g]]} />
+            </button>
+          ))}
+        </div>
+        <ClosingGateContent transaction={transaction} gate={openGate} />
+      </div>
+
+      {/* Mobile: vertical accordion, one gate expanded at a time. */}
+      <div className="md:hidden">
+        {CLOSING_GATE_ORDER.map((g, i) => {
+          const isOpen = openGate === g;
+          return (
+            <div key={g} style={{ borderBottom: i < CLOSING_GATE_ORDER.length - 1 ? "1px solid var(--lcs-line)" : undefined }}>
+              <button
+                type="button"
+                onClick={() => setOpenGate(isOpen ? current : g)}
+                aria-expanded={isOpen}
+                className="w-full flex items-center justify-between gap-3 px-3 h-11 text-start"
+              >
+                <span className="flex items-center gap-2 min-w-0">
+                  <span aria-hidden="true" className="text-[10px] shrink-0" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink-muted)" }}>
+                    {i + 1}
+                  </span>
+                  <span className="text-[13px] truncate" style={{ fontFamily: "var(--font-lcs-ui)", fontWeight: isOpen ? 500 : 400, color: "var(--lcs-ink)" }}>
+                    {CLOSING_GATE_LABEL[g]}
+                  </span>
+                </span>
+                <LcsStatusPill status={CLOSING_STATUS_TO_PILL[transaction.closingGates[g]]} label={CLOSING_STATUS_LABEL[transaction.closingGates[g]]} />
+              </button>
+              {isOpen && <ClosingGateContent transaction={transaction} gate={g} />}
+            </div>
+          );
+        })}
       </div>
     </LcsCard>
   );
