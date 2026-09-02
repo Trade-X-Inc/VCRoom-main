@@ -23,13 +23,71 @@
  * (-> "Spv", not "SPV") and "syndicate-lead". Moved here from §2's own
  * local const so §3 (the single-transaction lifecycle) doesn't need a
  * third duplicate copy. */
-export const SECTOR_LABEL: Record<string, string> = {
+export type LcsSectorId = "technology" | "real-estate" | "manufacturing" | "spv" | "syndicate-lead";
+
+export const SECTOR_LABEL: Record<LcsSectorId, string> = {
   technology: "Technology",
   "real-estate": "Real Estate",
   manufacturing: "Manufacturing",
   spv: "SPV",
   "syndicate-lead": "Syndicate Lead",
 };
+
+/** Every route reading a $sector URL param gets a plain `string` from
+ * TanStack Router (a route param can't be narrowed to LcsSectorId at the
+ * type level — a malformed/unknown URL is a real possibility, not just a
+ * type-checker technicality), so `SECTOR_LABEL[sector]` doesn't type-check
+ * once SECTOR_LABEL is properly keyed by LcsSectorId (checkpoint 5).
+ * Centralizes the lookup-with-fallback every route was already doing
+ * (`SECTOR_LABEL[sector] ?? sector`) rather than repeating an `as` cast at
+ * five call sites. */
+export function sectorLabel(id: string): string {
+  return (SECTOR_LABEL as Record<string, string>)[id] ?? id;
+}
+
+/** Sector-config single source of truth, checkpoint 5 (2 Sep 2026) — the
+ * multi-sector-support checkpoint. Before this, "is this sector active"
+ * was answered three different, disconnected ways: the hub's own local
+ * `Sector` type/array (status field, real), and two independent
+ * `sector === "technology"` string comparisons in the instrument picker
+ * and stage-filtered list (hardcoded to the one sector that happened to
+ * be active, not consulting the hub's array at all). Moving the hub's
+ * array here and having every screen read `isSectorActive()` instead of
+ * re-deriving the answer is the actual "config, not hardcoded branches"
+ * change — a sector goes live by editing one array entry's `status`, not
+ * by touching per-screen conditionals.
+ *
+ * Real Estate activated here alongside Technology, 2 Sep 2026, to prove
+ * the architecture actually works end-to-end rather than just typing
+ * correctly with only one active sector. scheduleCount is deliberately
+ * OMITTED for Real Estate, not fabricated: `pack_v1.schedule` was queried
+ * live before this was written (`select * from pack_v1.schedule`) and
+ * returned exactly one row — technology/seed/published, the same row
+ * Technology's own scheduleCount: 1 has always been justified against.
+ * No real-estate row exists. Per direct instruction: active status with
+ * an honest absence (renders the same "No schedule published yet." line
+ * the not-yet-active sectors show) rather than either a fabricated count
+ * or a downgrade back to coming-soon. */
+export interface LcsSectorConfig {
+  id: LcsSectorId;
+  name: string;
+  status: "active" | "coming-soon";
+  /** Only set when a real published pack_v1.schedule row exists for this
+   * sector. Never a placeholder or estimated figure. */
+  scheduleCount?: number;
+}
+
+export const SECTORS: LcsSectorConfig[] = [
+  { id: "technology", name: SECTOR_LABEL.technology, status: "active", scheduleCount: 1 },
+  { id: "real-estate", name: SECTOR_LABEL["real-estate"], status: "active" },
+  { id: "manufacturing", name: SECTOR_LABEL.manufacturing, status: "coming-soon" },
+  { id: "spv", name: SECTOR_LABEL.spv, status: "coming-soon" },
+  { id: "syndicate-lead", name: SECTOR_LABEL["syndicate-lead"], status: "coming-soon" },
+];
+
+export function isSectorActive(id: string): boolean {
+  return SECTORS.some((s) => s.id === id && s.status === "active");
+}
 
 /** Instrument-type picker labels, added for the sector-layer restructure
  * (1 Sep 2026) — the level inserted between Sector and the stage-filtered
@@ -159,7 +217,10 @@ export interface LcsSandboxTransaction {
   id: string;
   ref: string;
   companyName: string;
-  sector: "technology";
+  /** Widened from the literal "technology" to LcsSectorId, checkpoint 5
+   * (2 Sep 2026) — the sandbox previously couldn't represent a
+   * transaction in any other sector without a type change first. */
+  sector: LcsSectorId;
   instrumentType: LcsInstrumentType;
   owner: string;
   /** The investor/counterparty in this transaction — real column added
@@ -226,7 +287,16 @@ export interface LcsSandboxTransaction {
 // (Sector → Instrument → Stage). This DOES change the on-disk shape, so
 // the key bumps — old v3 data is simply invisible to the new code and
 // gets reseeded, same as every prior version bump.
-const STORAGE_KEY = "lcs-sandbox-v4";
+//
+// v5 (2 Sep 2026): checkpoint 5, multi-sector support. `sector` widened
+// from the literal "technology" to LcsSectorId (a real shape/type change,
+// not just new seed rows), plus two new Real Estate seed transactions
+// (sbx-7, sbx-8). Old v4 localStorage would still deserialize structurally
+// (no field added/removed), but its 6 rows would all still read
+// sector: "technology" — bumping the key ensures every existing session
+// picks up the two new Real Estate rows on next load rather than being
+// stuck on a stale 6-row seed indefinitely.
+const STORAGE_KEY = "lcs-sandbox-v5";
 
 const NO_GATES_STARTED: Record<LcsClosingGate, "not-started" | "in-progress" | "done"> = {
   counsel: "not-started",
@@ -340,6 +410,51 @@ function seedTransactions(): LcsSandboxTransaction[] {
       documents: [],
       diligenceItems: [],
       terms: [],
+      closingGates: NO_GATES_STARTED,
+    },
+    // Real Estate seeds, checkpoint 5 (2 Sep 2026) — the second sector
+    // activated to prove the sector-config architecture end-to-end, not
+    // just typed correctly. Deliberately new company names and terms, not
+    // the tech seed data relabeled — same "no fabricated realism cheaply
+    // reused" standard as everything else in this sandbox.
+    {
+      id: "sbx-7", ref: "TX-3007", companyName: "Meridian Row Holdings", sector: "real-estate", instrumentType: "equity", owner: "R. Mehta",
+      counterparty: "Cascade Property Partners", stage: "due_diligence", listStatus: "in-progress",
+      createdAt: "2026-08-10T10:00:00Z", stageEnteredAt: "2026-08-24T10:00:00Z",
+      lastActivity: { text: "Appraisal report requested", at: "2026-08-27T13:20:00Z" },
+      nda: { founderSignedAt: "2026-08-11T09:00:00Z", investorSignedAt: "2026-08-11T12:45:00Z" },
+      profile: { summary: "Mixed-use residential redevelopment, 42-unit portfolio.", sector: "Real Estate", stage: "Acquisition", askAmount: "$9,500,000" },
+      documents: [
+        { id: "doc-10", name: "Property Appraisal.pdf", category: "Overview", visibleTo: "both" },
+        { id: "doc-11", name: "Title Report.pdf", category: "Legal", visibleTo: "both" },
+      ],
+      diligenceItems: [
+        { id: "dd-9", label: "Title and lien search", owner: "Cascade Property Partners", satisfied: true },
+        { id: "dd-10", label: "Environmental survey", owner: "R. Mehta", satisfied: false },
+      ],
+      terms: [
+        { id: "term-6", label: "Purchase price", value: "$9,500,000", status: "proposed" },
+      ],
+      closingGates: NO_GATES_STARTED,
+    },
+    {
+      id: "sbx-8", ref: "TX-3008", companyName: "Harborview Logistics Park", sector: "real-estate", instrumentType: "equity", owner: "S. Cole",
+      counterparty: "Sentinel Capital Advisors", stage: "negotiation", listStatus: "active",
+      createdAt: "2026-08-01T10:00:00Z", stageEnteredAt: "2026-08-19T10:00:00Z",
+      lastActivity: { text: "Cap rate counter-proposed", at: "2026-08-26T11:40:00Z" },
+      nda: { founderSignedAt: "2026-08-02T09:15:00Z", investorSignedAt: "2026-08-02T14:00:00Z" },
+      profile: { summary: "Industrial warehouse acquisition, three-tenant lease.", sector: "Real Estate", stage: "Acquisition", askAmount: "$14,200,000" },
+      documents: [
+        { id: "doc-12", name: "Lease Abstracts.pdf", category: "Financials", visibleTo: "both" },
+      ],
+      diligenceItems: [
+        { id: "dd-11", label: "Tenant lease review", owner: "S. Cole", satisfied: true },
+        { id: "dd-12", label: "Zoning compliance check", owner: "Sentinel Capital Advisors", satisfied: true },
+      ],
+      terms: [
+        { id: "term-7", label: "Purchase price", value: "$14,200,000", status: "countered" },
+        { id: "term-8", label: "Cap rate", value: "6.25%", status: "proposed" },
+      ],
       closingGates: NO_GATES_STARTED,
     },
   ];

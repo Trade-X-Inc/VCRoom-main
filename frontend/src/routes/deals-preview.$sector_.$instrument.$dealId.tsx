@@ -22,7 +22,7 @@ import {
   daysInStage,
   STAGE_ORDER,
   STAGE_LABEL,
-  SECTOR_LABEL,
+  sectorLabel,
   type LcsTransactionStage,
   type LcsSandboxTransaction,
   type LcsTransactionListStatus,
@@ -138,7 +138,7 @@ function TransactionLifecycle() {
           text="This transaction doesn't exist in the sandbox — it may have been reset."
           action={
             <Link to="/deals-preview/$sector/$instrument" params={{ sector, instrument }}>
-              <LcsButton variant="text-link">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
+              <LcsButton variant="text-link">Back to {sectorLabel(sector)}</LcsButton>
             </Link>
           }
         />

@@ -16,7 +16,7 @@ import {
   type LcsStatus,
 } from "@/components/lcs";
 import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
-import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsTransactionListStatus, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
+import { getSandboxTransactions, resetSandboxTransactions, daysInStage, isSectorActive, sectorLabel, STAGE_LABEL, INSTRUMENT_LABEL, type LcsTransactionListStatus, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
 
 const VIEWER_ROLE_KEY = "lcs-viewer-role";
 /** Matches deals-preview.index.tsx's own hardcoded founder identity —
@@ -136,7 +136,10 @@ function SectorTransactions() {
     return () => window.removeEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
   }, []);
 
-  const isTechnology = sector === "technology";
+  // checkpoint 5 (2 Sep 2026) — reads the shared sector config instead of
+  // a hardcoded `sector === "technology"` comparison. See lcs-sandbox.ts's
+  // SECTORS/isSectorActive header comment for the full rationale.
+  const isActive = isSectorActive(sector);
   const instrumentType = instrument as LcsInstrumentType;
   const isFounderView = role === "founder";
 
@@ -192,34 +195,34 @@ function SectorTransactions() {
       )}
     >
       <LcsPageHeader
-        title={`${SECTOR_LABEL[sector] ?? sector} · ${INSTRUMENT_LABEL[instrumentType] ?? instrument}`}
+        title={`${sectorLabel(sector)} · ${INSTRUMENT_LABEL[instrumentType] ?? instrument}`}
         description={
-          isTechnology
+          isActive
             ? isFounderView
               ? `Sandbox pipeline — fictional demo data, not live transactions. Showing ${FOUNDER_OWNER}'s transactions only (Founder view).`
               : "Sandbox pipeline — fictional demo data, not live transactions."
             : "This sector is not yet active."
         }
         action={
-          isTechnology ? (
+          isActive ? (
             <LcsButton variant="secondary" onClick={handleReset} disabled={resetting}>
               {resetting ? "Resetting…" : "Reset demo data"}
             </LcsButton>
           ) : (
             <Link to="/deals-preview/$sector" params={{ sector }}>
-              <LcsButton variant="secondary">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
+              <LcsButton variant="secondary">Back to {sectorLabel(sector)}</LcsButton>
             </Link>
           )
         }
       />
 
-      {!isTechnology ? (
+      {!isActive ? (
         <LcsEmptyState
           title="Coming soon"
           text={`No schedule is published for this sector yet.`}
           action={
             <Link to="/deals-preview/$sector" params={{ sector }}>
-              <LcsButton variant="text-link">Back to {SECTOR_LABEL[sector] ?? sector}</LcsButton>
+              <LcsButton variant="text-link">Back to {sectorLabel(sector)}</LcsButton>
             </Link>
           }
         />

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LcsPageShell, LcsNavItem, LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
 import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
-import { getSandboxTransactions, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
+import { getSandboxTransactions, isSectorActive, sectorLabel, INSTRUMENT_LABEL, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
 
 // Sector-layer restructure, checkpoint 2 (1 Sep 2026) — the instrument-
 // type picker inserted between the sector selector (§1) and the
@@ -59,7 +59,11 @@ function InstrumentPicker() {
     return () => window.removeEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
   }, []);
 
-  const isTechnology = sector === "technology";
+  // checkpoint 5 (2 Sep 2026) — reads the shared sector config instead of
+  // a hardcoded `sector === "technology"` comparison. See lcs-sandbox.ts's
+  // SECTORS/isSectorActive header comment for the full "config, not
+  // hardcoded branches" rationale.
+  const isActive = isSectorActive(sector);
 
   return (
     <LcsPageShell
@@ -88,7 +92,7 @@ function InstrumentPicker() {
       )}
     >
       <LcsPageHeader
-        title={SECTOR_LABEL[sector] ?? sector}
+        title={sectorLabel(sector)}
         description="Choose an instrument type to view its pipeline."
         action={
           <Link to="/deals-preview">
@@ -97,7 +101,7 @@ function InstrumentPicker() {
         }
       />
 
-      {!isTechnology ? (
+      {!isActive ? (
         <LcsEmptyState
           title="Coming soon"
           text="No schedule is published for this sector yet."

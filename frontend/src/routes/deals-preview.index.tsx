@@ -6,7 +6,7 @@ import {
   LcsPageHeader,
 } from "@/components/lcs";
 import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
-import { type LcsViewerRole } from "@/lib/lcs-sandbox";
+import { SECTORS, type LcsViewerRole } from "@/lib/lcs-sandbox";
 
 // Transactions hub §1 — sector selector, 1 Sep 2026. UI only, mock/static
 // data, no backend wiring (per instruction) — every count below is either
@@ -63,23 +63,6 @@ const FOUNDER_INSTRUMENT = "equity";
 export const Route = createFileRoute("/deals-preview/")({
   component: TransactionsHub,
 });
-
-type Sector = {
-  id: string;
-  name: string;
-  status: "active" | "coming-soon";
-  /** Only set when a real published pack_v1.schedule row exists for this
-   * sector. Never a placeholder or estimated figure. */
-  scheduleCount?: number;
-};
-
-const SECTORS: Sector[] = [
-  { id: "technology", name: "Technology", status: "active", scheduleCount: 1 },
-  { id: "real-estate", name: "Real Estate", status: "coming-soon" },
-  { id: "manufacturing", name: "Manufacturing", status: "coming-soon" },
-  { id: "spv", name: "SPV", status: "coming-soon" },
-  { id: "syndicate-lead", name: "Syndicate Lead", status: "coming-soon" },
-];
 
 function TransactionsHub() {
   const navigate = useNavigate();
@@ -194,9 +177,11 @@ function TransactionsHub() {
                 </span>
               </div>
               <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)" }}>
-                {sector.scheduleCount === 1
-                  ? "1 published schedule"
-                  : `${sector.scheduleCount ?? 0} published schedules`}
+                {sector.scheduleCount === undefined
+                  ? "No schedule published yet."
+                  : sector.scheduleCount === 1
+                    ? "1 published schedule"
+                    : `${sector.scheduleCount} published schedules`}
               </p>
             </Link>
           ) : (
