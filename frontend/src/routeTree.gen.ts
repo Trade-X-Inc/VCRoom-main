@@ -59,6 +59,7 @@ import { Route as ForFoundersRouteImport } from './routes/for.founders'
 import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
 import { Route as ForAngelsRouteImport } from './routes/for.angels'
 import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
+import { Route as DealsPreviewVaultRouteImport } from './routes/deals-preview.vault'
 import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as CompanyContactRouteImport } from './routes/company.contact'
@@ -434,6 +435,11 @@ const ForAngelsRoute = ForAngelsRouteImport.update({
 const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
   id: '/for/advisors',
   path: '/for/advisors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewVaultRoute = DealsPreviewVaultRouteImport.update({
+  id: '/deals-preview/vault',
+  path: '/deals-preview/vault',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealsPreviewTeamRoute = DealsPreviewTeamRouteImport.update({
@@ -1149,6 +1155,7 @@ export interface FileRoutesByFullPath {
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
+  '/deals-preview/vault': typeof DealsPreviewVaultRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1324,6 +1331,7 @@ export interface FileRoutesByTo {
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
+  '/deals-preview/vault': typeof DealsPreviewVaultRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1502,6 +1510,7 @@ export interface FileRoutesById {
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
+  '/deals-preview/vault': typeof DealsPreviewVaultRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1681,6 +1690,7 @@ export interface FileRouteTypes {
     | '/company/contact'
     | '/cv/$slug'
     | '/deals-preview/team'
+    | '/deals-preview/vault'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1856,6 +1866,7 @@ export interface FileRouteTypes {
     | '/company/contact'
     | '/cv/$slug'
     | '/deals-preview/team'
+    | '/deals-preview/vault'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2033,6 +2044,7 @@ export interface FileRouteTypes {
     | '/company/contact'
     | '/cv/$slug'
     | '/deals-preview/team'
+    | '/deals-preview/vault'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2194,6 +2206,7 @@ export interface RootRouteChildren {
   CompanyContactRoute: typeof CompanyContactRoute
   CvSlugRoute: typeof CvSlugRoute
   DealsPreviewTeamRoute: typeof DealsPreviewTeamRoute
+  DealsPreviewVaultRoute: typeof DealsPreviewVaultRoute
   ForAdvisorsRoute: typeof ForAdvisorsRoute
   ForAngelsRoute: typeof ForAngelsRoute
   ForFamilyOfficesRoute: typeof ForFamilyOfficesRoute
@@ -2595,6 +2608,13 @@ declare module '@tanstack/react-router' {
       path: '/for/advisors'
       fullPath: '/for/advisors'
       preLoaderRoute: typeof ForAdvisorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/vault': {
+      id: '/deals-preview/vault'
+      path: '/deals-preview/vault'
+      fullPath: '/deals-preview/vault'
+      preLoaderRoute: typeof DealsPreviewVaultRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deals-preview/team': {
@@ -3769,6 +3789,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyContactRoute: CompanyContactRoute,
   CvSlugRoute: CvSlugRoute,
   DealsPreviewTeamRoute: DealsPreviewTeamRoute,
+  DealsPreviewVaultRoute: DealsPreviewVaultRoute,
   ForAdvisorsRoute: ForAdvisorsRoute,
   ForAngelsRoute: ForAngelsRoute,
   ForFamilyOfficesRoute: ForFamilyOfficesRoute,

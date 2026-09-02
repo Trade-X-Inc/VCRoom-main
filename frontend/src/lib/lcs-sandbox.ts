@@ -144,6 +144,357 @@ export const TEAM_MEMBERS: LcsSandboxTeamMember[] = [
   { id: "team-3", name: "M. Delacroix", role: "accountant", clientCompanies: ["Anchorpoint AI"] },
 ];
 
+/** Document Vault — checkpoint (2 Sep 2026), built against the corrected
+ * architecture report (three corrections from the "Pack Builder" scoping
+ * discussion, all grounded in CLAUDE.md's own already-established rules,
+ * not re-derived):
+ *
+ * 1. TWO-WAY ACCESS, not a tiered visibility model. CLAUDE.md §8.2 names
+ *    "release a document" as a Commit-class action — "No agent executes a
+ *    Commit-class action under any circumstance" — and §11.1 requires an
+ *    "immutable hash-chained audit log recording actor, action, object,
+ *    timestamp" for exactly this kind of event. The real product's action
+ *    layer already has this exact shape (`documentRender`/`docViewInsert`
+ *    for view-only, `documents.requestAccess`/`documents.grantRelease`
+ *    for release) — this sandbox mirrors it in spirit. **UI-only,
+ *    honestly flagged as not enforced**: this is a client-side sandbox
+ *    with no backend, no real auth, and no server to refuse an
+ *    unauthorized read — same standing disclosure as every other
+ *    document/role/visibility concept elsewhere in this build (e.g. the
+ *    transaction lifecycle's own DocumentVaultPanel comment: "the scope
+ *    is shown explicitly via the status pill rather than hidden — so the
+ *    screen documents the real access model instead of silently
+ *    simulating enforcement it can't actually perform").
+ * 2. PER-FIELD AI extraction, matching CLAUDE.md §10's AI-usage table
+ *    verbatim: "Proposes a value with citation to page and location.
+ *    Human confirms; the confirmation is the warranty." Confirmation is a
+ *    per-field action — there is no batch/bulk-confirm control anywhere
+ *    in the UI this data model feeds (see deals-preview.vault.tsx's own
+ *    header comment for the concrete UI-level guarantee). Extraction
+ *    itself is mocked (`mockExtractFields()`, no real AI call — this
+ *    build's standing "no backend wiring" rule) but the interaction
+ *    pattern is real, not stubbed to "later."
+ * 3. Universal cross-transaction document management (a shared library
+ *    spanning deals, versioning, a unified cross-deal audit trail) is
+ *    explicitly OUT OF SCOPE for this pass — logged as a distinct future
+ *    feature (CLAUDE.md's Amendment log), not folded in here. A vault
+ *    holds documents for the deals it's actually been built for or
+ *    shared into; no dedup/versioning system tracks a document's
+ *    presence across multiple vaults or deals. */
+export type LcsDocumentAccess = "view-only" | "release-on-request";
+
+export const DOCUMENT_ACCESS_LABEL: Record<LcsDocumentAccess, string> = {
+  "view-only": "View only",
+  "release-on-request": "Release on request",
+};
+
+/** Every view is logged (docViewInsert's real-product equivalent) —
+ * whether the access mode is view-only or release-on-request, viewing in
+ * place always writes a log entry. Sandbox-only, in-memory per vault
+ * document, not persisted to localStorage (a view log growing forever
+ * across every localStorage read/reseed isn't the point being
+ * demonstrated here — the confirm/correct and release-request flows are). */
+export interface LcsDocumentViewLog {
+  viewerRole: LcsViewerRole;
+  viewerName: string;
+  at: string;
+}
+
+/** documents.requestAccess -> documents.grantRelease, matching the real
+ * action names in spirit. A request is Prepare-class (produces something
+ * a human must act on); granting it is Commit-class (§8.2 — "release a
+ * document" is the named example) and is modeled here as a real two-step
+ * interaction, not a single toggle, even though nothing server-side is
+ * actually enforcing the distinction. */
+export interface LcsDocumentReleaseRequest {
+  id: string;
+  requestedBy: { role: LcsViewerRole; name: string };
+  status: "pending" | "granted" | "declined";
+  grantedBy?: { role: LcsViewerRole; name: string };
+  respondedAt?: string;
+  requestedAt: string;
+}
+
+export interface LcsVaultDocument {
+  id: string;
+  name: string;
+  category: string;
+  /** For the close-time archival privacy filter (deal-room documents
+   * feature, not built in this pass — the field exists now so the shape
+   * doesn't need another breaking version bump when that lands). A
+   * document the counterparty contributed is never archived with its
+   * real content past a room's close; only a generated summary persists. */
+  contributedBy: "self" | "counterparty";
+  access: LcsDocumentAccess;
+  viewLog: LcsDocumentViewLog[];
+  releaseRequests: LcsDocumentReleaseRequest[];
+}
+
+export interface LcsSandboxVault {
+  id: string;
+  name: string;
+  ownerRole: LcsViewerRole;
+  documents: LcsVaultDocument[];
+  createdAt: string;
+}
+
+const VAULT_STORAGE_KEY = "lcs-sandbox-vaults-v1";
+
+function seedVaults(): LcsSandboxVault[] {
+  return [
+    {
+      id: "vault-1",
+      name: "Series A materials",
+      ownerRole: "founder",
+      createdAt: "2026-08-15T10:00:00Z",
+      documents: [
+        {
+          id: "vdoc-1",
+          name: "Executive Summary.pdf",
+          category: "Overview",
+          contributedBy: "self",
+          access: "view-only",
+          viewLog: [{ viewerRole: "investor", viewerName: "Blue Horizon Ventures", at: "2026-08-24T09:10:00Z" }],
+          releaseRequests: [],
+        },
+        {
+          id: "vdoc-2",
+          name: "Cap Table (internal).xlsx",
+          category: "Legal",
+          contributedBy: "self",
+          access: "release-on-request",
+          viewLog: [],
+          releaseRequests: [
+            {
+              id: "req-1",
+              requestedBy: { role: "investor", name: "Blue Horizon Ventures" },
+              status: "pending",
+              requestedAt: "2026-08-25T11:00:00Z",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "vault-2",
+      name: "Fund deployment templates",
+      ownerRole: "investor",
+      createdAt: "2026-08-10T10:00:00Z",
+      documents: [
+        {
+          id: "vdoc-3",
+          name: "Standard DD Request.docx",
+          category: "Templates",
+          contributedBy: "self",
+          access: "view-only",
+          viewLog: [],
+          releaseRequests: [],
+        },
+      ],
+    },
+  ];
+}
+
+function looksLikeVaultShape(value: unknown): value is LcsSandboxVault[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (v) =>
+        v &&
+        typeof v.name === "string" &&
+        typeof v.ownerRole === "string" &&
+        Array.isArray(v.documents) &&
+        v.documents.every((d: unknown) => d && typeof (d as { access?: unknown }).access === "string")
+    )
+  );
+}
+
+function readAllVaults(): LcsSandboxVault[] {
+  if (typeof window === "undefined") return seedVaults();
+  try {
+    const raw = window.localStorage.getItem(VAULT_STORAGE_KEY);
+    if (!raw) {
+      const seeded = seedVaults();
+      window.localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    const parsed = JSON.parse(raw);
+    if (!looksLikeVaultShape(parsed)) {
+      const seeded = seedVaults();
+      window.localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    return parsed;
+  } catch {
+    return seedVaults();
+  }
+}
+
+function writeAllVaults(vaults: LcsSandboxVault[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vaults));
+  } catch {
+    /* private window / storage blocked — nothing to persist this session */
+  }
+}
+
+export function getSandboxVaults(): LcsSandboxVault[] {
+  return readAllVaults();
+}
+
+/** Creates a vault. Defaults name to "New Vault" when the caller doesn't
+ * supply one — the auto-create-on-move behavior described for Pack
+ * Builder's "move to vault without picking one first" path, even though
+ * Pack Builder itself isn't built in this pass. */
+export function createSandboxVault(ownerRole: LcsViewerRole, name?: string): LcsSandboxVault {
+  const vaults = readAllVaults();
+  const vault: LcsSandboxVault = {
+    id: `vault-${Date.now()}`,
+    name: name?.trim() || "New Vault",
+    ownerRole,
+    documents: [],
+    createdAt: new Date().toISOString(),
+  };
+  writeAllVaults([...vaults, vault]);
+  return vault;
+}
+
+export function renameSandboxVault(vaultId: string, name: string): void {
+  const vaults = readAllVaults();
+  writeAllVaults(vaults.map((v) => (v.id === vaultId ? { ...v, name: name.trim() || v.name } : v)));
+}
+
+export function addDocumentToVault(vaultId: string, doc: Omit<LcsVaultDocument, "id" | "viewLog" | "releaseRequests">): void {
+  const vaults = readAllVaults();
+  const newDoc: LcsVaultDocument = { ...doc, id: `vdoc-${Date.now()}`, viewLog: [], releaseRequests: [] };
+  writeAllVaults(vaults.map((v) => (v.id === vaultId ? { ...v, documents: [...v.documents, newDoc] } : v)));
+}
+
+export function removeDocumentFromVault(vaultId: string, documentId: string): void {
+  const vaults = readAllVaults();
+  writeAllVaults(
+    vaults.map((v) => (v.id === vaultId ? { ...v, documents: v.documents.filter((d) => d.id !== documentId) } : v))
+  );
+}
+
+/** Logs a view — called every time a document is opened in place,
+ * regardless of access mode (view-only or release-on-request both log
+ * views; release-on-request additionally gates a download/full-release
+ * behind a request, which viewing in place doesn't need). */
+export function logDocumentView(vaultId: string, documentId: string, viewer: LcsDocumentViewLog): void {
+  const vaults = readAllVaults();
+  writeAllVaults(
+    vaults.map((v) =>
+      v.id === vaultId
+        ? {
+            ...v,
+            documents: v.documents.map((d) =>
+              d.id === documentId ? { ...d, viewLog: [...d.viewLog, viewer] } : d
+            ),
+          }
+        : v
+    )
+  );
+}
+
+export function requestDocumentRelease(vaultId: string, documentId: string, requestedBy: { role: LcsViewerRole; name: string }): void {
+  const vaults = readAllVaults();
+  const request: LcsDocumentReleaseRequest = {
+    id: `req-${Date.now()}`,
+    requestedBy,
+    status: "pending",
+    requestedAt: new Date().toISOString(),
+  };
+  writeAllVaults(
+    vaults.map((v) =>
+      v.id === vaultId
+        ? {
+            ...v,
+            documents: v.documents.map((d) =>
+              d.id === documentId ? { ...d, releaseRequests: [...d.releaseRequests, request] } : d
+            ),
+          }
+        : v
+    )
+  );
+}
+
+/** Commit-class per CLAUDE.md §8.2 ("release a document" is the named
+ * example — no agent may ever perform this). A human decision, modeled
+ * here as an explicit grant/decline action, never automatic. */
+export function respondToReleaseRequest(
+  vaultId: string,
+  documentId: string,
+  requestId: string,
+  decision: "granted" | "declined",
+  grantedBy: { role: LcsViewerRole; name: string }
+): void {
+  const vaults = readAllVaults();
+  writeAllVaults(
+    vaults.map((v) =>
+      v.id === vaultId
+        ? {
+            ...v,
+            documents: v.documents.map((d) =>
+              d.id === documentId
+                ? {
+                    ...d,
+                    releaseRequests: d.releaseRequests.map((r) =>
+                      r.id === requestId
+                        ? { ...r, status: decision, grantedBy, respondedAt: new Date().toISOString() }
+                        : r
+                    ),
+                  }
+                : d
+            ),
+          }
+        : v
+    )
+  );
+}
+
+/** Extraction — mock computation only, no real AI call (this build's
+ * standing "no backend wiring" rule). The interaction pattern this feeds
+ * (per-field confirm/correct, only confirmed values enter a pack) is
+ * real; only the proposal computation is fictional, same
+ * implausible-not-realistic discipline as every other sandbox value
+ * (CLAUDE.md §7.4's standing lesson on plausible fabrication). */
+export interface LcsExtractedField {
+  id: string;
+  label: string;
+  proposedValue: string;
+  citation: { documentName: string; page: number; location: string };
+  status: "proposed" | "confirmed" | "corrected";
+  confirmedValue?: string;
+}
+
+export function mockExtractFields(documentName: string): LcsExtractedField[] {
+  return [
+    {
+      id: `ex-${Date.now()}-1`,
+      label: "Company legal name",
+      proposedValue: "Example Holdings Ltd.",
+      citation: { documentName, page: 1, location: "Header block" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-2`,
+      label: "Fiscal year revenue",
+      proposedValue: "$—,———,———",
+      citation: { documentName, page: 4, location: "Table 2, row 3" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-3`,
+      label: "Requested closing date",
+      proposedValue: "TBD",
+      citation: { documentName, page: 2, location: "Section 3.1" },
+      status: "proposed",
+    },
+  ];
+}
+
 export type LcsTransactionStage =
   | "initiation"
   | "nda_gate"
