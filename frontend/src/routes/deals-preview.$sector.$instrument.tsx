@@ -15,7 +15,14 @@ import {
   LcsButton,
   type LcsStatus,
 } from "@/components/lcs";
-import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsTransactionListStatus, type LcsInstrumentType } from "@/lib/lcs-sandbox";
+import { RoleSwitcher } from "@/components/deals-preview/RoleSwitcher";
+import { getSandboxTransactions, resetSandboxTransactions, daysInStage, STAGE_LABEL, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsTransactionListStatus, type LcsInstrumentType, type LcsViewerRole } from "@/lib/lcs-sandbox";
+
+const VIEWER_ROLE_KEY = "lcs-viewer-role";
+/** Matches deals-preview.index.tsx's own hardcoded founder identity —
+ * see that file's header comment for why a fixed person rather than an
+ * owner-select control. */
+const FOUNDER_OWNER = "R. Mehta";
 
 // Transactions hub §2 — filtered list view, 1 Sep 2026. UI only, sandbox
 // data only (src/lib/lcs-sandbox.ts — localStorage-backed, zero Supabase
@@ -91,19 +98,40 @@ function SectorTransactions() {
   // hydration-mismatch class as everything else on this page. Computed
   // once, client-side, after mount, alongside the sandbox data itself.
   const [now, setNow] = useState<number | null>(null);
+  // Same localStorage-backed role as deals-preview.index.tsx's switcher
+  // — a founder viewer reaches this exact list (redirected here for
+  // technology/equity specifically), and the list itself must still
+  // filter to only their own transactions. The redirect alone isn't
+  // enough: an investor/advisor navigating this same URL directly (or a
+  // founder's URL being shared) would otherwise see all 6 transactions
+  // regardless of role, which defeats the point of the founder scoping.
+  const [role, setRole] = useState<LcsViewerRole | null>(null);
 
   useEffect(() => {
     setTransactions(getSandboxTransactions());
     setNow(Date.now());
     setHydrated(true);
+    try {
+      const stored = localStorage.getItem(VIEWER_ROLE_KEY);
+      setRole(stored === "founder" || stored === "investor" || stored === "advisor" ? stored : "founder");
+    } catch {
+      setRole("founder");
+    }
   }, []);
 
   const isTechnology = sector === "technology";
   const instrumentType = instrument as LcsInstrumentType;
+  const isFounderView = role === "founder";
 
   const bySector = useMemo(
-    () => transactions.filter((d) => d.sector === sector && d.instrumentType === instrumentType),
-    [transactions, sector, instrumentType]
+    () =>
+      transactions.filter(
+        (d) =>
+          d.sector === sector &&
+          d.instrumentType === instrumentType &&
+          (!isFounderView || d.owner === FOUNDER_OWNER)
+      ),
+    [transactions, sector, instrumentType, isFounderView]
   );
   const filtered = useMemo(() => bySector.filter((d) => d.listStatus === tab), [bySector, tab]);
   const counts = useMemo(() => {
@@ -125,6 +153,7 @@ function SectorTransactions() {
       searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
+      headerExtra={<RoleSwitcher />}
       sidebar={(collapsed) => (
         <nav className="flex flex-col gap-0.5 p-2">
           {!collapsed && (
@@ -146,7 +175,9 @@ function SectorTransactions() {
         title={`${SECTOR_LABEL[sector] ?? sector} · ${INSTRUMENT_LABEL[instrumentType] ?? instrument}`}
         description={
           isTechnology
-            ? "Sandbox pipeline — fictional demo data, not live transactions."
+            ? isFounderView
+              ? `Sandbox pipeline — fictional demo data, not live transactions. Showing ${FOUNDER_OWNER}'s transactions only (Founder view).`
+              : "Sandbox pipeline — fictional demo data, not live transactions."
             : "This sector is not yet active."
         }
         action={

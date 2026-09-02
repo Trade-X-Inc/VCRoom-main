@@ -16,6 +16,7 @@ import {
   LcsTd,
   type LcsStatus,
 } from "@/components/lcs";
+import { RoleSwitcher } from "@/components/deals-preview/RoleSwitcher";
 import {
   getSandboxTransaction,
   daysInStage,
@@ -86,6 +87,7 @@ function TransactionLifecycle() {
       searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
+      headerExtra={<RoleSwitcher />}
       sidebar={(collapsed) => (
         <nav className="flex flex-col gap-0.5 p-2">
           {!collapsed && (

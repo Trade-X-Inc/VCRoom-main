@@ -29,6 +29,7 @@ export function LcsPageShell({
   userInitials,
   userLabel,
   onSearchOpen,
+  headerExtra,
   children,
 }: {
   /** Render-prop so nav items can react to collapse state — icons appear
@@ -41,6 +42,14 @@ export function LcsPageShell({
   userInitials: string;
   userLabel: string;
   onSearchOpen?: () => void;
+  /** Optional slot rendered in the top bar, between search and the user
+   * menu. Added 1 Sep 2026 for the sector-layer restructure's role
+   * switcher (Founder/Investor/Advisor) — deliberately a generic named
+   * slot, not a role-specific prop, since LcsPageShell is a shared
+   * Component System primitive used by every LCS screen (including
+   * lcs-preview.tsx, which has no concept of a viewer role at all). The
+   * shell stays feature-agnostic; callers own what goes in the slot. */
+  headerExtra?: ReactNode;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -178,7 +187,8 @@ export function LcsPageShell({
               ⌘K
             </span>
           </button>
-          <div className="ms-auto flex items-center gap-3 shrink-0">
+          {headerExtra && <div className="ms-auto shrink-0">{headerExtra}</div>}
+          <div className={headerExtra ? "flex items-center gap-3 shrink-0" : "ms-auto flex items-center gap-3 shrink-0"}>
             <span
               aria-label="Notifications"
               className="relative inline-flex size-4 items-center justify-center"

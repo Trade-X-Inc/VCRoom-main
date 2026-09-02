@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LcsPageShell, LcsNavItem, LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
+import { RoleSwitcher } from "@/components/deals-preview/RoleSwitcher";
 import { getSandboxTransactions, SECTOR_LABEL, INSTRUMENT_LABEL, type LcsInstrumentType } from "@/lib/lcs-sandbox";
 
 // Sector-layer restructure, checkpoint 2 (1 Sep 2026) — the instrument-
@@ -45,6 +46,7 @@ function InstrumentPicker() {
       searchPlaceholder="Search transactions, LPs, requests"
       userInitials="RM"
       userLabel="R. Mehta"
+      headerExtra={<RoleSwitcher />}
       sidebar={(collapsed) => (
         <nav className="flex flex-col gap-0.5 p-2">
           {!collapsed && (
