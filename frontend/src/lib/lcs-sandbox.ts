@@ -870,6 +870,51 @@ export function getSandboxTransaction(id: string): LcsSandboxTransaction | undef
   return readAll().find((d) => d.id === id);
 }
 
+/** Creates a new transaction — the sandbox equivalent of
+ * approveConnectionRequest's real deal_rooms INSERT (lib/connection-
+ * request-fn.ts). Starts at "nda_gate", matching the real room's start
+ * state (workflow_stage: "information_vault", i.e. pre-NDA) — this
+ * sandbox's closest real analog to "just created, NDA not yet signed by
+ * either party". Reference number is a simple incrementing TX-30XX,
+ * matching this sandbox's existing seed-data numbering (TX-3001..3008)
+ * rather than the real product's real ISO-7064-checked reference format
+ * (CLAUDE.md §8.4) — that scheme sits on no user-facing table in the
+ * real product either (§20.6), so there's nothing real to port here. */
+export function createSandboxTransaction(fields: { companyName: string; sector: LcsSectorId; instrumentType: LcsInstrumentType; owner: string; counterparty: string }): LcsSandboxTransaction {
+  const all = readAll();
+  const nextNum = 3000 + all.length + 1;
+  const now = new Date().toISOString();
+  const transaction: LcsSandboxTransaction = {
+    id: `sbx-${Date.now()}`,
+    ref: `TX-${nextNum}`,
+    companyName: fields.companyName,
+    sector: fields.sector,
+    instrumentType: fields.instrumentType,
+    owner: fields.owner,
+    counterparty: fields.counterparty,
+    stage: "nda_gate",
+    listStatus: "active",
+    createdAt: now,
+    stageEnteredAt: now,
+    lastActivity: { text: "Deal room created", at: now },
+    nda: { founderSignedAt: null, investorSignedAt: null },
+    profile: { summary: "", sector: SECTOR_LABEL[fields.sector], stage: "", askAmount: "" },
+    documents: [],
+    diligenceItems: [],
+    terms: [],
+    closingGates: NO_GATES_STARTED,
+  };
+  const next = [...all, transaction];
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked — nothing to persist this session */
+    }
+  }
+  return transaction;
+}
+
 /** Days elapsed since a transaction entered its current stage, computed
  * from the real stored timestamp against a caller-supplied "now" — never
  * Date.now() called internally. This function runs during SSR (this route
@@ -1473,4 +1518,132 @@ export function saveFounderThesisSandbox(thesis: LcsFounderThesis): void {
   } catch {
     /* private window / storage blocked */
   }
+}
+
+// ── Connection Requests — real screen extraction (2 Sep 2026). Source:
+// app.connections.tsx (founder-facing incoming requests) + lib/
+// connection-request-fn.ts (sendConnectionRequest/approveConnectionRequest/
+// declineConnectionRequest). Confirmed clean by the research pass — no
+// discovery-layer residue anywhere in either file. Real fields ported
+// verbatim: investor name, fund name, a thesis one-liner (sectors ·
+// stages · check-size range), a free-text message, relative age
+// ("today"/"N days ago"), status. Real mechanics: approve is
+// CONFIRM-FIRST (a confirmation card with the real product's own copy,
+// not a bare click), decline is immediate. Approving creates a real
+// transaction (see createSandboxTransaction above) — this sandbox's
+// equivalent of the real approveConnectionRequest's deal_rooms INSERT —
+// and marks the request "deal_room_created"; declining marks it
+// "declined" with the real product's own deliberately-generic investor-
+// facing message ("not accepting connections at this time" — the file's
+// own header comment: "the founder's reason is never shared").
+//
+// "Two founders never share a room" (confirmed product rule): not
+// applicable to this screen's own logic — a connection request is
+// always investor -> one founder's company, enforced by construction
+// here (requestedBy is always "investor" shaped data), same as the real
+// schema's own founder_id/investor_id column split.
+
+export type LcsConnectionRequestStatus = "pending" | "deal_room_created" | "declined";
+
+export interface LcsConnectionRequest {
+  id: string;
+  investorName: string;
+  fundName: string;
+  sectors: string;
+  stages: string;
+  checkSizeMin: string;
+  checkSizeMax: string;
+  message: string;
+  createdAt: string;
+  status: LcsConnectionRequestStatus;
+  dealRoomId?: string;
+}
+
+const CONNECTION_REQUESTS_STORAGE_KEY = "lcs-sandbox-connection-requests-v1";
+
+function seedConnectionRequests(): LcsConnectionRequest[] {
+  const now = Date.now();
+  return [
+    {
+      id: "conn-1",
+      investorName: "Priya Shah",
+      fundName: "Blue Horizon Ventures",
+      sectors: "B2B SaaS, Robotics",
+      stages: "Seed, Series A",
+      checkSizeMin: "250,000",
+      checkSizeMax: "2,000,000",
+      message: "We'd love to learn more about Nimbus Dynamics — met your co-founder at a demo day last month.",
+      createdAt: new Date(now - 2 * 86_400_000).toISOString(),
+      status: "pending",
+    },
+    {
+      id: "conn-2",
+      investorName: "Marcus Webb",
+      fundName: "Corvex Special Situations",
+      sectors: "Manufacturing, Deep tech",
+      stages: "Pre-seed, Seed",
+      checkSizeMin: "100,000",
+      checkSizeMax: "750,000",
+      message: "",
+      createdAt: new Date(now - 5 * 3_600_000).toISOString(),
+      status: "pending",
+    },
+  ];
+}
+
+function readConnectionRequests(): LcsConnectionRequest[] {
+  if (typeof window === "undefined") return seedConnectionRequests();
+  try {
+    const raw = window.localStorage.getItem(CONNECTION_REQUESTS_STORAGE_KEY);
+    if (!raw) {
+      const seeded = seedConnectionRequests();
+      window.localStorage.setItem(CONNECTION_REQUESTS_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    return JSON.parse(raw);
+  } catch {
+    return seedConnectionRequests();
+  }
+}
+
+function writeConnectionRequests(requests: LcsConnectionRequest[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(CONNECTION_REQUESTS_STORAGE_KEY, JSON.stringify(requests));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+export function getConnectionRequests(): LcsConnectionRequest[] {
+  return readConnectionRequests();
+}
+
+/** CONFIRM-FIRST in the real product — this function itself performs the
+ * write unconditionally; the confirm-first UX (a confirmation card the
+ * founder must acknowledge before this is ever called) lives in the
+ * route component, matching where the real product enforces it too
+ * (app.connections.tsx's own confirmId state, not inside
+ * approveConnectionRequest itself). */
+export function approveConnectionRequestSandbox(requestId: string): { ok: true; dealRoomId: string; sector: LcsSectorId; instrumentType: LcsInstrumentType } | { ok: false } {
+  const requests = readConnectionRequests();
+  const request = requests.find((r) => r.id === requestId);
+  const company = readCompany();
+  if (!request || !company) return { ok: false };
+  const transaction = createSandboxTransaction({
+    companyName: company.name || "Untitled company",
+    sector: company.sector,
+    instrumentType: "equity",
+    owner: company.founderName,
+    counterparty: request.fundName,
+  });
+  writeConnectionRequests(
+    requests.map((r) => (r.id === requestId ? { ...r, status: "deal_room_created", dealRoomId: transaction.id } : r))
+  );
+  return { ok: true, dealRoomId: transaction.id, sector: transaction.sector, instrumentType: transaction.instrumentType };
+}
+
+export function declineConnectionRequestSandbox(requestId: string): void {
+  const requests = readConnectionRequests();
+  writeConnectionRequests(requests.map((r) => (r.id === requestId ? { ...r, status: "declined" } : r)));
 }

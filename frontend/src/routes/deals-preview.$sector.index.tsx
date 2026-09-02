@@ -80,7 +80,7 @@ function InstrumentPicker() {
           )}
           <LcsNavItem to="/deals-preview" label="Home" collapsed={collapsed} icon="H" />
           <LcsNavItem to="/deals-preview" label="Transactions" active collapsed={collapsed} icon="T" />
-          <LcsNavItem to="/deals-preview" label="Requests" collapsed={collapsed} icon="R" />
+          <LcsNavItem to="/deals-preview/requests" label="Requests" collapsed={collapsed} icon="R" />
           {role === "founder" && (
             <LcsNavItem to="/deals-preview/profile" label="Profile" collapsed={collapsed} icon="C" />
           )}

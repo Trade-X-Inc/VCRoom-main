@@ -61,6 +61,7 @@ import { Route as ForAngelsRouteImport } from './routes/for.angels'
 import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
 import { Route as DealsPreviewVaultRouteImport } from './routes/deals-preview.vault'
 import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
+import { Route as DealsPreviewRequestsRouteImport } from './routes/deals-preview.requests'
 import { Route as DealsPreviewProfileRouteImport } from './routes/deals-preview.profile'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
 import { Route as CompanyContactRouteImport } from './routes/company.contact'
@@ -450,6 +451,11 @@ const DealsPreviewVaultRoute = DealsPreviewVaultRouteImport.update({
 const DealsPreviewTeamRoute = DealsPreviewTeamRouteImport.update({
   id: '/deals-preview/team',
   path: '/deals-preview/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewRequestsRoute = DealsPreviewRequestsRouteImport.update({
+  id: '/deals-preview/requests',
+  path: '/deals-preview/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealsPreviewProfileRoute = DealsPreviewProfileRouteImport.update({
@@ -1187,6 +1193,7 @@ export interface FileRoutesByFullPath {
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
   '/deals-preview/profile': typeof DealsPreviewProfileRoute
+  '/deals-preview/requests': typeof DealsPreviewRequestsRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/deals-preview/vault': typeof DealsPreviewVaultRoute
   '/for/advisors': typeof ForAdvisorsRoute
@@ -1368,6 +1375,7 @@ export interface FileRoutesByTo {
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
   '/deals-preview/profile': typeof DealsPreviewProfileRoute
+  '/deals-preview/requests': typeof DealsPreviewRequestsRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/deals-preview/vault': typeof DealsPreviewVaultRoute
   '/for/advisors': typeof ForAdvisorsRoute
@@ -1552,6 +1560,7 @@ export interface FileRoutesById {
   '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
   '/deals-preview/profile': typeof DealsPreviewProfileRoute
+  '/deals-preview/requests': typeof DealsPreviewRequestsRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/deals-preview/vault': typeof DealsPreviewVaultRoute
   '/for/advisors': typeof ForAdvisorsRoute
@@ -1737,6 +1746,7 @@ export interface FileRouteTypes {
     | '/company/contact'
     | '/cv/$slug'
     | '/deals-preview/profile'
+    | '/deals-preview/requests'
     | '/deals-preview/team'
     | '/deals-preview/vault'
     | '/for/advisors'
@@ -1918,6 +1928,7 @@ export interface FileRouteTypes {
     | '/company/contact'
     | '/cv/$slug'
     | '/deals-preview/profile'
+    | '/deals-preview/requests'
     | '/deals-preview/team'
     | '/deals-preview/vault'
     | '/for/advisors'
@@ -2101,6 +2112,7 @@ export interface FileRouteTypes {
     | '/company/contact'
     | '/cv/$slug'
     | '/deals-preview/profile'
+    | '/deals-preview/requests'
     | '/deals-preview/team'
     | '/deals-preview/vault'
     | '/for/advisors'
@@ -2268,6 +2280,7 @@ export interface RootRouteChildren {
   CompanyContactRoute: typeof CompanyContactRoute
   CvSlugRoute: typeof CvSlugRoute
   DealsPreviewProfileRoute: typeof DealsPreviewProfileRoute
+  DealsPreviewRequestsRoute: typeof DealsPreviewRequestsRoute
   DealsPreviewTeamRoute: typeof DealsPreviewTeamRoute
   DealsPreviewVaultRoute: typeof DealsPreviewVaultRoute
   ForAdvisorsRoute: typeof ForAdvisorsRoute
@@ -2689,6 +2702,13 @@ declare module '@tanstack/react-router' {
       path: '/deals-preview/team'
       fullPath: '/deals-preview/team'
       preLoaderRoute: typeof DealsPreviewTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/requests': {
+      id: '/deals-preview/requests'
+      path: '/deals-preview/requests'
+      fullPath: '/deals-preview/requests'
+      preLoaderRoute: typeof DealsPreviewRequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deals-preview/profile': {
@@ -3891,6 +3911,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyContactRoute: CompanyContactRoute,
   CvSlugRoute: CvSlugRoute,
   DealsPreviewProfileRoute: DealsPreviewProfileRoute,
+  DealsPreviewRequestsRoute: DealsPreviewRequestsRoute,
   DealsPreviewTeamRoute: DealsPreviewTeamRoute,
   DealsPreviewVaultRoute: DealsPreviewVaultRoute,
   ForAdvisorsRoute: ForAdvisorsRoute,
