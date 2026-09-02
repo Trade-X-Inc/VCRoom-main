@@ -885,6 +885,154 @@ export function daysInStage(transaction: LcsSandboxTransaction, now: number): nu
   return Math.max(0, Math.floor(ms / 86_400_000));
 }
 
+/** Company entity — Profile Builder (2 Sep 2026), extracted against the
+ * REAL product's app.profile-builder.tsx field set (read directly, not
+ * guessed at — its FIELD_LABELS constant names company_name, tagline,
+ * sector, stage, problem, solution, business_model, market_size,
+ * traction, team, funding_target, use_of_funds, competitive_advantage,
+ * plus a v3 set). Not every real field is carried into this sandbox —
+ * only the ones load-bearing for the screens this build actually has
+ * (the profile view, and eventually deal-room company-profile stage
+ * content) — but every field that IS here is a real field name from the
+ * real form, not invented.
+ *
+ * Confirmed before building: sector is not a variable Pack Builder
+ * branches its own behavior on (checkpoint 5's SECTORS/isSectorActive
+ * config still governs reachability everywhere else, unchanged) — it's a
+ * field the founder fills in HERE, and that's the actual mechanism by
+ * which a company's sector gets determined at all. The real product's
+ * own `sector` field is free text with no closed list; this sandbox
+ * deliberately constrains it to LcsSectorId (a select, not a text field)
+ * to stay consistent with checkpoint 5's own closed sector set — a
+ * deliberate divergence from the live product's current looseness, not
+ * an oversight.
+ *
+ * A founder MAY select any of the 5 sectors, including the 3 still
+ * coming-soon (Manufacturing, SPV, Syndicate Lead), confirmed directly:
+ * "founders can build the profile and from any sector startups. once we
+ * open our deal rooms for that particular sectors, can able to close
+ * deal, otherwise they remain as first waiting list for that sector
+ * (this is more a marketing technique than an infrastructure)." A
+ * coming-soon-sector profile is a legitimate pre-registration/waiting-
+ * list state, not a broken or blocked one — see WAITING_LIST_COPY below
+ * for the honest framing this uses instead of a generic "not active"
+ * error tone. */
+export type LcsCompanyStage =
+  | "Pre-idea"
+  | "Pre-revenue"
+  | "Pre-seed"
+  | "Seed"
+  | "Series A"
+  | "Series B"
+  | "Growth"
+  | "Profitable";
+
+export const COMPANY_STAGES: LcsCompanyStage[] = [
+  "Pre-idea",
+  "Pre-revenue",
+  "Pre-seed",
+  "Seed",
+  "Series A",
+  "Series B",
+  "Growth",
+  "Profitable",
+];
+
+export interface LcsSandboxCompany {
+  id: string;
+  founderName: string;
+  name: string;
+  tagline: string;
+  sector: LcsSectorId;
+  stage: LcsCompanyStage;
+  problem: string;
+  solution: string;
+  team: string;
+  fundingTarget: string;
+  published: boolean;
+  publishedAt: string | null;
+  /** Fictional, local-only counter — never presented as real platform
+   * data (this build's standing no-fabricated-metric discipline). A
+   * sandbox-side view count, incremented client-side, not a claim about
+   * real traffic. */
+  viewCount: number;
+}
+
+const COMPANY_STORAGE_KEY = "lcs-sandbox-company-v1";
+
+/** Corrected 2 Sep 2026, before this checkpoint's push — the original
+ * wording ("you're first in line once it opens") asserted an individual
+ * queue position that nothing in this codebase tracks: no ordering
+ * field, no per-founder position, no notification mechanism of any
+ * kind. Literally true for at most one founder per sector. The real,
+ * confirmed operational commitment is narrower and now logged as such in
+ * CLAUDE.md's Amendment log, not just carried as UI copy: profiles
+ * submitted for a coming-soon sector are retained and the founder will
+ * be contacted in real submission order once that sector activates — a
+ * promise the product owes, not a position it displays. */
+export const WAITING_LIST_COPY =
+  "This sector doesn't have open deal rooms yet. Your profile is saved — you'll be notified when it opens.";
+
+function looksLikeCompanyShape(value: unknown): value is LcsSandboxCompany {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof (value as { name?: unknown }).name === "string" &&
+    typeof (value as { sector?: unknown }).sector === "string" &&
+    typeof (value as { published?: unknown }).published === "boolean"
+  );
+}
+
+function readCompany(): LcsSandboxCompany | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(COMPANY_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return looksLikeCompanyShape(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCompany(company: LcsSandboxCompany): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(company));
+  } catch {
+    /* private window / storage blocked — nothing to persist this session */
+  }
+}
+
+export function getSandboxCompany(): LcsSandboxCompany | null {
+  return readCompany();
+}
+
+/** Creates or overwrites the one sandbox company — there is exactly one
+ * founder identity in this sandbox (R. Mehta, per checkpoint 3's
+ * hardcoded-founder decision), so there is exactly one company, not a
+ * list. */
+export function saveSandboxCompany(fields: Omit<LcsSandboxCompany, "id" | "published" | "publishedAt" | "viewCount">): LcsSandboxCompany {
+  const existing = readCompany();
+  const company: LcsSandboxCompany = {
+    id: existing?.id ?? `company-${Date.now()}`,
+    ...fields,
+    published: existing?.published ?? false,
+    publishedAt: existing?.publishedAt ?? null,
+    viewCount: existing?.viewCount ?? 0,
+  };
+  writeCompany(company);
+  return company;
+}
+
+export function publishSandboxCompany(): LcsSandboxCompany | null {
+  const existing = readCompany();
+  if (!existing) return null;
+  const company: LcsSandboxCompany = { ...existing, published: true, publishedAt: new Date().toISOString() };
+  writeCompany(company);
+  return company;
+}
+
 /** Clears and reseeds the sandbox. Returns the fresh seed set. */
 export function resetSandboxTransactions(): LcsSandboxTransaction[] {
   const seeded = seedTransactions();
