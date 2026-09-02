@@ -108,6 +108,10 @@ import { Route as ProductCompareDocsendRouteImport } from './routes/product.comp
 import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
 import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
 import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
+import { Route as DealsPreviewProfileThesisRouteImport } from './routes/deals-preview.profile_.thesis'
+import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-preview.profile_.team'
+import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
+import { Route as DealsPreviewProfileAchievementsRouteImport } from './routes/deals-preview.profile_.achievements'
 import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
@@ -683,6 +687,28 @@ const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
   path: '/team/$token',
   getParentRoute: () => JoinRoute,
 } as any)
+const DealsPreviewProfileThesisRoute =
+  DealsPreviewProfileThesisRouteImport.update({
+    id: '/deals-preview/profile_/thesis',
+    path: '/deals-preview/profile/thesis',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DealsPreviewProfileTeamRoute = DealsPreviewProfileTeamRouteImport.update({
+  id: '/deals-preview/profile_/team',
+  path: '/deals-preview/profile/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileFullRoute = DealsPreviewProfileFullRouteImport.update({
+  id: '/deals-preview/profile_/full',
+  path: '/deals-preview/profile/full',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileAchievementsRoute =
+  DealsPreviewProfileAchievementsRouteImport.update({
+    id: '/deals-preview/profile_/achievements',
+    path: '/deals-preview/profile/achievements',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DealsPreviewSectorInstrumentRoute =
   DealsPreviewSectorInstrumentRouteImport.update({
     id: '/deals-preview/$sector/$instrument',
@@ -1231,6 +1257,10 @@ export interface FileRoutesByFullPath {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
+  '/deals-preview/profile/achievements': typeof DealsPreviewProfileAchievementsRoute
+  '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
+  '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
+  '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
@@ -1408,6 +1438,10 @@ export interface FileRoutesByTo {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
+  '/deals-preview/profile/achievements': typeof DealsPreviewProfileAchievementsRoute
+  '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
+  '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
+  '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
@@ -1588,6 +1622,10 @@ export interface FileRoutesById {
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
+  '/deals-preview/profile_/achievements': typeof DealsPreviewProfileAchievementsRoute
+  '/deals-preview/profile_/full': typeof DealsPreviewProfileFullRoute
+  '/deals-preview/profile_/team': typeof DealsPreviewProfileTeamRoute
+  '/deals-preview/profile_/thesis': typeof DealsPreviewProfileThesisRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
@@ -1769,6 +1807,10 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/deals-preview/$sector/$instrument'
+    | '/deals-preview/profile/achievements'
+    | '/deals-preview/profile/full'
+    | '/deals-preview/profile/team'
+    | '/deals-preview/profile/thesis'
     | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
@@ -1946,6 +1988,10 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/deals-preview/$sector/$instrument'
+    | '/deals-preview/profile/achievements'
+    | '/deals-preview/profile/full'
+    | '/deals-preview/profile/team'
+    | '/deals-preview/profile/thesis'
     | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
@@ -2125,6 +2171,10 @@ export interface FileRouteTypes {
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/deals-preview/$sector/$instrument'
+    | '/deals-preview/profile_/achievements'
+    | '/deals-preview/profile_/full'
+    | '/deals-preview/profile_/team'
+    | '/deals-preview/profile_/thesis'
     | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
@@ -2259,6 +2309,10 @@ export interface RootRouteChildren {
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
   DealsPreviewSectorInstrumentRoute: typeof DealsPreviewSectorInstrumentRoute
+  DealsPreviewProfileAchievementsRoute: typeof DealsPreviewProfileAchievementsRoute
+  DealsPreviewProfileFullRoute: typeof DealsPreviewProfileFullRoute
+  DealsPreviewProfileTeamRoute: typeof DealsPreviewProfileTeamRoute
+  DealsPreviewProfileThesisRoute: typeof DealsPreviewProfileThesisRoute
   ProductCompareDatasiteRoute: typeof ProductCompareDatasiteRoute
   ProductCompareDealroomRoute: typeof ProductCompareDealroomRoute
   ProductCompareDocsendRoute: typeof ProductCompareDocsendRoute
@@ -2965,6 +3019,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/join/team/$token'
       preLoaderRoute: typeof JoinTeamTokenRouteImport
       parentRoute: typeof JoinRoute
+    }
+    '/deals-preview/profile_/thesis': {
+      id: '/deals-preview/profile_/thesis'
+      path: '/deals-preview/profile/thesis'
+      fullPath: '/deals-preview/profile/thesis'
+      preLoaderRoute: typeof DealsPreviewProfileThesisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/team': {
+      id: '/deals-preview/profile_/team'
+      path: '/deals-preview/profile/team'
+      fullPath: '/deals-preview/profile/team'
+      preLoaderRoute: typeof DealsPreviewProfileTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/full': {
+      id: '/deals-preview/profile_/full'
+      path: '/deals-preview/profile/full'
+      fullPath: '/deals-preview/profile/full'
+      preLoaderRoute: typeof DealsPreviewProfileFullRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/achievements': {
+      id: '/deals-preview/profile_/achievements'
+      path: '/deals-preview/profile/achievements'
+      fullPath: '/deals-preview/profile/achievements'
+      preLoaderRoute: typeof DealsPreviewProfileAchievementsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/deals-preview/$sector/$instrument': {
       id: '/deals-preview/$sector/$instrument'
@@ -3850,6 +3932,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
   DealsPreviewSectorInstrumentRoute: DealsPreviewSectorInstrumentRoute,
+  DealsPreviewProfileAchievementsRoute: DealsPreviewProfileAchievementsRoute,
+  DealsPreviewProfileFullRoute: DealsPreviewProfileFullRoute,
+  DealsPreviewProfileTeamRoute: DealsPreviewProfileTeamRoute,
+  DealsPreviewProfileThesisRoute: DealsPreviewProfileThesisRoute,
   ProductCompareDatasiteRoute: ProductCompareDatasiteRoute,
   ProductCompareDealroomRoute: ProductCompareDealroomRoute,
   ProductCompareDocsendRoute: ProductCompareDocsendRoute,

@@ -938,17 +938,78 @@ export const COMPANY_STAGES: LcsCompanyStage[] = [
   "Profitable",
 ];
 
+/** Widened 2 Sep 2026 (real-screen extraction pass) from the original
+ * 9-field sketch to match the REAL `StartupRow`/`FormState` shape in
+ * app.profile.tsx exactly — same field names (camelCased to match this
+ * file's own convention), same grouping into Company identity /
+ * Fundraising / Traction / Vision / Market / Business model /
+ * Cap & relationships / Media / Social links / Contact, per that file's
+ * own FormSection order. NOT extracted: `publiclyDiscoverable` (the real
+ * product's directory-visibility flag) — dropped per direct instruction,
+ * discovery-layer residue. `published`/`publishedAt` are kept verbatim;
+ * they gate go-live, not directory listing. */
 export interface LcsSandboxCompany {
   id: string;
+  // Company identity
   founderName: string;
   name: string;
+  legalEntityName: string;
+  registrationNumber: string;
   tagline: string;
+  website: string;
+  foundedYear: string;
+  country: string;
+  teamSize: string;
   sector: LcsSectorId;
   stage: LcsCompanyStage;
+  description: string;
+  // Fundraising
+  fundingTarget: string;
+  valuation: string;
+  previousFunding: string;
+  currentInvestors: string;
+  useOfFunds: string;
+  // Traction & metrics
+  revenue: string;
+  growthRate: string;
+  customerCount: string;
+  keyMetric: string;
+  traction: string;
+  // Vision & strategy
   problem: string;
   solution: string;
-  team: string;
-  fundingTarget: string;
+  businessModel: string;
+  marketSize: string;
+  whyUs: string;
+  whyNow: string;
+  // Market & opportunity
+  tam: string;
+  sam: string;
+  targetCustomer: string;
+  // Business model details
+  revenueModel: string;
+  pricing: string;
+  unitEconomics: string;
+  burnRate: string;
+  runwayMonths: string;
+  // Cap & relationships
+  moat: string;
+  competitors: string;
+  milestones: string;
+  advisors: string;
+  // Media
+  introVideoUrl: string;
+  productVideoUrl: string;
+  // Social links
+  socialLinks: { platform: string; url: string }[];
+  // Contact
+  founderEmail: string;
+  founderLinkedin: string;
+  cofounderName: string;
+  cofounderLinkedin: string;
+  // Section visibility — real 8-section model, see DEFAULT_SECTION_VISIBILITY
+  sectionVisibility: Record<string, LcsSectionVisibility>;
+  // Publishing — real gate, not directory visibility
   published: boolean;
   publishedAt: string | null;
   /** Fictional, local-only counter — never presented as real platform
@@ -958,7 +1019,120 @@ export interface LcsSandboxCompany {
   viewCount: number;
 }
 
-const COMPANY_STORAGE_KEY = "lcs-sandbox-company-v1";
+/** The REAL 14-key publish-gate formula, ported verbatim from
+ * lib/profileCompleteness.ts's getFounderProfileCompleteness — same
+ * required-field list, same percent formula, same ≥80% threshold. Two
+ * of the real 14 keys (`one_liner`, `investor_narrative`) don't exist in
+ * this sandbox's field set (v3 additions the agent's map flagged as not
+ * carried in); the other 12 map directly. Kept as 12 rather than padding
+ * to 14 with fields that don't exist — the percent is still a real
+ * completeness measure over real required fields, just a slightly
+ * different denominator than the live product's exact current list. */
+const COMPANY_REQUIRED_KEYS: (keyof LcsSandboxCompany)[] = [
+  "name", "tagline", "sector", "stage", "country", "fundingTarget",
+  "businessModel", "problem", "solution", "traction",
+  "useOfFunds", "founderName",
+];
+
+export function companyCompleteness(company: LcsSandboxCompany | null): { percent: number; missing: string[] } {
+  if (!company) return { percent: 0, missing: [] };
+  const missing = COMPANY_REQUIRED_KEYS.filter((k) => !String(company[k] ?? "").trim());
+  const percent = Math.round(((COMPANY_REQUIRED_KEYS.length - missing.length) / COMPANY_REQUIRED_KEYS.length) * 100);
+  return { percent, missing };
+}
+
+export const COMPANY_PUBLISH_THRESHOLD = 80;
+
+export const CAP_TABLE_ROLES = ["Founder", "Co-Founder", "Angel Investor", "VC", "Employee (ESOP)", "Advisor", "Other"];
+
+export interface LcsCapTableRow {
+  id: string;
+  shareholderName: string;
+  shareholderRole: string;
+  ownershipPercent: number;
+  linkedinUrl: string;
+}
+
+const CAP_TABLE_STORAGE_KEY = "lcs-sandbox-cap-table-v1";
+
+export function getSandboxCapTable(): LcsCapTableRow[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CAP_TABLE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveSandboxCapTableRow(row: Omit<LcsCapTableRow, "id">, editId?: string): LcsCapTableRow[] {
+  const rows = getSandboxCapTable();
+  const next = editId
+    ? rows.map((r) => (r.id === editId ? { ...row, id: editId } : r))
+    : [...rows, { ...row, id: `cap-${Date.now()}` }];
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(CAP_TABLE_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked */
+    }
+  }
+  return next;
+}
+
+export function removeSandboxCapTableRow(id: string): LcsCapTableRow[] {
+  const next = getSandboxCapTable().filter((r) => r.id !== id);
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(CAP_TABLE_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked */
+    }
+  }
+  return next;
+}
+
+/** Real 8-section model, ported verbatim from app.profile.tsx's
+ * defaultSectionVisibility + PrivacyTab — same section keys, same three
+ * states, same default (public). Shared here rather than duplicated in
+ * the future Privacy Settings screen, per this session's own standing
+ * practice (checkpoint 4's TEAM_MEMBERS cross-reference precedent). */
+export type LcsSectionVisibility = "public" | "on_request" | "deal_room";
+
+export const SECTION_VISIBILITY_LABEL: Record<LcsSectionVisibility, string> = {
+  public: "Public",
+  on_request: "On request",
+  deal_room: "Deal room only",
+};
+
+export const DEFAULT_SECTION_VISIBILITY: Record<string, LcsSectionVisibility> = {
+  problem_solution: "public",
+  market: "public",
+  traction: "public",
+  business_model: "public",
+  team: "public",
+  competition: "public",
+  fundraising: "public",
+  media: "public",
+};
+
+export const SECTION_VISIBILITY_LABELS: [string, string][] = [
+  ["problem_solution", "Problem & solution"],
+  ["market", "Market"],
+  ["traction", "Traction"],
+  ["business_model", "Business model"],
+  ["team", "Team"],
+  ["competition", "Competition"],
+  ["fundraising", "Fundraising"],
+  ["media", "Media"],
+];
+
+// v2 (2 Sep 2026, real-screen extraction pass): widened from 9 invented
+// fields to the real ~45-field StartupRow shape. Bumped so pre-existing
+// v1 sandbox data (the wrong shape) is simply invisible to the new code
+// and reseeds fresh, same reseed-not-migrate pattern as every other
+// version bump in this file.
+const COMPANY_STORAGE_KEY = "lcs-sandbox-company-v2";
 
 /** Corrected 2 Sep 2026, before this checkpoint's push — the original
  * wording ("you're first in line once it opens") asserted an individual
@@ -1033,6 +1207,53 @@ export function publishSandboxCompany(): LcsSandboxCompany | null {
   return company;
 }
 
+export function updateSandboxCompanySectionVisibility(section: string, visibility: LcsSectionVisibility): LcsSandboxCompany | null {
+  const existing = readCompany();
+  if (!existing) return null;
+  const company: LcsSandboxCompany = {
+    ...existing,
+    sectionVisibility: { ...existing.sectionVisibility, [section]: visibility },
+  };
+  writeCompany(company);
+  return company;
+}
+
+/** Mock pitch-deck extraction — matches the real product's RightCol
+ * "Upload pitch deck... AI will extract and pre-fill your profile"
+ * feature (app.profile.tsx), itself a legitimate CLAUDE.md §10 extraction
+ * use ("proposes a value with citation"), not the discovery-layer
+ * AIFeedback score/signal/recommendations the real Document Vault screen
+ * was correctly flagged for and will need stripped when that screen is
+ * reskinned. No real AI call — mocked computation only, per this build's
+ * standing no-backend-wiring rule; the per-field confirm/correct pattern
+ * this feeds is the same one already proven in Document Vault's "Add
+ * document" flow. */
+export function mockExtractCompanyFields(deckName: string): LcsExtractedField[] {
+  return [
+    {
+      id: `ex-${Date.now()}-1`,
+      label: "Company name",
+      proposedValue: "Meridian Robotics",
+      citation: { documentName: deckName, page: 1, location: "Title slide" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-2`,
+      label: "Tagline",
+      proposedValue: "Autonomous manufacturing robotics for mid-market factories.",
+      citation: { documentName: deckName, page: 1, location: "Title slide subtitle" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-3`,
+      label: "Funding target",
+      proposedValue: "$3,500,000",
+      citation: { documentName: deckName, page: 9, location: "The Ask slide" },
+      status: "proposed",
+    },
+  ];
+}
+
 /** Clears and reseeds the sandbox. Returns the fresh seed set. */
 export function resetSandboxTransactions(): LcsSandboxTransaction[] {
   const seeded = seedTransactions();
@@ -1045,4 +1266,211 @@ export function resetSandboxTransactions(): LcsSandboxTransaction[] {
     }
   }
   return seeded;
+}
+
+// ── Profile Builder — Team Cards, real fields per app.profile.tsx's
+// TeamMembersSection (full_name, role, tag, key_person, bio, highlights[],
+// social_links[]). Named LcsProfileTeamMember, distinct from the existing
+// LcsSandboxTeamMember (checkpoint 4's advisor client roster) — same
+// "team member" concept in the real product, but two unrelated entities:
+// one is the founder's own company team, the other is an advisor's
+// analyst/counsel/accountant roster. Real MEMBER_TAGS/MEMBER_SOCIAL_
+// PLATFORMS lists, ported verbatim.
+
+export const PROFILE_MEMBER_TAGS = ["Founder", "Co-Founder", "Advisor", "Employee", "Board Member"] as const;
+export type LcsProfileMemberTag = (typeof PROFILE_MEMBER_TAGS)[number];
+export const PROFILE_MEMBER_SOCIAL_PLATFORMS = ["LinkedIn", "X / Twitter", "Website", "AngelList", "Crunchbase", "Other"];
+
+export interface LcsProfileTeamMember {
+  id: string;
+  fullName: string;
+  role: string;
+  tag: LcsProfileMemberTag;
+  keyPerson: boolean;
+  bio: string;
+  highlights: string[];
+  socialLinks: { platform: string; url: string }[];
+}
+
+const PROFILE_TEAM_STORAGE_KEY = "lcs-sandbox-profile-team-v1";
+
+export function getProfileTeamMembers(): LcsProfileTeamMember[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PROFILE_TEAM_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeProfileTeamMembers(members: LcsProfileTeamMember[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PROFILE_TEAM_STORAGE_KEY, JSON.stringify(members));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+export function saveProfileTeamMember(fields: Omit<LcsProfileTeamMember, "id">, editId?: string): LcsProfileTeamMember[] {
+  const members = getProfileTeamMembers();
+  const next = editId
+    ? members.map((m) => (m.id === editId ? { ...fields, id: editId } : m))
+    : [...members, { ...fields, id: `member-${Date.now()}` }];
+  writeProfileTeamMembers(next);
+  return next;
+}
+
+export function removeProfileTeamMember(id: string): LcsProfileTeamMember[] {
+  const next = getProfileTeamMembers().filter((m) => m.id !== id);
+  writeProfileTeamMembers(next);
+  return next;
+}
+
+// ── Profile Builder — Achievements, real fields per app.prepare.profile-
+// builder.achievements.tsx: title, description, scope (individual/team/
+// company), date, plus a per-section visibility cycle (private ->
+// deal_room -> public). Ported verbatim, including the real emoji-suffixed
+// visibility labels ("Private 🔒" etc.) — this is the one place in the
+// real founder-facing UI that uses decorative emoji in a label, and it's
+// being carried through faithfully as part of the real screen, not
+// invented; CLAUDE.md §13's emoji ban governs THIS sandbox's own new
+// primitives, not a verbatim reskin of real product copy.
+
+export const ACHIEVEMENT_SCOPES = ["individual", "team", "company"] as const;
+export type LcsAchievementScope = (typeof ACHIEVEMENT_SCOPES)[number];
+
+export interface LcsAchievement {
+  id: string;
+  title: string;
+  description: string;
+  scope: LcsAchievementScope;
+  date: string;
+}
+
+export const ACHIEVEMENT_VISIBILITY_CYCLE: Record<LcsSectionVisibility | "private", "private" | "deal_room" | "public"> = {
+  private: "deal_room",
+  deal_room: "public",
+  public: "private",
+  on_request: "private",
+};
+
+export const ACHIEVEMENT_VISIBILITY_LABEL: Record<"private" | "deal_room" | "public", string> = {
+  private: "Private 🔒",
+  deal_room: "Deal Room 🔐",
+  public: "Public 🌐",
+};
+
+const ACHIEVEMENTS_STORAGE_KEY = "lcs-sandbox-achievements-v1";
+const ACHIEVEMENTS_VISIBILITY_KEY = "lcs-sandbox-achievements-visibility-v1";
+
+export function getAchievements(): LcsAchievement[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeAchievements(items: LcsAchievement[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+export function saveAchievements(items: LcsAchievement[]): void {
+  writeAchievements(items);
+}
+
+export function getAchievementsVisibility(): "private" | "deal_room" | "public" {
+  if (typeof window === "undefined") return "private";
+  try {
+    const raw = window.localStorage.getItem(ACHIEVEMENTS_VISIBILITY_KEY);
+    return raw === "deal_room" || raw === "public" ? raw : "private";
+  } catch {
+    return "private";
+  }
+}
+
+export function cycleAchievementsVisibility(): "private" | "deal_room" | "public" {
+  const current = getAchievementsVisibility();
+  const next = ACHIEVEMENT_VISIBILITY_CYCLE[current];
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(ACHIEVEMENTS_VISIBILITY_KEY, next);
+    } catch {
+      /* private window / storage blocked */
+    }
+  }
+  return next;
+}
+
+// ── Profile Builder — Fundraising Thesis, real fields per
+// lib/founder-thesis-fn.ts's FounderThesis type, ported verbatim:
+// preferred_check_size_min/max, preferred_investor_type, board_preference,
+// sector_expertise_wanted, geography_preference, exclusions,
+// what_good_fit_looks_like, status. Excluded per the confirmed residue:
+// the section header copy "This helps us match you with investors who
+// are actually right for you" (app.profile.tsx:1798) — matching-layer
+// framing. The 7 real fields themselves are kept; this sandbox instead
+// frames the section around what it actually is — a stated preference a
+// founder records for their own reference and to show approved
+// investors, not a matching input.
+
+export const INVESTOR_TYPE_OPTIONS = ["Capital only", "Capital + sector expertise", "Capital + network access"];
+export const BOARD_PREFERENCE_OPTIONS = [
+  { value: "Hands-on (board seat, regular check-ins)", short: "Hands-on" },
+  { value: "Collaborative (available but not directive)", short: "Collaborative" },
+  { value: "Hands-off (capital only, minimal involvement)", short: "Hands-off" },
+];
+
+export interface LcsFounderThesis {
+  preferredCheckSizeMin: string;
+  preferredCheckSizeMax: string;
+  preferredInvestorType: string;
+  boardPreference: string;
+  sectorExpertiseWanted: string;
+  geographyPreference: string;
+  exclusions: string;
+  whatGoodFitLooksLike: string;
+  status: "draft" | "complete";
+}
+
+const THESIS_EMPTY: LcsFounderThesis = {
+  preferredCheckSizeMin: "",
+  preferredCheckSizeMax: "",
+  preferredInvestorType: "",
+  boardPreference: "",
+  sectorExpertiseWanted: "",
+  geographyPreference: "",
+  exclusions: "",
+  whatGoodFitLooksLike: "",
+  status: "draft",
+};
+
+const THESIS_STORAGE_KEY = "lcs-sandbox-founder-thesis-v1";
+
+export function getFounderThesisSandbox(): LcsFounderThesis {
+  if (typeof window === "undefined") return THESIS_EMPTY;
+  try {
+    const raw = window.localStorage.getItem(THESIS_STORAGE_KEY);
+    return raw ? { ...THESIS_EMPTY, ...JSON.parse(raw) } : THESIS_EMPTY;
+  } catch {
+    return THESIS_EMPTY;
+  }
+}
+
+export function saveFounderThesisSandbox(thesis: LcsFounderThesis): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(THESIS_STORAGE_KEY, JSON.stringify(thesis));
+  } catch {
+    /* private window / storage blocked */
+  }
 }

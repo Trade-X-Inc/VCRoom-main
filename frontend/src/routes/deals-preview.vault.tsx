@@ -19,6 +19,7 @@ import {
   LcsDropzone,
 } from "@/components/lcs";
 import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
+import { ExtractionReview } from "@/components/deals-preview/ProfileForm";
 import {
   getSandboxVaults,
   createSandboxVault,
@@ -360,12 +361,12 @@ function CreateVaultModal({ onCreate, onClose }: { onCreate: (name: string) => v
 }
 
 /** Upload -> per-field mock-extraction confirm/correct -> add to vault.
- * THE GUARANTEE: handleConfirmField/handleCorrectField each take a single
- * field id and update only that field's entry in `fields` state. There is
- * no handler here that iterates over every field and confirms them all —
- * "Add to vault" (the only button that advances past this screen) only
- * reads fields whose status is already "confirmed"/"corrected"; it does
- * not itself set any field's status. */
+ * The per-field review UI itself moved to the shared ExtractionReview
+ * component (src/components/deals-preview/ProfileForm.tsx) once Profile
+ * Builder needed the identical mechanism for pitch-deck extraction — one
+ * implementation, two callers, not duplicated. THE GUARANTEE is enforced
+ * there now: no handler iterates over every field and confirms them all;
+ * "Add to vault" only reads fields already "confirmed"/"corrected". */
 function UploadExtractionModal({
   onDone,
   onClose,
@@ -377,33 +378,12 @@ function UploadExtractionModal({
 }) {
   const [documentName, setDocumentName] = useState<string | null>(null);
   const [fields, setFields] = useState<LcsExtractedField[]>([]);
-  const [correctingId, setCorrectingId] = useState<string | null>(null);
-  const [correctionDraft, setCorrectionDraft] = useState("");
 
   const handleFilesSelected = (files: FileList) => {
     const file = files[0];
     if (!file) return;
     setDocumentName(file.name);
     setFields(mockExtractFields(file.name));
-  };
-
-  const handleConfirmField = (fieldId: string) => {
-    setFields((prev) =>
-      prev.map((f) => (f.id === fieldId ? { ...f, status: "confirmed", confirmedValue: f.proposedValue } : f))
-    );
-  };
-
-  const handleStartCorrect = (fieldId: string, currentValue: string) => {
-    setCorrectingId(fieldId);
-    setCorrectionDraft(currentValue);
-  };
-
-  const handleSaveCorrection = (fieldId: string) => {
-    setFields((prev) =>
-      prev.map((f) => (f.id === fieldId ? { ...f, status: "corrected", confirmedValue: correctionDraft } : f))
-    );
-    setCorrectingId(null);
-    setCorrectionDraft("");
   };
 
   const confirmedCount = fields.filter((f) => f.status !== "proposed").length;
@@ -434,61 +414,7 @@ function UploadExtractionModal({
       {!documentName ? (
         <LcsDropzone label="Document" hint="Drop file or click to upload" onFilesSelected={handleFilesSelected} />
       ) : (
-        <div className="flex flex-col gap-3">
-          <p style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 13, color: "var(--lcs-ink-muted)" }}>
-            {documentName} — review each proposed value below. Only confirmed values are added to this document's
-            record.
-          </p>
-          {fields.map((field) => (
-            <div key={field.id} className="border p-3 flex flex-col gap-2" style={{ borderColor: "var(--lcs-line)" }}>
-              <div className="flex items-center justify-between gap-3">
-                <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 13, fontWeight: 500, color: "var(--lcs-ink)" }}>
-                  {field.label}
-                </span>
-                <LcsStatusPill
-                  status={field.status === "proposed" ? "pending" : "satisfied"}
-                  label={field.status === "proposed" ? "Proposed" : field.status === "confirmed" ? "Confirmed" : "Corrected"}
-                />
-              </div>
-              {correctingId === field.id ? (
-                <div className="flex flex-col gap-2">
-                  <LcsTextField
-                    label="Corrected value"
-                    value={correctionDraft}
-                    onChange={(e) => setCorrectionDraft(e.target.value)}
-                  />
-                  <div className="flex items-center gap-2">
-                    <LcsButton variant="secondary" onClick={() => handleSaveCorrection(field.id)}>
-                      Save correction
-                    </LcsButton>
-                    <LcsButton variant="text-link" onClick={() => setCorrectingId(null)}>
-                      Cancel
-                    </LcsButton>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <p style={{ fontFamily: "var(--font-lcs-data)", fontSize: 13, color: "var(--lcs-ink)" }}>
-                    {field.confirmedValue ?? field.proposedValue}
-                  </p>
-                  <p style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 11, color: "var(--lcs-ink-muted)" }}>
-                    {field.citation.documentName}, page {field.citation.page} — {field.citation.location}
-                  </p>
-                  {field.status === "proposed" && (
-                    <div className="flex items-center gap-2">
-                      <LcsButton variant="secondary" onClick={() => handleConfirmField(field.id)}>
-                        Confirm
-                      </LcsButton>
-                      <LcsButton variant="text-link" onClick={() => handleStartCorrect(field.id, field.proposedValue)}>
-                        Correct
-                      </LcsButton>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+        <ExtractionReview fields={fields} setFields={setFields} documentName={documentName} />
       )}
     </LcsModal>
   );
