@@ -30,6 +30,8 @@ export function LcsPageShell({
   userLabel,
   onSearchOpen,
   headerExtra,
+  notificationSlot,
+  userMenuSlot,
   children,
 }: {
   /** Render-prop so nav items can react to collapse state — icons appear
@@ -50,6 +52,17 @@ export function LcsPageShell({
    * lcs-preview.tsx, which has no concept of a viewer role at all). The
    * shell stays feature-agnostic; callers own what goes in the slot. */
   headerExtra?: ReactNode;
+  /** Optional real notification affordance, added for the Group 3 AppShell
+   * adoption (3 Sep 2026). The shell's own notification glyph (below) is a
+   * static, non-interactive placeholder — every existing LCS screen passes
+   * neither prop and gets that placeholder unchanged, so this is additive
+   * only. When supplied, replaces the placeholder glyph entirely rather
+   * than rendering both (a real NotificationBell next to a decorative fake
+   * one would be a visible, confusing duplication, not a composition). */
+  notificationSlot?: ReactNode;
+  /** Optional real account/user menu, same rationale and same additive
+   * guarantee as notificationSlot. */
+  userMenuSlot?: ReactNode;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -107,7 +120,7 @@ export function LcsPageShell({
 
   return (
     <div
-      className="flex min-h-screen"
+      className="flex w-full min-h-screen"
       style={{ background: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
     >
       {/* Desktop sidebar (>= md) — unchanged expand/collapse behavior,
@@ -199,31 +212,35 @@ export function LcsPageShell({
           </button>
           {headerExtra && <div className="ms-auto shrink-0">{headerExtra}</div>}
           <div className={headerExtra ? "flex items-center gap-3 shrink-0" : "ms-auto flex items-center gap-3 shrink-0"}>
-            <span
-              aria-label="Notifications"
-              className="relative inline-flex size-4 items-center justify-center"
-            >
-              <span aria-hidden="true">▢</span>
+            {notificationSlot ?? (
               <span
-                aria-hidden="true"
-                className="absolute -top-0.5 -end-0.5 size-1.5 rounded-full"
-                style={{ background: "var(--lcs-attention)" }}
-              />
-            </span>
-            <div className="flex items-center gap-2">
-              <span
-                className="size-6 rounded-full flex items-center justify-center text-[11px] font-medium shrink-0"
-                style={{ background: "var(--lcs-line)", color: "var(--lcs-ink)" }}
+                aria-label="Notifications"
+                className="relative inline-flex size-4 items-center justify-center"
               >
-                {userInitials}
+                <span aria-hidden="true">▢</span>
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-0.5 -end-0.5 size-1.5 rounded-full"
+                  style={{ background: "var(--lcs-attention)" }}
+                />
               </span>
-              <span className="text-[13px]" style={{ color: "var(--lcs-ink)" }}>
-                {userLabel}
-              </span>
-              <span aria-hidden="true" className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
-                ▾
-              </span>
-            </div>
+            )}
+            {userMenuSlot ?? (
+              <div className="flex items-center gap-2">
+                <span
+                  className="size-6 rounded-full flex items-center justify-center text-[11px] font-medium shrink-0"
+                  style={{ background: "var(--lcs-line)", color: "var(--lcs-ink)" }}
+                >
+                  {userInitials}
+                </span>
+                <span className="text-[13px]" style={{ color: "var(--lcs-ink)" }}>
+                  {userLabel}
+                </span>
+                <span aria-hidden="true" className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
+                  ▾
+                </span>
+              </div>
+            )}
           </div>
         </header>
 

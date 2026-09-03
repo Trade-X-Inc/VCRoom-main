@@ -173,3 +173,50 @@ progress indicator with the active gate's content below it, following the
 same expand-current/collapse-others logic sideways — but that's the
 closing-checkpoint content build's own decision against real gate content,
 not a responsive-only-pass decision to lock in now.
+
+## Z-index — PROPOSED, not yet applied
+
+Audited 3 Sep 2026 during the internal-UI migration's Group 3 (AppShell →
+LcsPageShell adoption), as prep work ahead of the full AppShell rewrite —
+not tied to any observed bug. No `--z-*` token exists anywhere in
+`styles.css` today; every real shell file (`AppShell.tsx`, `MemberShell.tsx`,
+`LcsPageShell`, LCS `Modal.tsx`) uses ad-hoc Tailwind arbitrary z-index
+values that happen to agree by convention, not by a documented scale.
+
+**The real, found convention, low → high:**
+
+| Layer | Observed value | Where |
+|---|---|---|
+| Sticky table header/column | `z-10` | `LcsTable`'s sticky column and header row |
+| Account-menu click-outside catcher | `z-30` | `UserMenu`'s invisible `fixed inset-0` overlay — deliberately *below* the dropdown/drawer layer, so it only catches clicks outside its own menu |
+| Mobile backdrop scrim | `z-40` | AppShell/MemberShell mobile-drawer backdrop; `LcsPageShell`'s mobile drawer wrapper |
+| Notification/user-menu dropdowns | `z-40` | `NotificationBell`, `UserMenu` popovers |
+| Sidebar / drawer itself | `z-50` | AppShell/MemberShell `<aside>` (desktop-collapsible and mobile-slide-in share the class) |
+| Sticky header bar | `z-20` | AppShell/MemberShell `<header>` |
+| Full-screen modals | `z-50` | AppShell's search modal, MemberShell's `FeedbackModal`, LCS `Modal.tsx` |
+
+**One real inconsistency found, not yet fixed:** `LcsPageShell`'s own
+mobile drawer wrapper is `z-40`, one tier below AppShell/MemberShell's
+`z-50` sidebar convention. Harmless today (the two never render inside
+the same document), but exactly the kind of drift a shared shell adoption
+should not silently inherit as if it were intentional.
+
+**Proposed token scale**, formalizing the above rather than inventing new
+values — same naming pattern as every other `--lcs-*` token:
+
+| Token | Value | Replaces |
+|---|---|---|
+| `--z-lcs-sticky` | `10` | `LcsTable` sticky column/header |
+| `--z-lcs-scrim` | `30` | Click-outside catchers and backdrop scrims (unifies `UserMenu`'s `z-30` catcher with the `z-40` backdrops below it — same conceptual layer, was inconsistently numbered) |
+| `--z-lcs-dropdown` | `40` | `NotificationBell`/`UserMenu` popovers, `LcsPageShell`'s mobile drawer wrapper (bumped to match the sidebar convention) |
+| `--z-lcs-drawer` | `50` | AppShell/MemberShell `<aside>` |
+| `--z-lcs-modal` | `50` | Full-screen modals (shares `50` with drawer today; modals and the drawer never coexist, so no ordering conflict — kept as one tier rather than splitting further) |
+
+**Status: proposed only.** Not added to `styles.css`, not applied to any
+component. This is documented here so it becomes real scope for the full
+AppShell rewrite (Group 3, subsystems 2-4) rather than a decision made
+once in a chat report and then lost. Whoever does that rewrite should
+apply this scale (or a deliberately revised version of it) across
+`AppShell.tsx`, `MemberShell.tsx`, `NotificationBell.tsx`, `UserMenu.tsx`,
+and `LcsPageShell`/`Modal.tsx` together, in one pass — not per-file, since
+the whole point is a shared, consistent scale.
