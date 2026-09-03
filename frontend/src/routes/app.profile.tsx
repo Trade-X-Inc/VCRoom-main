@@ -442,23 +442,31 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
     }
     setProfilePublishing(true);
     try {
-      // Going live also makes the startup discoverable in the directory —
-      // without this, published profiles never appeared anywhere (the
-      // settings toggle remains available as an opt-out).
+      // Group 4 correction (3 Sep 2026): publicly_discoverable removed from
+      // this write — traced and confirmed dead (no query anywhere filters,
+      // orders, or gates on it; the real public-profile whitelist RPC
+      // explicitly excludes it by name). There is no directory or browse
+      // feature for it to control — CLAUDE.md §15 prohibits building one.
+      // The prior comment here ("makes the startup discoverable in the
+      // directory") described a feature that was never actually built.
       const { error } = await supabase
         .from("startups")
-        .update({ profile_published: true, profile_slug: profileSlug, publicly_discoverable: true })
+        .update({ profile_published: true, profile_slug: profileSlug })
         .eq("id", startup.id);
       if (error) throw error;
       toast.success("Profile is live on Lengdon.");
-      // Durable confirmation — the founder should know they're now visible
-      // in the directory, with a link to their own public profile.
+      // Durable confirmation — the founder should know their public profile
+      // is live, with a link to it. Copy corrected in the same pass: the
+      // original claimed the profile is "live in the directory" and that
+      // "investors can now find you" — no directory or discovery surface
+      // reads publicly_discoverable or surfaces published profiles to
+      // investors at all; the only way to reach this URL is the link itself.
       import("@/lib/notify").then(({ notifyUser }) =>
         notifyUser({
           userId: user!.id,
           kind: "system",
-          title: "Your profile is live in the directory",
-          body: "Investors can now find you and request access. Share your public profile link anywhere.",
+          title: "Your profile is live",
+          body: "Share your public profile link with investors — anyone with the link can view it.",
           actionUrl: `/p/${profileSlug}`,
         })
       ).catch((e) => console.error("[profile] live notification failed:", e));

@@ -4,9 +4,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info, CreditCard, Activity } from "lucide-react";
 import { FounderHelpGuide, AboutSection } from "@/components/app/HelpGuide";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { LcsButton, LcsTextField, LcsSelectField } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/settings")({
   component: SettingsLayout,
@@ -25,6 +25,13 @@ const inlineTabs = [
   { id: "about", label: "About", icon: Info },
 ];
 
+// Group 4 structural note: this 200px fixed left nav rail + content-panel
+// split is the same class of gap as app.messages.tsx's Team Chat workspace
+// (a page-local secondary nav, not the outer app shell) — LCS's 10
+// primitives have no defined pattern for this, same reasoning as the
+// Group 3 subsystem 2 L2/L3 finding. Restyle-only: tokens applied to the
+// existing structure, not forced onto LcsNavGroup or any other primitive
+// not designed for this shape.
 function SettingsLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const search = useSearch({ strict: false }) as { tab?: string };
@@ -35,13 +42,13 @@ function SettingsLayout() {
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-2 mb-6">
-        <Settings className="h-5 w-5 text-brand" />
-        <h1 className="text-lg font-bold tracking-tight">Settings</h1>
+        <Settings className="h-5 w-5" style={{ color: "var(--lcs-accent)" }} />
+        <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Settings</h1>
       </div>
 
       <div className="flex gap-6 lg:gap-8">
         {/* Left sidebar — 200px fixed */}
-        <nav className="w-[200px] shrink-0 space-y-1">
+        <nav className="w-[200px] shrink-0 flex flex-col gap-1">
           {routeTabs.map((t) => {
             const active = inlineTab === null && (t.exact ? path === t.to : path.startsWith(t.to));
             return (
@@ -49,18 +56,21 @@ function SettingsLayout() {
                 key={t.to}
                 to={t.to as any}
                 onClick={() => setInlineTab(null)}
-                className={cn(
-                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
-                  active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-                )}
+                className="flex items-center gap-2.5 px-3 py-2 text-sm transition-colors"
+                style={{
+                  fontFamily: "var(--font-lcs-ui)",
+                  background: active ? "var(--lcs-progress-wash)" : "transparent",
+                  color: active ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+                  fontWeight: active ? 500 : 400,
+                }}
               >
-                <t.icon className={cn("h-4 w-4", active && "text-brand")} />
+                <t.icon className="h-4 w-4" style={{ color: active ? "var(--lcs-accent)" : undefined }} />
                 {t.label}
               </Link>
             );
           })}
 
-          <div className="my-2 border-t border-border/40" />
+          <div className="my-2" style={{ borderTop: "1px solid var(--lcs-line)" }} />
 
           {inlineTabs.map((t) => {
             const active = inlineTab === t.id;
@@ -69,12 +79,15 @@ function SettingsLayout() {
                 key={t.id}
                 onClick={() => setInlineTab(t.id as "help" | "about")}
                 data-testid={`settings-tab-${t.id}`}
-                className={cn(
-                  "w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors text-left",
-                  active ? "bg-accent text-foreground font-medium" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-                )}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left"
+                style={{
+                  fontFamily: "var(--font-lcs-ui)",
+                  background: active ? "var(--lcs-progress-wash)" : "transparent",
+                  color: active ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+                  fontWeight: active ? 500 : 400,
+                }}
               >
-                <t.icon className={cn("h-4 w-4", active && "text-brand")} />
+                <t.icon className="h-4 w-4" style={{ color: active ? "var(--lcs-accent)" : undefined }} />
                 {t.label}
               </button>
             );
@@ -97,24 +110,12 @@ function SettingsLayout() {
 // ── Shared card wrapper ───────────────────────────────────────────────────────
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-none border border-border/60 bg-card p-5 space-y-4">
-      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border p-5 flex flex-col gap-4" style={{ borderColor: "var(--lcs-line)" }}>
+      <h2 className="text-sm font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{title}</h2>
       {children}
     </section>
   );
 }
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-const inputCls = "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10";
-const disabledCls = "w-full rounded-md border border-border/40 bg-muted/40 px-3 py-2 text-sm text-muted-foreground cursor-not-allowed";
 
 // ── SECTION 1+2: Profile + Company ───────────────────────────────────────────
 function ProfileSettings() {
@@ -159,27 +160,30 @@ function ProfileSettings() {
   }, [userRow]);
 
   // Load startup (founders)
+  // Group 4 correction (3 Sep 2026): publicly_discoverable dropped from
+  // this select — the "Publicly discoverable" toggle it fed has been
+  // removed. Traced before removing: no query anywhere filters, orders,
+  // or gates on this column (confirmed by grepping every .eq()/.select()
+  // site across the repo and Supabase migrations), and the real public-
+  // profile whitelist RPC (supabase/migrations/20260823000000) explicitly
+  // excludes it by name — there is no directory/browse/search surface
+  // for a toggle like this to control. CLAUDE.md §15 prohibits building
+  // one. The column itself is left in place (data-retention question,
+  // not this pass's to answer, same treatment as other retired-column
+  // cases already logged in CLAUDE.md); only the dead UI writer and its
+  // false "appears in directory and search" copy are removed.
   const { data: startup } = useQuery({
     queryKey: ["settings-startup", user?.id],
     enabled: !!user?.id && !isInvestor,
     queryFn: async () => {
       const { data } = await supabase
         .from("startups")
-        .select("id, company_name, website, description, stage, country, profile_slug, founder_email, publicly_discoverable")
+        .select("id, company_name, website, description, stage, country, profile_slug, founder_email")
         .eq("founder_id", user!.id)
         .maybeSingle();
       return data;
     },
   });
-
-  // Discoverable toggle state (founders only)
-  const [discoverable, setDiscoverable] = useState<boolean>(false);
-  const [savingDiscoverable, setSavingDiscoverable] = useState(false);
-  useEffect(() => {
-    if (!isInvestor && startup) {
-      setDiscoverable(startup.publicly_discoverable ?? false);
-    }
-  }, [startup, isInvestor]);
 
   // Load investor profile
   const { data: investorProfile } = useQuery({
@@ -307,13 +311,16 @@ function ProfileSettings() {
   const initials = fullName ? fullName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-5">
       {/* Section 1 — Profile */}
       <Card title="Profile">
         {/* Avatar */}
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="h-16 w-16 rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground font-semibold text-lg shrink-0">
+            <div
+              className="h-16 w-16 rounded-full overflow-hidden flex items-center justify-center font-semibold text-lg shrink-0"
+              style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)" }}
+            >
               {avatarUrl ? (
                 <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
               ) : (
@@ -323,140 +330,87 @@ function ProfileSettings() {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={uploadingAvatar}
-              className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-background border border-border/60 grid place-items-center hover:bg-accent transition-colors"
+              className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full grid place-items-center transition-colors"
+              style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}
             >
-              {uploadingAvatar ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3 text-muted-foreground" />}
+              {uploadingAvatar ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" style={{ color: "var(--lcs-ink-muted)" }} />}
             </button>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
           </div>
           <div>
-            <div className="text-sm font-medium">{fullName || user?.email}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              <span className="inline-block px-2 py-0.5 rounded-full bg-accent text-brand font-medium capitalize">{user?.role ?? "founder"}</span>
+            <div className="text-sm font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{fullName || user?.email}</div>
+            <div className="text-xs mt-0.5">
+              <span
+                className="inline-block px-2 py-0.5 font-medium capitalize"
+                style={{ background: "var(--lcs-progress-wash)", color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}
+              >
+                {user?.role ?? "founder"}
+              </span>
             </div>
           </div>
         </div>
 
-        <Field label="Full name">
-          <input className={inputCls} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" />
-        </Field>
+        <LcsTextField label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" />
 
-        <Field label="Email address">
-          <input className={disabledCls} value={user?.email ?? ""} disabled readOnly />
-          <p className="text-[11px] text-muted-foreground mt-1">Email cannot be changed. Contact support if needed.</p>
-        </Field>
+        <LcsTextField
+          label="Email address"
+          value={user?.email ?? ""}
+          disabled
+          readOnly
+          helper="Email cannot be changed. Contact support if needed."
+        />
 
         <div className="flex justify-end pt-1">
-          <button
-            onClick={saveProfile}
-            disabled={savingProfile}
-            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
-          >
+          <LcsButton variant="primary" onClick={saveProfile} disabled={savingProfile}>
             {savingProfile && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Save profile
-          </button>
+          </LcsButton>
         </div>
       </Card>
 
       {/* Section 2 — Company / Fund */}
       <Card title={isInvestor ? "Fund details" : "Company info"}>
-        <Field label={isInvestor ? "Fund name" : "Company name"}>
-          <input className={inputCls} value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder={isInvestor ? "Acme Ventures" : "Acme Inc."} />
-        </Field>
+        <LcsTextField
+          label={isInvestor ? "Fund name" : "Company name"}
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          placeholder={isInvestor ? "Acme Ventures" : "Acme Inc."}
+        />
 
-        <Field label="Website">
-          <input className={inputCls} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" type="url" />
-        </Field>
+        <LcsTextField label="Website" type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" />
 
         {!isInvestor && (
           <>
-            <Field label="One-liner description">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>One-liner description</label>
               <textarea
-                className={inputCls + " resize-none"}
                 rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What your company does in one sentence"
+                className="w-full outline-none resize-none px-2.5 py-2 text-sm"
+                style={{ fontFamily: "var(--font-lcs-ui)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }}
               />
-            </Field>
+            </div>
 
-            <Field label="Funding stage">
-              <select className={inputCls} value={stage} onChange={(e) => setStage(e.target.value)}>
-                <option value="">Select stage…</option>
-                {["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Growth"].map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </Field>
+            <LcsSelectField label="Funding stage" value={stage} onChange={(e) => setStage(e.target.value)}>
+              <option value="">Select stage…</option>
+              {["Pre-seed", "Seed", "Series A", "Series B", "Series C+", "Growth"].map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </LcsSelectField>
           </>
         )}
 
-        <Field label="Location / country">
-          <input className={inputCls} value={country} onChange={(e) => setCountry(e.target.value)} placeholder="San Francisco, USA" />
-        </Field>
+        <LcsTextField label="Location / country" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="San Francisco, USA" />
 
         <div className="flex justify-end pt-1">
-          <button
-            onClick={saveCompany}
-            disabled={savingCompany}
-            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
-          >
+          <LcsButton variant="primary" onClick={saveCompany} disabled={savingCompany}>
             {savingCompany && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {isInvestor ? "Save fund details" : "Save company info"}
-          </button>
+          </LcsButton>
         </div>
       </Card>
-
-      {/* Publicly discoverable toggle — founders only */}
-      {!isInvestor && startup?.id && (
-        <Card title="Profile visibility">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="text-sm font-medium text-foreground">Publicly discoverable</div>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                When off, only investors you've connected with directly can see your full profile. Your company won't appear in general search or the directory. When on, investors browsing the platform can find you.
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={discoverable}
-              disabled={savingDiscoverable}
-              onClick={async () => {
-                if (!startup?.id) return;
-                const next = !discoverable;
-                setSavingDiscoverable(true);
-                try {
-                  const { error } = await supabase
-                    .from("startups")
-                    .update({ publicly_discoverable: next, updated_at: new Date().toISOString() })
-                    .eq("id", startup.id);
-                  if (error) throw error;
-                  setDiscoverable(next);
-                  qc.invalidateQueries({ queryKey: ["settings-startup", user?.id] });
-                  toast.success(next ? "Profile is now discoverable" : "Profile hidden from general search");
-                } catch (err: any) {
-                  toast.error(err.message || "Failed to update");
-                } finally {
-                  setSavingDiscoverable(false);
-                }
-              }}
-              className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-background disabled:opacity-60",
-                discoverable ? "hs-gradient" : "bg-muted"
-              )}
-            >
-              <span className={cn(
-                "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200",
-                discoverable ? "translate-x-5" : "translate-x-0"
-              )} />
-            </button>
-          </div>
-          <div className={cn("text-xs px-2 py-1 rounded-md w-fit font-medium", discoverable ? "bg-green-500/10 text-green-400" : "bg-muted/60 text-muted-foreground")}>
-            {savingDiscoverable ? "Saving…" : discoverable ? "Discoverable — appears in directory and search" : "Hidden — reachable only via direct connection"}
-          </div>
-        </Card>
-      )}
 
     </div>
   );

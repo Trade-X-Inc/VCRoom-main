@@ -799,6 +799,24 @@ After §19h became the third incidentally-discovered §15/§25 matching-language
 
 ---
 
+## 19j. `publicly_discoverable` toggle removed — dead column, no live directory feature behind it, 3 Sep 2026
+
+Found during the internal-UI-migration's Group 4 (Settings & Comms) restyle of `app.settings.tsx`, per direct instruction to trace the column before touching its UI rather than assume either way. Traced before any edit, per the standard set for this exact class of question (§19b/§19i): full-repo grep for every reader and writer, not just the toggle's own file.
+
+**Trace result:** zero queries anywhere — client or server — filter, order, or gate on `startups.publicly_discoverable`. The only two writers were `app.settings.tsx`'s own toggle (`discoverable`/`savingDiscoverable` state) and `app.profile.tsx`'s "Go live" publish action, which set it unconditionally `true` with a comment claiming this "makes the startup discoverable in the directory." No directory, browse, or search surface reads it — confirmed directly against `supabase/migrations/20260823000000_public_founder_profile_whitelist.sql`'s own `get_public_founder_profile()` RPC (the real, current mechanism controlling what a public profile visitor can see, per §19f), whose comment states explicitly that this column is excluded from the whitelist by design. This is not a feature waiting on backend wiring — Foundation §15/§25 excludes a discovery/browse directory outright, and no such surface was ever built to read this flag.
+
+**Fixed, same session, same standard as the matching-language and transactional-email fixes in §19a/§19i (not deferred):**
+- `app.settings.tsx`: `publicly_discoverable` dropped from the `.select()`, the `discoverable`/`savingDiscoverable` state removed, and the entire "Profile visibility" card — toggle plus its copy ("When off, only investors you've connected with directly can see your full profile... investors browsing the platform can find you") — deleted outright, not hidden or restyled.
+- `app.profile.tsx`: `publicly_discoverable: true` removed from the "Go live" `.update()` call; the misleading "makes the startup discoverable in the directory" comment replaced with an accurate one citing this trace. The real live notification fired on publish was also corrected — title changed from *"Your profile is live in the directory"* to *"Your profile is live"*; body changed from *"Investors can now find you and request access. Share your public profile link anywhere."* to *"Share your public profile link with investors — anyone with the link can view it."* Same shape as §19i Finding 3: a real, sending, user-facing artifact carrying a directory-existence claim that isn't true.
+
+**Verified:** `tsc` unchanged (55/55 against the Group-4 baseline, exact error-set match — no error touches either file), build clean, gzip 0.73 MB. No other reader of the column exists to break by no longer writing it; the column itself is left in place on `startups` (not dropped), same treatment as every other orphaned-but-harmless column this file already tracks (§19c's `readiness_snapshots` etc.) — a schema-level cleanup question, not a UI-content one, and out of scope for this pass.
+
+**Two pre-existing, unrelated data-layer defects surfaced live during this same Group's verification, confirmed unrelated to any restyle edit and left unfixed, flagged here so they aren't lost:**
+1. `app.messages.tsx`'s `TasksSection` queries `deal_rooms.select("id, company_name")` — returns a live `400` (confirmed via network inspection against the real founder fixture). Query text confirmed byte-identical before/after this session's restyle; the defect predates this pass. Likely the same class of issue as the `status`/`workflow_stage` and reference-numbering churn already tracked in §20.1/§20.12 — `deal_rooms` schema drift — not diagnosed further here.
+2. `app.users.tsx`'s team-accounts query joins `team_member_profiles` via a nested-select relationship — returns `"Could not find a relationship between 'startup_team_accounts' and 'team_member_profiles' in the schema cache"`, caught by the query's own existing `console.error` + `(data ?? [])` fallback, so the UI correctly degrades to the "No team members" empty state rather than crashing. Query text confirmed byte-identical before/after. Neither defect is a Group-4 regression; both are logged as found-live, not fixed, consistent with this session's practice of flagging data-layer bugs discovered incidentally during a restyle pass rather than silently fixing or silently ignoring them.
+
+---
+
 ## 20. Current status — documents-group migration closed, 5 Aug 2026
 
 **STATUS AS OF 5 AUG 2026:**

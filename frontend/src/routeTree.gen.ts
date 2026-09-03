@@ -117,7 +117,6 @@ import { Route as DealsPreviewProfileAchievementsRouteImport } from './routes/de
 import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
-import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppSettingsActivityRouteImport } from './routes/app.settings.activity'
 import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
@@ -738,11 +737,6 @@ const AppSettingsNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AppSettingsRoute,
   } as any)
-const AppSettingsDomainRoute = AppSettingsDomainRouteImport.update({
-  id: '/domain',
-  path: '/domain',
-  getParentRoute: () => AppSettingsRoute,
-} as any)
 const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -1267,7 +1261,6 @@ export interface FileRoutesByFullPath {
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
-  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
@@ -1450,7 +1443,6 @@ export interface FileRoutesByTo {
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
-  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
@@ -1636,7 +1628,6 @@ export interface FileRoutesById {
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
-  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
@@ -1823,7 +1814,6 @@ export interface FileRouteTypes {
     | '/app/investor/team'
     | '/app/settings/activity'
     | '/app/settings/billing'
-    | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/deals-preview/$sector/$instrument'
@@ -2006,7 +1996,6 @@ export interface FileRouteTypes {
     | '/app/investor/team'
     | '/app/settings/activity'
     | '/app/settings/billing'
-    | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/deals-preview/$sector/$instrument'
@@ -2191,7 +2180,6 @@ export interface FileRouteTypes {
     | '/app/investor/team'
     | '/app/settings/activity'
     | '/app/settings/billing'
-    | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
     | '/deals-preview/$sector/$instrument'
@@ -3109,13 +3097,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsNotificationsRouteImport
       parentRoute: typeof AppSettingsRoute
     }
-    '/app/settings/domain': {
-      id: '/app/settings/domain'
-      path: '/domain'
-      fullPath: '/app/settings/domain'
-      preLoaderRoute: typeof AppSettingsDomainRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
     '/app/settings/billing': {
       id: '/app/settings/billing'
       path: '/billing'
@@ -3737,7 +3718,6 @@ const AppInvestorRouteWithChildren = AppInvestorRoute._addFileChildren(
 interface AppSettingsRouteChildren {
   AppSettingsActivityRoute: typeof AppSettingsActivityRoute
   AppSettingsBillingRoute: typeof AppSettingsBillingRoute
-  AppSettingsDomainRoute: typeof AppSettingsDomainRoute
   AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
   AppSettingsSecurityRoute: typeof AppSettingsSecurityRoute
 }
@@ -3745,7 +3725,6 @@ interface AppSettingsRouteChildren {
 const AppSettingsRouteChildren: AppSettingsRouteChildren = {
   AppSettingsActivityRoute: AppSettingsActivityRoute,
   AppSettingsBillingRoute: AppSettingsBillingRoute,
-  AppSettingsDomainRoute: AppSettingsDomainRoute,
   AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
   AppSettingsSecurityRoute: AppSettingsSecurityRoute,
 }

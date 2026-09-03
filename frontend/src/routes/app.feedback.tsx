@@ -3,8 +3,8 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Star, CheckCircle2, ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { LcsButton } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/feedback")({
   component: FeedbackPage,
@@ -25,7 +25,6 @@ function FeedbackPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [rating, setRating] = useState(0);
-  const [hoveredRating, setHoveredRating] = useState(0);
   const [whatWorked, setWhatWorked] = useState("");
   const [whatToImprove, setWhatToImprove] = useState("");
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
@@ -72,26 +71,24 @@ function FeedbackPage() {
     }
   };
 
-  const ratingLabels = ["", "Poor", "Fair", "Good", "Great", "Excellent"];
-
   if (submitted) {
     return (
       <div className="p-6 lg:p-8 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl" style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}>
-          <CheckCircle2 className="h-8 w-8" style={{ color: "#10B981" }} />
+        <div className="grid h-16 w-16 place-items-center" style={{ background: "var(--lcs-satisfied-wash)", border: "1px solid var(--lcs-satisfied)" }}>
+          <CheckCircle2 className="h-8 w-8" style={{ color: "var(--lcs-satisfied)" }} />
         </div>
         <div>
-          <h1 className="text-lg font-bold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Thank you.</h1>
-          <p className="text-sm text-muted-foreground max-w-xs">
+          <h1 className="text-lg font-bold mb-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Thank you.</h1>
+          <p className="text-sm max-w-xs" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
             We read every response and use it to prioritise what to build next. Expect to see changes.
           </p>
         </div>
-        <button
+        <LcsButton
+          variant="secondary"
           onClick={() => navigate({ to: user?.role === "investor" ? "/app/investor/overview" : "/app/overview" })}
-          className="inline-flex items-center gap-2 rounded-lg border border-border/60 px-4 py-2 text-sm hover:bg-accent transition-colors"
         >
           <ArrowLeft className="h-4 w-4" /> Back to dashboard
-        </button>
+        </LcsButton>
       </div>
     );
   }
@@ -101,93 +98,95 @@ function FeedbackPage() {
       <div className="mb-8">
         <button
           onClick={() => navigate({ to: -1 as any })}
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm mb-4 transition-colors"
+          style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
-        <h1 className="text-lg font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
           Share your feedback
         </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
           We read every response. Your input shapes what gets built next.
         </p>
       </div>
 
-      <div className="space-y-6">
-        {/* Star rating */}
-        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
-          <div className="text-sm font-semibold mb-1">Overall experience</div>
-          <div className="text-xs text-muted-foreground mb-4">How would you rate Lengdon so far?</div>
+      <div className="flex flex-col gap-6">
+        {/* Rating — plain 1-5 numeric scale, not decorative star iconography
+            (same pattern as MemberShell's FeedbackModal, CLAUDE.md's
+            27 Aug 2026 Group 1 entry — §13 treats a multi-icon rating
+            widget as decorative regardless of whether it's rendered as an
+            emoji glyph or an SVG icon component). */}
+        <div className="border p-6" style={{ borderColor: "var(--lcs-line)" }}>
+          <div className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Overall experience</div>
+          <div className="text-xs mb-4" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>How would you rate Lengdon so far?</div>
           <div className="flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((v) => (
               <button
                 key={v}
                 type="button"
                 onClick={() => setRating(v)}
-                onMouseEnter={() => setHoveredRating(v)}
-                onMouseLeave={() => setHoveredRating(0)}
-                className="transition-transform hover:scale-110 focus:outline-none"
+                className="h-9 w-9 text-sm font-medium transition-colors"
+                style={{
+                  fontFamily: "var(--font-lcs-data)",
+                  border: v === rating ? "1.5px solid var(--lcs-accent)" : "1px solid var(--lcs-line)",
+                  background: v === rating ? "var(--lcs-progress-wash)" : "var(--lcs-white)",
+                  color: v === rating ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                }}
+                aria-label={`Rate ${v} of 5`}
+                aria-pressed={v === rating}
               >
-                <Star
-                  className={cn(
-                    "h-8 w-8 transition-colors",
-                    v <= (hoveredRating || rating)
-                      ? "fill-brand text-brand"
-                      : "text-muted-foreground/30"
-                  )}
-                />
+                {v}
               </button>
             ))}
-            {(hoveredRating || rating) > 0 && (
-              <span className="ml-2 text-sm font-medium" style={{ color: "#A855F7" }}>
-                {ratingLabels[hoveredRating || rating]}
-              </span>
-            )}
           </div>
         </div>
 
         {/* What worked */}
-        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
-          <label className="block text-sm font-semibold mb-1">What's working well?</label>
-          <p className="text-xs text-muted-foreground mb-3">What should we keep doing or double down on?</p>
+        <div className="border p-6" style={{ borderColor: "var(--lcs-line)" }}>
+          <label className="block text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>What's working well?</label>
+          <p className="text-xs mb-3" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>What should we keep doing or double down on?</p>
           <textarea
             value={whatWorked}
             onChange={(e) => setWhatWorked(e.target.value)}
             placeholder="The deal room flow is really smooth, especially..."
             rows={3}
-            className="w-full rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 text-sm resize-none focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10 placeholder:text-muted-foreground/40"
+            className="w-full px-3 py-2.5 text-sm resize-none focus:outline-none"
+            style={{ fontFamily: "var(--font-lcs-ui)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }}
           />
         </div>
 
         {/* What to improve */}
-        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
-          <label className="block text-sm font-semibold mb-1">What needs improvement?</label>
-          <p className="text-xs text-muted-foreground mb-3">Be specific — where did you get stuck or frustrated?</p>
+        <div className="border p-6" style={{ borderColor: "var(--lcs-line)" }}>
+          <label className="block text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>What needs improvement?</label>
+          <p className="text-xs mb-3" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Be specific — where did you get stuck or frustrated?</p>
           <textarea
             value={whatToImprove}
             onChange={(e) => setWhatToImprove(e.target.value)}
             placeholder="I had trouble with... / It would help if..."
             rows={3}
-            className="w-full rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 text-sm resize-none focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10 placeholder:text-muted-foreground/40"
+            className="w-full px-3 py-2.5 text-sm resize-none focus:outline-none"
+            style={{ fontFamily: "var(--font-lcs-ui)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }}
           />
         </div>
 
         {/* Feature checkboxes */}
-        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
-          <div className="text-sm font-semibold mb-1">Which features are you using?</div>
-          <p className="text-xs text-muted-foreground mb-4">Select all that apply.</p>
+        <div className="border p-6" style={{ borderColor: "var(--lcs-line)" }}>
+          <div className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Which features are you using?</div>
+          <p className="text-xs mb-4" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Select all that apply.</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {FEATURES.map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => toggleFeature(id)}
-                className={cn(
-                  "rounded-lg border px-3 py-2 text-xs font-medium text-left transition-colors",
-                  selectedFeatures.includes(id)
-                    ? "border-brand/60 bg-accent text-brand"
-                    : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground"
-                )}
+                className="px-3 py-2 text-xs font-medium text-left transition-colors"
+                style={{
+                  fontFamily: "var(--font-lcs-ui)",
+                  border: selectedFeatures.includes(id) ? "1px solid var(--lcs-accent)" : "1px solid var(--lcs-line)",
+                  background: selectedFeatures.includes(id) ? "var(--lcs-progress-wash)" : "transparent",
+                  color: selectedFeatures.includes(id) ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                }}
               >
                 {label}
               </button>
@@ -196,26 +195,28 @@ function FeedbackPage() {
         </div>
 
         {/* Free text */}
-        <div className="rounded-none border border-border/60 bg-card p-6 shadow-card">
-          <label className="block text-sm font-semibold mb-1">Anything else?</label>
-          <p className="text-xs text-muted-foreground mb-3">Feature requests, bug reports, or anything on your mind.</p>
+        <div className="border p-6" style={{ borderColor: "var(--lcs-line)" }}>
+          <label className="block text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Anything else?</label>
+          <p className="text-xs mb-3" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Feature requests, bug reports, or anything on your mind.</p>
           <textarea
             value={freeText}
             onChange={(e) => setFreeText(e.target.value)}
             placeholder="Free text — no structure needed here."
             rows={4}
-            className="w-full rounded-lg border border-border/60 bg-background/60 px-3 py-2.5 text-sm resize-none focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10 placeholder:text-muted-foreground/40"
+            className="w-full px-3 py-2.5 text-sm resize-none focus:outline-none"
+            style={{ fontFamily: "var(--font-lcs-ui)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }}
           />
         </div>
 
-        <button
+        <LcsButton
+          variant="primary"
           onClick={handleSubmit}
           disabled={loading || !rating}
           data-testid="feedback-submit-btn"
-          className="w-full rounded-lg hs-gradient text-brand-foreground py-3 text-sm font-semibold hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="w-full justify-center py-3"
         >
           {loading ? "Sending…" : "Submit feedback"}
-        </button>
+        </LcsButton>
       </div>
     </div>
   );
