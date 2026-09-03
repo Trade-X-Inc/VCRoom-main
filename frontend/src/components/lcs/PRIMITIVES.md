@@ -220,3 +220,49 @@ apply this scale (or a deliberately revised version of it) across
 `AppShell.tsx`, `MemberShell.tsx`, `NotificationBell.tsx`, `UserMenu.tsx`,
 and `LcsPageShell`/`Modal.tsx` together, in one pass — not per-file, since
 the whole point is a shared, consistent scale.
+
+## Nested nav — `LcsNavGroup` does not model the app's real L2→L3 pattern
+
+Found 3 Sep 2026, Group 3 subsystem 2, while checking AppShell's sidebar
+against the LCS pattern before restyling it further. **This is a gap in
+the primitive, not a defect in AppShell** — recorded here so it isn't
+silently treated as non-conformance to be "fixed" by a future pass that
+hasn't read this note.
+
+`LcsNavGroup`/`LcsNavSubItem` (above) model exactly one shape: a group
+label that's always visible, with its children always visible beneath
+it, indented, connected by a hairline rule. No toggle, no collapse
+state, no route-dependent content swap.
+
+**AppShell's real sidebar does something categorically different, and
+has for as long as this nav has existed (R9/R12, pre-dating the LCS
+migration):**
+1. **Route-dependent single-swap, not nesting.** The sidebar shows
+   *either* the flat top-level (L2) list *or*, once navigation enters a
+   section, an entirely different second-level (L3) list plus a "Back
+   to Dashboard" link — the sidebar's content changes based on where
+   you are, not "some items in one list happen to be grouped."
+   `LcsNavGroup` has no concept of this; it assumes one static list for
+   the life of the shell.
+2. **Click-to-expand/collapse groups within the L3 list**, with
+   auto-open-on-navigate and "never auto-close a group the user is
+   looking at" logic (`expandedGroups` state, a chevron toggle). Real,
+   deliberate interaction behavior — some L3 sections have enough
+   children that showing all of them unconditionally (`LcsNavGroup`'s
+   only mode) would be a materially worse sidebar, not a neutral
+   restyle.
+
+**Disposition, confirmed 3 Sep 2026: restyle-only, no structural
+change.** Subsystem 1 already ported this logic byte-identical into
+`LcsPageShell`'s `sidebar` render-prop, with LCS tokens/type applied to
+its existing markup — the correct move, since forcing the real
+navigation onto `LcsNavGroup`'s always-expanded shape would mean
+inventing a worse pattern purely to satisfy a primitive that was never
+designed for this case, not fixing a real inconsistency.
+
+**If a true LCS-conformant nested-nav primitive is ever wanted**, closing
+this gap is new primitive design work — a route-swap-capable,
+accordion-capable nav pattern — not a follow-up edit to AppShell. Until
+that primitive exists, AppShell's hand-rolled L2/L3 logic (now LCS-token-
+styled, unchanged in structure) is the correct implementation of real
+product navigation, not technical debt against this file.
