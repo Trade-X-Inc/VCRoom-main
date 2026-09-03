@@ -56,7 +56,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
   "": [
     {
       q: "What is Lengdon?",
-      a: "Lengdon is a global fundraising platform for founders and investors. Founders build a structured profile, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors get thesis-matched deal flow, an AI due-diligence engine that cross-examines documents against claims, and a decision pipeline. It is headquartered at DIFC, Dubai.",
+      a: "Lengdon is a global fundraising platform for founders and investors. Founders build a structured profile, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors build an investment thesis and profile, review deal flow inside NDA-gated deal rooms, and use an AI due-diligence engine that cross-examines documents against claims. It is headquartered at DIFC, Dubai.",
     },
     {
       q: "How does founder verification work?",

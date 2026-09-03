@@ -76,7 +76,7 @@ export function welcomeEmail({ name, role }: { name: string; role: "founder" | "
   const investorContent = `
     <div class="badge">🎉 Founding Member</div>
     <h1>Welcome to Lengdon, ${name}.</h1>
-    <p>You're in. Lengdon is in beta and you have full access to every investor tool — AI analysis, thesis-match scoring, deal flow pipeline, and more.</p>
+    <p>You're in. Lengdon is in beta and you have full access to every investor tool — your investment thesis, a document vault for diligence materials, and deal rooms with a full six-stage workflow.</p>
     <div class="highlight"><p>Founding investors lock in 50% off when paid plans launch. No action needed — it's automatic.</p></div>
     <h2>Start in 3 steps:</h2>
     <ul>
