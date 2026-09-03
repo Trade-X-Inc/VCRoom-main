@@ -1,105 +1,88 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LcsPageShell,
   LcsNavItem,
   LcsPageHeader,
-  LcsCard,
-  LcsTable,
-  LcsTableHead,
-  LcsTh,
-  LcsTableBody,
-  LcsTr,
-  LcsTd,
-  LcsStatusPill,
   LcsButton,
   LcsEmptyState,
   LcsModal,
   LcsTextField,
-  LcsDropzone,
+  LcsTextareaField,
 } from "@/components/lcs";
 import { RoleSwitcher, VIEWER_ROLE_CHANGE_EVENT } from "@/components/deals-preview/RoleSwitcher";
-import { ExtractionReview } from "@/components/deals-preview/ProfileForm";
 import {
-  getSandboxVaults,
-  createSandboxVault,
-  renameSandboxVault,
-  addDocumentToVault,
-  removeDocumentFromVault,
-  logDocumentView,
-  requestDocumentRelease,
-  respondToReleaseRequest,
-  mockExtractFields,
-  DOCUMENT_ACCESS_LABEL,
-  type LcsSandboxVault,
-  type LcsVaultDocument,
-  type LcsDocumentAccess,
-  type LcsExtractedField,
+  DOC_TEMPLATES,
+  DOC_TEMPLATE_FIELDS,
+  DOC_CATEGORY_LABELS,
+  DOC_CATEGORY_SORT_ORDER,
+  getFounderDocuments,
+  saveFounderDocument,
+  toggleDocDealRoomVisibility,
+  computeDocCompleteness,
+  getSandboxCompany,
+  type LcsDocTemplate,
+  type LcsDocCategory,
+  type LcsFounderDocument,
   type LcsViewerRole,
 } from "@/lib/lcs-sandbox";
 
-// Document Vault (2 Sep 2026) — built against the corrected architecture
-// report from the Pack Builder scoping discussion. Three corrections,
-// all grounded in CLAUDE.md's own already-established rules (§8.2's
-// tool-class table, §10's AI-usage table, the real documentRender/
-// documents.requestAccess/documents.grantRelease action names), not
-// re-derived from inference — see lcs-sandbox.ts's own header comment on
-// the vault data model for the full citation trail.
+// Document Vault — real screen extraction (3 Sep 2026), replacing the
+// generic upload-vault concept built in an earlier checkpoint entirely
+// (not kept alongside — confirmed no other screen depended on its
+// specific shape: LcsSandboxVault/LcsVaultDocument/etc. are defined in
+// lib/lcs-sandbox.ts and used nowhere outside the old version of this
+// file; the URL /deals-preview/vault and the "Documents" nav entry are
+// unchanged, so every other screen's nav link keeps resolving).
 //
-// 1. TWO-WAY ACCESS (view-only / release-on-request), UI-only, honestly
-//    flagged as not enforced by this sandbox. Every view is logged
-//    regardless of mode; release is modeled as a real two-step
-//    request/grant interaction (documents.requestAccess ->
-//    documents.grantRelease in spirit) rather than a single toggle,
-//    because CLAUDE.md §8.2 names "release a document" as a Commit-class
-//    action no agent may ever perform — the UI should read as a real
-//    human decision, not a settings flip, even with no backend behind it.
+// Source: app.documents.tsx's "document-intake" view (lines 788-1072) +
+// DocumentEditorModal (lines 1518-1787) + the real document_templates
+// table (17 rows, live-queried). Real structure kept: category rail
+// (5 real categories, real sort order), per-template checklist cards
+// (status icon/label, Required/Optional badge, progress bar, Start/
+// Continue/Review/Edit action verb by status), the per-field editor with
+// the real 4 field types (text/textarea/number/percentage), the real
+// required-field asterisk (visual only — not blocking, matching the real
+// screen exactly), live completeness %, and the deal-room visibility
+// toggle per document.
 //
-// 2. PER-FIELD extraction confirm/correct — CLAUDE.md §10 verbatim:
-//    "Proposes a value with citation to page and location. Human
-//    confirms; the confirmation is the warranty." THE CONCRETE GUARANTEE
-//    THIS FILE HOLDS: there is no "Confirm all" / batch-confirm control
-//    anywhere in ExtractionReview below. Each field's Confirm/Correct
-//    button operates on that field's id alone (see handleConfirmField/
-//    handleCorrectField) — no action in this file sets more than one
-//    field's status in a single call. Only fields with status
-//    "confirmed"/"corrected" (i.e. confirmedValue is set) are added to
-//    the vault; "proposed" fields are dropped, never silently included.
-//
-// 3. Universal cross-transaction document management (shared library,
-//    versioning, unified cross-deal audit trail) is explicitly OUT OF
-//    SCOPE — not built here, logged as a deferred future feature in
-//    CLAUDE.md's own Amendment log as part of this same commit.
-//
-// Vaults are reusable across deals (not scoped to one transaction, per
-// direct confirmation) — independent of the existing per-transaction
-// Document Vault stage panel (deals-preview.$sector_.$instrument.$dealId
-// .tsx's DocumentVaultPanel), which stays as-is: a display of whatever's
-// actually shared into that specific room, a different concern from
-// vault management itself, per explicit instruction not to merge them.
-//
-// Responsive: built against the addendum from the start — sticky first
-// table column, LcsModal's existing full-viewport-below-sm behavior for
-// both the create-vault and upload/extraction modals, no new breakpoint
-// behavior invented.
+// EXCLUDED as discovery-layer/scoring residue: the AIFeedback concept in
+// full (overall_score 1-10, signal, investor_flag, recommendations) and
+// its "AI Review" button — CLAUDE.md §15/§25 prohibits scoring/ranking/
+// assessment, and §19b already found this exact review-document prompt
+// flagged as a live, unresolved violation. Also excluded: file upload +
+// AI extraction (a distinct real flow, already built as the shared
+// ExtractionReview mechanism in Profile Builder's deck-upload — this
+// screen is the fill-the-template path, not the upload-and-extract path,
+// and porting both here would duplicate rather than extract). Also
+// excluded: Source Files and Document Privacy Settings (two of the real
+// file's four views) — flagged as a real scope note, not silently
+// dropped: privacy settings folds into the founder profile's own
+// section-visibility screen already built (Full Profile checkpoint),
+// and Source Files is a raw-upload list with no template structure of
+// its own, out of scope for the structured-template rebuild this
+// checkpoint is about.
 
 const VIEWER_ROLE_KEY = "lcs-viewer-role";
+const CATEGORY_ORDER: LcsDocCategory[] = ["market", "financials", "team", "product", "legal"];
 
 export const Route = createFileRoute("/deals-preview/vault")({
   component: DocumentVault,
 });
 
-const ACCESS_TO_PILL: Record<LcsDocumentAccess, "satisfied" | "pending"> = {
-  "view-only": "satisfied",
-  "release-on-request": "pending",
-};
+function statusVerb(status: LcsFounderDocument["status"] | undefined): string {
+  if (!status || status === "empty") return "Start";
+  if (status === "draft") return "Continue";
+  return "Edit";
+}
 
 function DocumentVault() {
   const [role, setRole] = useState<LcsViewerRole | undefined>(undefined);
-  const [vaults, setVaults] = useState<LcsSandboxVault[] | null>(null);
-  const [activeVaultId, setActiveVaultId] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [docs, setDocs] = useState<Record<string, LcsFounderDocument> | null>(null);
+  const [hasCompany, setHasCompany] = useState<boolean | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<LcsDocCategory | "All">("All");
+  const [editingSlug, setEditingSlug] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const readRole = () => {
@@ -116,57 +99,41 @@ function DocumentVault() {
     return () => window.removeEventListener(VIEWER_ROLE_CHANGE_EVENT, readRole);
   }, []);
 
-  const refresh = () => {
-    const all = getSandboxVaults();
-    setVaults(all);
-    setActiveVaultId((current) => current ?? all[0]?.id ?? null);
-  };
-
   useEffect(() => {
-    refresh();
+    setDocs(getFounderDocuments());
+    setHasCompany(!!getSandboxCompany());
   }, []);
 
-  const activeVault = vaults?.find((v) => v.id === activeVaultId) ?? null;
+  const templates = useMemo(
+    () =>
+      [...DOC_TEMPLATES]
+        .filter((t) => selectedCategory === "All" || t.category === selectedCategory)
+        .sort((a, b) => a.sort_order - b.sort_order),
+    [selectedCategory]
+  );
 
-  const handleCreateVault = (name: string) => {
-    createSandboxVault(role ?? "founder", name);
-    refresh();
-    setShowCreateModal(false);
+  const openEditor = (template: LcsDocTemplate) => {
+    const existing = docs?.[template.slug];
+    setEditContent(existing?.content ?? {});
+    setEditingSlug(template.slug);
   };
 
-  const handleView = (doc: LcsVaultDocument) => {
-    if (!activeVault) return;
-    logDocumentView(activeVault.id, doc.id, {
-      viewerRole: role ?? "founder",
-      viewerName: role === "founder" ? "R. Mehta" : role === "investor" ? "S. Cole" : "Advisor",
-      at: new Date().toISOString(),
-    });
-    refresh();
+  const handleSave = () => {
+    if (!editingSlug) return;
+    const saved = saveFounderDocument(editingSlug, editContent);
+    setDocs((prev) => ({ ...(prev ?? {}), [editingSlug]: saved }));
+    setEditingSlug(null);
   };
 
-  const handleRequestRelease = (doc: LcsVaultDocument) => {
-    if (!activeVault) return;
-    requestDocumentRelease(activeVault.id, doc.id, {
-      role: role ?? "founder",
-      name: role === "founder" ? "R. Mehta" : role === "investor" ? "S. Cole" : "Advisor",
-    });
-    refresh();
+  const handleToggleDealRoom = (slug: string) => {
+    const updated = toggleDocDealRoomVisibility(slug);
+    if (updated) setDocs((prev) => ({ ...(prev ?? {}), [slug]: updated }));
   };
 
-  const handleRespond = (doc: LcsVaultDocument, requestId: string, decision: "granted" | "declined") => {
-    if (!activeVault) return;
-    respondToReleaseRequest(activeVault.id, doc.id, requestId, decision, {
-      role: role ?? "founder",
-      name: role === "founder" ? "R. Mehta" : role === "investor" ? "S. Cole" : "Advisor",
-    });
-    refresh();
-  };
-
-  const handleRemoveDoc = (doc: LcsVaultDocument) => {
-    if (!activeVault) return;
-    removeDocumentFromVault(activeVault.id, doc.id);
-    refresh();
-  };
+  const isFounder = role === "founder";
+  const editingTemplate = editingSlug ? DOC_TEMPLATES.find((t) => t.slug === editingSlug) : undefined;
+  const editingFields = editingSlug ? (DOC_TEMPLATE_FIELDS[editingSlug] ?? []) : [];
+  const liveCompleteness = editingSlug ? computeDocCompleteness(editingSlug, editContent) : { score: 0, status: "empty" as const };
 
   return (
     <LcsPageShell
@@ -197,225 +164,201 @@ function DocumentVault() {
         </nav>
       )}
     >
-      <LcsPageHeader
-        title="Documents"
-        description="Vaults you own, reusable across deals. Share into a deal room from here — documents are never shared outside a deal room."
-        action={
-          <LcsButton variant="secondary" onClick={() => setShowCreateModal(true)}>
-            New vault
-          </LcsButton>
-        }
-      />
+      <LcsPageHeader title="Document workspace" description="Fill each document using the structured template, or track what's ready for a deal room." />
 
-      {role === undefined || vaults === null ? (
+      {role === undefined || docs === null || hasCompany === undefined ? (
         <div aria-hidden="true" style={{ minHeight: 300 }} />
-      ) : vaults.length === 0 ? (
-        <LcsEmptyState
-          title="No vaults yet"
-          text="Create a vault to start storing documents."
-          action={<LcsButton variant="secondary" onClick={() => setShowCreateModal(true)}>New vault</LcsButton>}
-        />
+      ) : !isFounder ? (
+        <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+          The document workspace is only available in Founder view. Switch roles above to view it.
+        </p>
+      ) : !hasCompany ? (
+        <div className="border border-dashed p-6 text-center" style={{ borderColor: "var(--lcs-line)" }}>
+          <p style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 13, color: "var(--lcs-ink-muted)" }}>Build your profile first to start filling documents.</p>
+        </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-1 flex-wrap" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
-            {vaults.map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                onClick={() => setActiveVaultId(v.id)}
-                className="h-9 px-3 text-[13px] flex items-center gap-1.5 -mb-px"
-                style={{
-                  fontFamily: "var(--font-lcs-ui)",
-                  fontWeight: activeVaultId === v.id ? 500 : 400,
-                  color: activeVaultId === v.id ? "var(--lcs-accent)" : "var(--lcs-ink)",
-                  borderBottom: activeVaultId === v.id ? "2px solid var(--lcs-accent)" : "2px solid transparent",
-                }}
-              >
-                {v.name}
-                <span
-                  className="text-[11px] px-1.5"
-                  style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink-muted)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}
+        <div className="flex flex-col sm:grid sm:grid-cols-12 gap-4 sm:gap-6 items-start">
+          {/* Category rail — real 5 categories, real sort order */}
+          <div className="w-full sm:col-span-3">
+            <div className="flex sm:flex-col gap-2 sm:gap-1 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
+              {(["All", ...CATEGORY_ORDER] as const).map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className="shrink-0 whitespace-nowrap text-left px-3 py-2 text-[13px] font-medium transition-colors"
+                  style={{
+                    fontFamily: "var(--font-lcs-ui)",
+                    color: selectedCategory === cat ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
+                    background: selectedCategory === cat ? "var(--lcs-accent)" : "transparent",
+                  }}
                 >
-                  {v.documents.length}
-                </span>
-              </button>
-            ))}
+                  {cat === "All" ? "All" : DOC_CATEGORY_LABELS[cat]}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {activeVault && (
-            <LcsCard title={activeVault.name} count={activeVault.documents.length}>
-              {activeVault.documents.length === 0 ? (
-                <LcsEmptyState text="No documents in this vault yet." />
-              ) : (
-                <LcsTable>
-                  <LcsTableHead>
-                    <LcsTh sticky>Name</LcsTh>
-                    <LcsTh>Category</LcsTh>
-                    <LcsTh>Access</LcsTh>
-                    <LcsTh>Activity</LcsTh>
-                    <LcsTh>Actions</LcsTh>
-                  </LcsTableHead>
-                  <LcsTableBody>
-                    {activeVault.documents.map((doc) => {
-                      const pendingRequest = doc.releaseRequests.find((r) => r.status === "pending");
-                      return (
-                        <LcsTr key={doc.id}>
-                          <LcsTd sticky>{doc.name}</LcsTd>
-                          <LcsTd>{doc.category}</LcsTd>
-                          <LcsTd>
-                            <LcsStatusPill status={ACCESS_TO_PILL[doc.access]} label={DOCUMENT_ACCESS_LABEL[doc.access]} />
-                          </LcsTd>
-                          <LcsTd>
-                            {doc.viewLog.length > 0 ? `Viewed ${doc.viewLog.length}×` : "No views"}
-                            {pendingRequest && (
-                              <>
-                                {" · "}
-                                <LcsStatusPill status="attention" label="Release requested" />
-                              </>
-                            )}
-                          </LcsTd>
-                          <LcsTd>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <LcsButton variant="text-link" onClick={() => handleView(doc)}>
-                                View
-                              </LcsButton>
-                              {doc.access === "release-on-request" && !pendingRequest && (
-                                <LcsButton variant="text-link" onClick={() => handleRequestRelease(doc)}>
-                                  Request release
-                                </LcsButton>
-                              )}
-                              {pendingRequest && (
-                                <>
-                                  <LcsButton variant="text-link" onClick={() => handleRespond(doc, pendingRequest.id, "granted")}>
-                                    Grant
-                                  </LcsButton>
-                                  <LcsButton variant="text-link" onClick={() => handleRespond(doc, pendingRequest.id, "declined")}>
-                                    Decline
-                                  </LcsButton>
-                                </>
-                              )}
-                              <LcsButton variant="text-link" onClick={() => handleRemoveDoc(doc)}>
-                                Remove
-                              </LcsButton>
+          {/* Template checklist */}
+          <div className="w-full sm:col-span-9">
+            {templates.length === 0 ? (
+              <LcsEmptyState text="No templates in this category." />
+            ) : (
+              <div className="flex flex-col gap-3">
+                {templates.map((template, i) => {
+                  const showHeader = selectedCategory === "All" && (i === 0 || templates[i - 1].category !== template.category);
+                  const doc = docs[template.slug];
+                  const status = doc?.status ?? "empty";
+                  return (
+                    <div key={template.id}>
+                      {showHeader && (
+                        <div
+                          className={i === 0 ? "mb-2" : "mt-5 mb-2"}
+                          style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--lcs-ink-muted)" }}
+                        >
+                          {DOC_CATEGORY_LABELS[template.category]}
+                        </div>
+                      )}
+                      <div className="border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderColor: "var(--lcs-line)" }}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span
+                              aria-hidden="true"
+                              className="inline-block size-1.5 rounded-full shrink-0"
+                              style={{
+                                background:
+                                  status === "complete" ? "var(--lcs-satisfied)" : status === "draft" ? "var(--lcs-progress)" : "var(--lcs-pending)",
+                              }}
+                            />
+                            <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 13, fontWeight: 500, color: "var(--lcs-ink)" }}>
+                              {template.name}
+                            </span>
+                            <span
+                              className="px-1.5 py-0.5"
+                              style={{
+                                fontFamily: "var(--font-lcs-ui)",
+                                fontSize: 10,
+                                fontWeight: 600,
+                                color: template.is_required ? "var(--lcs-attention)" : "var(--lcs-ink-muted)",
+                                background: template.is_required ? "var(--lcs-attention-wash)" : "var(--lcs-surface)",
+                              }}
+                            >
+                              {template.is_required ? "Required" : "Optional"}
+                            </span>
+                          </div>
+                          {doc && doc.completeness_score > 0 && status !== "complete" && (
+                            <div className="mt-2 flex items-center gap-2 max-w-[220px]">
+                              <div className="flex-1 h-1 overflow-hidden" style={{ background: "var(--lcs-surface)" }}>
+                                <div className="h-full" style={{ width: `${doc.completeness_score}%`, background: "var(--lcs-progress)" }} />
+                              </div>
+                              <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 10, color: "var(--lcs-ink-muted)" }}>{doc.completeness_score}%</span>
                             </div>
-                          </LcsTd>
-                        </LcsTr>
-                      );
-                    })}
-                  </LcsTableBody>
-                </LcsTable>
-              )}
-              <div className="px-3 py-3 flex items-center gap-2" style={{ borderTop: "1px solid var(--lcs-line)" }}>
-                <LcsButton variant="secondary" onClick={() => setShowUploadModal(true)}>
-                  Add document
-                </LcsButton>
+                          )}
+                          {doc && status === "complete" && (
+                            <button
+                              onClick={() => handleToggleDealRoom(template.slug)}
+                              className="mt-2 px-2 py-0.5 text-[11px] transition-colors"
+                              style={{
+                                fontFamily: "var(--font-lcs-ui)",
+                                color: doc.in_deal_room ? "var(--lcs-attention)" : "var(--lcs-ink-muted)",
+                                background: doc.in_deal_room ? "var(--lcs-attention-wash)" : "var(--lcs-surface)",
+                              }}
+                              title={doc.in_deal_room ? "Visible in deal room — click to restrict" : "Not in deal room — click to include"}
+                            >
+                              {doc.in_deal_room ? "Deal room" : "+ Add to deal room"}
+                            </button>
+                          )}
+                        </div>
+                        <LcsButton variant="secondary" onClick={() => openEditor(template)}>
+                          {statusVerb(status)}
+                        </LcsButton>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </LcsCard>
-          )}
+            )}
+          </div>
         </div>
       )}
 
-      {showCreateModal && <CreateVaultModal onCreate={handleCreateVault} onClose={() => setShowCreateModal(false)} />}
-      {showUploadModal && activeVault && (
-        <UploadExtractionModal
-          onDone={() => {
-            refresh();
-            setShowUploadModal(false);
-          }}
-          onClose={() => setShowUploadModal(false)}
-          onAddDocument={(name, category) => {
-            addDocumentToVault(activeVault.id, { name, category, contributedBy: "self", access: "view-only" });
-          }}
-        />
+      {editingSlug && editingTemplate && (
+        <LcsModal
+          title={editingTemplate.name}
+          variant="slide-over"
+          onClose={() => setEditingSlug(null)}
+          footer={
+            <>
+              <LcsButton variant="secondary" onClick={() => setEditingSlug(null)}>
+                Cancel
+              </LcsButton>
+              <LcsButton variant="primary" onClick={handleSave}>
+                Save
+              </LcsButton>
+            </>
+          }
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <div className="flex-1 h-1 overflow-hidden" style={{ background: "var(--lcs-surface)" }}>
+              <div className="h-full" style={{ width: `${liveCompleteness.score}%`, background: "var(--lcs-progress)" }} />
+            </div>
+            <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 11, color: "var(--lcs-ink-muted)" }}>{liveCompleteness.score}% complete</span>
+          </div>
+          {editingFields.map((field) => {
+            const label = field.required ? `${field.label} *` : field.label;
+            const value = editContent[field.key] ?? "";
+            const onChange = (v: string) => setEditContent((prev) => ({ ...prev, [field.key]: v }));
+            if (field.type === "textarea") {
+              return (
+                <LcsTextareaField
+                  key={field.key}
+                  label={label}
+                  placeholder={field.placeholder}
+                  rows={4}
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                />
+              );
+            }
+            if (field.type === "number") {
+              return (
+                <LcsTextField
+                  key={field.key}
+                  label={label}
+                  type="number"
+                  placeholder={field.placeholder}
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                />
+              );
+            }
+            if (field.type === "percentage") {
+              return (
+                <LcsTextField
+                  key={field.key}
+                  label={label}
+                  type="number"
+                  min={0}
+                  max={100}
+                  helper="%"
+                  placeholder={field.placeholder}
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                />
+              );
+            }
+            return (
+              <LcsTextField
+                key={field.key}
+                label={label}
+                type="text"
+                placeholder={field.placeholder}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+              />
+            );
+          })}
+        </LcsModal>
       )}
     </LcsPageShell>
-  );
-}
-
-function CreateVaultModal({ onCreate, onClose }: { onCreate: (name: string) => void; onClose: () => void }) {
-  const [name, setName] = useState("");
-  return (
-    <LcsModal
-      title="New vault"
-      onClose={onClose}
-      footer={
-        <>
-          <LcsButton variant="secondary" onClick={onClose}>
-            Cancel
-          </LcsButton>
-          <LcsButton variant="primary" onClick={() => onCreate(name)}>
-            Create
-          </LcsButton>
-        </>
-      }
-    >
-      <LcsTextField
-        label="Vault name"
-        placeholder="New Vault"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        helper="Leave blank to use “New Vault” — you can rename it any time."
-      />
-    </LcsModal>
-  );
-}
-
-/** Upload -> per-field mock-extraction confirm/correct -> add to vault.
- * The per-field review UI itself moved to the shared ExtractionReview
- * component (src/components/deals-preview/ProfileForm.tsx) once Profile
- * Builder needed the identical mechanism for pitch-deck extraction — one
- * implementation, two callers, not duplicated. THE GUARANTEE is enforced
- * there now: no handler iterates over every field and confirms them all;
- * "Add to vault" only reads fields already "confirmed"/"corrected". */
-function UploadExtractionModal({
-  onDone,
-  onClose,
-  onAddDocument,
-}: {
-  onDone: () => void;
-  onClose: () => void;
-  onAddDocument: (name: string, category: string) => void;
-}) {
-  const [documentName, setDocumentName] = useState<string | null>(null);
-  const [fields, setFields] = useState<LcsExtractedField[]>([]);
-
-  const handleFilesSelected = (files: FileList) => {
-    const file = files[0];
-    if (!file) return;
-    setDocumentName(file.name);
-    setFields(mockExtractFields(file.name));
-  };
-
-  const confirmedCount = fields.filter((f) => f.status !== "proposed").length;
-  const allResolved = fields.length > 0 && confirmedCount === fields.length;
-
-  const handleAddToVault = () => {
-    if (!documentName) return;
-    onAddDocument(documentName, "Uploaded");
-    onDone();
-  };
-
-  return (
-    <LcsModal
-      title="Add document"
-      variant="slide-over"
-      onClose={onClose}
-      footer={
-        <>
-          <LcsButton variant="secondary" onClick={onClose}>
-            Cancel
-          </LcsButton>
-          <LcsButton variant="primary" onClick={handleAddToVault} disabled={!allResolved}>
-            Add to vault
-          </LcsButton>
-        </>
-      }
-    >
-      {!documentName ? (
-        <LcsDropzone label="Document" hint="Drop file or click to upload" onFilesSelected={handleFilesSelected} />
-      ) : (
-        <ExtractionReview fields={fields} setFields={setFields} documentName={documentName} />
-      )}
-    </LcsModal>
   );
 }

@@ -1763,3 +1763,248 @@ export function declineConnectionRequestSandbox(requestId: string): void {
   const requests = readConnectionRequests();
   writeConnectionRequests(requests.map((r) => (r.id === requestId ? { ...r, status: "declined" } : r)));
 }
+
+// Document Vault — real screen extraction (3 Sep 2026). Source:
+// app.documents.tsx's "document-intake" view + DocumentEditorModal
+// (lines ~1518-1787), and the real `document_templates` table, queried
+// live via Supabase MCP against project ldimninnjlvxozubheib (17 rows,
+// confirmed authoritative, ported verbatim below — id/slug/name/category/
+// is_required/stage_relevance/sort_order). Per-field schema (TEMPLATE_FIELDS)
+// ported verbatim from app.documents.tsx lines 88-227.
+//
+// EXCLUDED as discovery-layer/scoring residue, confirmed against
+// CLAUDE.md's §15/§25 prohibitions and the review-document scoring-prompt
+// finding already logged there (§19b): the entire AIFeedback concept
+// (overall_score 1-10, signal strong/adequate/weak, investor_flag,
+// recommendations) and the "AI Review" button that produces it
+// (app.documents.tsx lines 1563-1596, 1690-1755, 1766-1773). Nothing here
+// scores, ranks, or grades a document — status is derived purely from
+// which required fields are filled, the same mechanical rule the real
+// completeness_score already uses for the progress bar, with no AI
+// judgment layered on top.
+export type LcsDocCategory = "market" | "financials" | "team" | "product" | "legal";
+
+export const DOC_CATEGORY_LABELS: Record<LcsDocCategory, string> = {
+  market: "Market",
+  financials: "Financials",
+  team: "Team",
+  product: "Product",
+  legal: "Legal",
+};
+
+export const DOC_CATEGORY_SORT_ORDER: Record<LcsDocCategory, number> = {
+  market: 0,
+  financials: 1,
+  team: 2,
+  product: 3,
+  legal: 4,
+};
+
+export interface LcsDocTemplateField {
+  key: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "percentage";
+  placeholder?: string;
+  required?: boolean;
+}
+
+export interface LcsDocTemplate {
+  id: string;
+  slug: string;
+  name: string;
+  category: LcsDocCategory;
+  is_required: boolean;
+  stage_relevance: string[];
+  sort_order: number;
+}
+
+// Real 17-row document_templates catalog, live-queried 3 Sep 2026.
+export const DOC_TEMPLATES: LcsDocTemplate[] = [
+  { id: "dt-1", slug: "executive_summary", name: "Executive Summary", category: "market", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 1 },
+  { id: "dt-2", slug: "problem_solution", name: "Problem & Solution", category: "market", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 2 },
+  { id: "dt-3", slug: "market_sizing", name: "Market Sizing (TAM/SAM/SOM)", category: "market", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 3 },
+  { id: "dt-4", slug: "competitive_landscape", name: "Competitive Landscape", category: "market", is_required: false, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 4 },
+  { id: "dt-5", slug: "go_to_market", name: "Go-to-Market Strategy", category: "market", is_required: false, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 5 },
+  { id: "dt-6", slug: "traction_metrics", name: "Traction & Key Metrics", category: "financials", is_required: true, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 6 },
+  { id: "dt-7", slug: "financial_model", name: "Financial Model Summary", category: "financials", is_required: true, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 7 },
+  { id: "dt-8", slug: "use_of_funds", name: "Use of Funds", category: "financials", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 8 },
+  { id: "dt-9", slug: "cap_table_summary", name: "Cap Table Summary", category: "financials", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 10 },
+  { id: "dt-10", slug: "unit_economics", name: "Unit Economics", category: "financials", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 11 },
+  { id: "dt-11", slug: "team_overview", name: "Team Overview", category: "team", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 12 },
+  { id: "dt-12", slug: "advisors_board", name: "Advisors & Board", category: "team", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 13 },
+  { id: "dt-13", slug: "product_overview", name: "Product Overview", category: "product", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 14 },
+  { id: "dt-14", slug: "product_roadmap", name: "Product Roadmap", category: "product", is_required: false, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 15 },
+  { id: "dt-15", slug: "cap_table_legal", name: "Cap Table (Legal)", category: "legal", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 16 },
+  { id: "dt-16", slug: "corporate_structure", name: "Corporate Structure", category: "legal", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 17 },
+  { id: "dt-17", slug: "ip_summary", name: "IP Summary", category: "legal", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 18 },
+];
+
+// Per-template field schema, ported verbatim from app.documents.tsx's
+// TEMPLATE_FIELDS constant (lines 88-227) — every key/label/type/
+// placeholder/required tuple kept exact. Only 4 real `type` values exist
+// in the source data (text, textarea, number, percentage) — no select or
+// date type is invented here.
+export const DOC_TEMPLATE_FIELDS: Record<string, LcsDocTemplateField[]> = {
+  executive_summary: [
+    { key: "company_name", label: "Company name", type: "text", required: true },
+    { key: "one_liner", label: "One-line pitch", type: "text", placeholder: "What you do, in one sentence", required: true },
+    { key: "summary", label: "Executive summary", type: "textarea", placeholder: "2-3 paragraph overview of the business", required: true },
+    { key: "ask", label: "The ask", type: "text", placeholder: "e.g. Raising $2M seed round", required: false },
+  ],
+  problem_solution: [
+    { key: "problem", label: "The problem", type: "textarea", required: true },
+    { key: "solution", label: "Your solution", type: "textarea", required: true },
+    { key: "why_now", label: "Why now", type: "textarea", placeholder: "What makes this the right time", required: false },
+  ],
+  market_sizing: [
+    { key: "tam", label: "TAM (Total Addressable Market)", type: "text", placeholder: "e.g. $50B", required: true },
+    { key: "sam", label: "SAM (Serviceable Addressable Market)", type: "text", placeholder: "e.g. $5B", required: true },
+    { key: "som", label: "SOM (Serviceable Obtainable Market)", type: "text", placeholder: "e.g. $50M", required: true },
+    { key: "methodology", label: "Sizing methodology", type: "textarea", placeholder: "How these figures were derived", required: false },
+  ],
+  competitive_landscape: [
+    { key: "competitors", label: "Key competitors", type: "textarea", required: false },
+    { key: "differentiation", label: "Your differentiation", type: "textarea", required: false },
+    { key: "moat", label: "Competitive moat", type: "textarea", required: false },
+  ],
+  go_to_market: [
+    { key: "channels", label: "Primary channels", type: "textarea", required: false },
+    { key: "sales_motion", label: "Sales motion", type: "text", placeholder: "e.g. Self-serve, sales-led, PLG", required: false },
+    { key: "cac_strategy", label: "Customer acquisition strategy", type: "textarea", required: false },
+  ],
+  traction_metrics: [
+    { key: "mrr", label: "Monthly recurring revenue", type: "text", required: false },
+    { key: "growth_rate", label: "Month-over-month growth", type: "percentage", required: false },
+    { key: "customers", label: "Number of customers", type: "number", required: false },
+    { key: "key_metrics", label: "Other key metrics", type: "textarea", required: true },
+  ],
+  financial_model: [
+    { key: "revenue_current", label: "Current annual revenue", type: "text", required: false },
+    { key: "revenue_projected", label: "Projected revenue (12mo)", type: "text", required: true },
+    { key: "burn_rate", label: "Monthly burn rate", type: "text", required: true },
+    { key: "runway_months", label: "Runway (months)", type: "number", required: true },
+  ],
+  use_of_funds: [
+    { key: "raise_amount", label: "Amount raising", type: "text", required: true },
+    { key: "allocation", label: "Fund allocation breakdown", type: "textarea", placeholder: "e.g. 60% engineering, 25% sales, 15% ops", required: true },
+    { key: "milestones", label: "Milestones this funds", type: "textarea", required: false },
+  ],
+  cap_table_summary: [
+    { key: "founder_ownership", label: "Founder ownership %", type: "percentage", required: false },
+    { key: "esop_pool", label: "ESOP pool %", type: "percentage", required: false },
+    { key: "notes", label: "Notes", type: "textarea", required: false },
+  ],
+  unit_economics: [
+    { key: "cac", label: "Customer acquisition cost", type: "text", required: false },
+    { key: "ltv", label: "Lifetime value", type: "text", required: false },
+    { key: "payback_months", label: "Payback period (months)", type: "number", required: false },
+    { key: "gross_margin", label: "Gross margin", type: "percentage", required: false },
+  ],
+  team_overview: [
+    { key: "founders", label: "Founders", type: "textarea", placeholder: "Name, role, relevant background", required: true },
+    { key: "team_size", label: "Team size", type: "number", required: false },
+    { key: "key_hires", label: "Key hires planned", type: "textarea", required: false },
+  ],
+  advisors_board: [
+    { key: "advisors", label: "Advisors", type: "textarea", required: false },
+    { key: "board_members", label: "Board members", type: "textarea", required: false },
+  ],
+  product_overview: [
+    { key: "description", label: "Product description", type: "textarea", required: true },
+    { key: "stage", label: "Development stage", type: "text", placeholder: "e.g. MVP, GA, beta", required: false },
+    { key: "tech_stack", label: "Tech stack", type: "text", required: false },
+  ],
+  product_roadmap: [
+    { key: "next_3mo", label: "Next 3 months", type: "textarea", required: false },
+    { key: "next_12mo", label: "Next 12 months", type: "textarea", required: false },
+  ],
+  cap_table_legal: [
+    { key: "shareholders", label: "Shareholders & classes", type: "textarea", required: false },
+    { key: "outstanding_instruments", label: "Outstanding SAFEs/notes/options", type: "textarea", required: false },
+  ],
+  corporate_structure: [
+    { key: "entity_type", label: "Entity type", type: "text", placeholder: "e.g. Delaware C-Corp", required: false },
+    { key: "jurisdiction", label: "Jurisdiction", type: "text", required: false },
+    { key: "subsidiaries", label: "Subsidiaries", type: "textarea", required: false },
+  ],
+  ip_summary: [
+    { key: "patents", label: "Patents / applications", type: "textarea", required: false },
+    { key: "trademarks", label: "Trademarks", type: "textarea", required: false },
+    { key: "proprietary_tech", label: "Proprietary technology notes", type: "textarea", required: false },
+  ],
+};
+
+export type LcsDocStatus = "empty" | "draft" | "complete";
+
+export interface LcsFounderDocument {
+  template_slug: string;
+  content: Record<string, string>;
+  status: LcsDocStatus;
+  completeness_score: number;
+  updated_at: string;
+  in_deal_room: boolean;
+}
+
+const DOC_STORAGE_KEY = "lcs-sandbox-founder-documents-v1";
+
+function readFounderDocuments(): Record<string, LcsFounderDocument> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(DOC_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeFounderDocuments(docs: Record<string, LcsFounderDocument>): void {
+  try {
+    window.localStorage.setItem(DOC_STORAGE_KEY, JSON.stringify(docs));
+  } catch {
+    /* storage blocked — edit not persisted this session */
+  }
+}
+
+export function getFounderDocuments(): Record<string, LcsFounderDocument> {
+  return readFounderDocuments();
+}
+
+/** Completeness = % of a template's fields (required or not, matching the
+ * real liveScore calc at app.documents.tsx:1528-1532) that have a
+ * non-empty trimmed value. Status derives mechanically from that score —
+ * no AI judgment, matching app.documents.tsx:1540's own status rule. */
+export function computeDocCompleteness(slug: string, content: Record<string, string>): { score: number; status: LcsDocStatus } {
+  const fields = DOC_TEMPLATE_FIELDS[slug] ?? [];
+  if (fields.length === 0) return { score: 0, status: "empty" };
+  const filled = fields.filter((f) => (content[f.key] ?? "").trim().length > 0).length;
+  const score = Math.round((filled / fields.length) * 100);
+  const status: LcsDocStatus = score === 100 ? "complete" : score > 0 ? "draft" : "empty";
+  return { score, status };
+}
+
+export function saveFounderDocument(slug: string, content: Record<string, string>): LcsFounderDocument {
+  const docs = readFounderDocuments();
+  const { score, status } = computeDocCompleteness(slug, content);
+  const existing = docs[slug];
+  const doc: LcsFounderDocument = {
+    template_slug: slug,
+    content,
+    status,
+    completeness_score: score,
+    updated_at: new Date().toISOString(),
+    in_deal_room: existing?.in_deal_room ?? false,
+  };
+  docs[slug] = doc;
+  writeFounderDocuments(docs);
+  return doc;
+}
+
+export function toggleDocDealRoomVisibility(slug: string): LcsFounderDocument | undefined {
+  const docs = readFounderDocuments();
+  const existing = docs[slug];
+  if (!existing) return undefined;
+  const doc: LcsFounderDocument = { ...existing, in_deal_room: !existing.in_deal_room };
+  docs[slug] = doc;
+  writeFounderDocuments(docs);
+  return doc;
+}
