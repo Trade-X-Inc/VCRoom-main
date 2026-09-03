@@ -19,32 +19,27 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
 
   return (
     <div
-      className="rounded-none border px-4 py-3 mb-4 flex items-center justify-between gap-3"
-      style={
-        isFounder
-          ? { background: "rgba(245,158,11,0.12)", borderColor: "rgba(245,158,11,0.3)" }
-          : { background: "rgba(124,58,237,0.06)", borderColor: "rgba(124,58,237,0.2)" }
-      }
+      className="border px-4 py-3 mb-4 flex items-center justify-between gap-3"
+      style={{ background: "var(--lcs-attention-wash)", borderColor: "var(--lcs-attention)" }}
     >
       <div className="flex items-center gap-2.5 min-w-0">
         {isFounder ? (
-          <AlertTriangle className="h-4 w-4 shrink-0" style={{ color: "#F59E0B" }} />
+          <AlertTriangle className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-attention)" }} />
         ) : (
-          <Lightbulb className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
+          <Lightbulb className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-attention)" }} />
         )}
-        <p className="text-sm text-foreground min-w-0">
+        <p className="text-sm min-w-0" style={{ color: "var(--lcs-ink)" }}>
           {isFounder ? (
             <>
               {percent}% ready ·{" "}
-              {/* amber-700 for AA (4.5:1+) on the light-amber tint; amber-500 fails as text */}
-              <Link to="/app/profile" className="font-medium underline underline-offset-2" style={{ color: "#B45309" }}>
+              <Link to="/app/profile" className="font-medium underline underline-offset-2" style={{ color: "var(--lcs-accent)" }}>
                 Complete profile →
               </Link>
             </>
           ) : (
             <>
-              Set your investment thesis to get matched with relevant founders.{" "}
-              <Link to="/app/investor/profile" className="font-medium underline underline-offset-2" style={{ color: "var(--brand)" }}>
+              Add your investment thesis so founders can see what you're looking for.{" "}
+              <Link to="/app/investor/profile" className="font-medium underline underline-offset-2" style={{ color: "var(--lcs-accent)" }}>
                 Set thesis →
               </Link>
             </>
@@ -53,7 +48,8 @@ export function ProfileCompletionBanner({ variant, percent }: ProfileCompletionB
       </div>
       <button
         onClick={() => markStep(dismissKey, true)}
-        className="grid h-6 w-6 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+        className="grid h-6 w-6 shrink-0 place-items-center transition-colors"
+        style={{ color: "var(--lcs-ink-muted)" }}
         title="Dismiss"
       >
         <X className="h-3.5 w-3.5" />
