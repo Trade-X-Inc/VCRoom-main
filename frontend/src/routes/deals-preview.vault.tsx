@@ -57,11 +57,20 @@ import {
 // and porting both here would duplicate rather than extract). Also
 // excluded: Source Files and Document Privacy Settings (two of the real
 // file's four views) — flagged as a real scope note, not silently
-// dropped: privacy settings folds into the founder profile's own
-// section-visibility screen already built (Full Profile checkpoint),
-// and Source Files is a raw-upload list with no template structure of
-// its own, out of scope for the structured-template rebuild this
-// checkpoint is about.
+// dropped. Confirmed by reading the real privacy-settings view (lines
+// 1321-1379) before excluding it, not assumed: it is NOT the founder-
+// profile section-visibility control (a separate real system gating
+// public-profile sections like "team"/"financials") — it's a second
+// surface for the exact same founder_documents.visibility toggle this
+// screen already has live on every checklist card (all four real
+// visibility writers in app.documents.tsx, lines 997/1114/1231/1354,
+// write the identical column/value pair). Privacy Settings' own two
+// sections are just that toggle re-listed for Source Files and the
+// digital-document-vault detail view — both out of scope here, so there
+// is no separate mechanism left to build; the toggle itself is already
+// ported and verified working. Source Files is a raw-upload list with no
+// template structure of its own, out of scope for the structured-
+// template rebuild this checkpoint is about.
 
 const VIEWER_ROLE_KEY = "lcs-viewer-role";
 const CATEGORY_ORDER: LcsDocCategory[] = ["market", "financials", "team", "product", "legal"];
@@ -152,7 +161,10 @@ function DocumentVault() {
           <LcsNavItem to="/deals-preview" label="Transactions" collapsed={collapsed} icon="T" />
           <LcsNavItem to="/deals-preview/requests" label="Requests" collapsed={collapsed} icon="R" />
           {role === "founder" && (
+            <>
             <LcsNavItem to="/deals-preview/profile" label="Profile" collapsed={collapsed} icon="C" />
+            <LcsNavItem to="/deals-preview/analytics" label="Analytics" collapsed={collapsed} icon="A" />
+            </>
           )}
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview/vault" label="Documents" active collapsed={collapsed} icon="D" />

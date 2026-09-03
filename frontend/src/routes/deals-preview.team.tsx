@@ -87,7 +87,10 @@ function TeamManagement() {
           <LcsNavItem to="/deals-preview" label="Transactions" collapsed={collapsed} icon="T" />
           <LcsNavItem to="/deals-preview/requests" label="Requests" collapsed={collapsed} icon="R" />
           {role === "founder" && (
+            <>
             <LcsNavItem to="/deals-preview/profile" label="Profile" collapsed={collapsed} icon="C" />
+            <LcsNavItem to="/deals-preview/analytics" label="Analytics" collapsed={collapsed} icon="A" />
+            </>
           )}
           <LcsNavItem to="/deals-preview" label="Investors" collapsed={collapsed} icon="I" />
           <LcsNavItem to="/deals-preview/vault" label="Documents" collapsed={collapsed} icon="D" />

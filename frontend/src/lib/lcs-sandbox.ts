@@ -2008,3 +2008,74 @@ export function toggleDocDealRoomVisibility(slug: string): LcsFounderDocument | 
   writeFounderDocuments(docs);
   return doc;
 }
+
+// Profile Analytics — real screen extraction (3 Sep 2026). Source:
+// app.profile.tsx's "analytics" tab (lines 353-393 for the query/
+// aggregation logic, lines 1507-1636 for the render). Genuinely
+// first-party page-view metrics — confirmed clean, no scoring/ranking/
+// recommendation residue anywhere in this slice (checked specifically,
+// per the pattern already found twice elsewhere in this codebase: no
+// computed score, no AI-assigned label, no investor-facing rank — every
+// number here is a plain count, average, or percentage-of-total derived
+// directly from raw view events). Real fields kept: viewer name/fund
+// (when known), viewer role (rendered as a plain label, not a score),
+// referrer-derived source, view duration, relative timestamp. Real
+// aggregates kept: total views, unique visitors, average duration,
+// last-7-days count, 30-day daily time series, source breakdown.
+export interface LcsProfileView {
+  id: string;
+  viewerName: string | null;
+  viewerFund: string | null;
+  viewerRole: "investor" | "founder" | null;
+  source: string;
+  durationSeconds: number | null;
+  createdAt: string;
+}
+
+const PROFILE_VIEWS_STORAGE_KEY = "lcs-sandbox-profile-views-v1";
+
+// Deliberately implausible seed data, same standard as every other
+// sandbox entity in this file (CLAUDE.md §20.15's §7.4 lesson) — round
+// numbers, generic fund names, spread across the last 30 days so the
+// time-series chart and "last 7 days" aggregate both render meaningfully
+// rather than as a single spike.
+function seedProfileViews(): LcsProfileView[] {
+  const now = Date.now();
+  const day = 86_400_000;
+  const rows: Array<Omit<LcsProfileView, "id" | "createdAt"> & { daysAgo: number }> = [
+    { viewerName: "Priya Shah", viewerFund: "Blue Horizon Ventures", viewerRole: "investor", source: "Direct", durationSeconds: 145, daysAgo: 0 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "LinkedIn", durationSeconds: 32, daysAgo: 0 },
+    { viewerName: "Marcus Webb", viewerFund: "Corvex Special Situations", viewerRole: "investor", source: "Direct", durationSeconds: 210, daysAgo: 1 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "X", durationSeconds: 18, daysAgo: 2 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "Direct", durationSeconds: 64, daysAgo: 3 },
+    { viewerName: "Dana Okafor", viewerFund: "Northlight Capital", viewerRole: "investor", source: "LinkedIn", durationSeconds: 98, daysAgo: 5 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "WhatsApp", durationSeconds: 12, daysAgo: 6 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "Direct", durationSeconds: 41, daysAgo: 9 },
+    { viewerName: "Priya Shah", viewerFund: "Blue Horizon Ventures", viewerRole: "investor", source: "Direct", durationSeconds: 180, daysAgo: 12 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "LinkedIn", durationSeconds: 27, daysAgo: 15 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "Other", durationSeconds: 8, daysAgo: 20 },
+    { viewerName: "Elena Vasquez", viewerFund: "Fieldstone Partners", viewerRole: "investor", source: "Direct", durationSeconds: 156, daysAgo: 24 },
+  ];
+  return rows.map((r, i) => ({
+    id: `pv-${i}`,
+    viewerName: r.viewerName,
+    viewerFund: r.viewerFund,
+    viewerRole: r.viewerRole,
+    source: r.source,
+    durationSeconds: r.durationSeconds,
+    createdAt: new Date(now - r.daysAgo * day).toISOString(),
+  }));
+}
+
+export function getProfileViews(): LcsProfileView[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PROFILE_VIEWS_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    const seeded = seedProfileViews();
+    window.localStorage.setItem(PROFILE_VIEWS_STORAGE_KEY, JSON.stringify(seeded));
+    return seeded;
+  } catch {
+    return [];
+  }
+}
