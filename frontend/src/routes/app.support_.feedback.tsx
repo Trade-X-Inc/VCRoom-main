@@ -1,12 +1,13 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Lock } from "lucide-react";
 import { LcsButton } from "@/components/lcs";
+import { SupportPreviewBanner } from "@/components/app/SupportPreviewBanner";
 
-export const Route = createFileRoute("/app/feedback")({
+export const Route = createFileRoute("/app/support_/feedback")({
   component: FeedbackPage,
 });
 
@@ -19,6 +20,19 @@ const FEATURES = [
   { id: "team_chat", label: "Team Chat & Tasks" },
   { id: "profile_builder", label: "Profile Builder" },
   { id: "due_diligence", label: "Due Diligence" },
+];
+
+// Invented preview content only — no points ledger, no earn/spend rules,
+// no redemption mechanism exists anywhere in the backend. Values below are
+// deliberately round/implausible (per CLAUDE.md §7.4's standing lesson: a
+// plausible placeholder is how invented content ships) and every
+// redemption item is disabled, not clickable, so nothing here can be
+// mistaken for a real action.
+const MOCK_CREDITS_BALANCE = 0;
+const MOCK_REDEMPTIONS = [
+  { label: "Priority support queue", cost: 100 },
+  { label: "Early access to new features", cost: 250 },
+  { label: "1:1 onboarding session", cost: 500 },
 ];
 
 function FeedbackPage() {
@@ -96,13 +110,13 @@ function FeedbackPage() {
   return (
     <div className="p-6 lg:p-8 max-w-2xl mx-auto">
       <div className="mb-8">
-        <button
-          onClick={() => navigate({ to: -1 as any })}
+        <Link
+          to="/app/support"
           className="inline-flex items-center gap-1.5 text-sm mb-4 transition-colors"
           style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
         >
-          <ArrowLeft className="h-4 w-4" /> Back
-        </button>
+          <ArrowLeft className="h-4 w-4" /> Back to Support
+        </Link>
         <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
           Share your feedback
         </h1>
@@ -217,6 +231,43 @@ function FeedbackPage() {
         >
           {loading ? "Sending…" : "Submit feedback"}
         </LcsButton>
+      </div>
+
+      {/* Credits — invented preview content, no real program exists.
+          Kept visually separate from the real feedback form above via the
+          banner, so nothing here is mistaken for a live balance. */}
+      <div className="mt-12 pt-8" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+        <h2 className="text-base font-bold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+          Credits
+        </h2>
+        <p className="text-sm mb-4" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+          A future program for earning credits by giving feedback, redeemable for perks.
+        </p>
+        <SupportPreviewBanner text="No credits program exists yet. The balance and redemption list below are invented placeholder content for visual review — nothing here is tracked, earned, or redeemable." />
+        <div className="border p-6 mb-4" style={{ borderColor: "var(--lcs-line)" }}>
+          <div className="text-xs mb-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Your balance</div>
+          <div className="text-2xl font-bold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-data)" }}>
+            {MOCK_CREDITS_BALANCE} credits
+          </div>
+        </div>
+        <div className="border" style={{ borderColor: "var(--lcs-line)" }}>
+          <div className="px-4 py-3 text-sm font-semibold" style={{ borderBottom: "1px solid var(--lcs-line)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+            Redeem
+          </div>
+          {MOCK_REDEMPTIONS.map((r, i) => (
+            <div
+              key={r.label}
+              className="flex items-center justify-between px-4 py-3"
+              style={{ borderTop: i > 0 ? "1px solid var(--lcs-line)" : undefined }}
+            >
+              <span className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{r.label}</span>
+              <span className="flex items-center gap-2 text-xs" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
+                {r.cost} credits
+                <Lock className="h-3 w-3" />
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

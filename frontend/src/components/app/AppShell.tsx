@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 import {
-  MessageCircle, Search, Settings, ChevronDown, ChevronRight,
+  LifeBuoy, Search, Settings, ChevronDown, ChevronRight,
   ArrowLeft, Sparkles, UserCircle2,
 } from "lucide-react";
 import {
@@ -227,7 +227,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
       !path.startsWith("/app/messages") &&
       !path.startsWith("/app/member-profile") &&
       !path.startsWith("/app/audit") &&
-      !path.startsWith("/app/feedback");
+      !path.startsWith("/app/support");
     const founderOutOfBounds = !isInvestor && path.startsWith("/app/investor") && !path.startsWith("/app/member-profile");
     if (investorOutOfBounds && lastRedirectRef.current !== "investor") {
       lastRedirectRef.current = "investor";
@@ -551,13 +551,13 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                         </Link>
                       )}
                       <Link
-                        to={"/app/feedback" as any}
-                        aria-label="Feedback"
+                        to={"/app/support" as any}
+                        aria-label="Support"
                         className="w-full flex items-center gap-2.5 text-sm transition-colors"
                         style={{ borderRadius: "var(--v2-radius)", padding: "8px 10px", color: "var(--v2-ink-muted)" }}
                       >
-                        <MessageCircle className="h-4 w-4" />
-                        <span>Feedback</span>
+                        <LifeBuoy className="h-4 w-4" />
+                        <span>Support</span>
                       </Link>
                     </>
                   )}

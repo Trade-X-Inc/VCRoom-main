@@ -71,6 +71,7 @@ import { Route as CompanyAboutRouteImport } from './routes/company.about'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppTeamChatRouteImport } from './routes/app.team-chat'
+import { Route as AppSupportRouteImport } from './routes/app.support'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
@@ -80,7 +81,6 @@ import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMemberProfileRouteImport } from './routes/app.member-profile'
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
 import { Route as AppHomeRouteImport } from './routes/app.home'
-import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppCloseRouteImport } from './routes/app.close'
@@ -115,6 +115,7 @@ import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-prev
 import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
 import { Route as DealsPreviewProfileAchievementsRouteImport } from './routes/deals-preview.profile_.achievements'
 import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
+import { Route as AppSupportFeedbackRouteImport } from './routes/app.support_.feedback'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
@@ -503,6 +504,11 @@ const AppTeamChatRoute = AppTeamChatRouteImport.update({
   path: '/team-chat',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSupportRoute = AppSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -546,11 +552,6 @@ const AppInvestorRoute = AppInvestorRouteImport.update({
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppFeedbackRoute = AppFeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDocumentsRoute = AppDocumentsRouteImport.update({
@@ -726,6 +727,11 @@ const DealsPreviewSectorInstrumentRoute =
     path: '/deals-preview/$sector/$instrument',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AppSupportFeedbackRoute = AppSupportFeedbackRouteImport.update({
+  id: '/support_/feedback',
+  path: '/support/feedback',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
   id: '/security',
   path: '/security',
@@ -1175,7 +1181,6 @@ export interface FileRoutesByFullPath {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/member-profile': typeof AppMemberProfileRoute
@@ -1185,6 +1190,7 @@ export interface FileRoutesByFullPath {
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
+  '/app/support': typeof AppSupportRoute
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -1263,6 +1269,7 @@ export interface FileRoutesByFullPath {
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/app/support/feedback': typeof AppSupportFeedbackRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
   '/deals-preview/profile/achievements': typeof DealsPreviewProfileAchievementsRoute
   '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
@@ -1358,7 +1365,6 @@ export interface FileRoutesByTo {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
@@ -1367,6 +1373,7 @@ export interface FileRoutesByTo {
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
+  '/app/support': typeof AppSupportRoute
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -1445,6 +1452,7 @@ export interface FileRoutesByTo {
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/app/support/feedback': typeof AppSupportFeedbackRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
   '/deals-preview/profile/achievements': typeof DealsPreviewProfileAchievementsRoute
   '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
@@ -1542,7 +1550,6 @@ export interface FileRoutesById {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/member-profile': typeof AppMemberProfileRoute
@@ -1552,6 +1559,7 @@ export interface FileRoutesById {
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
+  '/app/support': typeof AppSupportRoute
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -1630,6 +1638,7 @@ export interface FileRoutesById {
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/app/support_/feedback': typeof AppSupportFeedbackRoute
   '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
   '/deals-preview/profile_/achievements': typeof DealsPreviewProfileAchievementsRoute
   '/deals-preview/profile_/full': typeof DealsPreviewProfileFullRoute
@@ -1728,7 +1737,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/documents'
-    | '/app/feedback'
     | '/app/home'
     | '/app/investor'
     | '/app/member-profile'
@@ -1738,6 +1746,7 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/settings'
+    | '/app/support'
     | '/app/team-chat'
     | '/app/users'
     | '/auth/callback'
@@ -1816,6 +1825,7 @@ export interface FileRouteTypes {
     | '/app/settings/billing'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/app/support/feedback'
     | '/deals-preview/$sector/$instrument'
     | '/deals-preview/profile/achievements'
     | '/deals-preview/profile/full'
@@ -1911,7 +1921,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/documents'
-    | '/app/feedback'
     | '/app/home'
     | '/app/member-profile'
     | '/app/messages'
@@ -1920,6 +1929,7 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/settings'
+    | '/app/support'
     | '/app/team-chat'
     | '/app/users'
     | '/auth/callback'
@@ -1998,6 +2008,7 @@ export interface FileRouteTypes {
     | '/app/settings/billing'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/app/support/feedback'
     | '/deals-preview/$sector/$instrument'
     | '/deals-preview/profile/achievements'
     | '/deals-preview/profile/full'
@@ -2094,7 +2105,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/documents'
-    | '/app/feedback'
     | '/app/home'
     | '/app/investor'
     | '/app/member-profile'
@@ -2104,6 +2114,7 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/settings'
+    | '/app/support'
     | '/app/team-chat'
     | '/app/users'
     | '/auth/callback'
@@ -2182,6 +2193,7 @@ export interface FileRouteTypes {
     | '/app/settings/billing'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/app/support_/feedback'
     | '/deals-preview/$sector/$instrument'
     | '/deals-preview/profile_/achievements'
     | '/deals-preview/profile_/full'
@@ -2775,6 +2787,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamChatRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/support': {
+      id: '/app/support'
+      path: '/support'
+      fullPath: '/app/support'
+      preLoaderRoute: typeof AppSupportRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/settings': {
       id: '/app/settings'
       path: '/settings'
@@ -2836,13 +2855,6 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/app/home'
       preLoaderRoute: typeof AppHomeRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/feedback': {
-      id: '/app/feedback'
-      path: '/feedback'
-      fullPath: '/app/feedback'
-      preLoaderRoute: typeof AppFeedbackRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/documents': {
@@ -3082,6 +3094,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/deals-preview/$sector/$instrument'
       preLoaderRoute: typeof DealsPreviewSectorInstrumentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/support_/feedback': {
+      id: '/app/support_/feedback'
+      path: '/support/feedback'
+      fullPath: '/app/support/feedback'
+      preLoaderRoute: typeof AppSupportFeedbackRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/settings/security': {
       id: '/app/settings/security'
@@ -3769,7 +3788,6 @@ interface AppRouteChildren {
   AppCloseRoute: typeof AppCloseRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
-  AppFeedbackRoute: typeof AppFeedbackRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
   AppMemberProfileRoute: typeof AppMemberProfileRoute
@@ -3779,6 +3797,7 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppProfileBuilderRoute: typeof AppProfileBuilderRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
+  AppSupportRoute: typeof AppSupportRoute
   AppTeamChatRoute: typeof AppTeamChatRoute
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -3790,6 +3809,7 @@ interface AppRouteChildren {
   AppDealRoomsReportsVaultRoute: typeof AppDealRoomsReportsVaultRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
+  AppSupportFeedbackRoute: typeof AppSupportFeedbackRoute
   AppAdvisorPreviewIndexRoute: typeof AppAdvisorPreviewIndexRoute
   AppDealRoomsIndexRoute: typeof AppDealRoomsIndexRoute
   AppGoLiveIndexRoute: typeof AppGoLiveIndexRoute
@@ -3819,7 +3839,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCloseRoute: AppCloseRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocumentsRoute: AppDocumentsRoute,
-  AppFeedbackRoute: AppFeedbackRoute,
   AppHomeRoute: AppHomeRoute,
   AppInvestorRoute: AppInvestorRouteWithChildren,
   AppMemberProfileRoute: AppMemberProfileRoute,
@@ -3829,6 +3848,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppProfileBuilderRoute: AppProfileBuilderRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
+  AppSupportRoute: AppSupportRoute,
   AppTeamChatRoute: AppTeamChatRoute,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
@@ -3840,6 +3860,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDealRoomsReportsVaultRoute: AppDealRoomsReportsVaultRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
+  AppSupportFeedbackRoute: AppSupportFeedbackRoute,
   AppAdvisorPreviewIndexRoute: AppAdvisorPreviewIndexRoute,
   AppDealRoomsIndexRoute: AppDealRoomsIndexRoute,
   AppGoLiveIndexRoute: AppGoLiveIndexRoute,
