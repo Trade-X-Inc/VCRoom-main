@@ -267,7 +267,7 @@ test.describe("UI-FIX-2: Theme + route fixes", () => {
     await injectSession(ctx, investorSession, "light");
     const page = await ctx.newPage();
 
-    await page.goto(`${APP}/app/feedback`, { waitUntil: "networkidle" });
+    await page.goto(`${APP}/app/support/feedback`, { waitUntil: "networkidle" });
     await waitForLoad(page);
 
     console.log("\n── TEST 6 RESULT ──");

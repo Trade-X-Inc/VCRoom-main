@@ -107,7 +107,7 @@ test.describe("UI-FIX-3: Feedback, intake, workstation, deal room", () => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
 
-    await page.goto(`${APP}/app/feedback`, { waitUntil: "networkidle" });
+    await page.goto(`${APP}/app/support/feedback`, { waitUntil: "networkidle" });
     await waitForLoad(page);
 
     console.log("\n── TEST 1 RESULT ──");
