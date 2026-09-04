@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
+import { LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
 
 // R9 (c) — Deal Rooms › Team Assignments (investor). No per-room assignment
 // table exists on the investor side today (that's a founder-only concept via
@@ -37,18 +38,34 @@ function InvestorTeamAssignmentsPage() {
   });
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Investor" }, { label: "Deal Rooms" }, { label: "Team Assignments" }]}
-      title="Team Assignments"
-      description="Your team roster. Per-room assignment isn't available yet — manage room access from inside each deal room."
-    >
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Investor</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Deal Rooms</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Team Assignments</span>
+      </div>
+      <LcsPageHeader
+        title="Team Assignments"
+        description="Your team roster. Per-room assignment isn't available yet — manage room access from inside each deal room."
+      />
       {isLoading ? (
-        <EmptyState kind="loading" title="Loading" />
+        <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : members.length === 0 ? (
-        <EmptyState
-          kind="empty"
+        <LcsEmptyState
           title="No team members yet"
-          action={{ label: "Manage team", href: "/app/investor/team" }}
+          text="People you add to your team appear here."
+          action={
+            <a href="/app/investor/team">
+              <LcsButton variant="secondary">Manage team</LcsButton>
+            </a>
+          }
         />
       ) : (
         <div className="rounded-none border border-border/60 bg-card divide-y divide-border/60">
@@ -70,6 +87,6 @@ function InvestorTeamAssignmentsPage() {
       <div className="mt-4 text-xs text-muted-foreground">
         <Link to={"/app/investor/team" as any} className="text-brand hover:underline">Manage team roster →</Link>
       </div>
-    </PageFrame>
+    </div>
   );
 }

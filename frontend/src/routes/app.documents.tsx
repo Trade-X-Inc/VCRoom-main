@@ -1,7 +1,8 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import {
   FileText, CheckCircle2, AlertCircle, Zap,
   ArrowRight, ChevronDown, Loader2, X, Upload, Trash2,
+  ChevronRight,
 } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
 import { useMemo, useState } from "react";
@@ -10,7 +11,7 @@ import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -726,7 +727,16 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     <div className="flex flex-col h-full overflow-hidden">
     <div className="flex-1 overflow-y-auto p-6 lg:p-8">
       {/* Header */}
-      <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Documents" }]} />
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <Link to={"/app/prepare" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+          Your raise
+        </Link>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Documents</span>
+      </div>
       <div className="flex items-start justify-between gap-6 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
@@ -881,7 +891,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
               </button>
             )}
             {filteredDocs.length === 0 ? (
-              <EmptyState kind="empty" title="No documents" />
+              <LcsEmptyState title="No documents" text="Documents you add appear here." />
             ) : (
               filteredDocs.map((template, i) => {
                 const showCategoryHeader = selectedCategory === "All" && (i === 0 || filteredDocs[i - 1].category !== template.category);
@@ -1072,7 +1082,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       {view === "source-files" && (
         <div className="space-y-3">
           {filteredDocs.length === 0 ? (
-            <EmptyState kind="empty" title="No files uploaded yet" />
+            <LcsEmptyState title="No files uploaded yet" text="Files you upload appear here." />
           ) : (
             filteredDocs.map((template, i) => {
               const showCategoryHeader = i === 0 || filteredDocs[i - 1].category !== template.category;
@@ -1195,7 +1205,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
             </div>
           )}
           {filteredDocs.length === 0 ? (
-            <EmptyState kind="empty" title="No processed documents yet" />
+            <LcsEmptyState title="No processed documents yet" text="Documents appear here once processing finishes." />
           ) : (
             filteredDocs.map((template, i) => {
               const showCategoryHeader = i === 0 || filteredDocs[i - 1].category !== template.category;
@@ -1336,7 +1346,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 <div className="text-sm font-semibold text-foreground">{label}</div>
                 <p className="text-xs mt-1 mb-3" style={{ color: "#71717A" }}>{description}</p>
                 {docsForSection.length === 0 ? (
-                  <EmptyState kind="empty" title="Nothing here yet" />
+                  <LcsEmptyState title="Nothing here yet" text="Documents in this section appear here." />
                 ) : (
                   <div className="rounded-none border border-border bg-white divide-y divide-border">
                     {docsForSection.map((template) => {

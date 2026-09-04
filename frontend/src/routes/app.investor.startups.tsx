@@ -33,7 +33,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState, LcsButton } from "@/components/lcs";
 import { RequestAccessButton } from "@/components/app/RequestAccessButton";
 
 export const Route = createFileRoute("/app/investor/startups")({
@@ -343,7 +343,16 @@ export function StartupsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/source" }, { label: "Watchlist" }]} />
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <Link to={"/app/investor/source" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+          Deal flow
+        </Link>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Watchlist</span>
+      </div>
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Startups</h1>
@@ -557,7 +566,9 @@ export function StartupsPage() {
 
             {/* Content — loading skeleton, empty state, or cards */}
             {platformLoading ? (
-              <EmptyState kind="loading" title="Loading" />
+              <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
             ) : (() => {
               const filteredLeads = platformLeads.filter((l: any) => {
                 if (regionFilter === "All") return true;
@@ -565,9 +576,13 @@ export function StartupsPage() {
               });
               if (filteredLeads.length === 0) {
                 return (
-                  <EmptyState
-                    kind={regionFilter !== "All" ? "no-results" : "empty"}
+                  <LcsEmptyState
                     title={regionFilter !== "All" ? `No ${regionFilter} startups` : "No platform leads"}
+                    text={
+                      regionFilter !== "All"
+                        ? "No startups match this region filter."
+                        : "Platform leads appear here."
+                    }
                   />
                 );
               }
@@ -640,12 +655,18 @@ export function StartupsPage() {
         )}
 
         {isLoading ? (
-          <EmptyState kind="loading" title="Loading" />
+          <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </div>
         ) : filteredWatchlist.length === 0 && (activeTab !== "All" || dealRoomStartups.length === 0) ? (
-          <EmptyState
-            kind="empty"
+          <LcsEmptyState
             title={`No ${activeTab.toLowerCase()} companies`}
-            action={{ label: "Add company", onClick: () => setShowAdd(true) }}
+            text="Companies you add to your watchlist appear here."
+            action={
+              <LcsButton variant="secondary" onClick={() => setShowAdd(true)}>
+                Add company
+              </LcsButton>
+            }
           />
         ) : viewMode === "list" ? (
           /* ── LIST VIEW ── */

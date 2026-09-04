@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS } from "@/lib/roles";
 import { supabase } from "@/lib/supabase";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/member/")({
   component: MemberOverview,
@@ -98,7 +98,7 @@ function MemberOverview() {
         {isLoading ? (
           <div style={{ height: 80, borderRadius: 10, background: "var(--accent)" }} />
         ) : assignedRooms.length === 0 ? (
-          <EmptyState kind="empty" title="No deal rooms" />
+          <LcsEmptyState title="No deal rooms" text="Deal rooms you are assigned to appear here." />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {assignedRooms.map((r) => {

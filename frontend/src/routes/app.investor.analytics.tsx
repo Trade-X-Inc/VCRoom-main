@@ -1,11 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { LazyChart } from "@/components/shared/LazyChart";
-import { ArrowUpRight, Download } from "lucide-react";
+import { ArrowUpRight, Download, ChevronRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
-import { color, font, radius, space, table as tableTokens } from "@/lib/design-tokens";
+import { LcsPageHeader, LcsEmptyState } from "@/components/lcs";
 import { downloadCsv } from "@/lib/csv-export";
 
 export const Route = createFileRoute("/app/investor/analytics")({
@@ -22,10 +21,10 @@ const FUNNEL_STAGES = ["Sourcing", "Reviewing", "Diligence", "Invested", "Passed
 
 function ChartCard({ title, children, empty }: { title: string; children?: React.ReactNode; empty?: string }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink, marginBottom: 16 }}>{title}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)", marginBottom: 16 }}>{title}</div>
       {empty ? (
-        <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: color.inkTertiary, textAlign: "center", padding: "0 24px" }}>{empty}</div>
+        <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--lcs-ink-muted)", textAlign: "center", padding: "0 24px" }}>{empty}</div>
       ) : (
         <div style={{ height: 260 }}>{children}</div>
       )}
@@ -35,14 +34,14 @@ function ChartCard({ title, children, empty }: { title: string; children?: React
 
 function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
   return (
-    <th style={{ textAlign: right ? "right" : "left", fontSize: 12, fontWeight: 500, color: color.inkTertiary, padding: "0 20px", height: 36, borderBottom: `1px solid ${color.border}` }}>
+    <th style={{ textAlign: right ? "right" : "left", fontSize: 12, fontWeight: 500, color: "var(--lcs-ink-muted)", padding: "0 20px", height: 36, borderBottom: `1px solid var(--lcs-line)` }}>
       {children}
     </th>
   );
 }
 function Td({ children, right }: { children: React.ReactNode; right?: boolean }) {
   return (
-    <td style={{ textAlign: right ? "right" : "left", fontSize: 13, color: color.ink, padding: "0 20px", height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder, fontVariantNumeric: right ? "tabular-nums" : undefined }}>
+    <td style={{ textAlign: right ? "right" : "left", fontSize: 13, color: "var(--lcs-ink)", padding: "0 20px", height: 44, borderBottom: "1px solid var(--lcs-line)", fontVariantNumeric: right ? "tabular-nums" : undefined }}>
       {children}
     </td>
   );
@@ -54,8 +53,8 @@ function ExportButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       style={{
         display: "inline-flex", alignItems: "center", gap: 6, height: 28, padding: "0 10px",
-        background: color.white, color: color.inkTertiary, border: `1px solid ${color.border}`,
-        borderRadius: radius.control, fontSize: 12, fontWeight: 500, cursor: "pointer",
+        background: "var(--lcs-white)", color: "var(--lcs-ink-muted)", border: `1px solid var(--lcs-line)`,
+        borderRadius: "var(--radius-lcs-control)", fontSize: 12, fontWeight: 500, cursor: "pointer",
       }}
     >
       <Download style={{ width: 12, height: 12 }} /> CSV
@@ -65,9 +64,9 @@ function ExportButton({ onClick }: { onClick: () => void }) {
 
 function TableSection({ title, onExport, children }: { title: string; onExport?: () => void; children: React.ReactNode }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-      <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>{title}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+      <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>{title}</div>
         {onExport && <ExportButton onClick={onExport} />}
       </div>
       {children}
@@ -77,14 +76,14 @@ function TableSection({ title, onExport, children }: { title: string; onExport?:
 
 function StatCard({ label, value, sub, empty }: { label: string; value: string | number; sub?: string; empty?: string }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary }}>{label}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 12, color: "var(--lcs-ink-muted)" }}>{label}</div>
       {empty ? (
-        <div style={{ marginTop: 10, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>{empty}</div>
+        <div style={{ marginTop: 10, fontSize: 12, color: "var(--lcs-ink-muted)", lineHeight: 1.5 }}>{empty}</div>
       ) : (
         <>
-          <div style={{ marginTop: 6, fontFamily: font.display, fontSize: 26, fontWeight: 700, color: color.ink, fontVariantNumeric: "tabular-nums" }}>{value}</div>
-          {sub && <div style={{ marginTop: 2, fontSize: 12, color: color.inkTertiary }}>{sub}</div>}
+          <div style={{ marginTop: 6, fontFamily: "var(--font-lcs-ui)", fontSize: 26, fontWeight: 700, color: "var(--lcs-ink)", fontVariantNumeric: "tabular-nums" }}>{value}</div>
+          {sub && <div style={{ marginTop: 2, fontSize: 12, color: "var(--lcs-ink-muted)" }}>{sub}</div>}
         </>
       )}
     </div>
@@ -175,20 +174,28 @@ function InvestorAnalytics() {
     .sort((a, b) => b.total - a.total);
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Investor" }, { label: "Analytics" }]}
-      title="Analytics"
-      description="Pipeline conversion, pass reasons, and sourcing performance."
-      actions={
-        <Link
-          to="/app/investor/overview"
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: color.white, color: color.ink, border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: font.body, textDecoration: "none" }}
-        >
-          Overview <ArrowUpRight style={{ width: 14, height: 14 }} />
-        </Link>
-      }
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Investor</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Analytics</span>
+      </div>
+      <LcsPageHeader
+        title="Analytics"
+        description="Pipeline conversion, pass reasons, and sourcing performance."
+        action={
+          <Link
+            to="/app/investor/overview"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "var(--lcs-white)", color: "var(--lcs-ink)", border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: "var(--font-lcs-ui)", textDecoration: "none" }}
+          >
+            Overview <ArrowUpRight style={{ width: 14, height: 14 }} />
+          </Link>
+        }
+      />
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           <StatCard label="Tracked companies" value={totalTracked} sub="in your pipeline" />
@@ -205,10 +212,10 @@ function InvestorAnalytics() {
           <LazyChart render={(R) => (
           <R.ResponsiveContainer width="100%" height="100%">
             <R.BarChart data={funnelSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <R.CartesianGrid stroke={color.border} vertical={false} />
-              <R.XAxis dataKey="stage" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-              <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+              <R.CartesianGrid stroke={"var(--lcs-line)"} vertical={false} />
+              <R.XAxis dataKey="stage" tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={{ stroke: "var(--lcs-line)" }} tickLine={false} />
+              <R.YAxis tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid var(--lcs-line)`, borderRadius: 0 }} />
               <R.Bar dataKey="count" fill="#7C3AED" />
             </R.BarChart>
           </R.ResponsiveContainer>
@@ -221,7 +228,7 @@ function InvestorAnalytics() {
             onExport={passReasonRows.length > 0 ? () => downloadCsv("pass-reason-breakdown", ["Category", "Count"], passReasonRows.map(([cat, count]) => [cat, count])) : undefined}
           >
             {passReasonRows.length === 0 ? (
-              <EmptyState kind="empty" title="No pass reasons recorded yet" />
+              <LcsEmptyState title="No pass reasons recorded yet" text="Reasons appear here once you record a pass." />
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -247,7 +254,7 @@ function InvestorAnalytics() {
             onExport={sourceRows.length > 0 ? () => downloadCsv("source-performance", ["Source", "Tracked", "Invested", "Rate"], sourceRows.map((s) => [s.source, s.total, s.invested, `${s.rate}%`])) : undefined}
           >
             {sourceRows.length === 0 ? (
-              <EmptyState kind="empty" title="No data yet — add a source when you track a company" />
+              <LcsEmptyState title="No data yet" text="Add a source when you track a company." />
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -278,7 +285,7 @@ function InvestorAnalytics() {
           onExport={daysInStageRows.length > 0 ? () => downloadCsv("days-in-stage", ["Stage", "Count", "Avg days"], daysInStageRows.map((r) => [r.stage, r.count, r.avgDays])) : undefined}
         >
           {daysInStageRows.length === 0 ? (
-            <EmptyState kind="empty" title="No data yet — appears once entries move past Sourcing" />
+            <LcsEmptyState title="No data yet" text="Conversion appears once entries move past Sourcing." />
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
@@ -301,6 +308,6 @@ function InvestorAnalytics() {
           )}
         </TableSection>
       </div>
-    </PageFrame>
+    </div>
   );
 }

@@ -5,8 +5,7 @@ import { LazyChart } from "@/components/shared/LazyChart";
 import { ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
-import { color, font, radius, space, table as tableTokens } from "@/lib/design-tokens";
+import { LcsPageHeader, LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/analytics")({
   component: FounderAnalytics,
@@ -14,10 +13,10 @@ export const Route = createFileRoute("/app/analytics")({
 
 function ChartCard({ title, children, empty }: { title: string; children?: React.ReactNode; empty?: string }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink, marginBottom: 16 }}>{title}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)", marginBottom: 16 }}>{title}</div>
       {empty ? (
-        <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: color.inkTertiary, textAlign: "center", padding: "0 24px" }}>{empty}</div>
+        <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--lcs-ink-muted)", textAlign: "center", padding: "0 24px" }}>{empty}</div>
       ) : (
         <div style={{ height: 260 }}>{children}</div>
       )}
@@ -27,14 +26,14 @@ function ChartCard({ title, children, empty }: { title: string; children?: React
 
 function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
   return (
-    <th style={{ textAlign: right ? "right" : "left", fontSize: 12, fontWeight: 500, color: color.inkTertiary, padding: "0 20px", height: 36, borderBottom: `1px solid ${color.border}` }}>
+    <th style={{ textAlign: right ? "right" : "left", fontSize: 12, fontWeight: 500, color: "var(--lcs-ink-muted)", padding: "0 20px", height: 36, borderBottom: `1px solid var(--lcs-line)` }}>
       {children}
     </th>
   );
 }
 function Td({ children, right }: { children: React.ReactNode; right?: boolean }) {
   return (
-    <td style={{ textAlign: right ? "right" : "left", fontSize: 13, color: color.ink, padding: "0 20px", height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder, fontVariantNumeric: right ? "tabular-nums" : undefined }}>
+    <td style={{ textAlign: right ? "right" : "left", fontSize: 13, color: "var(--lcs-ink)", padding: "0 20px", height: 44, borderBottom: "1px solid var(--lcs-line)", fontVariantNumeric: right ? "tabular-nums" : undefined }}>
       {children}
     </td>
   );
@@ -163,41 +162,47 @@ function FounderAnalytics() {
   const sourceRows = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]);
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Analytics" }]}
-      title="Analytics"
-      description="How investors are engaging with your profile and deal rooms."
-      actions={
-        <Link
-          to="/app/overview"
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: color.white, color: color.ink, border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: font.body, textDecoration: "none" }}
-        >
-          Overview <ArrowUpRight style={{ width: 14, height: 14 }} />
-        </Link>
-      }
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Analytics</span>
+      </div>
+      <LcsPageHeader
+        title="Analytics"
+        description="How investors are engaging with your profile and deal rooms."
+        action={
+          <Link
+            to="/app/overview"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "var(--lcs-white)", color: "var(--lcs-ink)", border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: "var(--font-lcs-ui)", textDecoration: "none" }}
+          >
+            Overview <ArrowUpRight style={{ width: 14, height: 14 }} />
+          </Link>
+        }
+      />
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
         <ChartCard title="Profile views (30 days)" empty={totalViews === 0 ? "No data yet — publish your profile to start tracking views" : undefined}>
           <LazyChart render={(R) => (
           <R.ResponsiveContainer width="100%" height="100%">
             <R.AreaChart data={viewsSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <R.CartesianGrid stroke={color.border} vertical={false} />
-              <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} interval={4} />
-              <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+              <R.CartesianGrid stroke={"var(--lcs-line)"} vertical={false} />
+              <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={{ stroke: "var(--lcs-line)" }} tickLine={false} interval={4} />
+              <R.YAxis tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid var(--lcs-line)`, borderRadius: 0 }} />
               <R.Area type="monotone" dataKey="views" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.08} strokeWidth={2} />
             </R.AreaChart>
           </R.ResponsiveContainer>
           )} />
         </ChartCard>
 
-        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Engagement by deal room</div>
+        <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+            <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Engagement by deal room</div>
           </div>
           {roomRows.length === 0 ? (
-            <EmptyState kind="empty" title="No deal rooms yet" />
+            <LcsEmptyState title="No deal rooms yet" text="Engagement appears here once you open a deal room." />
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
@@ -227,12 +232,12 @@ function FounderAnalytics() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Document performance</div>
+          <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+              <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Document performance</div>
             </div>
             {docRows.length === 0 ? (
-              <EmptyState kind="empty" title="No document views yet" />
+              <LcsEmptyState title="No document views yet" text="Document engagement appears here once investors open your documents." />
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -255,12 +260,12 @@ function FounderAnalytics() {
             )}
           </div>
 
-          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Source breakdown</div>
+          <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+              <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Source breakdown</div>
             </div>
             {sourceRows.length === 0 ? (
-              <EmptyState kind="empty" title="No data yet — source tracking appears once profile views come in" />
+              <LcsEmptyState title="No data yet" text="Source tracking appears once profile views come in." />
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -282,6 +287,6 @@ function FounderAnalytics() {
           </div>
         </div>
       </div>
-    </PageFrame>
+    </div>
   );
 }

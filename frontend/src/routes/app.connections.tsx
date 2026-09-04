@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/connections")({
   component: ConnectionRequestsPage,
@@ -117,9 +117,11 @@ export function ConnectionRequestsPage() {
       </div>
 
       {isLoading ? (
-        <EmptyState kind="loading" title="Loading" />
+        <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : requests.length === 0 ? (
-        <EmptyState kind="empty" title="No connection requests" />
+        <LcsEmptyState title="No connection requests" text="Requests from investors to connect appear here." />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {requests.map((r: any) => {

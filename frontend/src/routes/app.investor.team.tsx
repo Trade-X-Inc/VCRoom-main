@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
 import { INVESTOR_ROLES, INVESTOR_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 import { PermissionGate } from "@/components/app/PermissionGate";
 
 export const Route = createFileRoute("/app/investor/team")({
@@ -283,9 +283,11 @@ function InvestorTeamPage() {
         </div>
 
         {loadingMembers ? (
-          <EmptyState kind="loading" title="Loading" />
+          <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </div>
         ) : members.length === 0 ? (
-          <EmptyState kind="empty" title="No team members" />
+          <LcsEmptyState title="No team members" text="People you invite to your team appear here." />
         ) : (
           members.map((m) => {
             const profileFirst = m.team_member_profiles?.first_name ?? "";

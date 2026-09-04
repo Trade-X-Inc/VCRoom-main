@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LazyChart } from "@/components/shared/LazyChart";
@@ -7,6 +7,7 @@ import {
   Eye, Edit3, Download, Zap, AlignLeft, AlertTriangle, Copy, Sparkles, BarChart3,
   Shield, Briefcase, TrendingUp, DollarSign, CheckCircle2,
   Linkedin, Twitter, Instagram, Target, Save, RefreshCw,
+  ChevronRight,
 } from "lucide-react";
 import type { FounderThesis } from "@/lib/founder-thesis-fn";
 import { PageGuide } from "@/components/app/PageGuide";
@@ -14,7 +15,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
@@ -856,7 +857,16 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         `}</style>
 
         <div className="p-6 lg:p-8">
-          <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Profile" }]} />
+          <div
+            className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+            style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+          >
+            <Link to={"/app/prepare" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+              Your raise
+            </Link>
+            <ChevronRight style={{ width: 12, height: 12 }} />
+            <span>Profile</span>
+          </div>
           <div className="flex items-center justify-between flex-wrap gap-3 mb-6 no-print">
             <div>
               <h1 className="text-lg font-bold tracking-tight">Company Profile</h1>
@@ -1008,7 +1018,16 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
 
   return (
     <div className="p-6 lg:p-8">
-      <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Profile" }]} />
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <Link to={"/app/prepare" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+          Your raise
+        </Link>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Profile</span>
+      </div>
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-lg font-bold tracking-tight">{startup ? "Edit profile" : "Create your profile"}</h1>
@@ -1566,7 +1585,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               </div>
 
               {totalViews === 0 ? (
-                <EmptyState kind="empty" title="No views yet" />
+                <LcsEmptyState title="No views yet" text="Views of your public profile appear here." />
               ) : (
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Traffic sources */}
@@ -2874,9 +2893,11 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
       )}
 
       {isLoading ? (
-        <EmptyState kind="loading" title="Loading" />
+        <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : members.length === 0 ? (
-        <EmptyState kind="empty" title="No team members" />
+        <LcsEmptyState title="No team members" text="People you add to your team appear here." />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {members.map((m) => {

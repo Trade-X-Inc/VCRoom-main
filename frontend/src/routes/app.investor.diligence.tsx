@@ -5,8 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { getDDSummaryForInvestor } from "@/lib/dd-fn";
 import {
   CheckCircle2, ClipboardCheck, Loader2, ArrowRight, Building2, ExternalLink,
+  ChevronRight,
 } from "lucide-react";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/investor/diligence")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -63,14 +64,27 @@ export function DiligencePage() {
   const dealRooms = summary?.dealRooms ?? [];
 
   if (isLoading) {
-    return <EmptyState kind="loading" title="Loading" />;
+    return (
+      <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+        <Loader2 className="h-5 w-5 animate-spin" />
+      </div>
+    );
   }
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
       <div>
-        <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "Due diligence" }]} />
+        <div
+          className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+          style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+        >
+          <Link to={"/app/investor/evaluate" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+            Deal flow
+          </Link>
+          <ChevronRight style={{ width: 12, height: 12 }} />
+          <span>Due diligence</span>
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
           Due Diligence
         </h1>
@@ -147,7 +161,7 @@ export function DiligencePage() {
           })}
         </div>
       ) : (
-        <EmptyState kind="empty" title="No deal rooms" />
+        <LcsEmptyState title="No deal rooms" text="Deal rooms you have access to appear here." />
       )}
 
       {/* Watchlist entries in Diligence with no deal room */}
@@ -198,7 +212,7 @@ export function DiligencePage() {
       )}
 
       {dealRooms.length === 0 && watchlistDiligence.length === 0 && !isLoading && (
-        <EmptyState kind="empty" title="Nothing in diligence" />
+        <LcsEmptyState title="Nothing in diligence" text="Companies you move into diligence appear here." />
       )}
     </div>
   );

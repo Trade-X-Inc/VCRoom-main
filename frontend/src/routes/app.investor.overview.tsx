@@ -3,12 +3,11 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { LazyChart } from "@/components/shared/LazyChart";
-import { ArrowRight, ArrowUpRight, Clock3 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Clock3, ChevronRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
-import { color, font, radius, space, table as tableTokens } from "@/lib/design-tokens";
+import { LcsPageHeader, LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/investor/overview")({
   component: InvestorOverview,
@@ -53,14 +52,14 @@ function safeActivityLabel(action: string): string {
 
 function StatCard({ label, value, sub, empty }: { label: string; value: string | number; sub?: string; empty?: string }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary }}>{label}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 12, color: "var(--lcs-ink-muted)" }}>{label}</div>
       {empty ? (
-        <div style={{ marginTop: 10, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>{empty}</div>
+        <div style={{ marginTop: 10, fontSize: 12, color: "var(--lcs-ink-muted)", lineHeight: 1.5 }}>{empty}</div>
       ) : (
         <>
-          <div style={{ marginTop: 6, fontFamily: font.display, fontSize: 26, fontWeight: 700, color: color.ink, fontVariantNumeric: "tabular-nums" }}>{value}</div>
-          {sub && <div style={{ marginTop: 2, fontSize: 12, color: color.inkTertiary }}>{sub}</div>}
+          <div style={{ marginTop: 6, fontFamily: "var(--font-lcs-ui)", fontSize: 26, fontWeight: 700, color: "var(--lcs-ink)", fontVariantNumeric: "tabular-nums" }}>{value}</div>
+          {sub && <div style={{ marginTop: 2, fontSize: 12, color: "var(--lcs-ink-muted)" }}>{sub}</div>}
         </>
       )}
     </div>
@@ -69,10 +68,10 @@ function StatCard({ label, value, sub, empty }: { label: string; value: string |
 
 function ChartCard({ title, children, empty }: { title: string; children?: React.ReactNode; empty?: string }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink, marginBottom: 16 }}>{title}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)", marginBottom: 16 }}>{title}</div>
       {empty ? (
-        <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: color.inkTertiary, textAlign: "center", padding: "0 24px" }}>{empty}</div>
+        <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--lcs-ink-muted)", textAlign: "center", padding: "0 24px" }}>{empty}</div>
       ) : (
         <div style={{ height: 220 }}>{children}</div>
       )}
@@ -264,43 +263,51 @@ function InvestorOverview() {
   });
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Investor" }, { label: "Overview" }]}
-      title="Overview"
-      description="What needs a decision, pipeline by stage, and recent activity."
-      actions={
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Investor</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Overview</span>
+      </div>
+      <LcsPageHeader
+        title="Overview"
+        description="What needs a decision, pipeline by stage, and recent activity."
+        action={
         <Link
           to="/app/investor/discover/deal-flow"
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control, padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: font.body, textDecoration: "none" }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, background: "#7C3AED", color: "#fff", border: "none", borderRadius: "var(--radius-lcs-control)", padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: "var(--font-lcs-ui)", textDecoration: "none" }}
         >
           Deal flow <ArrowUpRight style={{ width: 14, height: 14 }} />
         </Link>
-      }
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
+        }
+      />
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
         {/* Whose-move-is-it: stale deals waiting on investor action, first. */}
-        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Needs a decision</div>
+        <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+            <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Needs a decision</div>
           </div>
           {staleRooms.length === 0 && pendingApprovals.length === 0 ? (
-            <div style={{ padding: "16px 20px", fontSize: 12, color: color.inkTertiary }}>Nothing waiting on you.</div>
+            <div style={{ padding: "16px 20px", fontSize: 12, color: "var(--lcs-ink-muted)" }}>Nothing waiting on you.</div>
           ) : (
             <>
               {pendingApprovals.length > 0 && (
                 <Link
                   to="/app/investor/thesis/profile-builder/full-profile"
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none" }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid var(--lcs-line)`, textDecoration: "none" }}
                 >
                   <Clock3 style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
-                    <span style={{ fontSize: 13, color: color.ink }}>Profile changes</span>
-                    <span style={{ fontSize: 12, color: color.inkTertiary }}>
+                    <span style={{ fontSize: 13, color: "var(--lcs-ink)" }}>Profile changes</span>
+                    <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>
                       {pendingApprovals.length} {pendingApprovals.length === 1 ? "edit" : "edits"} awaiting approval
                     </span>
                   </div>
-                  <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
+                  <ArrowRight style={{ width: 12, height: 12, color: "var(--lcs-ink-muted)", flexShrink: 0 }} />
                 </Link>
               )}
               {staleRooms.map((r: any) => (
@@ -308,14 +315,14 @@ function InvestorOverview() {
                   key={r.id}
                   to="/app/deal-rooms/$id"
                   params={{ id: r.id }}
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none" }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 20px", height: 44, borderBottom: `1px solid var(--lcs-line)`, textDecoration: "none" }}
                 >
                   <Clock3 style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
-                    <span style={{ fontSize: 13, color: color.ink }}>{(r.startups as any)?.company_name ?? "Deal"}</span>
-                    <span style={{ fontSize: 12, color: color.inkTertiary }}>no decision update in 7+ days</span>
+                    <span style={{ fontSize: 13, color: "var(--lcs-ink)" }}>{(r.startups as any)?.company_name ?? "Deal"}</span>
+                    <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>no decision update in 7+ days</span>
                   </div>
-                  <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
+                  <ArrowRight style={{ width: 12, height: 12, color: "var(--lcs-ink-muted)", flexShrink: 0 }} />
                 </Link>
               ))}
             </>
@@ -323,16 +330,16 @@ function InvestorOverview() {
         </div>
 
         {/* Pipeline by stage — table, not a chart; a VC scans counts faster than bars. */}
-        <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-            <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Pipeline by stage</div>
+        <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+            <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Pipeline by stage</div>
           </div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <tbody>
               {pipelineSeries.map((s) => (
-                <tr key={s.stage} style={{ height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder }}>
-                  <td style={{ padding: "0 20px", fontSize: 13, color: color.ink }}>{s.stage}</td>
-                  <td style={{ padding: "0 20px", fontSize: 13, color: color.ink, textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>{s.count}</td>
+                <tr key={s.stage} style={{ height: 44, borderBottom: "1px solid var(--lcs-line)" }}>
+                  <td style={{ padding: "0 20px", fontSize: 13, color: "var(--lcs-ink)" }}>{s.stage}</td>
+                  <td style={{ padding: "0 20px", fontSize: 13, color: "var(--lcs-ink)", textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>{s.count}</td>
                 </tr>
               ))}
             </tbody>
@@ -358,28 +365,28 @@ function InvestorOverview() {
             <LazyChart render={(R) => (
             <R.ResponsiveContainer width="100%" height="100%">
               <R.LineChart data={matchesSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <R.CartesianGrid stroke={color.border} vertical={false} />
-                <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-                <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+                <R.CartesianGrid stroke={"var(--lcs-line)"} vertical={false} />
+                <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={{ stroke: "var(--lcs-line)" }} tickLine={false} />
+                <R.YAxis tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid var(--lcs-line)`, borderRadius: 0 }} />
                 <R.Line type="monotone" dataKey="matches" stroke="#7C3AED" strokeWidth={2} dot={false} />
               </R.LineChart>
             </R.ResponsiveContainer>
             )} />
           </ChartCard>
 
-          <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Recent activity</div>
+          <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+              <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Recent activity</div>
             </div>
             {activityItems.length === 0 ? (
-              <EmptyState kind="empty" title="No recent activity" />
+              <LcsEmptyState title="No recent activity" text="Recent activity across your deals appears here." />
             ) : (
               <div>
                 {activityItems.map((a) => (
-                  <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid ${color.border}` }}>
-                    <div style={{ fontSize: 13, color: color.ink }}>{a.label}</div>
-                    <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{a.sub} · {a.time}</div>
+                  <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+                    <div style={{ fontSize: 13, color: "var(--lcs-ink)" }}>{a.label}</div>
+                    <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 2 }}>{a.sub} · {a.time}</div>
                   </div>
                 ))}
               </div>
@@ -387,6 +394,6 @@ function InvestorOverview() {
           </div>
         </div>
       </div>
-    </PageFrame>
+    </div>
   );
 }

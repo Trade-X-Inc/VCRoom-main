@@ -1,6 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
-import { StatusDot } from "@/components/system";
+import { LcsStatusPill, type LcsStatus } from "@/components/lcs";
+
+/** v1 StatusDot tones → LCS status. LCS has no negative/red tone; attention
+ * amber covers it (CLAUDE.md §0 amendment, 1 Sep 2026). */
+const TONE_STATUS: Record<string, LcsStatus> = {
+  positive: "satisfied",
+  warning: "attention",
+  negative: "attention",
+  neutral: "pending",
+};
 
 /** /app/investor — the investor home. Four deal-flow steps, one spine. */
 
@@ -94,7 +103,7 @@ export function DealFlowHome() {
                 {m.metric && m.metric !== "0" && (
                   <span className="text-[13px] font-semibold tabular-nums">{m.metric}</span>
                 )}
-                <StatusDot tone={m.tone} label="" />
+                <LcsStatusPill status={TONE_STATUS[m.tone]} label="" />
               </div>
             </Link>
           );

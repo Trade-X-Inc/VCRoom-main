@@ -10,7 +10,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { DDAnalysisPanel } from "@/components/app/DDAnalysisPanel";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/diligence")({
@@ -512,7 +512,7 @@ function DiligencePage() {
 
           <div className="px-4 py-3 space-y-2">
             {filteredGoals.length === 0 && (
-              <EmptyState kind="empty" title="No goals" />
+              <LcsEmptyState title="No goals" text="Diligence goals for this room appear here." />
             )}
 
             {filteredGoals.map((goal: any) => {

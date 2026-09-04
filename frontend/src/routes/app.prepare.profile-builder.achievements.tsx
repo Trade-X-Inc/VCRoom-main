@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Loader2, Trophy } from "lucide-react";
+import { Plus, Trash2, Loader2, Trophy, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
+import { LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
 import { PermissionGate } from "@/components/app/PermissionGate";
 
 // R9 (c) — Prepare › Profile Builder › Achievements. Per user decision: an
@@ -141,36 +141,56 @@ function AchievementsEditor() {
   };
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Prepare" }, { label: "Profile Builder" }, { label: "Achievements" }]}
-      title="Achievements"
-      description="Individual, team, and company achievements — shown on your digital profile and in deal rooms."
-      actions={
-        startup?.id ? (
-          <div className="flex items-center gap-2">
-            {saving && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-            <button
-              onClick={cycleVisibility}
-              className="rounded-md border border-border/60 px-3 py-2 text-xs font-medium hover:bg-accent"
-            >
-              {VISIBILITY_LABELS[visibility]}
-            </button>
-            <button
-              onClick={addItem}
-              className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-3 py-2 text-sm font-medium"
-            >
-              <Plus className="h-4 w-4" /> Add achievement
-            </button>
-          </div>
-        ) : undefined
-      }
-    >
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Prepare</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Profile Builder</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Achievements</span>
+      </div>
+      <LcsPageHeader
+        title="Achievements"
+        description="Individual, team, and company achievements — shown on your digital profile and in deal rooms."
+        action={
+          startup?.id ? (
+            <div className="flex items-center gap-2">
+              {saving && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+              <button
+                onClick={cycleVisibility}
+                className="rounded-md border border-border/60 px-3 py-2 text-xs font-medium hover:bg-accent"
+              >
+                {VISIBILITY_LABELS[visibility]}
+              </button>
+              <button
+                onClick={addItem}
+                className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-3 py-2 text-sm font-medium"
+              >
+                <Plus className="h-4 w-4" /> Add achievement
+              </button>
+            </div>
+          ) : undefined
+        }
+      />
       {isLoading ? (
-        <EmptyState kind="loading" title="Loading" />
+        <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : !startup?.id ? (
-        <EmptyState kind="empty" title="Build your profile first" />
+        <LcsEmptyState title="Build your profile first" text="Add your company profile before adding achievements." />
       ) : items.length === 0 ? (
-        <EmptyState kind="empty" title="No achievements yet" action={{ label: "Add achievement", onClick: addItem }} />
+        <LcsEmptyState
+          title="No achievements yet"
+          text="Achievements you add appear here."
+          action={
+            <LcsButton variant="secondary" onClick={addItem}>
+              Add achievement
+            </LcsButton>
+          }
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {items.map((item, i) => (
@@ -223,6 +243,6 @@ function AchievementsEditor() {
           ))}
         </div>
       )}
-    </PageFrame>
+    </div>
   );
 }

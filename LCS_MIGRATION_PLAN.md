@@ -28,9 +28,19 @@ Two shared **v1 primitive layers** underpin nearly everything and are the real b
 
 ---
 
-## Group 5 — Shared v1 primitive layer
+## Group 5 — Shared v1 primitive layer — **CLOSED 4 Sep 2026**
 
 **Ordered first: pure dependency — 26 routes import these.**
+
+> **CLOSED.** `components/system/` (all 6 files + `index.ts`) and `lib/design-tokens.ts` deleted; all 28 real importers (one more than this document's original 26-count — `components/app/PermissionGate.tsx` imported via a deep path, `@/components/system/EmptyState`, invisible to the barrel-import grep that built the original list) migrated to real `@/components/lcs` primitives directly, using the exact mapping rules recorded below. One file, `routes/i.$slug.tsx`, turned out to be a **public-facing** route importing `design-tokens.ts` directly (out of scope for this internal-app migration per CLAUDE.md §9) — its two used values (`color`, `font` subsets) were inlined as a local const rather than touched structurally; verified live, side-by-side against production, pixel-identical before/after.
+>
+> The two Group-6-scoped deal-room files (`app.deal-rooms.$id.diligence.tsx`, `app.deal-rooms.$id.qa.tsx`) and the Group-10-scoped `app.roast.index.tsx` got **only** the mechanical primitive-import swap, confirmed by diff size (4-line diffs for the two deal-room files) — their broader v1 styling is untouched, left for their respective groups.
+>
+> **Verified:** `tsc` 55/55, error SET diffed against the pre-group baseline (not count alone) — every diff line was a pure line-number shift from added imports, zero new errors, confirmed independently by the orchestrating session, not just by the agent's self-report. Build clean, gzip 0.73 MB, action-split guard passed. Full-repo grep confirmed zero remaining references to either deleted module. Live-verified with real founder and investor sessions across multiple pages exercising the new primitives with real production data (`DealFlowHome`'s `LcsStatusPill` tone mapping, `app.investor.startups.tsx`'s watchlist table, `app.connections.tsx`'s empty state) — zero console errors throughout.
+>
+> **One real defect found and fixed during the swap, not a regression:** `app.investor.profile.tsx` had a pre-existing dead ternary, `color.ink === "#0A0A0B" ? "#7C3AED" : "#7C3AED"` — both branches already identical before the token substitution, so it was a no-op condition even in the original v1 code. Collapsed to the constant `"#7C3AED"` during the swap; behavior-identical, confirmed by reading both branches' literal values before accepting the change.
+>
+> No LCS primitive exists for `PageFrame`'s breadcrumb (`PageBreadcrumb`) or for `SectionLabel` — both inlined per-callsite as plain styled elements on `--lcs-*` tokens (the `SectionLabel` pattern matches the one already used in `app.messages.tsx`'s "CHANNELS"/"SECTIONS" labels), not built as new shared components, per instruction not to invent new primitives.
 
 | File | Lines |
 |---|---|

@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Brain, Loader2, Download, CheckCircle2, AlertTriangle, Lightbulb,
   FileText, Copy, Check as CheckIcon, RefreshCw, Save, Globe, Tag,
+  ChevronRight,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -13,7 +14,7 @@ import { PageGuide } from "@/components/app/PageGuide";
 import { generateInvestorMemo } from "@/lib/investor-memo-fn";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { Markdown } from "@/components/shared/LazyMarkdown";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/investor/analysis")({
   component: AnalysisPage,
@@ -231,7 +232,16 @@ Return this exact JSON shape:
 
   return (
     <div className="p-6 lg:p-8">
-      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/evaluate" }, { label: "AI analysis" }]} />
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <Link to={"/app/investor/evaluate" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+          Deal flow
+        </Link>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>AI analysis</span>
+      </div>
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">AI Analysis</h1>
@@ -362,11 +372,17 @@ Return this exact JSON shape:
 
           {/* Generating */}
           {generating && (
-            <EmptyState
-              kind="loading"
-              title="Analysing"
-              description={analysisStillWorking ? "Still working" : undefined}
-            />
+            <div
+              className="flex flex-col items-center justify-center gap-2 py-16"
+              style={{ color: "var(--lcs-ink-muted)" }}
+            >
+              <Loader2 className="h-5 w-5 animate-spin" />
+              {analysisStillWorking && (
+                <span className="text-[13px]" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+                  Still working
+                </span>
+              )}
+            </div>
           )}
 
           {/* Analysis error */}
@@ -530,11 +546,17 @@ Return this exact JSON shape:
                 <div className="px-5 py-3 text-sm text-destructive">{memoError}</div>
               )}
               {generatingMemo && !memoText && (
-                <EmptyState
-                  kind="loading"
-                  title="Writing memo"
-                  description={memoStillWorking ? "Still working" : undefined}
-                />
+                <div
+                  className="flex flex-col items-center justify-center gap-2 py-16"
+                  style={{ color: "var(--lcs-ink-muted)" }}
+                >
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  {memoStillWorking && (
+                    <span className="text-[13px]" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+                      Still working
+                    </span>
+                  )}
+                </div>
               )}
               {memoText && (
                 <div>

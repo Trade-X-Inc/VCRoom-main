@@ -25,7 +25,7 @@ import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
 import { AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { triggerDocumentUploadedEmail } from "@/lib/email/triggers";
 import { useGeneratedNdaDocs } from "@/lib/store";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/documents")({
@@ -900,7 +900,7 @@ function DocumentsPage() {
 
       {filteredDocs.length === 0 && activeDocTab === "All" && (
         <div className="flex flex-col items-center justify-center text-center">
-          <EmptyState kind="empty" title="No documents" />
+          <LcsEmptyState title="No documents" text="Documents shared in this deal room appear here." />
           {isFounder && (
             <label className="-mt-4 cursor-pointer">
               <V2Button variant="primary" style={{ pointerEvents: "none" }}>

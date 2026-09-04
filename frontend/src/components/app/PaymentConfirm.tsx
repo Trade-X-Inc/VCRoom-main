@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { CreditCard, Loader2 } from "lucide-react";
-import { brand, color, font, radius } from "@/lib/design-tokens";
 
 /**
  * R13 — the reusable payment-placeholder pattern (CLAUDE.md §32). Any
@@ -32,8 +31,8 @@ export function PaymentConfirm({
   return (
     <div
       style={{
-        border: `1px solid ${color.border}`,
-        background: color.white,
+        border: `1px solid var(--lcs-line)`,
+        background: "var(--lcs-white)",
         padding: 20,
         display: "flex",
         flexDirection: "column",
@@ -51,13 +50,13 @@ export function PaymentConfirm({
             flexShrink: 0,
           }}
         >
-          <CreditCard style={{ width: 16, height: 16, color: brand.flat }} />
+          <CreditCard style={{ width: 16, height: 16, color: "var(--lcs-accent)" }} />
         </div>
         <div>
-          <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>
+          <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>
             {feeLabel}
           </div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: color.ink, fontFamily: font.display }}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
             ${feeUsd}
           </div>
         </div>
@@ -65,8 +64,8 @@ export function PaymentConfirm({
 
       <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
         {terms.map((t, i) => (
-          <li key={i} style={{ fontSize: 12, color: color.inkSecondary, display: "flex", gap: 6, lineHeight: 1.5 }}>
-            <span style={{ color: color.inkTertiary }}>—</span>
+          <li key={i} style={{ fontSize: 12, color: "var(--lcs-ink-muted)", display: "flex", gap: 6, lineHeight: 1.5 }}>
+            <span style={{ color: "var(--lcs-ink-muted)" }}>—</span>
             {t}
           </li>
         ))}
@@ -79,12 +78,12 @@ export function PaymentConfirm({
           onChange={(e) => setAccepted(e.target.checked)}
           style={{ height: 14, width: 14 }}
         />
-        <span style={{ fontSize: 12, fontWeight: 500, color: color.ink }}>
+        <span style={{ fontSize: 12, fontWeight: 500, color: "var(--lcs-ink)" }}>
           I understand and accept these terms.
         </span>
       </label>
 
-      <div style={{ fontSize: 11, color: color.inkTertiary, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", lineHeight: 1.5 }}>
         Payment placeholder — no card is charged. Confirming records your acceptance and marks
         this as paid.
       </div>
@@ -100,9 +99,9 @@ export function PaymentConfirm({
             fontSize: 13,
             fontWeight: 500,
             color: "#fff",
-            background: brand.flat,
+            background: "var(--lcs-accent)",
             border: "none",
-            borderRadius: radius.control,
+            borderRadius: "var(--radius-lcs-control)",
             cursor: !accepted || confirming ? "default" : "pointer",
             opacity: !accepted || confirming ? 0.5 : 1,
             display: "inline-flex",
@@ -122,10 +121,10 @@ export function PaymentConfirm({
               height: 36,
               padding: "0 16px",
               fontSize: 13,
-              color: color.ink,
-              background: color.white,
-              border: `1px solid ${color.border}`,
-              borderRadius: radius.control,
+              color: "var(--lcs-ink)",
+              background: "var(--lcs-white)",
+              border: `1px solid var(--lcs-line)`,
+              borderRadius: "var(--radius-lcs-control)",
               cursor: "pointer",
             }}
           >

@@ -10,7 +10,7 @@ import { roomGetWorkflowState } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 import { completeQaAndGenerateReport } from "@/lib/qa-report-fn";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/qa")({
@@ -429,7 +429,7 @@ function QAPage() {
           )}
 
           {orderedQuestions.length === 0 ? (
-            <EmptyState kind="empty" title="No questions" />
+            <LcsEmptyState title="No questions" text="Questions asked in this deal room appear here." />
           ) : (
             orderedQuestions.map((q) => {
               const qNum = questions.indexOf(q) + 1;

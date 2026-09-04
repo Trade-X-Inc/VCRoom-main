@@ -2,7 +2,25 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Globe, Linkedin, CheckCircle2, Trophy, Briefcase, Users, Sparkles, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { color, font } from "@/lib/design-tokens";
+
+// Inlined from the retired lib/design-tokens.ts (deleted as part of the
+// internal-app LCS migration's Group 5 — that file's tokens were purely
+// internal-app v1 design system, this route is the one public-facing
+// exception that used it). Same values, unchanged, so this public page's
+// rendered output is byte-identical to before.
+const color = {
+  canvas: "#FAFAFA",
+  white: "#FFFFFF",
+  ink: "#0A0A0B",
+  inkSecondary: "#52525B",
+  inkTertiary: "#71717A",
+  border: "#E4E4E7",
+} as const;
+
+const font = {
+  display: "'Syne', sans-serif",
+  body: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
+} as const;
 
 export const Route = createFileRoute("/i/$slug")({
   loader: async ({ params }) => {

@@ -1,15 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import {
   LayoutGrid, List, Columns3, Search,
   AlertTriangle, Clock, X,
   CheckCircle2, ExternalLink, ArrowRight, Gavel, Download,
+  ChevronRight,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState, LcsButton } from "@/components/lcs";
 import { downloadCsv } from "@/lib/csv-export";
 
 export const Route = createFileRoute("/app/investor/decisions")({
@@ -317,7 +318,16 @@ export function DecisionsPage() {
   return (
     <div style={{ paddingTop: 24, paddingBottom: 40, paddingLeft: 24, paddingRight: 24 }}>
       {/* Header */}
-      <PageBreadcrumb items={[{ label: "Deal flow", to: "/app/investor/decide" }, { label: "Decisions" }]} />
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <Link to={"/app/investor/decide" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+          Deal flow
+        </Link>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Decisions</span>
+      </div>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
         <div>
           <h1 style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, color: "var(--color-foreground)", margin: 0 }}>Decision Board</h1>
@@ -377,13 +387,19 @@ export function DecisionsPage() {
 
       {/* Empty state */}
       {entries.length === 0 && (
-        <EmptyState
-          kind={rawEntries.length === 0 ? "empty" : "no-results"}
+        <LcsEmptyState
           title={rawEntries.length === 0 ? "No companies" : "No matches"}
-          action={
+          text={
             rawEntries.length === 0
-              ? { label: "Watchlist", href: "/app/investor/source#watchlist" }
-              : undefined
+              ? "Companies you track appear here."
+              : "No companies match the current filters."
+          }
+          action={
+            rawEntries.length === 0 ? (
+              <a href="/app/investor/source#watchlist">
+                <LcsButton variant="secondary">Watchlist</LcsButton>
+              </a>
+            ) : undefined
           }
         />
       )}

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { Clock } from "lucide-react";
+import { Clock, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { EmptyState } from "@/components/system";
+import { LcsEmptyState } from "@/components/lcs";
 
 export function Timeline({ dealRoomId }: { dealRoomId: string }) {
   const { data: events = [], isLoading, isError } = useQuery({
@@ -21,8 +21,14 @@ export function Timeline({ dealRoomId }: { dealRoomId: string }) {
   });
 
   if (isError) return <p className="p-6 text-sm text-destructive">Could not load data. Please refresh.</p>;
-  if (isLoading) return <EmptyState kind="loading" title="Loading" />;
-  if (events.length === 0) return <EmptyState kind="empty" title="No activity" />;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+        <Loader2 className="h-5 w-5 animate-spin" />
+      </div>
+    );
+  if (events.length === 0)
+    return <LcsEmptyState title="No activity" text="Activity in this deal room appears here." />;
 
   return (
     <div className="p-6 relative pl-8">

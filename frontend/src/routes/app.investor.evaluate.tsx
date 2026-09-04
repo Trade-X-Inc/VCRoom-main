@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
-import { PageFrame } from "@/components/system";
+import { ArrowRight, ChevronRight } from "lucide-react";
+import { LcsPageHeader } from "@/components/lcs";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 // ③ Evaluate — rooms, diligence, analysis. All three are real standalone
@@ -36,10 +36,16 @@ function SectionLinkRow({
 function EvaluatePage() {
   const { data: p } = useDealFlowProgress();
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Deal flow" }, { label: "Evaluate" }]}
-      title="Evaluate"
-    >
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Deal flow</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Evaluate</span>
+      </div>
+      <LcsPageHeader title="Evaluate" />
       <div className="bg-card border border-border/60 rounded-none px-6">
         <SectionLinkRow
           to="/app/investor/deal-rooms"
@@ -49,6 +55,6 @@ function EvaluatePage() {
         <SectionLinkRow to="/app/investor/diligence" label="Due diligence" />
         <SectionLinkRow to="/app/investor/analysis" label="AI analysis" />
       </div>
-    </PageFrame>
+    </div>
   );
 }
