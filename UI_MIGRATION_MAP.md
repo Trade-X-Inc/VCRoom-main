@@ -1,5 +1,9 @@
 # UI Migration Map — Audit Only
 
+**SUPERSEDED, 4 Sep 2026 — this document is historical record, not current state.** It audits a route/IA shape (the P4/P5 accordion-wizard consolidation, a "Design Constitution" flat-`#7C3AED` route map) from before the LCS (Lengdon Component System) migration described in CLAUDE.md §20 and its amendment log existed. Nearly every route named below (`app.deal-room.$id.tsx`, `app.prepare.tsx`, `app.close.tsx`, the accordion hubs) has since been restructured or deleted. **For the current internal-UI migration's remaining-work inventory and group plan, see [`LCS_MIGRATION_PLAN.md`](LCS_MIGRATION_PLAN.md) instead.** Left in place unmodified rather than rewritten, per this repo's standing practice (CLAUDE.md §19) of annotating a superseded record rather than erasing it.
+
+---
+
 Generated 2026-07-15. Read-only audit against the proposed "Design Constitution" route map and rendering rules. No files were modified as part of this document.
 
 **Open conflict, not resolved here:** the Design Constitution pasted into this task (flat `#7C3AED`, DM Sans, 0px radius, dense table-first layout, and the route map below) contradicts CLAUDE.md Section 9 (the July 2026 white redesign: purple-only-as-gradient, Inter/Syne, borderless `rounded-none` cards) and the current file-based routes. This document inventories facts only — it does not decide which system wins. That decision needs to be made explicitly before any implementation work starts.
