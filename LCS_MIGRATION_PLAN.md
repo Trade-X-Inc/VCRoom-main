@@ -24,7 +24,7 @@ Two shared **v1 primitive layers** underpin nearly everything and are the real b
 - `components/system/` (`PageFrame.tsx` 122L, `EmptyState.tsx` 75L, `Illustration.tsx` 134L, `StatusDot.tsx` 45L, `Button.tsx` 38L, `SectionLabel.tsx` 27L, `index.ts`) — imported by **26 route files**.
 - `lib/design-tokens.ts` (147L, hardcoded `#7C3AED` etc.) — imported by 8 routes + `PageFrame.tsx` + `StatusDot.tsx` + `RequestAccessButton.tsx` + `PaymentConfirm.tsx`.
 
-**Total remaining v1 work: ~26,350 lines across 35 route files and ~20 component files.**
+**Total remaining work: ~26,350 lines of v1 across 35 route files and ~20 component files, plus ~2,780 lines of v2 pulled into Group 6 by decision (see below) — ~29,130 lines total across Groups 5–10.**
 
 ---
 
@@ -43,9 +43,11 @@ Two shared **v1 primitive layers** underpin nearly everything and are the real b
 | `components/system/index.ts` | — |
 | `lib/design-tokens.ts` | 147 |
 
-**~588 lines.** Every one of these has a direct LCS equivalent already shipped (`PageFrame`→`LcsPageShell`/`LcsPageHeader`, `EmptyState`→`LcsEmptyState`, `Button`→`LcsButton`, `StatusDot`→`LcsStatusPill`). **Open decision before this group starts: delete-and-replace at callsites vs. restyle-in-place** — the former is likely cheaper given the equivalents already exist, but it changes every group below from "restyle" to "swap import," so decide this first and report it, don't assume.
+**~588 lines.** Every one of these has a direct LCS equivalent already shipped (`PageFrame`→`LcsPageShell`/`LcsPageHeader`, `EmptyState`→`LcsEmptyState`, `Button`→`LcsButton`, `StatusDot`→`LcsStatusPill`).
 
-**Structural-fit concern:** `lib/design-tokens.ts`'s header comment claims to be the design system's single source of truth. That's now false and will mislead future contributors — flag for deletion or a header rewrite as part of this group.
+**DECIDED, 4 Sep 2026: delete `components/system/` and `lib/design-tokens.ts` outright; swap all 26 importers to the real `@/components/lcs` primitives directly.** Not restyle-in-place, not a compatibility wrapper — one primitive library, no leftover parallel import path. Reasoning: a wrapper keeps a second, redundant import path alive permanently, exactly the `components/v2/`-alongside-`components/lcs/` problem this same document flags below as an existing issue; restyling in place would mean reimplementing what's already built and proven through Groups 3–4, for no benefit over pointing importers at the real thing.
+
+Each of the 26 importing route/component files still needs its own touch (import swap + any prop-shape differences between the old and new primitive) and its own byte-identical-logic verification — this decision settles the *target*, not the per-file mechanics, which still need the same structural-fit discipline as every prior group.
 
 ---
 
@@ -68,12 +70,14 @@ Two shared **v1 primitive layers** underpin nearly everything and are the real b
 | `components/app/MutualDisclosure.tsx` | 400 | hybrid — v1(2) + v2(2) |
 | `components/app/RequestAccessButton.tsx` | 191 | v1 + `design-tokens` |
 
-**~4,570 lines. Largest and riskiest group.**
+**~4,570 lines, plus the pulled-in v2 tabs below. Largest and riskiest group.**
+
+**DECIDED, 4 Sep 2026: pull all four already-v2 sibling tabs into this group's scope** — `documents` (1347L), `meetings` (749L), `term-sheets` (523L), `close` (161L), ~2,780 more lines, bringing the group total to **~7,350 lines**. Reasoning: restyling only the shell would ship the single most visible mixed-design-system surface in the app — a user moving tab-to-tab inside one deal room would see the chrome's design language change underneath them. Same precedent as Group 1's AppShell/MemberShell call (a mismatched pair judged worse than delaying either). Every tab — the five genuinely-v1 ones (shell, diligence, qa, nda, overview/information hybrids) and the four pulled-in v2 ones — gets the same structural-fit report before building and byte-identical-logic verification. **Live verification for this group must additionally cover the tab-to-tab navigation experience itself, not just each tab checked in isolation** — the seam being fixed is specifically about the transition, so a per-tab-only check would miss the actual defect this decision exists to prevent.
 
 **Structural-fit concerns:**
 - `app.deal-rooms.$id.tsx` has its own internal tab rail (`StageTabBar`) plus two slide-over drawers (Activity, AI) — same shape as Group 4's `app.settings.tsx`/`app.messages.tsx`. **Report structural fit before building.**
-- The already-v2 sibling tabs (`documents` 1347L, `meetings` 749L, `term-sheets` 523L, `close` 161L) render inside this v1 shell today. Restyling the shell to LCS while they stay v2 creates a visible seam — the most visible mixed-design-system surface in the app. Recommend pulling those into this group as LCS conversions rather than accepting the seam; needs an explicit decision, not an assumption.
 - `information.tsx` and `overview.tsx` are genuine v1/v2 hybrids (partially converted already) — audit per-file, don't blind-sweep.
+- The four pulled-in v2 tabs are on the *intermediate* v2 tokens, not v1 — their restyle work is v2→LCS, a different starting point than the v1→LCS work on the rest of the group. Confirm each one's actual v2-token surface before assuming the conversion is mechanically identical to the v1 files.
 - `app.deal-rooms.$id.activity.tsx` is 16 lines with no markup — check whether it's a stub worth deleting before restyling it.
 
 ---
@@ -222,8 +226,8 @@ No routes were found unreachable — `lib/nav-structure.ts` references every non
 
 | # | Group | Lines | Driving factor |
 |---|---|---|---|
-| 5 | Shared v1 primitives (`components/system` + `design-tokens`) | ~590 | Dependency — 26 routes import these |
-| 6 | Deal Room shell + Commit-class tabs | ~4,570 | Risk + dependency — shell wraps 9 tabs; NDA/closing/stage transitions |
+| 5 | Shared v1 primitives (`components/system` + `design-tokens`) — **decided: delete, not restyle** | ~590 | Dependency — 26 routes import these |
+| 6 | Deal Room shell + all 9 tabs (4 v2 tabs pulled in, **decided**) | ~7,350 | Risk + dependency — shell wraps 9 tabs; NDA/closing/stage transitions; avoids a shell/tab design-system seam |
 | 7 | Founder Profile & Documents | ~8,430 | Dependency — retires 14 alias routes; largest volume |
 | 8 | Investor Pipeline | ~8,960 | Risk (moderate) — write actions, no stage transitions |
 | 9 | Founder Home/Overview/Analytics | ~2,090 | Risk (low) — mostly read-only |
