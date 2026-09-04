@@ -4,6 +4,8 @@ Generated 4 Sep 2026, by a step-0 audit (Explore agent, Opus) of the current rep
 
 **Read this before starting any group below.** Each group still needs its own structural-fit report (per the standing discipline: report before building if anything doesn't map cleanly onto the 10 LCS primitives) and its own live verification pass, exactly as Groups 0–4 were done. This document is the *inventory and ordering*, not a substitute for that per-group discipline.
 
+**This ordering is not exclusive.** Per CLAUDE.md §7.4's standing rule (added 4 Sep 2026): a page rendering v1 purple theme found incidentally during *any* work — testing, an unrelated feature build, live verification of something else — gets flagged and migrated on the spot, regardless of which group it's assigned to below or whether that group has started. Content stays unchanged, only the visual system changes, same restyle-only discipline as every group here. This document still governs the deliberate, scheduled sequence; it doesn't gate an incidental fix.
+
 ---
 
 ## Method
