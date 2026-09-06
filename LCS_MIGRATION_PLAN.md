@@ -180,6 +180,24 @@ Standalone signing page, matching no other file's shape (no shell chrome, no `St
 
 ---
 
+## Group 6.5 — `AIChat.tsx` — deliberately deferred, own scoped item, not decided 6 Sep 2026
+
+**Explicitly separate from Groups 7–10 and from Group 6, which excluded it on purpose (see the Group 6 closing summary above).** Not scheduled — surfaced here so it isn't lost, with the specific open questions its eventual structural-fit recon must resolve before any code is touched, per the standing discipline.
+
+| File | Lines | State |
+|---|---|---|
+| `components/ai/AIChat.tsx` | 158 | v1 — confirmed live 6 Sep 2026 (6 v1 markers: `rounded-2xl`/`rounded-3xl`/`shadow-`/gradient hits, 0 LCS tokens) |
+
+**Why it doesn't fit either bucket cleanly:** mounted app-wide (deal-room AI slide-over, pipeline, leads, advisor, documents, meetings contexts) rather than owned by one screen or group, so it can't be restyled as a side effect of whichever group happens to touch a page that renders it. Structurally LCS-hostile as currently built: rounded chat bubbles, a Tailwind Typography `prose` scale for rendered Markdown with no LCS equivalent, 5 shadow usages, 3 gradients — none of which map onto the 10 (now 12, per Group 6) LCS primitives without either a documented exception or new design work.
+
+**Three sub-questions to resolve via its own structural-fit recon when it's taken up — not decided today:**
+
+1. **Does LCS get a documented exception for chat-bubble shapes (rounded corners), or does a genuinely new visual treatment need designing?** The Component System PDF's palette/radius rules (4px base unit, ≤2px radii elsewhere in the app) were not written with a conversational UI in mind. Resolve explicitly, in `PRIMITIVES.md` if an exception is granted, rather than let one file quietly carry a different radius scale forever.
+2. **What happens to the Markdown/prose typography dependency?** Is there an LCS-legal way to style rendered Markdown (headings, lists, code blocks, links) within the existing type scale, or does AI-generated chat output need its own small, deliberately-scoped typography treatment — and if so, is that treatment specific to this file or a new shared primitive.
+3. **The `/deal-room/` vs `/deal-rooms/` route-string bug (CLAUDE.md §19l) gets fixed as its own change, not bundled into whatever styling pass eventually covers this file.** It's a live AI-behavior defect (every deal-room AI interaction gets degraded context), not a styling concern — review it for its actual impact on live AI output before shipping, per §4's confirm-first standard for anything touching real AI-provider behavior, and land it independently of the visual restyle regardless of which lands first.
+
+---
+
 ## Group 7 — Founder Profile & Document workspaces
 
 **Ordered third on dependency: the largest raw volume, and restyling these retires 14 alias routes at once.**
@@ -326,7 +344,7 @@ No routes were found unreachable — `lib/nav-structure.ts` references every non
 |---|---|---|---|---|
 | 5 | Shared v1 primitives (`components/system` + `design-tokens`) | ~590 | Dependency — 26 routes import these | **CLOSED** |
 | 6 | Deal Room shell + all 9 tabs + 2 dependencies (4 v2 tabs pulled in) | ~7,350 | Risk + dependency — shell wraps 9 tabs; NDA/closing/stage transitions; avoids a shell/tab design-system seam | **CLOSED** |
-| — | `AIChat.tsx` — cross-cutting AI panel, explicitly excluded from Group 6 | 158 | Mounted app-wide, not deal-room-specific; LCS-hostile structure (chat bubbles, `prose` scale, shadows, gradients); own route-string bug | **Open — needs its own structural-fit decision before scheduling** |
+| 6.5 | `AIChat.tsx` — cross-cutting AI panel, explicitly excluded from Group 6 | 158 | Mounted app-wide, not deal-room-specific; LCS-hostile structure (chat bubbles, `prose` scale, shadows, gradients); own route-string bug | **Logged, not scheduled — see Group 6.5 above for the 3 open sub-questions** |
 | 7 | Founder Profile & Documents | ~8,430 | Dependency — retires 14 alias routes; largest volume | Not started |
 | 8 | Investor Pipeline | ~8,960 | Risk (moderate) — write actions, no stage transitions | Not started |
 | 9 | Founder Home/Overview/Analytics | ~2,090 | Risk (low) — mostly read-only | Not started |
