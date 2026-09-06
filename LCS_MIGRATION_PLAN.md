@@ -309,6 +309,30 @@ Neither recon bug (`app.documents.tsx`'s misleading delete-confirmation text, `a
 
 ---
 
+## Post-login Home Dashboard — closed out of sequence, 6 Sep 2026
+
+**Pulled ahead of both Group 8 and Group 9, on direct instruction, after being raised three times and deferred each time.** `RaiseHome.tsx` (the founder-owner home at `/app`, tracked under Group 9) was found still fully v1 — purple `hs-gradient` numeral circles, `Syne` font, `hs-hairline-t` dividers — during a Group 7 check-in when a screenshot of it was shared. Given a full design brief (not a token restyle) and built same-day, per a written brief titled "Post-login Home Dashboard — Design Brief," reproduced in full in the session record: no fake data that looks real, no invented company names/metrics, a genuine empty-state-first worklist design (headline → one honest primary action → real "Waiting on you"/"Waiting on them" sections, empty-but-labeled when there's no data → a compact real how-it-works strip), built using only the already-approved LCS primitives (`LcsPageHeader`, `LcsCard`, `LcsEmptyState`, `LcsButton`, `LcsStatusPill`) with no new primitive invented.
+
+**Scope correction found before building, not assumed:** the brief asked for "every role" (founder/investor/team member/advisor) in one component. Tracing `app.tsx`'s actual routing found this is wrong as a premise — there is no single home component for all roles today, "advisor" is not a real account type anywhere in the data model (`AccountContext.accountType` is `founder_owner`/`founder_admin`/`founder_member`/`investor_owner`/`investor_admin`/`investor_member`/`unknown` — "advisor" only exists in the unauthenticated `deals-preview` sandbox's `LcsViewerRole`), and three separate real routes already exist and already carry real, different data: `/app` → `RaiseHome.tsx` (founder-owner), `/app/investor` → `DealFlowHome.tsx` (investor-owner), `/app/member` → `MemberOverview` inline in `app.member.index.tsx` (any team member on either side — this is the real "advisor" case). Reported before writing any code; confirmed to rebuild all three, each on its own real data, same design language — not one component pretending to serve four roles.
+
+**A second scope mismatch was reported and resolved the same way**: `LcsPageShell` (the primitive brief that named it as an allowed building block) is a full app shell — its own sidebar, top bar, search, notifications — but all three target files render as content *inside* the real running shell (`AdminShell`/`MemberShell`). Using it would have nested a second shell inside the real one. Confirmed to skip it and use `LcsPageHeader` + the content primitives only, matching how every other already-migrated route in the app already works.
+
+**Built, all three files, using only `LcsPageHeader`/`LcsCard`/`LcsEmptyState`/`LcsButton`/`LcsStatusPill` — no new primitive invented:**
+- **`RaiseHome.tsx`** — headline and primary action both computed from real `useRaiseProgress()` state (zero-data → "Build your pack…" / prepare-incomplete → "Next: {section}." / prepare-done-not-live → "go live" / live → "here's what's moving"); "Waiting on you" lists the real 6 pack sections with their real status; "Waiting on them" shows real active/closing room counts; "How it works" is the real 4-step Prepare→Present→Engage→Close sequence, plain text, no fabricated content.
+- **`DealFlowHome.tsx`** — headline prioritizes the most urgent real signal (pending decisions > active rooms > generic); explicitly no "browse"/"discover" CTA anywhere, and the how-it-works copy states plainly that deal flow starts with a founder's brief, never a directory (Foundation §15/§25); "Waiting on you"/"Waiting on them" built from real `useDealFlowProgress()` counts (pending decisions, active rooms, watchlist, portfolio).
+- **`app.member.index.tsx`**'s `MemberOverview`** — same worklist shape applied to already-correct, already-real data (`deal_room_team_assignments`, `deal_room_documents`) that only needed retoning and restructuring, not new logic. Genuine zero-assignment state renders the honest "No deal rooms assigned to you yet" headline with calm, labeled empty boxes — not a demo card.
+
+**Verified:** `tsc` 55/55, exact error-set match against baseline (the two pre-existing errors in `app.member.index.tsx` — an `as any` cast and a route-param type mismatch — confirmed present before this change, untouched by it). Build clean, gzip 0.73 MB, action-split guard passed. Zero v1 markers remain in any of the three files (`hs-gradient`, `Syne`, hardcoded hex, `var(--foreground)`/`var(--card)`/etc. all swept). **Live-verified against real fixture data for all three roles, not mocked:**
+- Founder-owner (`test-founder@`): real 57%-ready progress, "Next: Profile." headline, 6 real pack-section statuses, **2 real active deal rooms** in "Waiting on them," all 4 how-it-works steps rendering. Zero console errors.
+- Investor-owner (`test-investor@`): headline correctly prioritized "2 decisions pending" over the lower-priority active-rooms signal; real counts throughout (2 pending, 2 active, 5 watchlist, 1 portfolio); honest "no directory to browse" copy rendered exactly as specified. Zero console errors.
+- Team member (`test-founder-member@`): genuine zero-assignment fixture, correctly rendered the honest empty state ("No deal rooms assigned to you yet") with no fabricated rooms. Zero console errors.
+
+**One pre-existing routing detail observed, not investigated or touched, flagged for whoever next touches `app.tsx`/`MemberShell`**: navigating this team-member fixture directly to `/app/member` renders the founder-style `AdminShell` nav (Prepare/Go Live/Connection Requests) rather than a member-scoped nav — `app.tsx`'s redirect-from-`/app` logic wasn't exercised by a direct navigation, so this may be expected shell behavior or may be a real gap; out of scope for this pass, which touched only the three content components named above.
+
+`LCS_MIGRATION_PLAN.md`'s Group 8 and Group 9 tables updated below — `DealFlowHome.tsx` (was Group 8's v2 cohort) and `RaiseHome.tsx`/`app.member.index.tsx` (were Group 9) struck through and marked closed here, per the standing annotate-don't-silently-delete convention.
+
+---
+
 ## Group 8 — Investor Pipeline
 
 **Ordered fourth: mixed risk — real write actions (connection accept/reject, decision recording) but no stage transitions or document release.** Consider splitting into 8a (the four ≥700L screens) and 8b (the rest) given the size.
@@ -331,7 +355,7 @@ Neither recon bug (`app.documents.tsx`'s misleading delete-confirmation text, `a
 | `routes/app.investor.evaluate.tsx` | 54 | 4 |
 | `routes/app.investor.source.tsx` | 53 | 4 |
 | `routes/app.investor.tsx` | 73 | 2 — layout route, error-state panel only |
-| `components/app/DealFlowHome.tsx` | 106 | 5 |
+| ~~`components/app/DealFlowHome.tsx`~~ | ~~106~~ | **CLOSED out of sequence, 6 Sep 2026 — see the Post-login Home Dashboard note above Group 8.** |
 | `components/app/PageGuide.tsx` | 585 | 9 |
 | `components/app/HelpGuide.tsx` | 451 | 38 |
 
@@ -357,9 +381,9 @@ Alias routes retired for free: `app.investor.discover.{deal-flow,watchlist,index
 | `routes/app.overview.tsx` | 529 | 7 |
 | `routes/app.connections.tsx` | 199 | 13 |
 | `routes/app.analytics.tsx` | 287 | 2 |
-| `routes/app.member.index.tsx` | 189 | 4 |
+| ~~`routes/app.member.index.tsx`~~ | ~~189~~ | **CLOSED out of sequence, 6 Sep 2026 — see the Post-login Home Dashboard note above Group 8.** |
 | `routes/app.deal-rooms.prep-notes.tsx` | 283 | 7 |
-| `components/app/RaiseHome.tsx` | 133 | 5 |
+| ~~`components/app/RaiseHome.tsx`~~ | ~~133~~ | **CLOSED out of sequence, 6 Sep 2026 — see the Post-login Home Dashboard note above Group 8.** |
 | `components/shared/LazyChart.tsx` | 61 | 0 — audit chart palette against the 4-color rule regardless |
 
 **~2,092 lines.**

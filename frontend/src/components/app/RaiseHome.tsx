@@ -1,142 +1,168 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import {
   useRaiseProgress,
   nextIncomplete,
   SECTION_LABELS,
 } from "@/hooks/useRaiseProgress";
-import { LcsStatusPill, type LcsStatus } from "@/components/lcs";
-
-/** v1 StatusDot tones → LCS status. LCS has no negative/red tone; attention
- * amber covers it (CLAUDE.md §0 amendment, 1 Sep 2026). */
-const TONE_STATUS: Record<string, LcsStatus> = {
-  positive: "satisfied",
-  warning: "attention",
-  negative: "attention",
-  neutral: "pending",
-};
+import { LcsPageHeader, LcsCard, LcsEmptyState, LcsButton, LcsStatusPill } from "@/components/lcs";
 
 /**
- * /app — the founder home. A vertical spine of the four raise steps.
- * This IS the overview; there is no separate overview page.
+ * /app — the founder-owner home. A worklist, not a dashboard: one honest
+ * headline, one primary action, and the real structural sections (what's
+ * on the founder, what's on someone else, the real workflow shape) shown
+ * empty-but-labeled when there's no data yet. No invented content, no
+ * placeholder companies or metrics — per the Post-login Home Dashboard
+ * design brief (6 Sep 2026). Rebuilt from the old numbered-spine layout.
  */
 
-const STEPS = [
-  { n: "①", to: "/app/prepare", label: "Prepare" },
-  { n: "②", to: "/app/go-live", label: "Go live" },
-  { n: "③", to: "/app/deal-rooms", label: "Deal rooms" },
-  { n: "④", to: "/app/deal-rooms", label: "Close" },
+const HOW_IT_WORKS = [
+  { label: "Prepare", text: "Build your pack — profile, documents, verification." },
+  { label: "Present", text: "Publish and share with investors you choose." },
+  { label: "Engage", text: "Answer questions, negotiate terms in a deal room." },
+  { label: "Close", text: "Confirm terms with both sides and close the raise." },
 ] as const;
 
 export function RaiseHome() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: p } = useRaiseProgress();
   const next = nextIncomplete(p);
 
-  const stepMeta = (n: string) => {
-    if (!p) return { metric: "", tone: "neutral" as const, status: "" };
-    switch (n) {
-      case "①":
-        return {
-          metric: `${p.prepareDone}/${p.prepareTotal}`,
-          tone:
-            p.prepareDone === p.prepareTotal
-              ? ("positive" as const)
-              : ("warning" as const),
-          status:
-            p.prepareDone === p.prepareTotal
-              ? "Done"
-              : next
-                ? `Next: ${SECTION_LABELS[next]}`
-                : "In progress",
-        };
-      case "②":
-        return p.goLiveDone
-          ? { metric: "Live", tone: "positive" as const, status: "Published" }
-          : p.prepareUnlocked
-            ? { metric: "", tone: "warning" as const, status: "Ready to publish" }
-            : { metric: "", tone: "neutral" as const, status: "Finish Prepare first" };
-      case "③":
-        return {
-          metric: String(p.activeRooms),
-          tone: p.activeRooms > 0 ? ("positive" as const) : ("neutral" as const),
-          status:
-            p.activeRooms > 0
-              ? `${p.activeRooms} active`
-              : "No rooms yet",
-        };
-      case "④":
-        return p.closedRooms > 0
-          ? { metric: String(p.closedRooms), tone: "positive" as const, status: "Closed" }
-          : p.closingRooms > 0
-            ? { metric: String(p.closingRooms), tone: "warning" as const, status: "In closing" }
-            : { metric: "", tone: "neutral" as const, status: "Not there yet" };
-      default:
-        return { metric: "", tone: "neutral" as const, status: "" };
-    }
-  };
-
   const firstName = user?.email?.split("@")[0] ?? "Founder";
+  const hasStartup = !!p?.startupId;
+  const prepareComplete = !!p && p.prepareDone === p.prepareTotal;
+
+  const headline = !hasStartup
+    ? "Build your pack to start sharing with investors."
+    : prepareComplete
+      ? p.goLiveDone
+        ? "Your profile is live. Here's what's moving."
+        : "Your pack is ready — go live to start sharing."
+      : `Next: ${next ? SECTION_LABELS[next] : "finish your pack"}.`;
+
+  const primaryAction = !hasStartup || !prepareComplete
+    ? { to: "/app/prepare" as const, label: "Go to Pack Builder" }
+    : !p?.goLiveDone
+      ? { to: "/app/go-live" as const, label: "Go live" }
+      : { to: "/app/deal-rooms" as const, label: "View deal rooms" };
+
+  // "Waiting on you" — real, on-you pack items not yet complete.
+  const onYou = p
+    ? (Object.keys(p.sections) as Array<keyof typeof p.sections>).filter(
+        (k) => p.sections[k] !== "complete",
+      )
+    : [];
+
+  // "Waiting on them" — real, in-flight rooms where the next move isn't the founder's.
+  const activeRooms = p?.activeRooms ?? 0;
+  const closingRooms = p?.closingRooms ?? 0;
 
   return (
     <div className="p-6 lg:p-12 max-w-3xl mx-auto" data-testid="raise-home">
-      <div
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "#71717A",
-        }}
-      >
-        {p?.companyName ?? firstName}
-      </div>
-      <h1
-        className="text-lg font-bold tracking-tight mt-1 mb-12"
-        style={{ fontFamily: "'Syne', sans-serif" }}
-      >
-        Your raise
-      </h1>
+      <LcsPageHeader
+        title={headline}
+        description={p?.companyName ?? `Welcome, ${firstName}`}
+        action={
+          <LcsButton variant="primary" onClick={() => navigate({ to: primaryAction.to })}>
+            {primaryAction.label}
+          </LcsButton>
+        }
+      />
 
-      <div>
-        {STEPS.map((s) => {
-          const m = stepMeta(s.n);
-          return (
-            <Link
-              key={s.n}
-              to={s.to}
-              className="hs-hairline-t flex items-center justify-between gap-6 py-8 group"
-              data-testid={`home-step-${s.label.toLowerCase().replace(" ", "-")}`}
-            >
-              <div className="flex items-center gap-6 min-w-0">
-                <span
-                  className="hs-gradient-text"
-                  style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800 }}
+      <div className="flex flex-col gap-4">
+        <LcsCard title="Waiting on you">
+          {!hasStartup ? (
+            <div className="p-4">
+              <LcsEmptyState
+                text="Nothing to confirm yet — start by building your pack."
+              />
+            </div>
+          ) : onYou.length === 0 ? (
+            <div className="p-4">
+              <LcsEmptyState text="Nothing waiting on you right now." />
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {onYou.map((k, i) => (
+                <Link
+                  key={k}
+                  to="/app/prepare"
+                  className="flex items-center justify-between px-4 py-3"
+                  style={{ borderTop: i === 0 ? undefined : "1px solid var(--lcs-line)" }}
+                  data-testid={`home-onyou-${k}`}
                 >
-                  {s.n}
+                  <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                    {SECTION_LABELS[k]}
+                  </span>
+                  <LcsStatusPill
+                    status={p!.sections[k] === "in-progress" ? "in-progress" : "pending"}
+                    label={p!.sections[k] === "in-progress" ? "In progress" : "Not started"}
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+        </LcsCard>
+
+        <LcsCard title="Waiting on them">
+          {!hasStartup || activeRooms === 0 ? (
+            <div className="p-4">
+              <LcsEmptyState text="No deal rooms yet — this fills once investors are in one." />
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3">
+                <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                  Active deal rooms
                 </span>
-                <div>
-                  <div
-                    className="text-[15px] font-bold tracking-tight group-hover:opacity-70 transition-opacity"
-                    style={{ fontFamily: "'Syne', sans-serif" }}
-                  >
-                    {s.label}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{m.status}</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] font-semibold tabular-nums" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink)" }}>
+                    {activeRooms}
+                  </span>
+                  <LcsStatusPill status="in-progress" label="Active" />
                 </div>
               </div>
-              <div className="flex items-center gap-4 shrink-0">
-                {m.metric && (
-                  <span className="text-[13px] font-semibold tabular-nums">{m.metric}</span>
-                )}
-                <LcsStatusPill status={TONE_STATUS[m.tone]} label="" />
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+              {closingRooms > 0 && (
+                <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+                  <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                    In closing
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-semibold tabular-nums" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink)" }}>
+                      {closingRooms}
+                    </span>
+                    <LcsStatusPill status="attention" label="Awaiting close" />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </LcsCard>
 
+        <LcsCard title="How it works">
+          <div className="grid gap-4 p-4 sm:grid-cols-2">
+            {HOW_IT_WORKS.map((s, i) => (
+              <div key={s.label} className="flex gap-3">
+                <span
+                  className="text-[13px] font-semibold tabular-nums shrink-0"
+                  style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink-muted)" }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <div className="text-[13px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                    {s.label}
+                  </div>
+                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+                    {s.text}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </LcsCard>
+      </div>
     </div>
   );
 }

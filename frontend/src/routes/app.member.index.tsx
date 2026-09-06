@@ -1,15 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Briefcase, FileText, MessageSquare, UserCircle2, ArrowRight } from "lucide-react";
+import { FileText, MessageSquare, UserCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS } from "@/lib/roles";
 import { supabase } from "@/lib/supabase";
-import { LcsEmptyState } from "@/components/lcs";
+import { LcsPageHeader, LcsCard, LcsEmptyState, LcsStatusPill } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/member/")({
   component: MemberOverview,
 });
+
+/**
+ * /app/member — the team-member home (any non-owner, non-admin account:
+ * a founder's or investor's team, referred to elsewhere as "advisor" in
+ * casual usage, though that isn't a distinct account type in the data
+ * model — see AccountContext). Same worklist shape as the founder and
+ * investor homes: one honest headline, real assigned rooms shown
+ * empty-but-labeled, no invented content. Rebuilt from the old stat-card
+ * layout, per the Post-login Home Dashboard design brief (6 Sep 2026).
+ */
 
 function MemberOverview() {
   const { user } = useAuth();
@@ -52,120 +62,72 @@ function MemberOverview() {
     },
   });
 
+  const headline = isLoading
+    ? "Loading your assignments…"
+    : assignedRooms.length === 0
+      ? "No deal rooms assigned to you yet."
+      : `${assignedRooms.length} deal room${assignedRooms.length === 1 ? "" : "s"} assigned to you.`;
+
   return (
-    <div style={{ padding: "32px", maxWidth: 800, margin: "0 auto" }}>
-      {/* Welcome */}
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 6 }}>
-          Welcome, {firstName}
-        </h1>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{
-            background: "rgba(124,58,237,0.15)", color: "#a78bfa",
-            padding: "3px 10px", borderRadius: 99, fontSize: 11, fontWeight: 600,
-          }}>
-            {roleLabel}
-          </span>
-          {roleDescription && (
-            <span style={{ fontSize: 13, color: "var(--muted-foreground)" }}>
-              {roleDescription}
-            </span>
+    <div className="p-6 lg:p-12 max-w-3xl mx-auto">
+      <LcsPageHeader
+        title={headline}
+        description={`Welcome, ${firstName}${roleLabel ? ` — ${roleLabel}` : ""}${roleDescription ? `. ${roleDescription}` : ""}`}
+      />
+
+      <div className="flex flex-col gap-4">
+        <LcsCard title="Your deal rooms">
+          {isLoading ? (
+            <div className="p-4">
+              <LcsEmptyState text="Loading…" />
+            </div>
+          ) : assignedRooms.length === 0 ? (
+            <div className="p-4">
+              <LcsEmptyState text="Deal rooms you're assigned to appear here — nothing to show until you're added to one." />
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {assignedRooms.map((r, i) => {
+                const companyName = r.deal_rooms?.startups?.company_name ?? "Deal room";
+                return (
+                  <Link
+                    key={r.deal_room_id}
+                    to={"/app/deal-rooms/$id" as any}
+                    params={{ id: r.deal_room_id }}
+                    className="flex items-center justify-between px-4 py-3"
+                    style={{ borderTop: i === 0 ? undefined : "1px solid var(--lcs-line)" }}
+                  >
+                    <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                      {companyName}
+                    </span>
+                    <LcsStatusPill status="in-progress" label="Active" />
+                  </Link>
+                );
+              })}
+            </div>
           )}
-        </div>
-      </div>
+        </LcsCard>
 
-      {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 32 }}>
-        <StatCard
-          label="Deal Rooms"
-          value={isLoading ? "…" : String(assignedRooms.length)}
-          icon={<Briefcase size={18} style={{ color: "#a78bfa" }} />}
-          note="assigned to you"
-        />
-        <StatCard
-          label="Recent Documents"
-          value={String(recentActivity.length)}
-          icon={<FileText size={18} style={{ color: "#10B981" }} />}
-          note="in your rooms"
-        />
-      </div>
+        <LcsCard title="Recent documents">
+          {recentActivity.length === 0 ? (
+            <div className="p-4">
+              <LcsEmptyState text="Recent uploads across your assigned rooms appear here." />
+            </div>
+          ) : (
+            <div className="p-4 text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+              {recentActivity.length} document{recentActivity.length === 1 ? "" : "s"} added recently across your rooms.
+            </div>
+          )}
+        </LcsCard>
 
-      {/* Assigned deal rooms */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
-          My Deal Rooms
-        </div>
-        {isLoading ? (
-          <div style={{ height: 80, borderRadius: 10, background: "var(--accent)" }} />
-        ) : assignedRooms.length === 0 ? (
-          <LcsEmptyState title="No deal rooms" text="Deal rooms you are assigned to appear here." />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {assignedRooms.map((r) => {
-              const companyName = r.deal_rooms?.startups?.company_name ?? "Deal Room";
-              return (
-                <Link
-                  key={r.deal_room_id}
-                  to={"/app/deal-rooms/$id" as any}
-                  params={{ id: r.deal_room_id }}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    background: "var(--card)", border: "1px solid var(--border)",
-                    borderRadius: 10, padding: "14px 16px", textDecoration: "none",
-                    color: "var(--foreground)",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(124,58,237,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#a78bfa" }}>
-                      {companyName[0]?.toUpperCase() ?? "D"}
-                    </div>
-                    <span style={{ fontSize: 14, fontWeight: 500 }}>{companyName}</span>
-                  </div>
-                  <ArrowRight size={14} style={{ color: "var(--faint)" }} />
-                </Link>
-              );
-            })}
+        <LcsCard title="Quick links">
+          <div className="grid gap-2 p-4 sm:grid-cols-3">
+            <QuickLink to="/app/documents" label="Documents" icon={<FileText size={14} />} />
+            <QuickLink to="/app/messages" label="Team Chat" icon={<MessageSquare size={14} />} />
+            <QuickLink to="/app/member-profile" label="My Profile" icon={<UserCircle2 size={14} />} />
           </div>
-        )}
-        {assignedRooms.length > 0 && (
-          <Link
-            to={"/app/deal-rooms" as any}
-            style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10, fontSize: 12, color: "var(--muted-foreground)" }}
-          >
-            View all deal rooms <ArrowRight size={12} />
-          </Link>
-        )}
+        </LcsCard>
       </div>
-
-      {/* Quick links */}
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
-          Quick Links
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
-          <QuickLink to="/app/documents" label="Documents" icon={<FileText size={16} />} />
-          <QuickLink to="/app/messages" label="Team Chat" icon={<MessageSquare size={16} />} />
-          <QuickLink to="/app/member-profile" label="My Profile" icon={<UserCircle2 size={16} />} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value, icon, note }: {
-  label: string; value: string; icon: React.ReactNode; note?: string;
-}) {
-  return (
-    <div style={{
-      background: "var(--card)", border: "1px solid var(--border)",
-      borderRadius: 12, padding: "16px 18px",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <span style={{ fontSize: 11, color: "var(--muted-foreground)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
-        {icon}
-      </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "var(--foreground)", lineHeight: 1 }}>{value}</div>
-      {note && <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>{note}</div>}
     </div>
   );
 }
@@ -174,15 +136,10 @@ function QuickLink({ to, label, icon }: { to: string; label: string; icon: React
   return (
     <Link
       to={to as any}
-      style={{
-        display: "flex", alignItems: "center", gap: 10,
-        background: "var(--accent)", border: "1px solid var(--border)",
-        borderRadius: 10, padding: "12px 14px", textDecoration: "none",
-        color: "var(--muted-foreground)", fontSize: 13, fontWeight: 500,
-        transition: "background 0.15s",
-      }}
+      className="flex items-center gap-2 px-3 py-2"
+      style={{ border: "1px solid var(--lcs-line)", color: "var(--lcs-ink)", fontSize: 13, fontFamily: "var(--font-lcs-ui)" }}
     >
-      <span style={{ color: "var(--muted-foreground)" }}>{icon}</span>
+      <span style={{ color: "var(--lcs-ink-muted)" }}>{icon}</span>
       {label}
     </Link>
   );
