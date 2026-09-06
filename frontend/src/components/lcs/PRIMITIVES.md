@@ -72,6 +72,20 @@ all. Before reaching for `LcsStatusPill` on any new multi-value control,
 ask: does this value represent *progress*, or a *choice*? If it's a
 choice, it isn't a status.
 
+## Data-visualization color — `--lcs-accent`, confirmed 6 Sep 2026
+
+**A single-series chart (line, area, bar) uses `--lcs-accent` for its
+stroke/fill.** Confirmed by the founder when `app.profile.tsx`'s
+analytics chart (previously hardcoded `#7C3AED`, v1 purple) needed an
+answer — the same question was open for Group 9's `LazyChart.tsx` and is
+now settled for both from this one decision. This is a deliberate
+widening of accent's role beyond `LcsButton`'s primary variant (see the
+button-set row above, revised the same day: "the only *control* that
+fills with accent" — a chart series is not a control, so it doesn't
+violate that constraint). **No new chart-specific color was introduced**
+— do not invent a second accent-adjacent tone for data visualization;
+reach for `--lcs-accent` first.
+
 ## Chat-bubble radius — open, not resolved (Group 6.5 / Group 7 recon, 6 Sep 2026)
 
 **Two live surfaces render directional, rounded chat messages that don't
@@ -123,7 +137,7 @@ other "ask before inventing" gap this document already defers.
 | 06 | Card / section container | `Card.tsx` | `LcsCard`. Header (title + optional count badge + optional "View all", 42px tall) · body holds a table/list directly, no inner padding. 1px border, flat, no shadow. |
 | 07 | Empty state | `EmptyState.tsx` | `LcsEmptyState`. One plain sentence naming what would appear. No illustration, no mascot. Single optional action. |
 | 08 | Form field set | `FormField.tsx` | `LcsTextField`/`LcsSelectField`/`LcsTextareaField`/`LcsDropzone`. Label above input always, 11px gray helper text below. Error state: border + helper switch to attention tone, label stays neutral — no red anywhere. Inputs 32px tall, flat, sharp corners. |
-| 09 | Button set | `Button.tsx` | `LcsButton` with `variant`: `primary` (filled accent, one per view — the only place accent fills a shape) / `secondary` (outlined neutral) / `destructive` (outlined amber, never filled) / `text-link` (accent, no border). |
+| 09 | Button set | `Button.tsx` | `LcsButton` with `variant`: `primary` (filled accent, one per view — the only *control* that fills with accent) / `secondary` (outlined neutral) / `destructive` (outlined amber, never filled) / `text-link` (accent, no border). |
 | 10 | Modal / slide-over | `Modal.tsx` | `LcsModal`. Header (task name only) · body (context + form fields) · footer (right-aligned: cancel, then primary/destructive, in that order). `variant="slide-over"` anchors to the inline-end edge, full height. Escape key closes. |
 
 ## RTL and multi-language — built in from the start, not retrofitted
