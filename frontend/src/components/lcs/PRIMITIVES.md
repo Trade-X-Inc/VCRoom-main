@@ -43,6 +43,74 @@ replace with exact values if the founder supplies them.
 If LCS work needs a value not in the PDF, ask before inventing one — same
 rule §0a already states for layout.
 
+## `LcsStatusPill` is for states, not settings — standing rule (Group 7 recon, confirmed 6 Sep 2026)
+
+**A multi-value control is only a candidate for `LcsStatusPill` if its
+values represent progress through a lifecycle.** If the values are a
+user-chosen, mutually-exclusive *setting* with no inherent ordering —
+visibility level, access tier, category, role — putting it on the status
+pill's pending/in-progress/satisfied/attention vocabulary silently
+asserts an ordering the product may not intend, and can actively invert
+real meaning.
+
+**Concrete instance that surfaced this:** `app.profile.tsx`'s
+section-visibility control (`public` / `on_request` / `deal_room`) and
+the parallel `startup_profile_sections.visibility` vocabulary
+(`private` / `deal_room` / `public`, `achievements.tsx` /
+`ProfileBuilder.tsx`). These read as a 3-state progression on first
+glance — tempting to map `public → satisfied`, `deal_room →
+in-progress`. But the product's own copy states the opposite: `deal_room`
+is the **recommended, safest** setting, not a less-complete one. Mapping
+these onto `LcsStatusPill` would have shipped a visual signal that
+directly contradicts the security guidance sitting next to it.
+
+**Standing rule going forward:** a labeled multi-value control gets
+`LcsStatusPill` only when its values are genuine, ordered lifecycle
+states. Otherwise, use a plain segmented control — bordered options on
+`--lcs-line`, the selected option on `--lcs-accent`, no status tones at
+all. Before reaching for `LcsStatusPill` on any new multi-value control,
+ask: does this value represent *progress*, or a *choice*? If it's a
+choice, it isn't a status.
+
+## Chat-bubble radius — open, not resolved (Group 6.5 / Group 7 recon, 6 Sep 2026)
+
+**Two live surfaces render directional, rounded chat messages that don't
+fit the radius rule above:** `components/ai/AIChat.tsx` (`rounded-2xl`,
+i.e. 16px, plus `shadow-card`/`shadow-glow` and a Tailwind Typography
+`prose` scale for rendered Markdown) and `app.profile-builder.tsx`'s
+`InterviewScreen` (`borderRadius: 16`, plain text, no Markdown rendering
+today). Both are role-directional (sender vs. AI, opposite alignment),
+both use a circular avatar beside the bubble.
+
+**Why this isn't a case of "round the corner and move on":** the radius
+rule above is stated as an absolute — 3px for controls, 0px for
+everything structural, "never reach for a larger radius utility on
+structural elements." A chat message is structural content, not a
+control, so a 16px bubble radius isn't a stretched interpretation of the
+existing rule, it's a different rule the PDF doesn't define. Same
+reasoning applies to the two `shadow-*` usages (LCS has no shadow scale
+at all) and the `prose` typography (no LCS equivalent for rendered
+Markdown — headings, lists, code blocks, links).
+
+**Recommendation, not yet decided — needs the founder's call:** don't
+patch a bubble shape onto the existing control-radius token. A
+conversational surface is different enough in kind from every other LCS
+surface (page shells, tables, cards, forms) that it likely needs its own
+small, explicitly-scoped treatment — a documented exception (a named
+`--radius-lcs-bubble` token, if one is warranted) rather than reusing
+`--radius-lcs-control`, plus an explicit answer for Markdown styling
+(style rendered Markdown within the existing IBM Plex Sans scale, or
+accept a second small typography scale scoped to AI output only).
+Whichever way this goes, it settles both files at once — `AIChat.tsx`
+(deferred as its own item, "Group 6.5") and `app.profile-builder.tsx`'s
+`InterviewScreen` (Group 7's Phase-0 decision 4) — do not decide it once
+per file.
+
+**Not resolved here.** This section records the shape of the question and
+the evidence for why it can't be answered by extending the current radius
+rule; the actual answer needs the founder's design call, same as every
+other "ask before inventing" gap this document already defers.
+
 ## Components
 
 | # | Component | File | Notes |
