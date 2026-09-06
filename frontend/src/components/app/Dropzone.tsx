@@ -11,10 +11,10 @@ function validateFile(file: File): string | null {
   if (file.size > MAX_FILE_SIZE) return `${file.name}: exceeds 50 MB limit`;
   return null;
 }
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { uploadDocument, supabase } from "@/lib/supabase";
 import { logActivity } from "@/lib/activity-fn";
+import { LcsButton, LcsModal } from "@/components/lcs";
 
 export interface UploadedFile {
   id: string;
@@ -41,48 +41,38 @@ function MismatchDialog({
   onCancel: () => void;
 }) {
   return (
-    <div
-      style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
-      onClick={onCancel}
+    <LcsModal
+      title="Category mismatch"
+      onClose={onCancel}
+      footer={
+        <>
+          <LcsButton variant="secondary" onClick={onCancel}>
+            Cancel — pick the right tab
+          </LcsButton>
+          <LcsButton variant="primary" onClick={onContinue}>
+            Upload to {activeTab} anyway
+          </LcsButton>
+        </>
+      }
     >
-      <div
-        className="bg-card border border-border/60 rounded-none p-6 max-w-sm w-full shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start gap-3 mb-4">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(245,158,11,0.12)" }}>
-            <AlertTriangle className="h-4 w-4" style={{ color: "#F59E0B" }} />
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-foreground">Category mismatch</div>
-            <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-              This looks like a <strong className="text-foreground">{detectedCategory}</strong> document, but you're uploading to the <strong className="text-foreground">{activeTab}</strong> section.
-            </div>
-          </div>
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ background: "var(--lcs-attention-wash)" }}>
+          <AlertTriangle className="h-4 w-4" style={{ color: "var(--lcs-attention)" }} />
         </div>
         <div
-          className="rounded-lg text-xs text-muted-foreground leading-relaxed mb-5 px-3 py-2.5"
-          style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)" }}
+          className="text-[13px] leading-relaxed"
+          style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
         >
-          <strong className="text-foreground">{fileName}</strong> — AI classified this as <em>{detectedCategory}</em>. It will be filed under {activeTab} unless you cancel and switch tabs.
-        </div>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-xs rounded-lg border border-border/60 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Cancel — pick the right tab
-          </button>
-          <button
-            onClick={onContinue}
-            className="px-4 py-2 text-xs font-medium rounded-lg text-foreground transition-colors"
-            style={{ background: "var(--gradient-brand)" }}
-          >
-            Upload to {activeTab} anyway
-          </button>
+          This looks like a <strong style={{ color: "var(--lcs-ink)" }}>{detectedCategory}</strong> document, but you're uploading to the <strong style={{ color: "var(--lcs-ink)" }}>{activeTab}</strong> section.
         </div>
       </div>
-    </div>
+      <div
+        className="text-[12px] leading-relaxed px-3 py-2.5"
+        style={{ background: "var(--lcs-attention-wash)", border: "1px solid var(--lcs-attention)", color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <strong style={{ color: "var(--lcs-ink)" }}>{fileName}</strong> — AI classified this as <em>{detectedCategory}</em>. It will be filed under {activeTab} unless you cancel and switch tabs.
+      </div>
+    </LcsModal>
   );
 }
 
@@ -227,16 +217,24 @@ export function Dropzone({
           onDragLeave={() => setIsOver(false)}
           onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
-          className={cn(
-            "relative rounded-none border border-dashed p-8 text-center cursor-pointer transition-all",
-            isOver ? "border-brand bg-accent" : "border-border bg-muted/30 hover:border-brand/50 hover:bg-accent/40"
-          )}
+          className="relative border border-dashed p-8 text-center cursor-pointer transition-colors"
+          style={{
+            borderColor: isOver ? "var(--lcs-accent)" : "var(--lcs-line)",
+            background: isOver ? "var(--lcs-progress-wash)" : "var(--lcs-surface)",
+          }}
         >
-          <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-brand text-brand-foreground mx-auto shadow-glow">
+          <div
+            className="grid h-12 w-12 place-items-center mx-auto"
+            style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)" }}
+          >
             <Upload className="h-5 w-5" />
           </div>
-          <div className="mt-3 text-sm font-medium">{title}</div>
-          <div className="text-xs text-muted-foreground mt-1">{hint}</div>
+          <div className="mt-3 text-[14px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+            {title}
+          </div>
+          <div className="text-[12px] mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+            {hint}
+          </div>
           <input
             ref={inputRef}
             type="file"
@@ -248,33 +246,44 @@ export function Dropzone({
         </div>
 
         {files.length > 0 && (
-          <div className="rounded-none border border-border/60 bg-card shadow-card divide-y divide-border/60 overflow-hidden">
-            {files.map((f) => (
-              <div key={f.id} className="flex items-center gap-3 px-4 py-3">
-                <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0">
-                  <FileText className="h-4 w-4 text-brand" />
+          <div style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
+            {files.map((f, i) => (
+              <div
+                key={f.id}
+                className="flex items-center gap-3 px-4 py-3"
+                style={{ borderTop: i === 0 ? undefined : "1px solid var(--lcs-line)" }}
+              >
+                <div className="grid h-8 w-8 place-items-center shrink-0" style={{ background: "var(--lcs-surface)" }}>
+                  <FileText className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium truncate">{f.name}</div>
-                    <div className="text-[11px] text-muted-foreground tabular-nums shrink-0">{(f.size / 1024).toFixed(0)} KB</div>
+                    <div className="text-[13px] font-medium truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                      {f.name}
+                    </div>
+                    <div className="text-[11px] tabular-nums shrink-0" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
+                      {(f.size / 1024).toFixed(0)} KB
+                    </div>
                   </div>
                   {f.error ? (
-                    <div className="mt-1.5 text-xs text-destructive">Upload failed — try again</div>
+                    <div className="mt-1.5 text-[12px]" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}>
+                      Upload failed — try again
+                    </div>
                   ) : (
-                    <div className="mt-1.5 h-1 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-gradient-brand transition-all" style={{ width: `${f.progress}%` }} />
+                    <div className="mt-1.5 h-1 overflow-hidden" style={{ background: "var(--lcs-line)" }}>
+                      <div className="h-full transition-all" style={{ width: `${f.progress}%`, background: "var(--lcs-accent)" }} />
                     </div>
                   )}
                 </div>
                 {f.error ? (
-                  <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                  <XCircle className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-attention)" }} />
                 ) : f.progress === 100 ? (
-                  <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-satisfied)" }} />
                 ) : (
                   <button
                     onClick={(e) => { e.stopPropagation(); setFiles((xs) => xs.filter((x) => x.id !== f.id)); }}
-                    className="text-muted-foreground hover:text-foreground shrink-0"
+                    className="shrink-0"
+                    style={{ color: "var(--lcs-ink-muted)" }}
                   >
                     <X className="h-4 w-4" />
                   </button>
