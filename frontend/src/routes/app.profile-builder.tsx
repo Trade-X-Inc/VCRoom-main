@@ -19,6 +19,7 @@ import {
 import { seedFounderPlaybook } from "@/lib/desk-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
+import { LcsButton, LcsStatusPill, type LcsStatus } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/profile-builder")({
   component: ProfileBuilder,
@@ -119,38 +120,40 @@ const TEXTAREA_FIELDS = new Set(["problem", "solution", "business_model", "tract
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const card: React.CSSProperties = {
-  background: "var(--card)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
+  background: "var(--lcs-white)",
+  border: "1px solid var(--lcs-line)",
+  borderRadius: 0,
   padding: 28,
 };
 
 const inputBase: React.CSSProperties = {
   width: "100%",
-  background: "var(--accent)",
-  border: "1px solid var(--border)",
-  borderRadius: 8,
+  background: "var(--lcs-white)",
+  border: "1px solid var(--lcs-line)",
+  borderRadius: 0,
   padding: "10px 12px",
-  fontSize: 13,
-  color: "var(--foreground)",
+  fontSize: 14,
+  color: "var(--lcs-ink)",
   outline: "none",
   boxSizing: "border-box",
+  fontFamily: "var(--font-lcs-ui)",
 };
 
 const missingBorder: React.CSSProperties = {
   ...inputBase,
-  border: "1px solid rgba(245,158,11,0.4)",
-  background: "rgba(245,158,11,0.04)",
+  border: "1px solid var(--lcs-attention)",
+  background: "var(--lcs-attention-wash)",
 };
 
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
-  color: "var(--muted-foreground)",
+  color: "var(--lcs-ink-muted)",
   textTransform: "uppercase",
   letterSpacing: "0.06em",
   display: "block",
   marginBottom: 5,
+  fontFamily: "var(--font-lcs-data)",
 };
 
 // ── Main component ──────────────────────────────────────────────────────────────
@@ -749,28 +752,29 @@ function ProfileBuilder() {
 
   // done — profile saved, point at the next step instead of the dashboard
   if (screen === "done") return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--lcs-white)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
       <div style={{ maxWidth: 520, width: "100%", textAlign: "center" }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(16,185,129,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-          <Check size={26} style={{ color: "#10B981" }} />
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--lcs-satisfied-wash)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+          <Check size={26} style={{ color: "var(--lcs-satisfied)" }} />
         </div>
-        <h2 style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 26, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 10 }}>
+        <h2 style={{ fontFamily: "var(--font-lcs-ui)", fontWeight: 600, fontSize: 26, color: "var(--lcs-ink)", letterSpacing: "-0.03em", marginBottom: 10 }}>
           Profile built.
         </h2>
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 15, color: "var(--muted-foreground)", lineHeight: 1.6, marginBottom: 28 }}>
+        <p style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 15, color: "var(--lcs-ink-muted)", lineHeight: 1.6, marginBottom: 28 }}>
           Your profile is ready to share. Head to your dashboard to continue preparing for your raise.
         </p>
-        <button
+        <LcsButton
+          variant="primary"
           onClick={() => navigate({ to: "/app" as any })}
           data-testid="pb-done-verify-cta"
-          style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "Syne, sans-serif" }}
+          className="text-[15px] px-8 py-3.5"
         >
           Go to dashboard →
-        </button>
+        </LcsButton>
         <div style={{ marginTop: 16 }}>
           <button
             onClick={() => navigate({ to: "/app" as any })}
-            style={{ background: "transparent", border: "none", color: "var(--faint)", fontSize: 13, cursor: "pointer" }}
+            style={{ background: "transparent", border: "none", color: "var(--lcs-ink-muted)", fontSize: 13, cursor: "pointer", fontFamily: "var(--font-lcs-ui)" }}
           >
             Skip for now — go to dashboard
           </button>
@@ -808,7 +812,7 @@ function SelectScreen({
   onDismissIntro?: () => void;
 }) {
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--lcs-white)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
       {showIntro && onDismissIntro && (
         <OnboardingTour
           steps={[{
@@ -823,20 +827,22 @@ function SelectScreen({
         />
       )}
       <div style={{ maxWidth: 660, width: "100%" }}>
-        <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: "var(--lcs-accent)", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-lcs-data)" }}>
           Profile Builder
         </div>
-        <h1 style={{ fontSize: 32, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 8 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 600, color: "var(--lcs-ink)", letterSpacing: "-0.03em", marginBottom: 8, fontFamily: "var(--font-lcs-ui)" }}>
           Let's build your profile
         </h1>
-        <p style={{ fontSize: 15, color: "var(--muted-foreground)", marginBottom: 40, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 15, color: "var(--lcs-ink-muted)", marginBottom: 40, lineHeight: 1.6, fontFamily: "var(--font-lcs-ui)" }}>
           Two ways to do this. Pick whichever is faster for you.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {/* Card A — Documents */}
+          {/* Card A — Documents. Icon tints deliberately equal (not one
+              accent, one muted) — two equally-valid options, not a
+              preferred-vs-alternate pair (Group 7 Phase-0 decision 10). */}
           <PathCard
-            icon={<Upload size={24} style={{ color: "#a78bfa" }} />}
+            icon={<Upload size={24} style={{ color: "var(--lcs-ink-muted)" }} />}
             title="I have documents"
             description="Upload your pitch deck, financials, or any materials you already have. We'll extract what we can and ask you to confirm or fill gaps."
             time="~10 minutes"
@@ -845,7 +851,7 @@ function SelectScreen({
           />
           {/* Card B — Interview */}
           <PathCard
-            icon={<MessageCircle size={24} style={{ color: "#34d399" }} />}
+            icon={<MessageCircle size={24} style={{ color: "var(--lcs-ink-muted)" }} />}
             title="Start from scratch"
             description="No documents yet? We'll walk you through a structured conversation and build your profile from your answers."
             time="~15 minutes"
@@ -863,17 +869,14 @@ function SelectScreen({
               border: "none",
               cursor: "pointer",
               fontSize: 13,
-              color: "var(--faint)",
+              color: "var(--lcs-ink-muted)",
               padding: "8px 16px",
-              borderRadius: 8,
-              transition: "color 0.15s",
+              fontFamily: "var(--font-lcs-ui)",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--faint)")}
           >
             Skip for now — explore first
           </button>
-          <p style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>
+          <p style={{ fontSize: 11, color: "var(--lcs-ink-muted)", marginTop: 4, fontFamily: "var(--font-lcs-ui)" }}>
             You can always come back to this from your dashboard.
           </p>
         </div>
@@ -893,28 +896,27 @@ function PathCard({ icon, title, description, time, cta, onClick }: {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: "var(--card)",
-        border: `1px solid ${hover ? "rgba(124,58,237,0.4)" : "var(--border)"}`,
-        borderRadius: 16,
+        background: "var(--lcs-white)",
+        border: `1px solid ${hover ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
+        borderRadius: 0,
         padding: 28,
         cursor: "pointer",
-        transition: "border-color 0.15s, transform 0.12s",
-        transform: hover ? "translateY(-2px)" : "none",
+        transition: "border-color 0.15s",
         display: "flex",
         flexDirection: "column",
         gap: 14,
       }}
     >
-      <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(124,58,237,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 48, height: 48, background: "var(--lcs-surface)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {icon}
       </div>
       <div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "var(--foreground)", marginBottom: 8 }}>{title}</div>
-        <p style={{ fontSize: 13, color: "var(--muted-foreground)", lineHeight: 1.6, margin: 0 }}>{description}</p>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "var(--lcs-ink)", marginBottom: 8, fontFamily: "var(--font-lcs-ui)" }}>{title}</div>
+        <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)", lineHeight: 1.6, margin: 0, fontFamily: "var(--font-lcs-ui)" }}>{description}</p>
       </div>
       <div style={{ marginTop: "auto" }}>
-        <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 12 }}>{time}</div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "#a78bfa" }}>
+        <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", marginBottom: 12, fontFamily: "var(--font-lcs-ui)" }}>{time}</div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}>
           {cta} <ChevronRight size={14} />
         </div>
       </div>
@@ -940,15 +942,15 @@ function UploadScreen({
   onSubmit: () => void;
 }) {
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--lcs-white)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
       <div style={{ maxWidth: 560, width: "100%" }}>
-        <div style={{ marginBottom: 4, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <div style={{ marginBottom: 4, fontSize: 11, fontWeight: 600, color: "var(--lcs-accent)", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-lcs-data)" }}>
           Step 1 of 2
         </div>
-        <h2 style={{ fontSize: 26, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 6 }}>
+        <h2 style={{ fontSize: 26, fontWeight: 600, color: "var(--lcs-ink)", letterSpacing: "-0.03em", marginBottom: 6, fontFamily: "var(--font-lcs-ui)" }}>
           Upload your documents
         </h2>
-        <p style={{ fontSize: 13, color: "var(--muted-foreground)", marginBottom: 28 }}>
+        <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)", marginBottom: 28, fontFamily: "var(--font-lcs-ui)" }}>
           PDF, PPTX, DOCX, or XLSX. Add as many as you like — we'll extract from all of them.
         </p>
 
@@ -960,21 +962,20 @@ function UploadScreen({
           onDragLeave={onDragLeave}
           onClick={() => fileInputRef.current?.click()}
           style={{
-            border: `2px dashed ${dragOver ? "rgba(124,58,237,0.6)" : "var(--border)"}`,
-            borderRadius: 12,
+            border: `1px dashed ${dragOver ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
             padding: "40px 24px",
             textAlign: "center",
             cursor: "pointer",
-            background: dragOver ? "rgba(124,58,237,0.04)" : "transparent",
-            transition: "all 0.15s",
+            background: dragOver ? "var(--lcs-progress-wash)" : "var(--lcs-surface)",
+            transition: "border-color 0.15s, background 0.15s",
             marginBottom: 16,
           }}
         >
-          <Upload size={28} style={{ color: "var(--faint)", margin: "0 auto 12px" }} />
-          <div style={{ fontSize: 14, fontWeight: 500, color: "var(--muted-foreground)", marginBottom: 4 }}>
+          <Upload size={28} style={{ color: "var(--lcs-ink-muted)", margin: "0 auto 12px" }} />
+          <div style={{ fontSize: 14, fontWeight: 500, color: "var(--lcs-ink)", marginBottom: 4, fontFamily: "var(--font-lcs-ui)" }}>
             Drop files here or click to browse
           </div>
-          <div style={{ fontSize: 12, color: "var(--faint)" }}>
+          <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
             Pitch deck · Financials · Any document you have
           </div>
         </div>
@@ -991,11 +992,11 @@ function UploadScreen({
         {files.length > 0 && (
           <div style={{ marginBottom: 24, display: "flex", flexDirection: "column", gap: 8 }}>
             {files.map((f) => (
-              <div key={f.name} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 14px" }}>
-                <FileText size={14} style={{ color: "#a78bfa", flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: 13, color: "var(--foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
-                <span style={{ fontSize: 11, color: "var(--faint)", flexShrink: 0 }}>{(f.size / 1024).toFixed(0)} KB</span>
-                <button onClick={(e) => { e.stopPropagation(); onRemove(f.name); }} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--faint)", padding: 2, display: "flex" }}>
+              <div key={f.name} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", padding: "10px 14px" }}>
+                <FileText size={14} style={{ color: "var(--lcs-ink-muted)", flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: 13, color: "var(--lcs-ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "var(--font-lcs-ui)" }}>{f.name}</span>
+                <span style={{ fontSize: 11, color: "var(--lcs-ink-muted)", flexShrink: 0, fontFamily: "var(--font-lcs-data)" }}>{(f.size / 1024).toFixed(0)} KB</span>
+                <button onClick={(e) => { e.stopPropagation(); onRemove(f.name); }} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--lcs-ink-muted)", padding: 2, display: "flex" }}>
                   <X size={14} />
                 </button>
               </div>
@@ -1003,19 +1004,14 @@ function UploadScreen({
           </div>
         )}
 
-        <button
+        <LcsButton
+          variant="primary"
           onClick={onSubmit}
           disabled={!files.length || uploading}
-          style={{
-            width: "100%", background: files.length && !uploading ? "var(--gradient-brand)" : "var(--accent)",
-            color: files.length && !uploading ? "#fff" : "var(--faint)",
-            border: "none", borderRadius: 10, padding: "13px 24px",
-            fontSize: 14, fontWeight: 600, cursor: files.length && !uploading ? "pointer" : "not-allowed",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          }}
+          className="w-full justify-center text-[14px] py-3"
         >
           {uploading ? <><Loader2 size={15} className="animate-spin" /> Reading documents…</> : "Extract profile from documents →"}
-        </button>
+        </LcsButton>
       </div>
     </div>
   );
@@ -1122,16 +1118,16 @@ function InterviewScreen({
 
 function ExtractingScreen() {
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20 }}>
-      <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Sparkles size={22} style={{ color: "#a78bfa" }} className="animate-pulse" />
+    <div style={{ minHeight: "100vh", background: "var(--lcs-white)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20 }}>
+      <div style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--lcs-progress-wash)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Sparkles size={22} style={{ color: "var(--lcs-accent)" }} className="animate-pulse" />
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--foreground)", marginBottom: 6 }}>Reading your documents…</div>
-        <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>This usually takes 10–20 seconds</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--lcs-ink)", marginBottom: 6, fontFamily: "var(--font-lcs-ui)" }}>Reading your documents…</div>
+        <div style={{ fontSize: 13, color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>This usually takes 10–20 seconds</div>
       </div>
-      <div style={{ width: 200, height: 3, background: "var(--accent)", borderRadius: 99, overflow: "hidden" }}>
-        <div style={{ height: "100%", background: "var(--gradient-brand)", borderRadius: 99, animation: "extractProgress 2s ease-in-out infinite" }} />
+      <div style={{ width: 200, height: 3, background: "var(--lcs-line)", overflow: "hidden" }}>
+        <div style={{ height: "100%", background: "var(--lcs-accent)", animation: "extractProgress 2s ease-in-out infinite" }} />
       </div>
       <style>{`@keyframes extractProgress { 0%{width:0%} 50%{width:80%} 100%{width:100%} }`}</style>
     </div>
@@ -1204,12 +1200,12 @@ function FieldRow({ fieldKey, optional, form, isMissing, onField }: {
       <div style={{ marginBottom: 16 }}>
         <label style={labelStyle}>{FIELD_LABELS[fieldKey as string]}</label>
         {missing && (
-          <div style={{ fontSize: 11, color: "#F59E0B", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ fontSize: 11, color: "var(--lcs-attention)", marginBottom: 4, display: "flex", alignItems: "center", gap: 4, fontFamily: "var(--font-lcs-ui)" }}>
             <AlertTriangle size={11} /> We couldn't find this — please fill it in.
           </div>
         )}
         {!missing && !optional && (
-          <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 4 }}>
+          <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", marginBottom: 4, fontFamily: "var(--font-lcs-ui)" }}>
             AI-extracted — review and edit
           </div>
         )}
@@ -1252,9 +1248,9 @@ function FieldRow({ fieldKey, optional, form, isMissing, onField }: {
 
 function SectionHeader({ title, hint }: { title: string; hint: string }) {
   return (
-    <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid var(--border)" }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--foreground)" }}>{title}</div>
-      <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 2 }}>{hint}</div>
+    <div style={{ margin: "26px 0 14px", paddingTop: 20, borderTop: "1px solid var(--lcs-line)" }}>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{title}</div>
+      <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 2, fontFamily: "var(--font-lcs-ui)" }}>{hint}</div>
     </div>
   );
 }
@@ -1282,22 +1278,22 @@ function ConfirmScreen({
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", padding: "40px 16px" }}>
+    <div style={{ minHeight: "100vh", background: "var(--lcs-white)", padding: "40px 16px" }}>
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
-        <div style={{ marginBottom: 6, fontSize: 11, fontWeight: 600, color: "rgba(124,58,237,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+        <div style={{ marginBottom: 6, fontSize: 11, fontWeight: 600, color: "var(--lcs-accent)", textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: "var(--font-lcs-data)" }}>
           Step 2 of 2
         </div>
-        <h2 style={{ fontSize: 26, fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 8 }}>
+        <h2 style={{ fontSize: 26, fontWeight: 600, color: "var(--lcs-ink)", letterSpacing: "-0.03em", marginBottom: 8, fontFamily: "var(--font-lcs-ui)" }}>
           Here's what we found. Confirm or fix anything that's off.
         </h2>
         {missingFields.length > 0 && (
-          <div style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 24, fontSize: 12, color: "#F59E0B", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ background: "var(--lcs-attention-wash)", border: "1px solid var(--lcs-attention)", padding: "10px 14px", marginBottom: 24, fontSize: 12, color: "var(--lcs-attention)", display: "flex", alignItems: "center", gap: 8, fontFamily: "var(--font-lcs-ui)" }}>
             <AlertTriangle size={14} />
             {missingFields.length} field{missingFields.length !== 1 ? "s" : ""} couldn't be found in your documents — please fill them in below.
           </div>
         )}
         {extractionError && (
-          <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 24, fontSize: 12, color: "#EF4444", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ background: "var(--lcs-attention-wash)", border: "1px solid var(--lcs-attention)", padding: "10px 14px", marginBottom: 24, fontSize: 12, color: "var(--lcs-attention)", display: "flex", alignItems: "center", gap: 8, fontFamily: "var(--font-lcs-ui)" }}>
             <AlertTriangle size={14} />
             We had trouble processing that. You can still fill in the details manually below.
           </div>
@@ -1306,8 +1302,8 @@ function ConfirmScreen({
         {/* Per-document detection results */}
         {docResults && docResults.length > 0 && (
           <div style={{ ...card, marginBottom: 24 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--foreground)", marginBottom: 2 }}>Documents we read</div>
-            <div style={{ fontSize: 12, color: "var(--faint)", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--lcs-ink)", marginBottom: 2, fontFamily: "var(--font-lcs-ui)" }}>Documents we read</div>
+            <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginBottom: 14, fontFamily: "var(--font-lcs-ui)" }}>
               What each file was detected as, and what we pulled from it.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1315,38 +1311,28 @@ function ConfirmScreen({
                 const unknown = result.document_type === "unknown";
                 const lowConf = result.confidence !== "high";
                 const summary = extractionSummary(result);
+                const typeStatus: LcsStatus = unknown ? "attention" : "satisfied";
+                const confStatus: LcsStatus = lowConf ? "attention" : "pending";
                 return (
-                  <div key={fileName} style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 14px" }}>
+                  <div key={fileName} style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", padding: "10px 14px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                      <FileText size={13} style={{ color: "var(--faint)", flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: "var(--foreground)", fontWeight: 500, wordBreak: "break-all" }}>{fileName}</span>
-                      <span style={{
-                        fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999,
-                        background: unknown ? "rgba(245,158,11,0.12)" : "rgba(16,185,129,0.12)",
-                        color: unknown ? "#F59E0B" : "#10B981",
-                      }}>
-                        {DOC_TYPE_LABELS[result.document_type]}
-                      </span>
+                      <FileText size={13} style={{ color: "var(--lcs-ink-muted)", flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, color: "var(--lcs-ink)", fontWeight: 500, wordBreak: "break-all", fontFamily: "var(--font-lcs-ui)" }}>{fileName}</span>
+                      <LcsStatusPill status={typeStatus} label={DOC_TYPE_LABELS[result.document_type]} />
                       {!unknown && (
-                        <span style={{
-                          fontSize: 11, padding: "2px 8px", borderRadius: 999,
-                          background: lowConf ? "rgba(245,158,11,0.12)" : "var(--accent)",
-                          color: lowConf ? "#F59E0B" : "var(--muted-foreground)",
-                        }}>
-                          {lowConf ? "Low confidence — double-check below" : "High confidence"}
-                        </span>
+                        <LcsStatusPill status={confStatus} label={lowConf ? "Low confidence — double-check below" : "High confidence"} />
                       )}
                     </div>
                     {unknown ? (
-                      <div style={{ fontSize: 12, color: "#F59E0B", marginTop: 6 }}>
+                      <div style={{ fontSize: 12, color: "var(--lcs-attention)", marginTop: 6, fontFamily: "var(--font-lcs-ui)" }}>
                         Could not detect document type — please review manually.{result.detail ? ` ${result.detail}` : ""}
                       </div>
                     ) : summary.length > 0 ? (
-                      <div style={{ fontSize: 12, color: "var(--muted-foreground)", marginTop: 6, display: "flex", flexWrap: "wrap", gap: "4px 14px" }}>
+                      <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 6, display: "flex", flexWrap: "wrap", gap: "4px 14px", fontFamily: "var(--font-lcs-ui)" }}>
                         {summary.map((s) => <span key={s}>{s}</span>)}
                       </div>
                     ) : (
-                      <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 6 }}>
+                      <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 6, fontFamily: "var(--font-lcs-ui)" }}>
                         Detected, but no structured fields could be extracted.
                       </div>
                     )}
@@ -1364,10 +1350,10 @@ function ConfirmScreen({
           <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>Team</label>
             {!isMissing("team") && (
-              <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 4 }}>AI-extracted — review and edit</div>
+              <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", marginBottom: 4, fontFamily: "var(--font-lcs-ui)" }}>AI-extracted — review and edit</div>
             )}
             {isMissing("team") && (
-              <div style={{ fontSize: 11, color: "#F59E0B", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{ fontSize: 11, color: "var(--lcs-attention)", marginBottom: 4, display: "flex", alignItems: "center", gap: 4, fontFamily: "var(--font-lcs-ui)" }}>
                 <AlertTriangle size={11} /> We couldn't find this — please fill it in.
               </div>
             )}
@@ -1396,7 +1382,7 @@ function ConfirmScreen({
                   />
                   <button
                     onClick={() => onField("team")(form.team.filter((_, j) => j !== i))}
-                    style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--faint)", padding: "0 4px", display: "flex", alignItems: "center" }}
+                    style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--lcs-ink-muted)", padding: "0 4px", display: "flex", alignItems: "center" }}
                   >
                     <X size={14} />
                   </button>
@@ -1404,7 +1390,7 @@ function ConfirmScreen({
               ))}
               <button
                 onClick={() => onField("team")([...form.team, { name: "", role: "" }])}
-                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "1px dashed var(--border)", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "var(--muted-foreground)", cursor: "pointer", width: "fit-content" }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "transparent", border: "1px dashed var(--lcs-line)", padding: "8px 14px", fontSize: 12, color: "var(--lcs-ink-muted)", cursor: "pointer", width: "fit-content", fontFamily: "var(--font-lcs-ui)" }}
               >
                 <Plus size={12} /> Add team member
               </button>
@@ -1470,19 +1456,14 @@ function ConfirmScreen({
           </div>
         </div>
 
-        <button
+        <LcsButton
+          variant="primary"
           onClick={onSave}
           disabled={saving}
-          style={{
-            marginTop: 24, width: "100%", background: saving ? "var(--accent)" : "var(--gradient-brand)",
-            color: saving ? "var(--faint)" : "#fff",
-            border: "none", borderRadius: 10, padding: "14px 24px",
-            fontSize: 15, fontWeight: 600, cursor: saving ? "not-allowed" : "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          }}
+          className="mt-6 w-full justify-center text-[15px] py-3.5"
         >
           {saving ? <><Loader2 size={15} className="animate-spin" /> Saving…</> : <><Check size={15} /> Save and continue →</>}
-        </button>
+        </LcsButton>
       </div>
     </div>
   );
