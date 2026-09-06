@@ -8,6 +8,7 @@ import { logActivity } from "@/lib/activity-fn";
 import { Logo } from "@/components/brand/Logo";
 import { triggerNdaSignedEmail } from "@/lib/email/triggers";
 import { generateNdaDocument } from "@/lib/nda-fn";
+import { LcsButton } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/nda")({
   component: NdaPage,
@@ -261,26 +262,26 @@ function NdaPage() {
   if (checkingNda || roomLoading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] grid place-items-center">
-        <div className="text-sm text-muted-foreground animate-pulse">Loading…</div>
+        <div className="text-sm animate-pulse" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Loading…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-muted/30 py-10 px-4">
+    <div className="min-h-[calc(100vh-4rem)] py-10 px-4" style={{ background: "var(--lcs-surface)", fontFamily: "var(--font-lcs-ui)" }}>
       <div className="mx-auto max-w-2xl">
         <div className="flex justify-center mb-8">
           <Logo withWordmark />
         </div>
 
-        <div className="rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden">
-          <div className="px-8 py-6 border-b border-border/60 flex items-center gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-accent border border-brand/20">
-              <Shield className="h-6 w-6 text-brand" />
+        <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="px-8 py-6 border-b flex items-center gap-4" style={{ borderColor: "var(--lcs-line)" }}>
+            <div className="grid h-12 w-12 shrink-0 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-progress-wash)" }}>
+              <Shield className="h-6 w-6" style={{ color: "var(--lcs-accent)" }} />
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight">Non-Disclosure Agreement</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)" }}>Non-Disclosure Agreement</h1>
+              <p className="text-sm mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>
                 Review and sign to access this deal room.
               </p>
             </div>
@@ -288,25 +289,27 @@ function NdaPage() {
 
           <div className="px-8 py-6 space-y-6">
             <div className="grid grid-cols-3 gap-3 text-xs">
-              <div className="rounded-lg border border-border/60 bg-background p-3">
-                <div className="text-muted-foreground mb-0.5">Company</div>
-                <div className="font-medium truncate">{startupName}</div>
+              <div className="border p-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                <div className="mb-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Company</div>
+                <div className="font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{startupName}</div>
               </div>
-              <div className="rounded-lg border border-border/60 bg-background p-3">
-                <div className="text-muted-foreground mb-0.5">Signing as</div>
-                <div className="font-medium truncate">{signerName}</div>
+              <div className="border p-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                <div className="mb-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Signing as</div>
+                <div className="font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{signerName}</div>
               </div>
-              <div className="rounded-lg border border-border/60 bg-background p-3">
-                <div className="text-muted-foreground mb-0.5">Version</div>
-                <div className="font-medium">v1.0 · {today}</div>
+              <div className="border p-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                <div className="mb-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Version</div>
+                <div className="font-medium" style={{ color: "var(--lcs-ink)" }}>v1.0 · {today}</div>
               </div>
             </div>
 
             <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+              <div className="text-xs uppercase tracking-wider font-semibold mb-2" style={{ color: "var(--lcs-ink-muted)" }}>
                 Agreement text
               </div>
-              <div className="h-64 overflow-y-auto rounded-none border border-border/60 bg-background p-5 text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap">
+              {/* Chrome only — ndaPreviewText itself (the recorded agreement
+                  content) is untouched, per standing instruction. */}
+              <div className="h-64 overflow-y-auto border p-5 text-xs leading-relaxed whitespace-pre-wrap" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>
                 {ndaPreviewText}
               </div>
             </div>
@@ -316,20 +319,23 @@ function NdaPage() {
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)] cursor-pointer"
+                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer"
+                style={{ accentColor: "var(--lcs-accent)" }}
               />
-              <span className="text-sm leading-snug">
+              <span className="text-sm leading-snug" style={{ color: "var(--lcs-ink)" }}>
                 I have read and agree to the terms of this Non-Disclosure Agreement. I understand
                 this is a legally binding agreement executed electronically.
               </span>
             </label>
 
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-sm" style={{ color: "var(--lcs-attention)" }}>{error}</p>}
 
-            <button
+            <LcsButton
+              variant="primary"
               onClick={handleAccept}
               disabled={!agreed || accepting || !user?.id}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-brand text-brand-foreground py-3 text-sm font-medium disabled:opacity-50 transition-all hover:scale-[1.01]"
+              className="w-full justify-center"
+              style={{ height: "auto", padding: "12px 16px" }}
             >
               {accepting ? (
                 <>
@@ -340,9 +346,9 @@ function NdaPage() {
                   <Lock className="h-4 w-4" /> Accept &amp; Enter Deal Room
                 </>
               )}
-            </button>
+            </LcsButton>
 
-            <p className="text-center text-xs text-muted-foreground pb-2">
+            <p className="text-center text-xs pb-2" style={{ color: "var(--lcs-ink-muted)" }}>
               Your acceptance is timestamped and logged with your browser&apos;s user-agent string.
             </p>
           </div>
