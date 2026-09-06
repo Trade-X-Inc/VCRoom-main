@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { LcsEmptyState } from "@/components/lcs";
+import { LcsEmptyState, LcsButton, LcsStatusPill, type LcsStatus, LcsModal, LcsSkeleton } from "@/components/lcs";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
@@ -819,9 +819,9 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
   if (isLoading) {
     return (
       <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-4">
-        <div className="h-8 w-64 rounded-lg bg-muted animate-pulse" />
-        <div className="h-4 w-96 rounded bg-muted/60 animate-pulse" />
-        <div className="h-64 rounded-2xl bg-muted/40 animate-pulse" />
+        <LcsSkeleton className="h-8 w-64" />
+        <LcsSkeleton className="h-4 w-96" />
+        <LcsSkeleton className="h-64" />
       </div>
     );
   }
@@ -869,46 +869,37 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           </div>
           <div className="flex items-center justify-between flex-wrap gap-3 mb-6 no-print">
             <div>
-              <h1 className="text-lg font-bold tracking-tight">Company Profile</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">How investors see your startup.</p>
+              <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Company Profile</h1>
+              <p className="text-sm mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>How investors see your startup.</p>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleDownloadPDF}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
-              >
+              <LcsButton variant="secondary" onClick={handleDownloadPDF} style={{ height: 32 }}>
                 <Download className="h-4 w-4" /> Download PDF
-              </button>
-              <button
-                onClick={() => setMode("edit")}
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-2 text-sm shadow-glow"
-              >
+              </LcsButton>
+              <LcsButton variant="primary" onClick={() => setMode("edit")} style={{ height: 32 }}>
                 <Edit3 className="h-4 w-4" /> Edit profile
-              </button>
+              </LcsButton>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/60 bg-card shadow-card overflow-hidden print-card">
-            <div className="h-28 bg-gradient-mesh relative">
-              <div className="absolute inset-0 noise opacity-40" />
-            </div>
+          <div className="border overflow-hidden print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+            <div className="h-28 relative" style={{ background: "var(--lcs-surface)" }} />
             <div className="px-6 pb-6 -mt-10">
               <div className="flex items-end gap-4">
-                <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-background shadow-elev overflow-hidden shrink-0">
+                <div
+                  className="grid h-20 w-20 place-items-center text-lg font-bold overflow-hidden shrink-0"
+                  style={{ borderRadius: "50%", background: "var(--lcs-accent)", color: "var(--lcs-white)", border: "4px solid var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
+                >
                   {logoUrl
                     ? <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
                     : <span>{initials}</span>}
                 </div>
                 <div className="pb-1">
-                  <h2 className="text-2xl font-bold">{form.company_name || "Unnamed Company"}</h2>
-                  {filled(form.tagline) && <p className="text-sm text-muted-foreground mt-0.5">{form.tagline}</p>}
+                  <h2 className="text-2xl font-bold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{form.company_name || "Unnamed Company"}</h2>
+                  {filled(form.tagline) && <p className="text-sm mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>{form.tagline}</p>}
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    {filled(form.stage) && (
-                      <span className="rounded-full bg-accent text-brand text-xs px-2.5 py-0.5 font-medium">{form.stage}</span>
-                    )}
-                    {filled(form.sector) && (
-                      <span className="rounded-full bg-violet/10 text-violet text-xs px-2.5 py-0.5 font-medium">{form.sector}</span>
-                    )}
+                    {filled(form.stage) && <LcsStatusPill status="in-progress" label={form.stage} />}
+                    {filled(form.sector) && <LcsStatusPill status="pending" label={form.sector} />}
                   </div>
                 </div>
               </div>
@@ -916,20 +907,20 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           </div>
 
           {filled(form.description) && (
-            <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
-              <div className="text-sm font-semibold mb-2">About</div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{form.description}</p>
+            <div className="mt-4 border p-5 print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+              <div className="text-sm font-semibold mb-2" style={{ color: "var(--lcs-ink)" }}>About</div>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{form.description}</p>
             </div>
           )}
 
           {pairs.length > 0 && (
-            <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
-              <div className="text-sm font-semibold mb-3">Key details</div>
+            <div className="mt-4 border p-5 print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+              <div className="text-sm font-semibold mb-3" style={{ color: "var(--lcs-ink)" }}>Key details</div>
               <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
                 {pairs.map(([label, val]) => (
-                  <div key={label} className="flex items-center justify-between border-b border-border/40 pb-2 gap-2">
-                    <span className="text-xs text-muted-foreground shrink-0">{label}</span>
-                    <span className="text-sm font-medium truncate">{val}</span>
+                  <div key={label} className="flex items-center justify-between pb-2 gap-2" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
+                    <span className="text-xs shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>{label}</span>
+                    <span className="text-sm font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{val}</span>
                   </div>
                 ))}
               </div>
@@ -939,15 +930,15 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           {(filled(form.problem) || filled(form.solution)) && (
             <div className="mt-4 grid sm:grid-cols-2 gap-4">
               {filled(form.problem) && (
-                <div className="rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
-                  <div className="text-sm font-semibold mb-2">Problem</div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{form.problem}</p>
+                <div className="border p-5 print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-sm font-semibold mb-2" style={{ color: "var(--lcs-ink)" }}>Problem</div>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{form.problem}</p>
                 </div>
               )}
               {filled(form.solution) && (
-                <div className="rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
-                  <div className="text-sm font-semibold mb-2">Solution</div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{form.solution}</p>
+                <div className="border p-5 print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-sm font-semibold mb-2" style={{ color: "var(--lcs-ink)" }}>Solution</div>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{form.solution}</p>
                 </div>
               )}
             </div>
@@ -962,17 +953,17 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                 ["Why now?", form.why_now],
                 ["Competitive advantage", form.competitive_advantage],
               ].filter(([, v]) => filled(v)).map(([label, val]) => (
-                <div key={label as string} className="rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
-                  <div className="text-sm font-semibold mb-2">{label}</div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{val}</p>
+                <div key={label as string} className="border p-5 print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-sm font-semibold mb-2" style={{ color: "var(--lcs-ink)" }}>{label}</div>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{val}</p>
                 </div>
               ))}
             </div>
           )}
 
           {(filled(form.founder_name) || filled(form.founder_email)) && (
-            <div className="mt-4 rounded-none border border-border/60 bg-card p-5 shadow-card print-card">
-              <div className="text-sm font-semibold mb-3">Contact</div>
+            <div className="mt-4 border p-5 print-card" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+              <div className="text-sm font-semibold mb-3" style={{ color: "var(--lcs-ink)" }}>Contact</div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
                   ["Founder", form.founder_name],
@@ -982,8 +973,8 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                   ["Co-founder LinkedIn", form.cofounder_linkedin],
                 ].filter(([, v]) => filled(v)).map(([label, val]) => (
                   <div key={label as string}>
-                    <div className="text-xs text-muted-foreground">{label}</div>
-                    <div className="text-sm font-medium mt-0.5">{val}</div>
+                    <div className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{label}</div>
+                    <div className="text-sm font-medium mt-0.5" style={{ color: "var(--lcs-ink)" }}>{val}</div>
                   </div>
                 ))}
               </div>
@@ -1003,17 +994,16 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
   // ── Edit Mode ──────────────────────────────────────────────────────
 
   const SaveBtn = ({ full = false }: { full?: boolean }) => (
-    <button
+    <LcsButton
+      variant="primary"
       onClick={handleSave}
       disabled={saving}
-      className={cn(
-        "inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60",
-        full && "w-full justify-center",
-      )}
+      className={full ? "w-full" : ""}
+      style={{ height: 32, ...(full ? { width: "100%" } : {}) }}
     >
       {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
       Save changes
-    </button>
+    </LcsButton>
   );
 
   return (
@@ -1030,44 +1020,49 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       </div>
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-lg font-bold tracking-tight">{startup ? "Edit profile" : "Create your profile"}</h1>
-          <div className="text-sm text-muted-foreground">
+          <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{startup ? "Edit profile" : "Create your profile"}</h1>
+          <div className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
             {startup ? "Edit your startup details, team, and pitch." : "Set up your startup profile so investors know who you are."}
           </div>
         </div>
         <div className="flex items-center gap-2">
           <PageGuide pageId="profile" />
           {startup && (
-            <button
-              onClick={() => setMode("view")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent"
-            >
+            <LcsButton variant="secondary" onClick={() => setMode("view")} style={{ height: 32 }}>
               <Eye className="h-4 w-4" /> View profile
-            </button>
+            </LcsButton>
           )}
           <SaveBtn />
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5 shadow-card">
+      <div className="mt-6 border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm text-muted-foreground">Profile completion</div>
+            <div className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>Profile completion</div>
             <div className="mt-2 flex items-center gap-3">
-              <div className="h-2 flex-1 overflow-hidden rounded-full bg-accent">
-                <div className={`h-full rounded-full ${completenessScore < 41 ? "bg-red-500" : completenessScore < 80 ? "bg-amber-400" : "bg-emerald-500"}`} style={{ width: `${Math.min(completenessScore, 100)}%` }} />
+              <div className="h-2 flex-1 overflow-hidden" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-surface)" }}>
+                <div
+                  className="h-full"
+                  style={{
+                    borderRadius: "var(--radius-lcs-control)",
+                    width: `${Math.min(completenessScore, 100)}%`,
+                    background: completenessScore < 41 ? "var(--lcs-attention)" : completenessScore < 80 ? "var(--lcs-progress)" : "var(--lcs-satisfied)",
+                  }}
+                />
               </div>
-              <div className="text-sm font-semibold">{completenessScore}%</div>
+              <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{completenessScore}%</div>
             </div>
           </div>
-          <button
+          <LcsButton
+            variant={profileReady ? "primary" : "secondary"}
             data-tour="publish-button"
             onClick={handleGoLive}
             disabled={!profileReady || profilePublishing}
-            className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${profileReady ? "hs-gradient text-foreground hover:bg-[#6d28d9]" : "bg-accent text-muted-foreground cursor-not-allowed"}`}
+            style={{ height: 32 }}
           >
             Go live
-          </button>
+          </LcsButton>
         </div>
         {progress?.account_type === "founder" && progress.current_step === "publish" && (
           <OnboardingTour
@@ -1084,14 +1079,14 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           />
         )}
         {completenessScore < 80 && (
-          <div className="mt-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
+          <div className="mt-4 px-4 py-3 text-sm" style={{ borderRadius: 0, border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)" }}>
             <span className="font-semibold">Your profile is not yet visible in the directory.</span> Complete at least 80% to go live.
           </div>
         )}
       </div>
 
       {startup && !form.company_name.trim() && (
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
+        <div className="mt-4 flex items-start gap-3 px-4 py-3 text-sm" style={{ borderRadius: 0, border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)" }}>
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>
             <span className="font-semibold">Company name is missing.</span>{" "}
@@ -1110,21 +1105,22 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       {(!view || view === "full" || view === "preview") && (() => {
         const canUpload = !view || view === "full";
         return (
-      <div className="mt-6 rounded-none border border-border bg-white shadow-card overflow-hidden">
+      <div className="mt-6 overflow-hidden" style={{ borderRadius: 0, border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
         <CoverArea readOnly={!canUpload}>
           {coverUrl ? (
             <img src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
           ) : (
-            <div className="h-full w-full bg-gradient-mesh relative">
-              <div className="absolute inset-0 noise opacity-40" />
-            </div>
+            <div className="h-full w-full relative" style={{ background: "var(--lcs-surface)" }} />
           )}
           {canUpload && (
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
               {coverUploading ? (
                 <Loader2 className="h-5 w-5 animate-spin text-white" />
               ) : (
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1.5 rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium text-foreground">
+                <span
+                  className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium"
+                  style={{ borderRadius: "var(--radius-lcs-control)", background: "rgba(255,255,255,0.9)", color: "var(--lcs-ink)" }}
+                >
                   <Upload className="h-3.5 w-3.5" /> {coverUrl ? "Replace cover" : "Add cover image"}
                 </span>
               )}
@@ -1135,15 +1131,18 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         <div className="px-6 pb-6 -mt-10 relative">
           <div className="flex items-end gap-4">
             <LogoArea readOnly={!canUpload}>
-              <div className="grid h-20 w-20 place-items-center rounded-none bg-gradient-brand text-brand-foreground text-lg font-bold border-4 border-white shadow-elev overflow-hidden">
+              <div
+                className="grid h-20 w-20 place-items-center text-lg font-bold overflow-hidden"
+                style={{ borderRadius: "50%", background: "var(--lcs-accent)", color: "var(--lcs-white)", border: "4px solid var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
+              >
                 {logoUploading
-                  ? <Loader2 className="h-6 w-6 animate-spin text-brand-foreground" />
+                  ? <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--lcs-white)" }} />
                   : logoUrl
                   ? <img src={logoUrl} alt="logo" className="h-full w-full object-cover" />
                   : <span>{initials}</span>}
               </div>
               {canUpload && (
-                <div className="absolute inset-0 rounded-none bg-black/40 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderRadius: "50%", background: "rgba(0,0,0,0.4)" }}>
                   <Upload className="h-5 w-5 text-white" />
                 </div>
               )}
@@ -1151,24 +1150,23 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             </LogoArea>
           </div>
           <div className="mt-4">
-            <div className="text-xl font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>{form.company_name || "Your Company"}</div>
-            <div className="text-sm mt-1" style={{ color: "#52525B" }}>{form.tagline || form.description || "Add a tagline below"}</div>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: "#71717A" }}>
+            <div className="text-xl font-semibold" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>{form.company_name || "Your Company"}</div>
+            <div className="text-sm mt-1" style={{ color: "var(--lcs-ink-muted)" }}>{form.tagline || form.description || "Add a tagline below"}</div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--lcs-ink-muted)" }}>
               <span>Your profile link:</span>
-              <span className="rounded-none border border-border bg-white px-2 py-1 text-[11px] font-medium text-foreground">lengdon.com/p/{profileSlug || "your-slug"}</span>
-              <button
-                type="button"
+              <span className="px-2 py-1 text-[11px] font-medium" style={{ borderRadius: 0, border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-data)" }}>lengdon.com/p/{profileSlug || "your-slug"}</span>
+              <LcsButton
+                variant="secondary"
                 onClick={() => {
                   if (profileSlug) {
                     navigator.clipboard.writeText(`https://lengdon.com/p/${profileSlug}`);
                     toast.success("Profile URL copied");
                   }
                 }}
-                className="inline-flex items-center gap-1 rounded-none border border-border bg-white px-2 py-1 text-xs hover:bg-accent transition-colors"
-                style={{ color: "#52525B" }}
+                style={{ height: 24, padding: "0 8px" }}
               >
                 <Copy className="h-3.5 w-3.5" /> Copy
-              </button>
+              </LcsButton>
             </div>
           </div>
         </div>
@@ -1179,49 +1177,64 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       {/* STEP 6: Quick setup / Full details tabs — hidden under R9 route
           control, where the swapped sidebar owns navigation between slices */}
       {!view && (
-      <div className="mt-5 flex items-center gap-1 rounded-lg border border-border/60 bg-muted/30 p-1 w-fit">
+      <div className="mt-5 flex items-center gap-1 p-1 w-fit" style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
         <button
           onClick={() => setTab("quick")}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
-            tab === "quick" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
-          )}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            background: tab === "quick" ? "var(--lcs-white)" : "transparent",
+            color: tab === "quick" ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+            fontWeight: tab === "quick" ? 600 : 400,
+          }}
         >
           <Zap className="h-3.5 w-3.5" /> Quick setup
         </button>
         <button
           onClick={() => setTab("full")}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
-            tab === "full" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
-          )}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            background: tab === "full" ? "var(--lcs-white)" : "transparent",
+            color: tab === "full" ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+            fontWeight: tab === "full" ? 600 : 400,
+          }}
         >
           <AlignLeft className="h-3.5 w-3.5" /> Full details
         </button>
         <button
           onClick={() => setTab("privacy")}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
-            tab === "privacy" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
-          )}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            background: tab === "privacy" ? "var(--lcs-white)" : "transparent",
+            color: tab === "privacy" ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+            fontWeight: tab === "privacy" ? 600 : 400,
+          }}
         >
           <Shield className="h-3.5 w-3.5" /> Privacy
         </button>
         <button
           onClick={() => setTab("preview")}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
-            tab === "preview" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
-          )}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            background: tab === "preview" ? "var(--lcs-white)" : "transparent",
+            color: tab === "preview" ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+            fontWeight: tab === "preview" ? 600 : 400,
+          }}
         >
           <Eye className="h-3.5 w-3.5" /> Profile preview
         </button>
         <button
           onClick={() => setTab("analytics")}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
-            tab === "analytics" ? "bg-background text-foreground font-medium shadow-xs" : "text-muted-foreground hover:text-foreground",
-          )}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            background: tab === "analytics" ? "var(--lcs-white)" : "transparent",
+            color: tab === "analytics" ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+            fontWeight: tab === "analytics" ? 600 : 400,
+          }}
         >
           <BarChart3 className="h-3.5 w-3.5" /> Analytics{totalViews > 0 ? ` (${totalViews})` : ""}
         </button>
@@ -1229,52 +1242,48 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       )}
 
       {extractionError && (
-        <div className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="mt-4 flex items-start gap-2 px-4 py-3 text-sm" style={{ borderRadius: 0, border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)" }}>
           <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>{extractionError}</span>
-          <button onClick={() => setExtractionError(null)} className="ml-auto text-destructive/60 hover:text-destructive"><X className="h-4 w-4" /></button>
+          <button onClick={() => setExtractionError(null)} className="ml-auto" style={{ color: "var(--lcs-attention)" }}><X className="h-4 w-4" /></button>
         </div>
       )}
 
       {showExtractionPreview && extractionResult && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4" onClick={() => setShowExtractionPreview(false)}>
-          <div className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elev overflow-hidden max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between px-5 py-4 border-b border-border/60 shrink-0">
-              <div>
-                <div className="flex items-center gap-2 font-semibold text-sm"><Sparkles className="h-4 w-4 text-brand" /> AI extracted these fields</div>
-                <p className="text-xs text-muted-foreground mt-1">Select which fields to apply to your profile.</p>
-              </div>
-              <button onClick={() => setShowExtractionPreview(false)} className="text-muted-foreground hover:text-foreground ml-4"><X className="h-4 w-4" /></button>
-            </div>
-            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-2">
-              {Object.entries(FIELD_LABELS).map(([key, label]) => {
-                const val = extractionResult[key];
-                if (val === null || val === undefined) return null;
-                const checked = selectedFields.has(key);
-                return (
-                  <label key={key} className="flex items-start gap-3 cursor-pointer group">
-                    <input type="checkbox" checked={checked} onChange={(e) => setSelectedFields((prev) => { const next = new Set(prev); e.target.checked ? next.add(key) : next.delete(key); return next; })}
-                      className="mt-0.5 accent-[var(--brand)] shrink-0" />
-                    <div className="min-w-0">
-                      <span className="text-xs font-medium text-muted-foreground">{label}: </span>
-                      <span className="text-xs text-foreground break-words">{safeStringify(val)}</span>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            <div className="px-5 py-4 border-t border-border/60 flex items-center justify-between gap-3 shrink-0">
-              <span className="text-xs text-muted-foreground">{selectedFields.size} field{selectedFields.size !== 1 ? "s" : ""} selected</span>
+        <LcsModal
+          title="AI extracted these fields"
+          onClose={() => setShowExtractionPreview(false)}
+          footer={
+            <div className="flex items-center justify-between gap-3 w-full">
+              <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{selectedFields.size} field{selectedFields.size !== 1 ? "s" : ""} selected</span>
               <div className="flex gap-2">
-                <button onClick={() => setShowExtractionPreview(false)} className="rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent">Cancel</button>
-                <button onClick={applyExtractedFields} disabled={selectedFields.size === 0}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-1.5 text-sm shadow-glow disabled:opacity-50">
+                <LcsButton variant="secondary" onClick={() => setShowExtractionPreview(false)} style={{ height: 28 }}>Cancel</LcsButton>
+                <LcsButton variant="primary" onClick={applyExtractedFields} disabled={selectedFields.size === 0} style={{ height: 28 }}>
                   Apply selected fields →
-                </button>
+                </LcsButton>
               </div>
             </div>
+          }
+        >
+          <p className="text-xs -mt-2" style={{ color: "var(--lcs-ink-muted)" }}>Select which fields to apply to your profile.</p>
+          <div className="space-y-2">
+            {Object.entries(FIELD_LABELS).map(([key, label]) => {
+              const val = extractionResult[key];
+              if (val === null || val === undefined) return null;
+              const checked = selectedFields.has(key);
+              return (
+                <label key={key} className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" checked={checked} onChange={(e) => setSelectedFields((prev) => { const next = new Set(prev); e.target.checked ? next.add(key) : next.delete(key); return next; })}
+                    className="mt-0.5 shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-xs font-medium" style={{ color: "var(--lcs-ink-muted)" }}>{label}: </span>
+                    <span className="text-xs break-words" style={{ color: "var(--lcs-ink)" }}>{safeStringify(val)}</span>
+                  </div>
+                </label>
+              );
+            })}
           </div>
-        </div>
+        </LcsModal>
       )}
 
       {isTabView && (tab === "quick" ? (
@@ -1312,25 +1321,27 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
             <FormSection title="Company identity">
               <Field label="Company name" value={form.company_name} onChange={field("company_name")} placeholder="Atlas Robotics" />
               <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider">Legal entity name</label>
+                <label className="text-xs uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Legal entity name</label>
                 <input
                   type="text"
                   value={form.legal_entity_name ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, legal_entity_name: e.target.value }))}
                   placeholder="Full registered legal name (if different from trading name)"
-                  className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors mt-2"
+                  className="w-full px-4 py-3 text-sm outline-none transition-colors mt-2"
+                  style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground uppercase tracking-wider">Company registration number</label>
+                <label className="text-xs uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Company registration number</label>
                 <input
                   type="text"
                   value={form.registration_number ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, registration_number: e.target.value }))}
                   placeholder="e.g. 0001234 (Companies House), CL1234 (DIFC)"
-                  className="w-full bg-accent border border-border rounded-lg px-4 py-3 text-foreground text-sm placeholder:text-faint focus:border-brand/50 outline-none transition-colors"
+                  className="w-full px-4 py-3 text-sm outline-none transition-colors"
+                  style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                 />
-                <p className="text-xs text-faint mt-1">Optional but improves registry verification accuracy</p>
+                <p className="text-xs mt-1" style={{ color: "var(--lcs-ink-muted)" }}>Optional but improves registry verification accuracy</p>
               </div>
 
               <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />
@@ -1341,8 +1352,13 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                 <Field label="Team size" value={form.team_size} onChange={field("team_size")} placeholder="e.g. 12" title="Number of full-time team members" />
                 <Field label="Sector" value={form.sector} onChange={field("sector")} placeholder="B2B SaaS, Fintech, AI..." />
                 <div>
-                  <label className="text-xs text-muted-foreground">Stage</label>
-                  <select value={form.stage} onChange={field("stage")} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50">
+                  <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Stage</label>
+                  <select
+                    value={form.stage}
+                    onChange={field("stage")}
+                    className="mt-1 w-full px-3 py-2 text-sm outline-none"
+                    style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
+                  >
                     <option value="">Select stage</option>
                     {STAGES.map((s) => <option key={s}>{s}</option>)}
                   </select>
@@ -1365,29 +1381,61 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               <div className="grid sm:grid-cols-2 gap-3">
                 {/* Revenue */}
                 <div>
-                  <label className="text-xs text-muted-foreground">Revenue / ARR</label>
-                  <input value={form.revenue} onChange={field("revenue")} onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))} placeholder="e.g. 500,000" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
+                  <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Revenue / ARR</label>
+                  <input
+                    value={form.revenue}
+                    onChange={field("revenue")}
+                    onBlur={(e) => setForm((f) => ({ ...f, revenue: formatNumber(e.target.value) }))}
+                    placeholder="e.g. 500,000"
+                    className="w-full px-3 py-2 text-sm outline-none mt-1"
+                    style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
+                  />
                 </div>
                 {/* Growth rate */}
                 <div>
-                  <label className="text-xs text-muted-foreground">Growth rate</label>
-                  <input value={form.growth_rate} onChange={field("growth_rate")} placeholder="+15% MoM" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
+                  <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Growth rate</label>
+                  <input
+                    value={form.growth_rate}
+                    onChange={field("growth_rate")}
+                    placeholder="+15% MoM"
+                    className="w-full px-3 py-2 text-sm outline-none mt-1"
+                    style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
+                  />
                 </div>
                 {/* Customer count */}
                 <div>
-                  <label className="text-xs text-muted-foreground">Customer count</label>
-                  <input value={form.customer_count} onChange={field("customer_count")} placeholder="500 paying customers" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
+                  <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Customer count</label>
+                  <input
+                    value={form.customer_count}
+                    onChange={field("customer_count")}
+                    placeholder="500 paying customers"
+                    className="w-full px-3 py-2 text-sm outline-none mt-1"
+                    style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
+                  />
                 </div>
                 {/* Key metric */}
                 <div>
-                  <label className="text-xs text-muted-foreground">Key metric</label>
-                  <input value={form.key_metric} onChange={field("key_metric")} placeholder="Your most important metric" className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 mt-1" />
+                  <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Key metric</label>
+                  <input
+                    value={form.key_metric}
+                    onChange={field("key_metric")}
+                    placeholder="Your most important metric"
+                    className="w-full px-3 py-2 text-sm outline-none mt-1"
+                    style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
+                  />
                 </div>
               </div>
               {/* Traction textarea */}
               <div>
-                <label className="text-xs text-muted-foreground">Traction highlights</label>
-                <textarea value={form.traction} onChange={field("traction")} placeholder="Key traction highlights..." rows={3} className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none mt-1" />
+                <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Traction highlights</label>
+                <textarea
+                  value={form.traction}
+                  onChange={field("traction")}
+                  placeholder="Key traction highlights..."
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm outline-none resize-none mt-1"
+                  style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
+                />
               </div>
             </FormSection>
 
@@ -1441,30 +1489,32 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                       value={link.platform}
                       onChange={(e) => setSocialLinks((prev) => prev.map((l, j) => j === i ? { ...l, platform: e.target.value } : l))}
                       placeholder="Platform name"
-                      className="w-32 shrink-0 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                      className="w-32 shrink-0 px-3 py-2 text-sm outline-none"
+                      style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                     />
                     <input
                       value={link.url}
                       onChange={(e) => setSocialLinks((prev) => prev.map((l, j) => j === i ? { ...l, url: e.target.value } : l))}
                       placeholder="https://..."
-                      className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                      className="flex-1 px-3 py-2 text-sm outline-none"
+                      style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                     />
                     <button
                       type="button"
                       onClick={() => setSocialLinks((prev) => prev.filter((_, j) => j !== i))}
-                      className="text-muted-foreground hover:text-foreground px-2 text-lg leading-none"
+                      className="px-2 text-lg leading-none"
+                      style={{ color: "var(--lcs-ink-muted)" }}
                     >
                       ×
                     </button>
                   </div>
                 ))}
-                <button
-                  type="button"
+                <LcsButton
+                  variant="text-link"
                   onClick={() => setSocialLinks((prev) => [...prev, { platform: "", url: "" }])}
-                  className="text-xs text-brand hover:text-brand/80 transition-colors"
                 >
                   + Add social link
-                </button>
+                </LcsButton>
               </div>
             </FormSection>
 
@@ -1472,21 +1522,24 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               {/* Founder avatar upload */}
               <div className="mb-4 flex items-center gap-4">
                 <label className="relative cursor-pointer group shrink-0">
-                  <div className="h-[72px] w-[72px] rounded-full overflow-hidden bg-gradient-brand flex items-center justify-center text-brand-foreground text-2xl font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
+                  <div
+                    className="h-[72px] w-[72px] overflow-hidden flex items-center justify-center text-2xl font-bold"
+                    style={{ borderRadius: "50%", background: "var(--lcs-accent)", color: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
+                  >
                     {avatarUploading
                       ? <Loader2 className="h-5 w-5 animate-spin" />
                       : avatarUrl
                       ? <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover" />
                       : <span>{(form.founder_name || user?.name || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
                   </div>
-                  <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Upload className="h-4 w-4 text-foreground" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderRadius: "50%", background: "rgba(0,0,0,0.5)" }}>
+                    <Upload className="h-4 w-4 text-white" />
                   </div>
                   <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
                 </label>
                 <div>
-                  <div className="text-sm font-medium">Profile photo</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">Max 2MB. JPG, PNG or WebP.</div>
+                  <div className="text-sm font-medium" style={{ color: "var(--lcs-ink)" }}>Profile photo</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Max 2MB. JPG, PNG or WebP.</div>
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
@@ -1534,19 +1587,19 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       ) : tab === "analytics" ? (
         <div className="mt-4 space-y-6">
           {!startup?.profile_slug ? (
-            <div className="rounded-none border border-border/60 bg-card p-8 text-center">
-              <BarChart3 className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
-              <p className="text-sm font-medium text-foreground mb-1">Publish your profile first to start tracking views</p>
-              <p className="text-xs text-muted-foreground mb-3">Go to Full Details, fill at least 80% of fields, then click "Go live"</p>
-              <button onClick={() => setTab("full")} className="text-xs text-brand hover:underline">Go to Full Details →</button>
+            <div className="border p-8 text-center" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+              <BarChart3 className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--lcs-ink-muted)", opacity: 0.3 }} />
+              <p className="text-sm font-medium mb-1" style={{ color: "var(--lcs-ink)" }}>Publish your profile first to start tracking views</p>
+              <p className="text-xs mb-3" style={{ color: "var(--lcs-ink-muted)" }}>Go to Full Details, fill at least 80% of fields, then click "Go live"</p>
+              <button onClick={() => setTab("full")} className="text-xs hover:underline" style={{ color: "var(--lcs-accent)" }}>Go to Full Details →</button>
             </div>
           ) : (
             <>
               {/* Stats — R10 step 9: restyled to white bordered cells,
                   matching app.analytics.tsx's ChartCard convention */}
               <div>
-                <p className="text-sm font-semibold text-foreground mb-1">Profile Analytics</p>
-                <p className="text-xs mb-4" style={{ color: "#71717A" }}>Tracking views of lengdon.com/p/{startup.profile_slug}</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)" }}>Profile Analytics</p>
+                <p className="text-xs mb-4" style={{ color: "var(--lcs-ink-muted)" }}>Tracking views of lengdon.com/p/{startup.profile_slug}</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { label: "Total views", value: String(totalViews) },
@@ -1554,29 +1607,29 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                     { label: "Avg duration", value: avgDuration > 0 ? `${avgDuration}s` : "0s" },
                     { label: "Last 7 days", value: String(last7Days) },
                   ].map(({ label, value }) => (
-                    <div key={label} className="rounded-none border border-border bg-white p-5">
-                      <p className="text-3xl font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{value}</p>
-                      <p className="text-xs font-semibold uppercase tracking-wider mt-1" style={{ color: "#71717A" }}>{label}</p>
+                    <div key={label} className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                      <p className="text-3xl font-bold" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>{value}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider mt-1" style={{ color: "var(--lcs-ink-muted)" }}>{label}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Views over time — 30-day area chart */}
-              <div className="rounded-none border border-border bg-white p-5">
-                <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "#71717A" }}>Profile views (30 days)</p>
+              <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--lcs-ink-muted)" }}>Profile views (30 days)</p>
                 {totalViews === 0 ? (
-                  <p className="text-sm" style={{ color: "#71717A" }}>No data yet — publish your profile to start tracking views.</p>
+                  <p className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>No data yet — publish your profile to start tracking views.</p>
                 ) : (
                   <div style={{ height: 220 }}>
                     <LazyChart render={(R) => (
                     <R.ResponsiveContainer width="100%" height="100%">
                       <R.AreaChart data={viewsSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                        <R.CartesianGrid stroke="#E4E4E7" vertical={false} />
-                        <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: "#71717A" }} axisLine={{ stroke: "#E4E4E7" }} tickLine={false} interval={4} />
-                        <R.YAxis tick={{ fontSize: 11, fill: "#71717A" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <R.Tooltip contentStyle={{ fontSize: 12, border: "1px solid #E4E4E7", borderRadius: 0 }} />
-                        <R.Area type="monotone" dataKey="views" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.08} strokeWidth={2} />
+                        <R.CartesianGrid stroke="var(--lcs-line)" vertical={false} />
+                        <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: "#57544E" }} axisLine={{ stroke: "#DDDBD6" }} tickLine={false} interval={4} />
+                        <R.YAxis tick={{ fontSize: 11, fill: "#57544E" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <R.Tooltip contentStyle={{ fontSize: 12, border: "1px solid #DDDBD6", borderRadius: 0 }} />
+                        <R.Area type="monotone" dataKey="views" stroke="#1F4E8C" fill="#1F4E8C" fillOpacity={0.08} strokeWidth={2} />
                       </R.AreaChart>
                     </R.ResponsiveContainer>
                     )} />
@@ -1589,24 +1642,24 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               ) : (
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Traffic sources */}
-                  <div className="rounded-none border border-border bg-white p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "#71717A" }}>Traffic sources</p>
+                  <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--lcs-ink-muted)" }}>Traffic sources</p>
                     <div className="space-y-3">
                       {Object.entries(sourceBreakdown).sort(([, a], [, b]) => (b as number) - (a as number)).map(([source, count]) => (
                         <div key={source} className="flex items-center gap-3">
-                          <span className="text-sm w-20 shrink-0" style={{ color: "#52525B" }}>{source}</span>
-                          <div className="flex-1 h-1.5 bg-[#FAFAFA] border border-border rounded-none overflow-hidden">
-                            <div className="h-full" style={{ width: `${((count as number) / totalViews) * 100}%`, background: "#7C3AED" }} />
+                          <span className="text-sm w-20 shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>{source}</span>
+                          <div className="flex-1 h-1.5 overflow-hidden" style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", borderRadius: 0 }}>
+                            <div className="h-full" style={{ width: `${((count as number) / totalViews) * 100}%`, background: "var(--lcs-accent)" }} />
                           </div>
-                          <span className="text-sm w-6 text-right tabular-nums" style={{ color: "#52525B" }}>{count as number}</span>
+                          <span className="text-sm w-6 text-right tabular-nums" style={{ color: "var(--lcs-ink-muted)" }}>{count as number}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* View history */}
-                  <div className="rounded-none border border-border bg-white p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "#71717A" }}>View history</p>
+                  <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--lcs-ink-muted)" }}>View history</p>
                     <div>
                       {profileViews.map((view: any) => {
                         const namedInvestor = view.viewer_role === "investor" && view.viewer_name;
@@ -1623,37 +1676,44 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                           ? view.users.full_name.charAt(0).toUpperCase()
                           : null;
                         return (
-                        <div key={view.id} className={cn(
-                          "flex items-center justify-between py-3 border-b border-border last:border-0",
-                          namedInvestor && "bg-accent px-3 -mx-3 border-l-2 border-l-brand"
-                        )}>
+                        <div
+                          key={view.id}
+                          className="flex items-center justify-between py-3 last:border-0"
+                          style={{
+                            borderBottom: "1px solid var(--lcs-line)",
+                            ...(namedInvestor ? { background: "var(--lcs-surface)", padding: "12px", margin: "0 -12px", borderLeft: "2px solid var(--lcs-accent)" } : {}),
+                          }}
+                        >
                           <div className="flex items-center gap-3 min-w-0">
                             {avatarLetter ? (
-                              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-xs text-brand font-bold shrink-0">
+                              <div
+                                className="w-8 h-8 flex items-center justify-center text-xs font-bold shrink-0"
+                                style={{ borderRadius: "50%", background: "var(--lcs-surface)", color: "var(--lcs-accent)" }}
+                              >
                                 {avatarLetter}
                               </div>
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0" style={{ color: "#71717A" }}>?</div>
+                              <div className="w-8 h-8 flex items-center justify-center shrink-0" style={{ borderRadius: "50%", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>?</div>
                             )}
                             <div className="min-w-0">
-                              <p className="text-sm text-foreground truncate flex items-center gap-1.5">
+                              <p className="text-sm truncate flex items-center gap-1.5" style={{ color: "var(--lcs-ink)" }}>
                                 {viewerLabel}
                                 {namedInvestor && (
-                                  <span className="text-xs bg-accent text-brand px-1.5 py-0.5 rounded">Investor</span>
+                                  <span className="text-xs px-1.5 py-0.5" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-surface)", color: "var(--lcs-accent)" }}>Investor</span>
                                 )}
                               </p>
-                              <p className="text-xs truncate" style={{ color: "#71717A" }}>
+                              <p className="text-xs truncate" style={{ color: "var(--lcs-ink-muted)" }}>
                                 {view.source || (view.referrer?.includes("linkedin") ? "via LinkedIn" : view.referrer?.includes("x.com") ? "via X" : view.referrer ? `via ${(() => { try { return new URL(view.referrer).hostname; } catch { return view.referrer; } })()}` : "Direct link")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0 ml-4">
                             {view.duration_seconds > 0 && (
-                              <span className="text-xs tabular-nums" style={{ color: "#71717A" }}>
+                              <span className="text-xs tabular-nums" style={{ color: "var(--lcs-ink-muted)" }}>
                                 {view.duration_seconds < 60 ? `${view.duration_seconds}s` : `${Math.floor(view.duration_seconds / 60)}m ${view.duration_seconds % 60}s`}
                               </span>
                             )}
-                            <p className="text-xs tabular-nums" style={{ color: "#71717A" }}>{formatRelativeTime(view.created_at)}</p>
+                            <p className="text-xs tabular-nums" style={{ color: "var(--lcs-ink-muted)" }}>{formatRelativeTime(view.created_at)}</p>
                           </div>
                         </div>
                         );
@@ -1664,21 +1724,26 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               )}
 
               {/* Share link */}
-              <div className="p-4 rounded-none border border-border bg-white">
-                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Your shareable profile link</p>
+              <div className="p-4 border" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--lcs-ink-muted)" }}>Your shareable profile link</p>
                 <div className="flex items-center gap-2">
-                  <span className="flex-1 text-sm font-mono truncate" style={{ color: "#52525B" }}>lengdon.com/p/{startup.profile_slug}</span>
-                  <button
+                  <span className="flex-1 text-sm truncate" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>lengdon.com/p/{startup.profile_slug}</span>
+                  <LcsButton
+                    variant="secondary"
                     onClick={() => { navigator.clipboard.writeText(`https://lengdon.com/p/${startup.profile_slug}`); toast.success("Copied!"); }}
-                    className="px-3 py-1.5 text-xs bg-accent border border-border rounded-none hover:bg-accent transition-colors"
-                    style={{ color: "#52525B" }}
-                  >Copy</button>
+                    style={{ height: 28 }}
+                  >
+                    Copy
+                  </LcsButton>
                   <a
                     href={`https://lengdon.com/p/${startup.profile_slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 text-xs bg-accent border border-brand/30 rounded-none text-brand hover:bg-accent transition-colors"
-                  >Open →</a>
+                    className="px-3 py-1.5 text-xs transition-colors"
+                    style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-accent)" }}
+                  >
+                    Open →
+                  </a>
                 </div>
               </div>
             </>
@@ -1690,35 +1755,35 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
         // stat row. Every stat cell fixed from bg-[#111118] (unmigrated
         // legacy dark box) to a white bordered cell per the Constitution.
         <div className="mt-4 space-y-6">
-          <div className="rounded-none border border-border bg-white p-6 shadow-card">
-            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Overview</div>
+          <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Overview</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {([
                 ["Stage", form.stage], ["Sector", form.sector],
                 ["Country", form.country], ["Founded", form.founded_year],
               ] as [string, string][]).map(([label, val]) => (
-                <div key={label} className="rounded-none border border-border bg-[#FAFAFA] p-4">
-                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{label}</div>
-                  <div className="mt-2 text-sm font-medium text-foreground">{val || "—"}</div>
+                <div key={label} className="border p-4" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-surface)" }}>
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>{label}</div>
+                  <div className="mt-2 text-sm font-medium" style={{ color: "var(--lcs-ink)" }}>{val || "—"}</div>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-none border border-border bg-white p-6 shadow-card">
-              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>About</div>
-              <p className="mt-3 text-sm leading-relaxed" style={{ color: "#52525B" }}>{form.description || "Your company description appears here."}</p>
+            <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>About</div>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{form.description || "Your company description appears here."}</p>
             </div>
-            <div className="rounded-none border border-border bg-white p-6 shadow-card">
-              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Key metrics</div>
+            <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Key metrics</div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {([
                   ["Raising", form.funding_target], ["Valuation", form.valuation], ["Revenue", form.revenue],
                 ] as [string, string][]).map(([label, val]) => (
-                  <div key={label} className="rounded-none border border-border bg-[#FAFAFA] p-4">
-                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{label}</div>
-                    <div className="mt-2 text-sm font-medium text-foreground">{val || "—"}</div>
+                  <div key={label} className="border p-4" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-surface)" }}>
+                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>{label}</div>
+                    <div className="mt-2 text-sm font-medium" style={{ color: "var(--lcs-ink)" }}>{val || "—"}</div>
                   </div>
                 ))}
               </div>
@@ -1732,9 +1797,9 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
               ["Why us", form.why_us, "Why is your team uniquely positioned?"],
               ["Why now", form.why_now, "Why is now the right moment?"],
             ] as [string, string, string][]).map(([label, val, placeholder]) => (
-              <div key={label} className="rounded-none border border-border bg-white p-6 shadow-card">
-                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{label}</div>
-                <p className="mt-3 text-sm leading-relaxed" style={{ color: "#52525B" }}>{val || placeholder}</p>
+              <div key={label} className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>{label}</div>
+                <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{val || placeholder}</p>
               </div>
             ))}
           </div>
@@ -1742,44 +1807,44 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           {(form.tam || form.sam || form.target_customer || form.revenue_model || form.pricing || form.unit_economics || form.burn_rate || form.runway_months || form.advisors || form.competitors || form.milestones || form.intro_video_url || form.product_video_url || form.moat) && (
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               {(form.tam || form.sam || form.target_customer) && (
-                <div className="rounded-none border border-border bg-white p-6 shadow-card">
-                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Market opportunity</div>
-                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
-                    {form.tam && <div><span className="font-semibold text-foreground">TAM:</span> {form.tam}</div>}
-                    {form.sam && <div><span className="font-semibold text-foreground">SAM:</span> {form.sam}</div>}
-                    {form.target_customer && <div><span className="font-semibold text-foreground">Target customer:</span> {form.target_customer}</div>}
+                <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Market opportunity</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
+                    {form.tam && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>TAM:</span> {form.tam}</div>}
+                    {form.sam && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>SAM:</span> {form.sam}</div>}
+                    {form.target_customer && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Target customer:</span> {form.target_customer}</div>}
                   </div>
                 </div>
               )}
               {(form.revenue_model || form.pricing || form.unit_economics) && (
-                <div className="rounded-none border border-border bg-white p-6 shadow-card">
-                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Business model</div>
-                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
-                    {form.revenue_model && <div><span className="font-semibold text-foreground">Revenue model:</span> {form.revenue_model}</div>}
-                    {form.pricing && <div><span className="font-semibold text-foreground">Pricing:</span> {form.pricing}</div>}
-                    {form.unit_economics && <div><span className="font-semibold text-foreground">Unit economics:</span> {form.unit_economics}</div>}
+                <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Business model</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
+                    {form.revenue_model && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Revenue model:</span> {form.revenue_model}</div>}
+                    {form.pricing && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Pricing:</span> {form.pricing}</div>}
+                    {form.unit_economics && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Unit economics:</span> {form.unit_economics}</div>}
                   </div>
                 </div>
               )}
               {(form.burn_rate || form.runway_months) && (
-                <div className="rounded-none border border-border bg-white p-6 shadow-card">
-                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Runway</div>
-                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
-                    {form.burn_rate && <div><span className="font-semibold text-foreground">Burn rate:</span> {form.burn_rate}</div>}
-                    {form.runway_months && <div><span className="font-semibold text-foreground">Runway:</span> {form.runway_months} months</div>}
+                <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Runway</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
+                    {form.burn_rate && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Burn rate:</span> {form.burn_rate}</div>}
+                    {form.runway_months && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Runway:</span> {form.runway_months} months</div>}
                   </div>
                 </div>
               )}
               {(form.advisors || form.competitors || form.milestones || form.moat || form.intro_video_url || form.product_video_url) && (
-                <div className="rounded-none border border-border bg-white p-6 shadow-card">
-                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Differentiators</div>
-                  <div className="mt-3 space-y-2 text-sm" style={{ color: "#52525B" }}>
-                    {form.moat && <div><span className="font-semibold text-foreground">Moat:</span> {form.moat}</div>}
-                    {form.competitors && <div><span className="font-semibold text-foreground">Competitors:</span> {form.competitors}</div>}
-                    {form.milestones && <div><span className="font-semibold text-foreground">Milestones:</span> {form.milestones}</div>}
-                    {form.advisors && <div><span className="font-semibold text-foreground">Advisors:</span> {form.advisors}</div>}
-                    {form.intro_video_url && <div><span className="font-semibold text-foreground">Intro video:</span> <a href={form.intro_video_url} target="_blank" rel="noreferrer" className="text-brand hover:underline">Watch</a></div>}
-                    {form.product_video_url && <div><span className="font-semibold text-foreground">Product video:</span> <a href={form.product_video_url} target="_blank" rel="noreferrer" className="text-brand hover:underline">Watch</a></div>}
+                <div className="border p-6" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)" }}>Differentiators</div>
+                  <div className="mt-3 space-y-2 text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
+                    {form.moat && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Moat:</span> {form.moat}</div>}
+                    {form.competitors && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Competitors:</span> {form.competitors}</div>}
+                    {form.milestones && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Milestones:</span> {form.milestones}</div>}
+                    {form.advisors && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Advisors:</span> {form.advisors}</div>}
+                    {form.intro_video_url && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Intro video:</span> <a href={form.intro_video_url} target="_blank" rel="noreferrer" style={{ color: "var(--lcs-accent)" }} className="hover:underline">Watch</a></div>}
+                    {form.product_video_url && <div><span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Product video:</span> <a href={form.product_video_url} target="_blank" rel="noreferrer" style={{ color: "var(--lcs-accent)" }} className="hover:underline">Watch</a></div>}
                   </div>
                 </div>
               )}
@@ -1795,33 +1860,27 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       )}
 
       {!startup?.id && !isLoading && (view === "team-cards" || (!view && tab !== "analytics")) && (
-        <div className="mt-6 rounded-none border border-dashed border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
+        <div className="mt-6 p-6 text-center text-sm" style={{ borderRadius: 0, border: "1px dashed var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink-muted)" }}>
           Save your profile first to add team members.
         </div>
       )}
 
       {/* ── Investor criteria / Founder thesis ───────────────────────── */}
       {startup?.id && (view === "fundraising-thesis" || (!view && tab !== "analytics")) && (
-        <div className="mt-8 rounded-none border border-border/60 bg-card p-5 shadow-card space-y-5">
+        <div className="mt-8 border p-5 space-y-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
           {/* Section header */}
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: "rgba(124,58,237,0.1)" }}>
-              <Target className="h-4 w-4" style={{ color: "#A855F7" }} />
+            <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-progress-wash)" }}>
+              <Target className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+                <h2 className="text-sm font-semibold" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>
                   What kind of investor are you looking for
                 </h2>
-                {existingThesis?.status === "complete" && (
-                  <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full"
-                    style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>
-                    <CheckCircle2 className="h-3 w-3" /> Complete
-                  </span>
-                )}
+                {existingThesis?.status === "complete" && <LcsStatusPill status="satisfied" label="Complete" />}
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+              <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>
                 The last step. This helps us match you with investors who are actually right for you, not just anyone who's interested.
               </p>
             </div>
@@ -1829,48 +1888,32 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
 
           {/* AI propose banner — only if thesis not yet complete */}
           {existingThesis?.status !== "complete" && (
-            <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3 flex-wrap"
-              style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
-              <p className="text-xs text-muted-foreground leading-relaxed flex-1">
+            <div className="px-4 py-3 flex items-center justify-between gap-3 flex-wrap" style={{ borderRadius: 0, background: "var(--lcs-progress-wash)", border: "1px solid var(--lcs-line)" }}>
+              <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--lcs-ink-muted)" }}>
                 Based on your profile and documents, we can suggest a starting point — edit anything that's wrong.
               </p>
-              <button
-                onClick={handleThesisAIPropose}
-                disabled={thesisProposing}
-                className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium shrink-0 transition-colors"
-                style={{
-                  background: thesisProposing ? "rgba(124,58,237,0.3)" : "rgba(124,58,237,0.15)",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  color: thesisProposing ? "var(--muted-foreground)" : "#A855F7",
-                  cursor: thesisProposing ? "not-allowed" : "pointer",
-                }}
-              >
+              <LcsButton variant="secondary" onClick={handleThesisAIPropose} disabled={thesisProposing} style={{ height: 28 }}>
                 {thesisProposing
                   ? <><Loader2 className="h-3 w-3 animate-spin" /> Proposing…</>
                   : <><Sparkles className="h-3 w-3" /> Suggest defaults</>}
-              </button>
+              </LcsButton>
             </div>
           )}
 
           {/* Regenerate button for complete thesis */}
           {existingThesis?.status === "complete" && (
-            <button
-              onClick={handleThesisAIPropose}
-              disabled={thesisProposing}
-              className="inline-flex items-center gap-1.5 text-xs transition-colors"
-              style={{ color: "var(--faint)", background: "none", border: "none", cursor: thesisProposing ? "not-allowed" : "pointer", padding: 0 }}
-            >
+            <LcsButton variant="text-link" onClick={handleThesisAIPropose} disabled={thesisProposing}>
               {thesisProposing
                 ? <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating…</>
                 : <><RefreshCw className="h-3 w-3" /> Regenerate AI suggestions</>}
-            </button>
+            </LcsButton>
           )}
 
           {/* Form fields */}
           <div className="space-y-4">
             {/* Check size */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>
                 Check size range
               </label>
               <div className="flex items-center gap-2">
@@ -1878,131 +1921,146 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                   value={thesisForm.preferred_check_size_min}
                   onChange={thesisField("preferred_check_size_min")}
                   placeholder="Min e.g. $250k"
-                  className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="flex-1 px-3 py-2 text-sm outline-none"
+                  style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                 />
-                <span className="text-xs text-muted-foreground shrink-0">to</span>
+                <span className="text-xs shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>to</span>
                 <input
                   value={thesisForm.preferred_check_size_max}
                   onChange={thesisField("preferred_check_size_max")}
                   placeholder="Max e.g. $3M"
-                  className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                  className="flex-1 px-3 py-2 text-sm outline-none"
+                  style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                 />
               </div>
             </div>
 
             {/* Investor type */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">Investor type</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>Investor type</label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {["Capital only", "Capital + sector expertise", "Capital + network access"].map((val) => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => setThesisForm((p) => ({ ...p, preferred_investor_type: val }))}
-                    className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
-                      thesisForm.preferred_investor_type === val
-                        ? "border-brand/60 bg-accent text-foreground"
-                        : "border-border/60 bg-background text-muted-foreground hover:border-border"
-                    }`}
-                  >
-                    {val}
-                  </button>
-                ))}
+                {["Capital only", "Capital + sector expertise", "Capital + network access"].map((val) => {
+                  const active = thesisForm.preferred_investor_type === val;
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setThesisForm((p) => ({ ...p, preferred_investor_type: val }))}
+                      className="px-3 py-2.5 text-left text-sm transition-colors"
+                      style={{
+                        borderRadius: "var(--radius-lcs-control)",
+                        border: `1px solid ${active ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
+                        background: active ? "var(--lcs-progress-wash)" : "var(--lcs-white)",
+                        color: active ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+                      }}
+                    >
+                      {val}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Board preference */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">Involvement preference</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>Involvement preference</label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {[
                   { val: "Hands-on (board seat, regular check-ins)", short: "Hands-on" },
                   { val: "Collaborative (available but not directive)", short: "Collaborative" },
                   { val: "Hands-off (capital only, minimal involvement)", short: "Hands-off" },
-                ].map(({ val, short }) => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => setThesisForm((p) => ({ ...p, board_preference: val }))}
-                    className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
-                      thesisForm.board_preference === val
-                        ? "border-brand/60 bg-accent text-foreground"
-                        : "border-border/60 bg-background text-muted-foreground hover:border-border"
-                    }`}
-                  >
-                    {short}
-                  </button>
-                ))}
+                ].map(({ val, short }) => {
+                  const active = thesisForm.board_preference === val;
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setThesisForm((p) => ({ ...p, board_preference: val }))}
+                      className="px-3 py-2.5 text-left text-sm transition-colors"
+                      style={{
+                        borderRadius: "var(--radius-lcs-control)",
+                        border: `1px solid ${active ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
+                        background: active ? "var(--lcs-progress-wash)" : "var(--lcs-white)",
+                        color: active ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
+                      }}
+                    >
+                      {short}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Sector expertise */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">Sector expertise wanted</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>Sector expertise wanted</label>
               <input
                 value={thesisForm.sector_expertise_wanted}
                 onChange={thesisField("sector_expertise_wanted")}
                 placeholder="e.g. Defence, robotics, GCC enterprise sales"
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full px-3 py-2 text-sm outline-none"
+                style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
               />
             </div>
 
             {/* Geography */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">Geography preference</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>Geography preference</label>
               <input
                 value={thesisForm.geography_preference}
                 onChange={thesisField("geography_preference")}
                 placeholder="e.g. GCC-based or UK/Europe, or 'No preference'"
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                className="w-full px-3 py-2 text-sm outline-none"
+                style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
               />
             </div>
 
             {/* Exclusions */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">Exclusions / red lines</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>Exclusions / red lines</label>
               <textarea
                 rows={2}
                 value={thesisForm.exclusions}
                 onChange={thesisField("exclusions")}
                 placeholder="e.g. No investors with portfolio conflicts in defence or surveillance tech"
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+                className="w-full px-3 py-2 text-sm outline-none resize-none"
+                style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
               />
             </div>
 
             {/* What good fit looks like */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">What a great-fit investor looks like</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "var(--lcs-ink-muted)" }}>What a great-fit investor looks like</label>
               <textarea
                 rows={3}
                 value={thesisForm.what_good_fit_looks_like}
                 onChange={thesisField("what_good_fit_looks_like")}
                 placeholder="In your own words — what would make you say yes immediately?"
-                className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+                className="w-full px-3 py-2 text-sm outline-none resize-none"
+                style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
               />
             </div>
 
             {/* Save actions */}
             <div className="flex items-center gap-3 pt-1">
-              <button
-                type="button"
+              <LcsButton
+                variant="primary"
                 onClick={() => handleThesisSave("complete")}
                 disabled={thesisSaving || !startup?.id}
-                className="inline-flex items-center gap-2 rounded-lg hs-gradient text-brand-foreground px-5 py-2.5 text-sm font-medium disabled:opacity-60 transition-colors"
+                style={{ height: 32 }}
               >
                 {thesisSaving ? <Loader2 className="h-4 w-4 animate-spin" />
                   : thesisSaved ? <CheckCircle2 className="h-4 w-4" />
                   : <Save className="h-4 w-4" />}
                 {thesisSaved ? "Saved" : "Save investor criteria"}
-              </button>
-              <button
-                type="button"
+              </LcsButton>
+              <LcsButton
+                variant="text-link"
                 onClick={() => handleThesisSave("draft")}
                 disabled={thesisSaving || !startup?.id}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
               >
                 Save as draft
-              </button>
+              </LcsButton>
             </div>
           </div>
         </div>
@@ -2104,14 +2162,14 @@ function PrivacyTab({
 
   return (
     <div className="mt-4 space-y-4">
-      <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
+      <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
         <div className="flex items-start gap-3 mb-6">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent shrink-0 mt-0.5">
-            <Shield className="h-5 w-5 text-brand" />
+          <div className="grid h-9 w-9 place-items-center shrink-0 mt-0.5" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-surface)" }}>
+            <Shield className="h-5 w-5" style={{ color: "var(--lcs-accent)" }} />
           </div>
           <div>
-            <div className="text-sm font-semibold">Profile Privacy Controls</div>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Profile Privacy Controls</div>
+            <p className="text-xs mt-1 leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>
               Control what investors see at each stage of your fundraising relationship.
             </p>
           </div>
@@ -2123,19 +2181,20 @@ function PrivacyTab({
             return (
               <div
                 key={section.key}
-                className="rounded-none border border-border/60 bg-background/40 p-5"
+                className="border p-5"
+                style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-surface)" }}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   {/* Left: label + fields */}
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className="grid h-8 w-8 place-items-center rounded-md bg-accent shrink-0 mt-0.5">
-                      <section.Icon className="h-4 w-4 text-muted-foreground" />
+                    <div className="grid h-8 w-8 place-items-center shrink-0 mt-0.5" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-white)" }}>
+                      <section.Icon className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-semibold">{section.label}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">{section.fields}</div>
+                      <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{section.label}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>{section.fields}</div>
                       {section.note && (
-                        <div className="mt-2 text-xs text-warning leading-relaxed">{section.note}</div>
+                        <div className="mt-2 text-xs leading-relaxed" style={{ color: "var(--lcs-attention)" }}>{section.note}</div>
                       )}
                     </div>
                   </div>
@@ -2143,23 +2202,26 @@ function PrivacyTab({
                   {/* Right: toggle */}
                   <div className="shrink-0">
                     {section.locked ? (
-                      <div className="inline-flex items-center gap-1.5 rounded-full border border-brand bg-accent px-3 py-1.5 text-xs font-medium text-brand">
-                        🌐 Public — always on
+                      <div
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium"
+                        style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-accent)", background: "var(--lcs-white)", color: "var(--lcs-accent)" }}
+                      >
+                        Public — always on
                       </div>
                     ) : (
-                      <div className="flex rounded-lg border border-border/60 overflow-hidden">
-                        {VIS_OPTIONS.map((opt) => (
+                      <div className="flex overflow-hidden" style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)" }}>
+                        {VIS_OPTIONS.map((opt, i) => (
                           <button
                             key={opt.value}
                             type="button"
                             title={opt.desc}
                             onClick={() => setLocal((prev) => ({ ...prev, [section.key]: opt.value }))}
-                            className={cn(
-                              "px-3 py-1.5 text-xs font-medium transition-colors border-r last:border-r-0 border-border/60",
-                              current === opt.value
-                                ? "hs-gradient text-white"
-                                : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent",
-                            )}
+                            className="px-3 py-1.5 text-xs font-medium transition-colors"
+                            style={{
+                              borderRight: i < VIS_OPTIONS.length - 1 ? "1px solid var(--lcs-line)" : "none",
+                              background: current === opt.value ? "var(--lcs-accent)" : "transparent",
+                              color: current === opt.value ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
+                            }}
                           >
                             {opt.label}
                           </button>
@@ -2171,7 +2233,7 @@ function PrivacyTab({
 
                 {/* Description of current selection */}
                 {!section.locked && (
-                  <div className="mt-3 text-xs text-muted-foreground/70">
+                  <div className="mt-3 text-xs" style={{ color: "var(--lcs-ink-muted)", opacity: 0.7 }}>
                     {VIS_OPTIONS.find((o) => o.value === current)?.desc}
                   </div>
                 )}
@@ -2181,15 +2243,11 @@ function PrivacyTab({
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Changes take effect immediately on your public profile.</p>
-          <button
-            onClick={handleSave}
-            disabled={saving || !startupId}
-            className="inline-flex items-center gap-2 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60"
-          >
+          <p className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Changes take effect immediately on your public profile.</p>
+          <LcsButton variant="primary" onClick={handleSave} disabled={saving || !startupId} style={{ height: 32 }}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
             Save privacy settings
-          </button>
+          </LcsButton>
         </div>
       </div>
     </div>
@@ -2210,39 +2268,39 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
 }) {
   return (
     <>
-      <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
+      <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
         <div className="flex items-center gap-1.5 mb-3">
-          <div className="text-sm font-semibold">Pitch deck</div>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent text-brand font-medium">AI</span>
+          <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Pitch deck</div>
+          <span className="text-[10px] px-1.5 py-0.5 font-medium" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-surface)", color: "var(--lcs-accent)" }}>AI</span>
         </div>
         {isExtracting ? (
-          <div className="rounded-lg border border-brand/20 bg-accent p-5 text-center">
-            <Loader2 className="h-6 w-6 text-brand mx-auto animate-spin" />
-            <div className="text-sm font-medium mt-3 text-foreground">Analysing pitch deck…</div>
-            <div className="text-xs text-muted-foreground mt-1">This takes 10–20 seconds</div>
+          <div className="p-5 text-center" style={{ borderRadius: 0, border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+            <Loader2 className="h-6 w-6 mx-auto animate-spin" style={{ color: "var(--lcs-accent)" }} />
+            <div className="text-sm font-medium mt-3" style={{ color: "var(--lcs-ink)" }}>Analysing pitch deck…</div>
+            <div className="text-xs mt-1" style={{ color: "var(--lcs-ink-muted)" }}>This takes 10–20 seconds</div>
           </div>
         ) : deckName ? (
-          <div className="rounded-lg border border-border/60 bg-accent/30 p-3">
-            <div className="text-sm font-medium truncate">{deckName}</div>
-            <div className="text-xs text-muted-foreground mt-0.5 mb-2">Uploaded</div>
-            <label className="text-xs text-brand hover:underline cursor-pointer">
+          <div className="p-3" style={{ borderRadius: 0, border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+            <div className="text-sm font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{deckName}</div>
+            <div className="text-xs mt-0.5 mb-2" style={{ color: "var(--lcs-ink-muted)" }}>Uploaded</div>
+            <label className="text-xs hover:underline cursor-pointer" style={{ color: "var(--lcs-accent)" }}>
               Replace &amp; re-extract
               <input type="file" accept=".pdf,.pptx" className="sr-only" onChange={(e) => e.target.files?.[0] && onDeckUpload(e.target.files[0])} />
             </label>
           </div>
         ) : (
-          <label className="rounded-none border border-dashed border-border/80 bg-card p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
-            <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
-            <div className="text-sm font-medium mt-2">Upload pitch deck</div>
-            <div className="text-xs text-muted-foreground mt-0.5">PDF or PPTX · Max 10MB</div>
-            <div className="text-xs text-brand mt-2">AI will extract and pre-fill your profile</div>
+          <label className="p-5 text-center cursor-pointer transition-colors block" style={{ borderRadius: 0, border: "1px dashed var(--lcs-line)", background: "var(--lcs-white)" }}>
+            <Upload className="h-5 w-5 mx-auto" style={{ color: "var(--lcs-ink-muted)" }} />
+            <div className="text-sm font-medium mt-2" style={{ color: "var(--lcs-ink)" }}>Upload pitch deck</div>
+            <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>PDF or PPTX · Max 10MB</div>
+            <div className="text-xs mt-2" style={{ color: "var(--lcs-accent)" }}>AI will extract and pre-fill your profile</div>
             <input type="file" accept=".pdf,.pptx" className="sr-only" onChange={(e) => e.target.files?.[0] && onDeckUpload(e.target.files[0])} />
           </label>
         )}
       </div>
 
-      <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
-        <div className="text-sm font-semibold mb-3">Overview</div>
+      <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+        <div className="text-sm font-semibold mb-3" style={{ color: "var(--lcs-ink)" }}>Overview</div>
         <div className="space-y-2.5">
           {([
             [Globe, "Stage", form.stage],
@@ -2250,28 +2308,28 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
             [Building2, "Sector", form.sector],
           ] as [any, string, string][]).map(([Icon, label, val]) => (
             <div key={label} className="flex items-center gap-2.5 text-sm">
-              <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground text-xs">{label}</span>
-              <span className="ml-auto font-medium text-sm">{val || "—"}</span>
+              <Icon className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-ink-muted)" }} />
+              <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{label}</span>
+              <span className="ml-auto font-medium text-sm" style={{ color: "var(--lcs-ink)" }}>{val || "—"}</span>
             </div>
           ))}
           {form.growth_rate && (
             <div className="flex items-center gap-2.5 text-sm">
-              <span className="text-muted-foreground text-xs">Growth</span>
-              <span className="ml-auto font-medium text-sm text-success">{form.growth_rate}</span>
+              <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Growth</span>
+              <span className="ml-auto font-medium text-sm" style={{ color: "var(--lcs-satisfied)" }}>{form.growth_rate}</span>
             </div>
           )}
           {form.customer_count && (
             <div className="flex items-center gap-2.5 text-sm">
-              <span className="text-muted-foreground text-xs">Customers</span>
-              <span className="ml-auto font-medium text-sm">{form.customer_count}</span>
+              <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Customers</span>
+              <span className="ml-auto font-medium text-sm" style={{ color: "var(--lcs-ink)" }}>{form.customer_count}</span>
             </div>
           )}
         </div>
       </div>
       {showVisibility && sectionVisibility && onVisibilityChange && (
-        <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
-          <div className="text-sm font-semibold mb-3">Section visibility</div>
+        <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
+          <div className="text-sm font-semibold mb-3" style={{ color: "var(--lcs-ink)" }}>Section visibility</div>
           <div className="space-y-4">
             {([
               ["problem_solution", "Problem & solution"],
@@ -2284,7 +2342,7 @@ function RightCol({ form, deckName, deckUploading, isExtracting, onDeckUpload, s
               ["media", "Media"],
             ] as [string, string][]).map(([section, label]) => (
               <div key={section}>
-                <div className="text-xs text-muted-foreground mb-2">{label}</div>
+                <div className="text-xs mb-2" style={{ color: "var(--lcs-ink-muted)" }}>{label}</div>
                 <VisibilitySelector
                   visibility={sectionVisibility[section] ?? "public"}
                   onChange={(value) => onVisibilityChange(section, value)}
@@ -2393,26 +2451,23 @@ function CapTableSection({ startupId }: { startupId: string }) {
   const f = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((prev) => ({ ...prev, [k]: e.target.value }));
 
-  const inputCls = "mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50";
+  const inputCls = "mt-1 w-full px-3 py-2 text-sm outline-none";
+  const inputStyle: React.CSSProperties = { borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" };
 
   return (
-    <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
+    <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="text-sm font-semibold">Cap Table</div>
-          <div className="text-xs text-muted-foreground mt-0.5">Visible only to you — not shared with investors by default.</div>
+          <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Cap Table</div>
+          <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Visible only to you — not shared with investors by default.</div>
         </div>
-        <button
-          onClick={() => { setShowForm((v) => !v); setEditingId(null); setForm(blank); }}
-          className="inline-flex items-center gap-1.5 text-xs rounded-md border border-border/60 px-3 py-1.5 hover:bg-accent transition-colors"
-        >
+        <LcsButton variant="secondary" onClick={() => { setShowForm((v) => !v); setEditingId(null); setForm(blank); }} style={{ height: 28 }}>
           <Plus className="h-3.5 w-3.5" /> Add shareholder
-        </button>
+        </LcsButton>
       </div>
 
       {overLimit && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs"
-          style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}>
+        <div className="mb-3 flex items-center gap-2 px-3 py-2 text-xs" style={{ borderRadius: 0, background: "var(--lcs-attention-wash)", border: "1px solid var(--lcs-attention)", color: "var(--lcs-attention)" }}>
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
           Total ownership is {totalOwnership.toFixed(1)}% — exceeds 100%. This may be intentional if data is incomplete.
         </div>
@@ -2422,87 +2477,82 @@ function CapTableSection({ startupId }: { startupId: string }) {
         <div className="space-y-2 mb-4">
           {rows.map((row) => (
             <div key={row.id}
-              style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 10 }}
+              style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", borderRadius: 0 }}
               className="px-4 py-3"
             >
               <div className="flex items-start justify-between gap-2 flex-wrap">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-foreground">{row.shareholder_name}</span>
+                    <span className="text-sm font-medium" style={{ color: "var(--lcs-ink)" }}>{row.shareholder_name}</span>
                     {row.shareholder_role && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full"
-                        style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#A855F7" }}>
+                      <span className="text-xs px-1.5 py-0.5" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)" }}>
                         {row.shareholder_role}
                       </span>
                     )}
-                    <span className="text-sm font-semibold text-muted-foreground">{row.ownership_percent}%</span>
+                    <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink-muted)" }}>{row.ownership_percent}%</span>
                   </div>
                   <div className="flex items-center gap-3 mt-1.5">
-                    {row.linkedin_url && <a href={row.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Linkedin className="h-3.5 w-3.5" /></a>}
-                    {row.x_url && <a href={row.x_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Twitter className="h-3.5 w-3.5" /></a>}
-                    {row.instagram_url && <a href={row.instagram_url} target="_blank" rel="noopener noreferrer" className="text-faint hover:text-muted-foreground transition-colors"><Instagram className="h-3.5 w-3.5" /></a>}
+                    {row.linkedin_url && <a href={row.linkedin_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--lcs-ink-muted)" }} className="transition-colors"><Linkedin className="h-3.5 w-3.5" /></a>}
+                    {row.x_url && <a href={row.x_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--lcs-ink-muted)" }} className="transition-colors"><Twitter className="h-3.5 w-3.5" /></a>}
+                    {row.instagram_url && <a href={row.instagram_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--lcs-ink-muted)" }} className="transition-colors"><Instagram className="h-3.5 w-3.5" /></a>}
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <button onClick={() => startEdit(row)} className="text-faint hover:text-muted-foreground p-1"><Pencil className="h-3.5 w-3.5" /></button>
-                  <button onClick={() => handleDelete(row.id)} className="text-faint hover:text-red-400 p-1"><Trash2 className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => startEdit(row)} className="p-1" style={{ color: "var(--lcs-ink-muted)" }}><Pencil className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => handleDelete(row.id)} className="p-1" style={{ color: "var(--lcs-ink-muted)" }}><Trash2 className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
             </div>
           ))}
-          <div className="pt-1 text-xs text-muted-foreground text-right">
-            Total documented: <span className={overLimit ? "text-[#F59E0B] font-semibold" : "font-medium"}>{totalOwnership.toFixed(1)}%</span>
+          <div className="pt-1 text-xs text-right" style={{ color: "var(--lcs-ink-muted)" }}>
+            Total documented: <span className="font-semibold" style={overLimit ? { color: "var(--lcs-attention)" } : { fontWeight: 500 }}>{totalOwnership.toFixed(1)}%</span>
           </div>
         </div>
       )}
 
       {rows.length === 0 && !showForm && (
-        <p className="text-xs text-muted-foreground">No shareholders</p>
+        <p className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>No shareholders</p>
       )}
 
       {showForm && (
-        <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: 10 }} className="p-4 space-y-3">
+        <div style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", borderRadius: 0 }} className="p-4 space-y-3">
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-muted-foreground">Shareholder name *</label>
-              <input value={form.shareholder_name} onChange={f("shareholder_name")} placeholder="Jane Smith" className={inputCls} />
+              <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Shareholder name *</label>
+              <input value={form.shareholder_name} onChange={f("shareholder_name")} placeholder="Jane Smith" className={inputCls} style={inputStyle} />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Role</label>
-              <select value={form.shareholder_role} onChange={f("shareholder_role")} className={inputCls}>
+              <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Role</label>
+              <select value={form.shareholder_role} onChange={f("shareholder_role")} className={inputCls} style={inputStyle}>
                 {CAP_ROLES.map((r) => <option key={r}>{r}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Ownership % *</label>
-              <input type="number" min="0" max="100" step="0.01" value={form.ownership_percent} onChange={f("ownership_percent")} placeholder="25.0" className={inputCls} />
+              <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Ownership % *</label>
+              <input type="number" min="0" max="100" step="0.01" value={form.ownership_percent} onChange={f("ownership_percent")} placeholder="25.0" className={inputCls} style={inputStyle} />
             </div>
           </div>
-          <div className="text-xs text-muted-foreground font-medium pt-1">Social links (at least one required for verification)</div>
+          <div className="text-xs font-medium pt-1" style={{ color: "var(--lcs-ink-muted)" }}>Social links (at least one required for verification)</div>
           <div className="grid sm:grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1"><Linkedin className="h-3 w-3" /> LinkedIn URL</label>
-              <input value={form.linkedin_url} onChange={f("linkedin_url")} placeholder="https://linkedin.com/in/..." className={inputCls} />
+              <label className="text-xs flex items-center gap-1" style={{ color: "var(--lcs-ink-muted)" }}><Linkedin className="h-3 w-3" /> LinkedIn URL</label>
+              <input value={form.linkedin_url} onChange={f("linkedin_url")} placeholder="https://linkedin.com/in/..." className={inputCls} style={inputStyle} />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1"><Twitter className="h-3 w-3" /> X (Twitter) URL</label>
-              <input value={form.x_url} onChange={f("x_url")} placeholder="https://x.com/..." className={inputCls} />
+              <label className="text-xs flex items-center gap-1" style={{ color: "var(--lcs-ink-muted)" }}><Twitter className="h-3 w-3" /> X (Twitter) URL</label>
+              <input value={form.x_url} onChange={f("x_url")} placeholder="https://x.com/..." className={inputCls} style={inputStyle} />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1"><Instagram className="h-3 w-3" /> Instagram URL</label>
-              <input value={form.instagram_url} onChange={f("instagram_url")} placeholder="https://instagram.com/..." className={inputCls} />
+              <label className="text-xs flex items-center gap-1" style={{ color: "var(--lcs-ink-muted)" }}><Instagram className="h-3 w-3" /> Instagram URL</label>
+              <input value={form.instagram_url} onChange={f("instagram_url")} placeholder="https://instagram.com/..." className={inputCls} style={inputStyle} />
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-1">
-            <button onClick={() => { setShowForm(false); setEditingId(null); setForm(blank); }} className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">Cancel</button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-1.5 text-xs font-medium disabled:opacity-60"
-            >
+            <LcsButton variant="text-link" onClick={() => { setShowForm(false); setEditingId(null); setForm(blank); }}>Cancel</LcsButton>
+            <LcsButton variant="primary" onClick={handleSave} disabled={saving} style={{ height: 28 }}>
               {saving && <Loader2 className="h-3 w-3 animate-spin" />}
               {editingId ? "Update" : "Add shareholder"}
-            </button>
+            </LcsButton>
           </div>
         </div>
       )}
@@ -2514,9 +2564,9 @@ function CapTableSection({ startupId }: { startupId: string }) {
 
 function FormSection({ title, badge, children }: { title: string; badge?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="rounded-none border border-border/60 bg-card p-5 shadow-card">
+    <div className="border p-5" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
       <div className="flex items-center gap-2 mb-4">
-        <div className="text-sm font-semibold">{title}</div>
+        <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{title}</div>
         {badge}
       </div>
       <div className="space-y-3">{children}</div>
@@ -2535,7 +2585,7 @@ function Field({ label, value, onChange, placeholder, type = "text", onBlur, tit
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="text-xs text-muted-foreground">{label}</label>
+        <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{label}</label>
         {badge}
       </div>
       <input
@@ -2545,7 +2595,8 @@ function Field({ label, value, onChange, placeholder, type = "text", onBlur, tit
         onBlur={onBlur}
         placeholder={placeholder}
         title={title}
-        className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+        className="w-full px-3 py-2 text-sm outline-none"
+        style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
       />
     </div>
   );
@@ -2560,7 +2611,7 @@ function TextArea({ label, value, onChange, placeholder, rows = 3, badge }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="text-xs text-muted-foreground">{label}</label>
+        <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{label}</label>
         {badge}
       </div>
       <textarea
@@ -2568,7 +2619,8 @@ function TextArea({ label, value, onChange, placeholder, rows = 3, badge }: {
         onChange={onChange}
         placeholder={placeholder}
         rows={rows}
-        className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+        className="w-full px-3 py-2 text-sm outline-none resize-none"
+        style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
       />
     </div>
   );
@@ -2576,18 +2628,24 @@ function TextArea({ label, value, onChange, placeholder, rows = 3, badge }: {
 
 function VisibilitySelector({ visibility, onChange }: { visibility: SectionVisibility; onChange: (value: SectionVisibility) => void }) {
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+    <div className="mb-4 flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--lcs-ink-muted)" }}>
       <span className="font-semibold uppercase tracking-[0.24em]">Visibility</span>
       {[
-        { value: "public" as SectionVisibility, label: "🌐 Public" },
-        { value: "on_request" as SectionVisibility, label: "🔒 On request" },
-        { value: "deal_room" as SectionVisibility, label: "🏛 Deal room only" },
+        { value: "public" as SectionVisibility, label: "Public" },
+        { value: "on_request" as SectionVisibility, label: "On request" },
+        { value: "deal_room" as SectionVisibility, label: "Deal room only" },
       ].map((option) => (
         <button
           key={option.value}
           type="button"
           onClick={() => onChange(option.value)}
-          className={`rounded-full border px-3 py-1 text-[11px] transition ${visibility === option.value ? "border-brand bg-accent text-brand" : "border-border/70 bg-accent text-muted-foreground hover:border-border hover:bg-accent"}`}
+          className="px-3 py-1 text-[11px] transition"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            border: `1px solid ${visibility === option.value ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
+            background: visibility === option.value ? "var(--lcs-progress-wash)" : "transparent",
+            color: visibility === option.value ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+          }}
         >
           {option.label}
         </button>
@@ -2740,41 +2798,35 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
     }
   };
 
-  const tagColor: Record<string, string> = {
-    Founder: "bg-violet/10 text-violet", "Co-Founder": "bg-violet/10 text-violet",
-    Advisor: "bg-warning/10 text-warning", Employee: "bg-accent text-brand",
-    "Board Member": "bg-success/10 text-success",
-  };
-
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Team members</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h2 className="text-lg font-semibold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Team members</h2>
+          <p className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>
             Key people get a full profile — visible as a card in every deal room, full detail unlocks with mutual disclosure.
           </p>
         </div>
         {!readOnly && (
-          <button
-            onClick={() => { closeForm(); setShowForm((v) => !v); }}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-accent"
-          >
+          <LcsButton variant="secondary" onClick={() => { closeForm(); setShowForm((v) => !v); }} style={{ height: 28 }}>
             <Plus className="h-3.5 w-3.5" /> Add member
-          </button>
+          </LcsButton>
         )}
       </div>
 
       {!readOnly && showForm && (
-        <div className="mb-5 rounded-none border border-brand/30 bg-card p-5 shadow-card">
+        <div className="mb-5 border p-5" style={{ borderColor: "var(--lcs-accent)", borderRadius: 0, background: "var(--lcs-white)" }}>
           <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-semibold">{editingId ? "Edit team member" : "New team member"}</div>
-            <button onClick={closeForm} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+            <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{editingId ? "Edit team member" : "New team member"}</div>
+            <button onClick={closeForm} style={{ color: "var(--lcs-ink-muted)" }}><X className="h-4 w-4" /></button>
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <label className="relative cursor-pointer">
-                <div className="grid h-14 w-14 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-sm font-semibold text-muted-foreground shrink-0">
+                <div
+                  className="grid h-14 w-14 place-items-center overflow-hidden text-sm font-semibold shrink-0"
+                  style={{ borderRadius: "50%", background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)" }}
+                >
                   {photoUploading
                     ? <Loader2 className="h-4 w-4 animate-spin" />
                     : mf.photo_url
@@ -2783,20 +2835,20 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                 </div>
                 <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
               </label>
-              <span className="text-xs text-muted-foreground">Click avatar to upload photo</span>
+              <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Click avatar to upload photo</span>
             </div>
             <div className="grid sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground">Full name</label>
-                <input value={mf.full_name} onChange={setField("full_name")} placeholder="Jane Smith" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Full name</label>
+                <input value={mf.full_name} onChange={setField("full_name")} placeholder="Jane Smith" className="mt-1 w-full px-3 py-2 text-sm outline-none" style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }} />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Role / title</label>
-                <input value={mf.role} onChange={setField("role")} placeholder="CTO" className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50" />
+                <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Role / title</label>
+                <input value={mf.role} onChange={setField("role")} placeholder="CTO" className="mt-1 w-full px-3 py-2 text-sm outline-none" style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }} />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Tag</label>
-                <select value={mf.tag} onChange={setField("tag")} className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50">
+                <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Tag</label>
+                <select value={mf.tag} onChange={setField("tag")} className="mt-1 w-full px-3 py-2 text-sm outline-none" style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
                   {MEMBER_TAGS.map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
@@ -2808,27 +2860,28 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                     onChange={(e) => setMf((f) => ({ ...f, key_person: e.target.checked }))}
                     className="h-4 w-4"
                   />
-                  <span className="text-sm font-medium">Key person</span>
+                  <span className="text-sm font-medium" style={{ color: "var(--lcs-ink)" }}>Key person</span>
                 </label>
               </div>
-              <div className="sm:col-span-2 text-xs text-muted-foreground -mt-1">
+              <div className="sm:col-span-2 text-xs -mt-1" style={{ color: "var(--lcs-ink-muted)" }}>
                 Key people appear as a card in every shared deal room from the moment both parties enter — name, photo,
                 and title only, until the room's Information stage unlocks the full profile below.
               </div>
               <div className="sm:col-span-2">
-                <label className="text-xs text-muted-foreground flex items-center justify-between">
-                  Bio <span className="text-muted-foreground/60">{mf.bio.length}/200</span>
+                <label className="text-xs flex items-center justify-between" style={{ color: "var(--lcs-ink-muted)" }}>
+                  Bio <span style={{ color: "var(--lcs-ink-muted)", opacity: 0.6 }}>{mf.bio.length}/200</span>
                 </label>
                 <textarea
                   value={mf.bio}
                   onChange={(e) => { if (e.target.value.length <= 200) setField("bio")(e); }}
                   placeholder="Brief background and expertise"
                   rows={2}
-                  className="mt-1 w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 resize-none"
+                  className="mt-1 w-full px-3 py-2 text-sm outline-none resize-none"
+                  style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="text-xs text-muted-foreground">Highlights</label>
+                <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Highlights</label>
                 <div className="mt-1 space-y-2">
                   {mf.highlights.map((h, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -2836,27 +2889,29 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                         value={h}
                         onChange={(e) => updateHighlight(i, e.target.value)}
                         placeholder="e.g. Led engineering at a $50M ARR startup"
-                        className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                        className="flex-1 px-3 py-2 text-sm outline-none"
+                        style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                       />
-                      <button onClick={() => removeHighlight(i)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent">
+                      <button onClick={() => removeHighlight(i)} className="grid h-8 w-8 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}>
                         <X className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   ))}
-                  <button onClick={addHighlight} className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border/60 px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent">
+                  <LcsButton variant="secondary" onClick={addHighlight} style={{ height: 28 }}>
                     <Plus className="h-3 w-3" /> Add highlight
-                  </button>
+                  </LcsButton>
                 </div>
               </div>
               <div className="sm:col-span-2">
-                <label className="text-xs text-muted-foreground">Social links</label>
+                <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Social links</label>
                 <div className="mt-1 space-y-2">
                   {mf.social_links.map((l, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <select
                         value={l.platform}
                         onChange={(e) => updateSocialLink(i, { platform: e.target.value })}
-                        className="w-36 shrink-0 rounded-md border border-border/60 bg-background px-2 py-2 text-xs focus:outline-none focus:border-brand/50"
+                        className="w-36 shrink-0 px-2 py-2 text-xs outline-none"
+                        style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                       >
                         {MEMBER_SOCIAL_PLATFORMS.map((p) => <option key={p}>{p}</option>)}
                       </select>
@@ -2864,29 +2919,26 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
                         value={l.url}
                         onChange={(e) => updateSocialLink(i, { url: e.target.value })}
                         placeholder="https://..."
-                        className="flex-1 rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+                        className="flex-1 px-3 py-2 text-sm outline-none"
+                        style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                       />
-                      <button onClick={() => removeSocialLink(i)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-accent">
+                      <button onClick={() => removeSocialLink(i)} className="grid h-8 w-8 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}>
                         <X className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   ))}
-                  <button onClick={addSocialLink} className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-border/60 px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent">
+                  <LcsButton variant="secondary" onClick={addSocialLink} style={{ height: 28 }}>
                     <Plus className="h-3 w-3" /> Add link
-                  </button>
+                  </LcsButton>
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-1">
-              <button onClick={closeForm} className="rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent">Cancel</button>
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-4 py-2 text-sm shadow-glow disabled:opacity-60"
-              >
+              <LcsButton variant="secondary" onClick={closeForm} style={{ height: 32 }}>Cancel</LcsButton>
+              <LcsButton variant="primary" onClick={handleSubmit} disabled={submitting} style={{ height: 32 }}>
                 {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                 {editingId ? "Save changes" : "Add member"}
-              </button>
+              </LcsButton>
             </div>
           </div>
         </div>
@@ -2904,41 +2956,53 @@ function TeamMembersSection({ startupId, readOnly = false }: { startupId: string
             const inits = (m.name ?? "?").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
             const d = detailByMemberId.get(m.id);
             return (
-              <div key={m.id} className="rounded-none border border-border/60 bg-card p-4 shadow-card">
+              <div key={m.id} className="border p-4" style={{ borderColor: "var(--lcs-line)", borderRadius: 0, background: "var(--lcs-white)" }}>
                 <div className="flex items-start gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-accent border border-border/60 overflow-hidden text-xs font-semibold shrink-0">
+                  <div
+                    className="grid h-10 w-10 place-items-center overflow-hidden text-xs font-semibold shrink-0"
+                    style={{ borderRadius: "50%", background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)" }}
+                  >
                     {m.photo_url ? <img src={m.photo_url} alt={m.name ?? ""} className="h-full w-full object-cover" /> : inits}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <div className="text-sm font-semibold truncate">{m.name}</div>
+                      <div className="text-sm font-semibold truncate" style={{ color: "var(--lcs-ink)" }}>{m.name}</div>
                       {m.key_person && (
-                        <span className="text-[9px] font-semibold text-brand border border-brand/30 rounded-full px-1.5 py-0.5 shrink-0">KEY</span>
+                        <span
+                          className="text-[9px] font-semibold px-1.5 py-0.5 shrink-0"
+                          style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-accent)", color: "var(--lcs-accent)" }}
+                        >
+                          KEY
+                        </span>
                       )}
                     </div>
-                    <div className="text-xs text-muted-foreground truncate">{m.title}</div>
+                    <div className="text-xs truncate" style={{ color: "var(--lcs-ink-muted)" }}>{m.title}</div>
                     {m.tag && (
-                      <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-1 inline-block", tagColor[m.tag] ?? "bg-muted text-muted-foreground")}>
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 font-medium mt-1 inline-block"
+                        style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}
+                      >
                         {m.tag}
                       </span>
                     )}
                   </div>
                   {!readOnly && (
                     <div className="flex gap-1 shrink-0">
-                      <button onClick={() => openEdit(m)} className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground">
+                      <button onClick={() => openEdit(m)} className="grid h-7 w-7 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}>
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(m.id)}
                         disabled={deletingId === m.id}
-                        className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
+                        className="grid h-7 w-7 place-items-center disabled:opacity-40"
+                        style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                       >
                         {deletingId === m.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                       </button>
                     </div>
                   )}
                 </div>
-                {d?.bio && <div className="mt-2 text-xs text-muted-foreground line-clamp-2">{d.bio}</div>}
+                {d?.bio && <div className="mt-2 text-xs line-clamp-2" style={{ color: "var(--lcs-ink-muted)" }}>{d.bio}</div>}
               </div>
             );
           })}
