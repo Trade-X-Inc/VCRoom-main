@@ -125,6 +125,41 @@ the evidence for why it can't be answered by extending the current radius
 rule; the actual answer needs the founder's design call, same as every
 other "ask before inventing" gap this document already defers.
 
+## `LcsModal`'s footer contract may be too narrow — flagged, not fixed (Group 7 Phase 4, 6 Sep 2026)
+
+**`LcsModal`'s documented footer anatomy is strictly two buttons, right-
+aligned: secondary/cancel, then the task's primary/destructive action, in
+that order.** Two real shapes in `app.documents.tsx`'s Phase 4 restyle
+didn't fit that contract, and both were built as custom modal shells on
+LCS tokens rather than forced into the primitive — the right call in the
+moment, but worth tracking as a pattern rather than two isolated
+one-offs:
+
+1. **`DocumentEditorModal`** — a real 3-button footer: Close (left-
+   aligned, standing alone) plus AI Review and Save (right-aligned
+   together). Not a 2-button left/right pair; a 1-left, 2-right layout.
+2. **The Custom Document / Employee 1-pager upload modals** — a single
+   full-width primary action living in the body, with **no footer button
+   row at all**. Closing is via the header's X or a backdrop click, not a
+   footer cancel button.
+
+**Not yet a pattern requiring a fix, but worth naming before it becomes
+one.** This is only the second and third real-use-case mismatch found
+against `LcsModal` in this migration (the first, `Dropzone.tsx`'s
+`MismatchDialog`, fit the 2-button contract exactly — cancel then
+primary, right-aligned, matching what the dialog already had). Two
+mismatches inside one file's restyle isn't yet strong evidence the
+primitive itself needs to change; it may simply be that
+`app.documents.tsx` happens to have unusually varied confirm/action
+shapes. **The instruction for Groups 8–10: when a modal or dialog doesn't
+fit `LcsModal`'s 2-button contract, keep building the custom shell as
+before, but note it here (or in the relevant group's migration-plan
+entry) each time, so a third or fourth instance is visible as a pattern
+rather than silently re-discovered from scratch.** If a real pattern
+emerges — e.g., a recurring 1-left/2-right shape, or a recurring
+footer-less single-action shape — that's the point to propose either a
+documented `LcsModal` variant or a second primitive, not before.
+
 ## Components
 
 | # | Component | File | Notes |
