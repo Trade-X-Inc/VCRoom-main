@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LcsButton } from "@/components/lcs";
 
 const VIEWPORT_MARGIN = 8;
 
@@ -130,8 +131,9 @@ export function OnboardingTour({
       {hasTarget && anchoredStyle ? (
         <>
           <div
-            className="fixed inset-0 bg-foreground/40 backdrop-blur-[1px] transition-all duration-200 pointer-events-none"
+            className="fixed inset-0 backdrop-blur-[1px] transition-all duration-200 pointer-events-none"
             style={{
+              background: "color-mix(in srgb, var(--lcs-ink) 40%, transparent)",
               clipPath: `polygon(
                 0% 0%, 0% 100%, ${rect!.left - 6}px 100%, ${rect!.left - 6}px ${rect!.top - 6}px,
                 ${rect!.left + rect!.width + 6}px ${rect!.top - 6}px,
@@ -142,12 +144,13 @@ export function OnboardingTour({
             }}
           />
           <div
-            className="fixed rounded-lg ring-2 ring-brand pointer-events-none transition-all duration-200"
+            className="fixed pointer-events-none transition-all duration-200"
             style={{
               top: rect!.top - 6,
               left: rect!.left - 6,
               width: rect!.width + 12,
               height: rect!.height + 12,
+              boxShadow: "0 0 0 2px var(--lcs-accent)",
             }}
           />
           <TourCard
@@ -163,7 +166,8 @@ export function OnboardingTour({
         </>
       ) : (
         <div
-          className="fixed inset-0 bg-foreground/20 backdrop-blur-sm grid place-items-center p-4"
+          className="fixed inset-0 backdrop-blur-sm grid place-items-center p-4"
+          style={{ background: "color-mix(in srgb, var(--lcs-ink) 20%, transparent)" }}
           onClick={onSkip}
         >
           <TourCard
@@ -207,47 +211,44 @@ function TourCard({
     <div
       ref={cardRef}
       onClick={onClick}
-      style={style}
-      className="w-full max-w-sm rounded-2xl border border-border/60 bg-card shadow-elev p-6"
+      style={{ ...style, background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}
+      className="w-full max-w-sm p-6"
     >
       <div className="flex items-center justify-between mb-3">
-        <div className="text-sm font-semibold">{step.title}</div>
+        <div className="text-sm font-semibold" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>
+          {step.title}
+        </div>
         <button
           onClick={onSkip}
-          className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground shrink-0"
+          className="grid h-7 w-7 place-items-center shrink-0"
+          style={{ color: "var(--lcs-ink-muted)" }}
           title="Skip tour"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
-      <div className="text-sm text-muted-foreground leading-relaxed mb-5">{step.body}</div>
+      <div className="text-sm leading-relaxed mb-5" style={{ color: "var(--lcs-ink-muted)" }}>
+        {step.body}
+      </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           {steps.map((s, i) => (
             <div
               key={s.id}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
-                i === activeIndex ? "w-4 hs-gradient" : "w-1.5 bg-muted",
-              )}
+              className={cn("h-1.5 transition-all", i === activeIndex ? "w-4" : "w-1.5")}
+              style={{ background: i === activeIndex ? "var(--lcs-accent)" : "var(--lcs-line)" }}
             />
           ))}
         </div>
         <div className="flex items-center gap-2">
           {step.cta && (
-            <button
-              onClick={step.cta.onClick}
-              className="rounded-md border border-border/60 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
-            >
+            <LcsButton variant="secondary" onClick={step.cta.onClick} className="text-xs px-3 py-1.5">
               {step.cta.label}
-            </button>
+            </LcsButton>
           )}
-          <button
-            onClick={onPrimary}
-            className="rounded-md bg-gradient-brand px-3 py-1.5 text-xs font-medium text-brand-foreground shadow-glow hover:opacity-90"
-          >
+          <LcsButton variant="primary" onClick={onPrimary} className="text-xs px-3 py-1.5">
             {isLast ? "Done" : "Next"}
-          </button>
+          </LcsButton>
         </div>
       </div>
     </div>
