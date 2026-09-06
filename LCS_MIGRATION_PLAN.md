@@ -159,6 +159,25 @@ Standalone signing page, matching no other file's shape (no shell chrome, no `St
 
 **This closes Group 6 in full** — all 9 tabs, the shell, `DealRoomTimeline.tsx`, and `LawyerRoomView.tsx` restyled onto LCS, verified byte-identical logic throughout, live-tested against real fixture data at every step.
 
+### Group 6 — closing summary (confirmed closed, 6 Sep 2026)
+
+**Scope delivered:** shell (`app.deal-rooms.$id.tsx`) + all 9 tabs (`overview`, `information`, `qa`, `diligence`, `nda`, `documents`, `meetings`, `term-sheets`, `close`) + 2 shared dependencies (`DealRoomTimeline.tsx`, `LawyerRoomView.tsx`) — the full set listed in the Group 6 table above, restyled onto LCS across two pushed commits (`d0808c2` Phases 1–4, `e8f67de` nda.tsx). Every file's business logic verified byte-identical via `git diff` before and after restyle; every file live-tested against real fixture/production data, including the tab-to-tab navigation seam itself (not just each tab in isolation), per the Phase-0 decision to pull the four v2 tabs into scope specifically to avoid a shell/tab design-system mismatch.
+
+**`app.deal-rooms.$id.activity.tsx`** (the 16-line stub flagged as a dead-code candidate in the "Dead-code observations" section below) is confirmed **not dead** — it renders `Timeline` from `DealRoomTimeline.tsx`, which Group 6 restyled. It is therefore already-LCS by inheritance and needs no separate work; the "verify before deleting" note below is resolved by this finding, not by deletion.
+
+**2 new LCS primitives built** (Phase-0 decision 1): `LcsSkeleton`/`LcsSkeletonRows` (`components/lcs/Skeleton.tsx`) and `LcsReferenceLine` (`components/lcs/ReferenceLine.tsx`), replacing `components/v2/Skeleton.tsx` and `components/v2/ReferenceLine.tsx` respectively for `overview.tsx`'s needs. LCS is now a 12-primitive system, documented in `PRIMITIVES.md`. **`LcsStatusPill` extended** (Phase-0 decision 2) with an additive `dot?: boolean` prop (default `true`), replacing `components/v2/StatusLabel.tsx`'s `neutral`/`adverse` tones — zero effect on any pre-existing caller, verified by tsc before proceeding.
+
+**3 live, non-styling bugs found and logged, none fixed by this group (restyle-only discipline held throughout):**
+1. `documents.tsx` — the Stage-2 document-gating block is permanently unreachable: its own filter depends on a column (`deal_room_stage`) the query never selects. Logged in CLAUDE.md §19l.
+2. `AIChat.tsx` — deal-room page-context detection checks `/deal-room/` (singular) against the real `/deal-rooms/` (plural) routes and never matches, degrading every deal-room AI interaction to a worse context. Logged in CLAUDE.md §19l. Not fixed because `AIChat.tsx` itself was explicitly excluded from Group 6 (see below).
+3. `diligence.tsx` — `analysisResult` is local `useState`, never rehydrated from the investor's own saved `deal_room_notes` row on mount, so a saved AI analysis doesn't survive a navigate-away-and-back. Confirmed present by diff, not fixed per instruction.
+
+**One latent primitive-contract gap found, not fixed** (editing `LcsButton` itself was out of scope mid-restyle): the `text-link` variant unconditionally applies `text-decoration: underline` with no way to suppress it via the `style` prop — currently invisible on every icon-only caller (no text to underline) but a latent gap for a future caller with visible text. Tracked for the next time `LcsButton` is touched directly.
+
+**Full-app v1-purple footprint (47 files, including `styles.css` itself) tracked as separate future scope, not expanded into Group 6.** Confirmed with you mid-Phase-4: only the shell file (`app.deal-rooms.$id.tsx`) got its purple removed in this pass, plus the two decorative `STAGES` emoji icons in the shared `deal-room-stages.ts`. The other 46 files are logged in CLAUDE.md §19m as their own dedicated future pass — not silently rolled into Group 7 or any later group without an explicit decision to do so.
+
+**`AIChat.tsx` remains explicitly out of scope**, unrestyled (confirmed live: 6 v1 markers remain, zero LCS tokens). Per the Group 6 recon's own reasoning, it's mounted app-wide (pipeline, leads, advisor, documents, meetings contexts), not deal-room-specific, so its restyle is a cross-cutting pass that happens to be reachable from the deal-room AI slide-over — not a Group 6 change. It also has genuinely LCS-hostile structure (chat bubbles, a Tailwind Typography `prose` scale with no LCS equivalent, 5 shadow usages, 3 gradients) needing its own structural-fit decision, plus the route-string bug above.
+
 ---
 
 ## Group 7 — Founder Profile & Document workspaces
@@ -303,13 +322,18 @@ No routes were found unreachable — `lib/nav-structure.ts` references every non
 
 ## Order summary
 
-| # | Group | Lines | Driving factor |
-|---|---|---|---|
-| 5 | Shared v1 primitives (`components/system` + `design-tokens`) — **decided: delete, not restyle** | ~590 | Dependency — 26 routes import these |
-| 6 | Deal Room shell + all 9 tabs (4 v2 tabs pulled in, **decided**) | ~7,350 | Risk + dependency — shell wraps 9 tabs; NDA/closing/stage transitions; avoids a shell/tab design-system seam |
-| 7 | Founder Profile & Documents | ~8,430 | Dependency — retires 14 alias routes; largest volume |
-| 8 | Investor Pipeline | ~8,960 | Risk (moderate) — write actions, no stage transitions |
-| 9 | Founder Home/Overview/Analytics | ~2,090 | Risk (low) — mostly read-only |
-| 10 | Founder Roast | ~1,710 | Risk (low), fully isolated |
+| # | Group | Lines | Driving factor | Status |
+|---|---|---|---|---|
+| 5 | Shared v1 primitives (`components/system` + `design-tokens`) | ~590 | Dependency — 26 routes import these | **CLOSED** |
+| 6 | Deal Room shell + all 9 tabs + 2 dependencies (4 v2 tabs pulled in) | ~7,350 | Risk + dependency — shell wraps 9 tabs; NDA/closing/stage transitions; avoids a shell/tab design-system seam | **CLOSED** |
+| — | `AIChat.tsx` — cross-cutting AI panel, explicitly excluded from Group 6 | 158 | Mounted app-wide, not deal-room-specific; LCS-hostile structure (chat bubbles, `prose` scale, shadows, gradients); own route-string bug | **Open — needs its own structural-fit decision before scheduling** |
+| 7 | Founder Profile & Documents | ~8,430 | Dependency — retires 14 alias routes; largest volume | Not started |
+| 8 | Investor Pipeline | ~8,960 | Risk (moderate) — write actions, no stage transitions | Not started |
+| 9 | Founder Home/Overview/Analytics | ~2,090 | Risk (low) — mostly read-only | Not started |
+| 10 | Founder Roast | ~1,710 | Risk (low), fully isolated | Not started |
+| — | Full-app v1-purple sweep (47 files incl. `styles.css`), tracked CLAUDE.md §19m | unscoped | Found during Group 6; deliberately not folded into any numbered group | Deferred, unscheduled |
+| — | `components/v2/` retirement (15 route files + 6 components on the intermediate v2 tokens) | unscoped | Third parallel primitive library alongside `components/lcs/`; not touched by Groups 5–10 | Deferred, unscheduled |
 
-Update this document's totals and remove a group's row once it closes, matching the discipline already used for the old 11-group plan's tracking (that plan's own history is preserved in CLAUDE.md's amendment log rather than in a file, which is the exact gap this document exists to close going forward).
+**Remaining real work after Group 6: ~21,190 lines across Groups 7–10, plus `AIChat.tsx` (158 lines, blocked on a structural-fit decision) and the two unscheduled sweeps above (purple footprint, `components/v2/` retirement) whose actual line counts overlap significantly with Groups 6–10's own files and are not separately additive.**
+
+Update this document's totals and mark a group's row CLOSED once it closes (do not delete rows — the closed rows above are the running record), matching the discipline already used for the old 11-group plan's tracking (that plan's own history is preserved in CLAUDE.md's amendment log rather than in a file, which is the exact gap this document exists to close going forward).
