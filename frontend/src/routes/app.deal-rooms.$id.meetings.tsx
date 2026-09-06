@@ -11,7 +11,8 @@ import { upsertDealRoomMeeting } from "@/lib/deal-room-workflow-fn";
 import { skipMeeting, updateMeetingNotes } from "@/lib/deal-room-fn";
 import { createInterviewRoom, mintInterviewToken, saveMeetingTranscript, runMeetingExtraction, flagTranscriptionStoppedEarly, type MeetingExtraction } from "@/lib/interview-fn";
 import { LawyerGate, useLawyerGateState } from "@/components/app/LawyerGate";
-import { V2Button, V2PageHeader, StatusLabel, type StatusTone } from "@/components/v2";
+import { LcsButton, LcsPageHeader, LcsStatusPill, type LcsStatus } from "@/components/lcs";
+import { ChevronRight } from "lucide-react";
 
 // R14B step 3 — the interview stage sequencer, re-mounting the old
 // (orphaned) Stage3Panel 3-slot pattern as a real route, extended to the
@@ -60,17 +61,20 @@ function statusOf(m: MeetingRow | undefined): "done" | "skipped" | "scheduled" |
   return "unscheduled";
 }
 
-// §7.2 closed 4-tone vocabulary.
-const CHIP: Record<string, { label: string; tone: StatusTone }> = {
-  done: { label: "Done", tone: "satisfied" },
-  skipped: { label: "Skipped", tone: "neutral" },
-  scheduled: { label: "Scheduled", tone: "attention" },
-  unscheduled: { label: "Not scheduled", tone: "neutral" },
+// Component 05's closed 4-status vocabulary (Pending/In progress/Satisfied/
+// Attention). "skipped"/"unscheduled" both map to pending — neither is a
+// live-negotiation "in progress" state, matching the mapping decision from
+// the term-sheets.tsx pass (Group 6 Phase-0 decision 2).
+const CHIP: Record<string, { label: string; status: LcsStatus }> = {
+  done: { label: "Done", status: "satisfied" },
+  skipped: { label: "Skipped", status: "pending" },
+  scheduled: { label: "Scheduled", status: "attention" },
+  unscheduled: { label: "Not scheduled", status: "pending" },
 };
 
 function StatusChip({ status }: { status: string }) {
   const c = CHIP[status] ?? CHIP.unscheduled;
-  return <StatusLabel tone={c.tone}>{c.label}</StatusLabel>;
+  return <LcsStatusPill status={c.status} label={c.label} />;
 }
 
 // ── Embedded Daily call (private room + token) ──────────────────────────────
@@ -167,14 +171,17 @@ function InterviewCall({ roomUrl, token, onLeft, onError, isTranscriptionOwner, 
     <div className="relative w-full">
       {transcribing && (
         <div
-          className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 px-3 py-2 text-white font-medium"
-          style={{ background: "rgba(10,10,11,0.82)", fontSize: "12px" }}
+          className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 px-3 py-2 font-medium"
+          style={{ background: "rgba(10,10,11,0.82)", color: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)", fontSize: "12px" }}
           data-testid="transcription-indicator"
         >
-          <span className="inline-block h-2 w-2 bg-v2-adverse" style={{ borderRadius: "50%" }} />
+          <span className="inline-block h-2 w-2" style={{ background: "var(--lcs-attention)", borderRadius: "50%" }} />
           Transcription on — this meeting is being transcribed to generate AI notes. Both parties can see this.
         </div>
       )}
+      {/* containerRef is the Daily.co iframe's mount target — createFrame's own
+          iframeStyle (width/height/border) governs the iframe itself and is
+          untouched here; only this wrapper div (not restylable content) changes. */}
       <div ref={containerRef} className="w-full bg-black" style={{ height: 480 }} />
     </div>
   );
@@ -417,9 +424,18 @@ function MeetingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-8 py-8 font-v2-ui text-v2-ink">
-      <V2PageHeader
-        breadcrumb={[{ label: "Deal room" }, { label: "Interviews" }]}
+    <div className="mx-auto max-w-5xl px-8 py-8" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>
+      {/* Breadcrumb as a small inline element above LcsPageHeader, per Group 6
+          Phase-0 decision 3 — LcsPageHeader's contract has no breadcrumb prop. */}
+      <div
+        className="flex items-center gap-1.5"
+        style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink-muted)", fontSize: "11.5px", marginBottom: "8px" }}
+      >
+        <span>Deal room</span>
+        <ChevronRight style={{ width: 11, height: 11 }} />
+        <span>Interviews</span>
+      </div>
+      <LcsPageHeader
         title="Interviews"
         description={
           isLawyer
@@ -430,14 +446,15 @@ function MeetingsPage() {
 
       {/* Active call panel */}
       {call && (
-        <div className="mb-6 border border-v2-rule bg-v2-panel">
-          <div className="flex items-center justify-between border-b border-v2-rule px-4 py-2.5">
-            <span className="text-v2-ink font-semibold text-sm">
+        <div className="mb-6 border" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="flex items-center justify-between border-b px-4 py-2.5" style={{ borderColor: "var(--lcs-line)" }}>
+            <span className="font-semibold text-sm" style={{ color: "var(--lcs-ink)" }}>
               {STAGES.find((s) => s.number === call.meetingNumber)?.label} — live
             </span>
             <button
               onClick={() => setCall(null)}
-              className="grid h-7 w-7 place-items-center text-v2-ink-muted hover:text-v2-ink"
+              className="grid h-7 w-7 place-items-center"
+              style={{ color: "var(--lcs-ink-muted)" }}
               title="Close"
             >
               <X className="h-4 w-4" />
@@ -461,7 +478,7 @@ function MeetingsPage() {
       )}
 
       {isLoading ? (
-        <div className="border border-v2-rule bg-v2-panel p-6 text-v2-ink-muted text-sm">Loading meeting stages…</div>
+        <div className="border p-6 text-sm" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink-muted)" }}>Loading meeting stages…</div>
       ) : (
         <div className="flex flex-col gap-3">
           {visibleStages.map((stage) => {
@@ -472,14 +489,14 @@ function MeetingsPage() {
             const errHere = joinError?.meetingNumber === stage.number ? joinError : null;
 
             return (
-              <div key={stage.number} className="border border-v2-rule bg-v2-panel" data-testid={`interview-stage-${stage.slug}`}>
+              <div key={stage.number} className="border" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }} data-testid={`interview-stage-${stage.slug}`}>
                 <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className="grid h-7 w-7 shrink-0 place-items-center border font-semibold"
                       style={{
-                        borderColor: status === "done" ? "var(--v2-satisfied)" : "var(--v2-rule)",
-                        color: status === "done" ? "var(--v2-satisfied)" : "var(--v2-ink-muted)",
+                        borderColor: status === "done" ? "var(--lcs-satisfied)" : "var(--lcs-line)",
+                        color: status === "done" ? "var(--lcs-satisfied)" : "var(--lcs-ink-muted)",
                         fontSize: "12px",
                       }}
                     >
@@ -487,10 +504,10 @@ function MeetingsPage() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-v2-ink font-semibold text-sm">{stage.label}</span>
+                        <span className="font-semibold text-sm" style={{ color: "var(--lcs-ink)" }}>{stage.label}</span>
                         <StatusChip status={status} />
                         {m?.scheduled_at && status !== "skipped" && (
-                          <span className="inline-flex items-center gap-1 text-v2-ink-muted" style={{ fontSize: "12px" }}>
+                          <span className="inline-flex items-center gap-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "12px" }}>
                             {isOnline ? <Video className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
                             {new Date(m.scheduled_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
                             {" · "}{isOnline ? "Online" : "In person"}
@@ -498,7 +515,7 @@ function MeetingsPage() {
                         )}
                       </div>
                       {m?.notes_shared && (
-                        <div className="mt-1 text-v2-ink-secondary max-w-xl truncate" style={{ fontSize: "12px" }}>{m.notes_shared}</div>
+                        <div className="mt-1 max-w-xl truncate" style={{ color: "var(--lcs-ink-muted)", fontSize: "12px" }}>{m.notes_shared}</div>
                       )}
                     </div>
                   </div>
@@ -517,10 +534,10 @@ function MeetingsPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Join — both parties, online + scheduled or done-pending */}
                       {status === "scheduled" && isOnline && (
-                        <V2Button variant="primary" onClick={() => join(stage.number)} disabled={joining === stage.number}>
+                        <LcsButton variant="primary" onClick={() => join(stage.number)} disabled={joining === stage.number}>
                           {joining === stage.number ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Video className="h-3.5 w-3.5" />}
                           Join meeting
-                        </V2Button>
+                        </LcsButton>
                       )}
 
                       {isInvestor && status === "unscheduled" && (
@@ -528,8 +545,8 @@ function MeetingsPage() {
                           <select
                             value={types[stage.number] ?? "video"}
                             onChange={(e) => setTypes((p) => ({ ...p, [stage.number]: e.target.value as "video" | "in_person" }))}
-                            className="h-8 border border-v2-rule bg-v2-surface px-2 text-v2-ink"
-                            style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
+                            className="h-8 border px-2"
+                            style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)", fontSize: "12px" }}
                           >
                             <option value="video">Online</option>
                             <option value="in_person">In person</option>
@@ -538,42 +555,42 @@ function MeetingsPage() {
                             type="datetime-local"
                             value={dates[stage.number] ?? ""}
                             onChange={(e) => setDates((p) => ({ ...p, [stage.number]: e.target.value }))}
-                            className="h-8 border border-v2-rule bg-v2-surface px-2 text-v2-ink"
-                            style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
+                            className="h-8 border px-2"
+                            style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)", fontSize: "12px" }}
                           />
-                          <V2Button
+                          <LcsButton
                             variant="primary"
                             onClick={() => schedule(stage.number)}
                             disabled={!dates[stage.number] || saving === stage.number}
                             data-testid={`schedule-stage-${stage.number}`}
                           >
                             {saving === stage.number ? "…" : "Schedule"}
-                          </V2Button>
-                          <V2Button
+                          </LcsButton>
+                          <LcsButton
                             variant="secondary"
                             onClick={() => { setSkipOpen(skipOpen === stage.number ? null : stage.number); setSkipReason(""); }}
                           >
                             Skip
-                          </V2Button>
+                          </LcsButton>
                         </>
                       )}
 
                       {isInvestor && status === "scheduled" && (
                         <>
-                          <V2Button variant="secondary" onClick={() => markDone(stage.number)} disabled={saving === stage.number} className="text-v2-satisfied">
+                          <LcsButton variant="secondary" onClick={() => markDone(stage.number)} disabled={saving === stage.number} style={{ color: "var(--lcs-satisfied)" }}>
                             Mark done
-                          </V2Button>
-                          <V2Button
+                          </LcsButton>
+                          <LcsButton
                             variant="secondary"
                             onClick={() => { setSkipOpen(skipOpen === stage.number ? null : stage.number); setSkipReason(""); }}
                           >
                             Skip
-                          </V2Button>
+                          </LcsButton>
                         </>
                       )}
 
                       {isInvestor && (status === "scheduled" || status === "done") && (
-                        <V2Button
+                        <LcsButton
                           variant="secondary"
                           onClick={() => {
                             setNotesOpen(notesOpen === stage.number ? null : stage.number);
@@ -582,7 +599,7 @@ function MeetingsPage() {
                           }}
                         >
                           Notes
-                        </V2Button>
+                        </LcsButton>
                       )}
                     </div>
                   )}
@@ -590,14 +607,14 @@ function MeetingsPage() {
 
                 {/* Join error + regenerate */}
                 {errHere && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-v2-rule bg-v2-attention-wash px-4 py-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-v2-attention" style={{ fontSize: "12px" }}>
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2.5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-attention-wash)" }}>
+                    <span className="inline-flex items-center gap-1.5" style={{ color: "var(--lcs-attention)", fontSize: "12px" }}>
                       <AlertTriangle className="h-3.5 w-3.5" />
                       {errHere.message} The room may have expired.
                     </span>
-                    <V2Button variant="secondary" onClick={() => regenerate(stage.number)} disabled={regenerating}>
+                    <LcsButton variant="secondary" onClick={() => regenerate(stage.number)} disabled={regenerating}>
                       {regenerating ? "Regenerating…" : "Regenerate room"}
-                    </V2Button>
+                    </LcsButton>
                   </div>
                 )}
 
@@ -608,9 +625,9 @@ function MeetingsPage() {
                     ? (rec.extracted_notes as MeetingExtraction)
                     : null;
                   return (
-                    <div className="border-t border-v2-rule px-4 py-3 space-y-2">
+                    <div className="border-t px-4 py-3 space-y-2" style={{ borderColor: "var(--lcs-line)" }}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-1.5 text-v2-ink-muted" style={{ fontSize: "12px" }}>
+                        <span className="inline-flex items-center gap-1.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "12px" }}>
                           <FileAudio className="h-3.5 w-3.5" />
                           {!rec || rec.transcript_status === "pending" ? "No transcript saved — call may have ended without speech captured, or was left before saving"
                             : rec.transcript_status === "failed" ? "Transcript could not be saved"
@@ -618,14 +635,14 @@ function MeetingsPage() {
                             : rec.extraction_status === "failed" ? "Transcript saved — extraction failed"
                             : "Transcript and notes ready"}
                         </span>
-                        <V2Button variant="secondary" onClick={() => checkRecording(stage.number)} disabled={checkingRecording === stage.number}>
+                        <LcsButton variant="secondary" onClick={() => checkRecording(stage.number)} disabled={checkingRecording === stage.number}>
                           {checkingRecording === stage.number ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
                           Run extraction
-                        </V2Button>
+                        </LcsButton>
                       </div>
 
                       {rec?.transcription_stopped_early && (
-                        <div className="flex items-start gap-1.5 border border-v2-attention bg-v2-attention-wash px-3 py-2 text-v2-attention" style={{ fontSize: "12px" }}>
+                        <div className="flex items-start gap-1.5 border px-3 py-2" style={{ borderColor: "var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)", fontSize: "12px" }}>
                           <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                           <span>
                             Transcription was stopped early during this meeting{rec.transcription_stopped_by ? ` by ${rec.transcription_stopped_by}` : ""}
@@ -633,13 +650,15 @@ function MeetingsPage() {
                           </span>
                         </div>
                       )}
+                      {/* v2-adverse (red) → LCS attention amber — CLAUDE.md §0 amendment,
+                          "attention amber covers errors too", no red anywhere in the system. */}
                       {rec?.transcript_status === "failed" && rec.transcript_error && (
-                        <div className="border border-v2-adverse bg-v2-adverse-wash px-3 py-2 text-v2-adverse" style={{ fontSize: "12px" }}>
+                        <div className="border px-3 py-2" style={{ borderColor: "var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)", fontSize: "12px" }}>
                           {rec.transcript_error}
                         </div>
                       )}
                       {rec?.extraction_status === "failed" && rec.extraction_error && (
-                        <div className="border border-v2-adverse bg-v2-adverse-wash px-3 py-2 text-v2-adverse" style={{ fontSize: "12px" }}>
+                        <div className="border px-3 py-2" style={{ borderColor: "var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)", fontSize: "12px" }}>
                           Transcript stored successfully; AI extraction failed: {rec.extraction_error}
                         </div>
                       )}
@@ -647,17 +666,17 @@ function MeetingsPage() {
                       {notes && (
                         <div className="space-y-3 pt-1">
                           <div>
-                            <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Summary</div>
-                            <p className="text-v2-ink text-sm">{notes.summary}</p>
+                            <div className="font-medium mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Summary</div>
+                            <p className="text-sm" style={{ color: "var(--lcs-ink)" }}>{notes.summary}</p>
                           </div>
                           {notes.topics?.length > 0 && (
                             <div>
-                              <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Discussed</div>
+                              <div className="font-medium mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Discussed</div>
                               <ul className="space-y-1.5">
                                 {notes.topics.map((t, i) => (
-                                  <li key={i} className="text-v2-ink text-sm">
+                                  <li key={i} className="text-sm" style={{ color: "var(--lcs-ink)" }}>
                                     <span className="font-medium">{t.topic}:</span> {t.detail}
-                                    <span className="ml-1.5 text-v2-ink-muted" style={{ fontSize: "11px" }}>({t.confidence} confidence — "{t.source_quote}")</span>
+                                    <span className="ml-1.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>({t.confidence} confidence — "{t.source_quote}")</span>
                                   </li>
                                 ))}
                               </ul>
@@ -665,12 +684,12 @@ function MeetingsPage() {
                           )}
                           {notes.stated_figures?.length > 0 && (
                             <div>
-                              <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Figures mentioned</div>
+                              <div className="font-medium mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Figures mentioned</div>
                               <ul className="space-y-1.5">
                                 {notes.stated_figures.map((f, i) => (
-                                  <li key={i} className="text-v2-ink text-sm">
-                                    <span className="font-medium font-v2-data">{f.figure}</span> — stated by {f.stated_by}
-                                    <span className="ml-1.5 text-v2-ink-muted" style={{ fontSize: "11px" }}>({f.confidence} confidence — "{f.source_quote}")</span>
+                                  <li key={i} className="text-sm" style={{ color: "var(--lcs-ink)" }}>
+                                    <span className="font-medium" style={{ fontFamily: "var(--font-lcs-data)" }}>{f.figure}</span> — stated by {f.stated_by}
+                                    <span className="ml-1.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>({f.confidence} confidence — "{f.source_quote}")</span>
                                   </li>
                                 ))}
                               </ul>
@@ -678,12 +697,12 @@ function MeetingsPage() {
                           )}
                           {notes.open_items?.length > 0 && (
                             <div>
-                              <div className="text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Open items</div>
+                              <div className="font-medium mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Open items</div>
                               <ul className="space-y-1.5">
                                 {notes.open_items.map((o, i) => (
-                                  <li key={i} className="text-v2-ink text-sm">
+                                  <li key={i} className="text-sm" style={{ color: "var(--lcs-ink)" }}>
                                     {o.item}
-                                    <span className="ml-1.5 text-v2-ink-muted" style={{ fontSize: "11px" }}>({o.confidence} confidence — "{o.source_quote}")</span>
+                                    <span className="ml-1.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>({o.confidence} confidence — "{o.source_quote}")</span>
                                   </li>
                                 ))}
                               </ul>
@@ -697,46 +716,46 @@ function MeetingsPage() {
 
                 {/* Skip-with-reason */}
                 {skipOpen === stage.number && (
-                  <div className="flex flex-wrap items-center gap-2 border-t border-v2-rule px-4 py-2.5">
+                  <div className="flex flex-wrap items-center gap-2 border-t px-4 py-2.5" style={{ borderColor: "var(--lcs-line)" }}>
                     <input
                       value={skipReason}
                       onChange={(e) => setSkipReason(e.target.value.slice(0, 300))}
                       placeholder="Reason (optional) — visible to both parties"
-                      className="h-8 flex-1 min-w-[220px] border border-v2-rule bg-v2-surface px-2 text-v2-ink"
-                      style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
+                      className="h-8 flex-1 min-w-[220px] border px-2"
+                      style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)", fontSize: "12px" }}
                     />
-                    <V2Button variant="primary" onClick={() => skip(stage.number)} disabled={saving === stage.number}>
+                    <LcsButton variant="primary" onClick={() => skip(stage.number)} disabled={saving === stage.number}>
                       Confirm skip
-                    </V2Button>
+                    </LcsButton>
                   </div>
                 )}
 
                 {/* Notes editor (investor) */}
                 {notesOpen === stage.number && isInvestor && (
-                  <div className="border-t border-v2-rule px-4 py-3 space-y-3">
+                  <div className="border-t px-4 py-3 space-y-3" style={{ borderColor: "var(--lcs-line)" }}>
                     <div>
-                      <label className="block text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Shared notes — visible to both parties</label>
+                      <label className="block font-medium mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Shared notes — visible to both parties</label>
                       <textarea
                         value={sharedDraft}
                         onChange={(e) => setSharedDraft(e.target.value)}
                         rows={2}
-                        className="w-full border border-v2-rule bg-v2-surface px-2 py-1.5 text-sm text-v2-ink resize-none"
-                        style={{ borderRadius: "var(--v2-radius)" }}
+                        className="w-full border px-2 py-1.5 text-sm resize-none"
+                        style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                       />
                     </div>
                     <div>
-                      <label className="block text-v2-ink-muted font-medium mb-1" style={{ fontSize: "11px" }}>Private notes — investor only</label>
+                      <label className="block font-medium mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Private notes — investor only</label>
                       <textarea
                         value={privateDraft}
                         onChange={(e) => setPrivateDraft(e.target.value)}
                         rows={2}
-                        className="w-full border border-v2-rule bg-v2-surface px-2 py-1.5 text-sm text-v2-ink resize-none"
-                        style={{ borderRadius: "var(--v2-radius)" }}
+                        className="w-full border px-2 py-1.5 text-sm resize-none"
+                        style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                       />
                     </div>
-                    <V2Button variant="primary" onClick={() => saveNotes(stage.number)} disabled={saving === stage.number}>
+                    <LcsButton variant="primary" onClick={() => saveNotes(stage.number)} disabled={saving === stage.number}>
                       {saving === stage.number ? "Saving…" : "Save notes"}
-                    </V2Button>
+                    </LcsButton>
                   </div>
                 )}
               </div>

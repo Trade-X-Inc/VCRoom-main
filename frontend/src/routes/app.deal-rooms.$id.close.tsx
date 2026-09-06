@@ -42,10 +42,10 @@ export const Route = createFileRoute("/app/deal-rooms/$id/close")({
 function GateDone({ label }: { label: string }) {
   return (
     <div
-      className="flex items-center gap-2 border border-v2-rule px-4 py-3 text-v2-ink-secondary"
-      style={{ fontSize: "13px" }}
+      className="flex items-center gap-2 border px-4 py-3"
+      style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)", fontSize: "13px" }}
     >
-      <CheckCircle2 className="h-4 w-4 shrink-0 text-v2-satisfied" />
+      <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-satisfied)" }} />
       {label}
     </div>
   );
@@ -61,8 +61,8 @@ function GateDone({ label }: { label: string }) {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="font-v2-ui font-bold text-v2-ink-secondary"
-      style={{ fontSize: "11px", letterSpacing: "0.55px", textTransform: "uppercase" }}
+      className="font-bold"
+      style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)", fontSize: "11px", letterSpacing: "0.55px", textTransform: "uppercase" }}
     >
       {children}
     </div>
@@ -93,17 +93,18 @@ function ClosePage() {
   });
 
   return (
-    <div className="mx-auto max-w-[1360px] font-v2-ui" style={{ padding: "24px" }}>
+    <div className="mx-auto max-w-[1360px]" style={{ padding: "24px", fontFamily: "var(--font-lcs-ui)" }}>
       {/* Header card — exact shape from 35:9978 ("Deal Header & Gate
-          Progress"): panel bg, 1px rule border, 2px radius, 25px padding,
-          drop-shadow(0px 1px 1px rgba(0,0,0,0.05)). */}
+          Progress"): panel bg, 1px rule border, hairline radius, 25px
+          padding. Drop-shadow removed under LCS (no shadows anywhere in
+          the system, flat borders define hierarchy instead). */}
       <div
-        className="bg-v2-panel border border-v2-rule"
-        style={{ borderRadius: "var(--v2-radius)", padding: "25px", boxShadow: "0px 1px 1px rgba(0,0,0,0.05)" }}
+        className="border"
+        style={{ background: "var(--lcs-surface)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)", padding: "25px" }}
       >
-        <div className="text-v2-ink-muted" style={{ fontSize: "12px" }}>Deal room · Closing</div>
-        <h1 className="mt-1 font-semibold text-v2-ink" style={{ fontSize: "20px", letterSpacing: "-0.2px" }}>Close the deal</h1>
-        <p className="mt-1 text-v2-ink-secondary" style={{ fontSize: "13px" }}>
+        <div style={{ color: "var(--lcs-ink-muted)", fontSize: "12px" }}>Deal room · Closing</div>
+        <h1 className="mt-1 font-semibold" style={{ color: "var(--lcs-ink)", fontSize: "20px", letterSpacing: "-0.2px" }}>Close the deal</h1>
+        <p className="mt-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>
           {isClosed ? "This deal is closed — the room is a read-only archive." : "Counsel, agreement, fee, signing, investment payment, and mutual close — the full path to a signed deal for " + companyName + "."}
         </p>
       </div>

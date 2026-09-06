@@ -50,7 +50,7 @@ function DealRoomLayout() {
   if (!user?.id || ndaLoading) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
+        <div className="text-sm animate-pulse" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Verifying access…</div>
       </div>
     );
   }
@@ -60,13 +60,13 @@ function DealRoomLayout() {
   // content — an honest error beats silently mis-scoping (§6A2).
   if (accessError) {
     return (
-      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-3 p-8 text-center">
-        <div className="font-semibold text-foreground">Couldn't verify your access</div>
-        <div className="text-sm text-gray-500 max-w-sm">
+      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-3 p-8 text-center" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+        <div className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Couldn't verify your access</div>
+        <div className="text-sm max-w-sm" style={{ color: "var(--lcs-ink-muted)" }}>
           We couldn't confirm your access to this deal room. Reload the page, and if this
           keeps happening, contact support.
         </div>
-        <Link to="/app/deal-rooms" className="mt-1 text-sm text-brand hover:underline inline-flex items-center gap-1">
+        <Link to="/app/deal-rooms" className="mt-1 text-sm hover:underline inline-flex items-center gap-1" style={{ color: "var(--lcs-accent)" }}>
           <ArrowLeft className="h-4 w-4" /> Back to deal rooms
         </Link>
       </div>
@@ -84,7 +84,7 @@ function DealRoomLayout() {
   if (isNdaRoute) {
     return (
       <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]">
-        <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50">
+        <main className="flex-1 overflow-y-auto min-h-0" style={{ background: "var(--lcs-surface)" }}>
           <Outlet />
         </main>
       </div>
@@ -96,7 +96,7 @@ function DealRoomLayout() {
   if (!ndaAcceptance) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
-        <div className="text-sm text-gray-500 animate-pulse">Verifying access…</div>
+        <div className="text-sm animate-pulse" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Verifying access…</div>
       </div>
     );
   }
@@ -113,32 +113,33 @@ function DealRoomLayout() {
     return (
       <DealRoomCtx.Provider value={ctx}>
         <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
-          <header className="shrink-0 border-b bg-white border-[rgba(0,0,0,0.08)]" data-testid="deal-stage-bar">
+          <header className="shrink-0 border-b" style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)" }} data-testid="deal-stage-bar">
             <div className="flex items-center gap-3 px-4 py-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <Link
                   to={"/app/deal-rooms" as any}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-foreground hover:bg-accent shrink-0"
+                  className="grid h-8 w-8 place-items-center shrink-0"
+                  style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                   title="All deal rooms"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <div
-                  className="grid h-8 w-8 place-items-center rounded-lg shrink-0 font-semibold text-foreground"
-                  style={{ background: "var(--gradient-brand)" }}
+                  className="grid h-8 w-8 place-items-center shrink-0 font-semibold"
+                  style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-accent)", color: "var(--lcs-white)" }}
                 >
                   {companyName[0] ?? "D"}
                 </div>
                 <div className="min-w-0 hidden sm:block">
-                  <div className="text-sm font-semibold text-gray-900 truncate" style={{ fontFamily: "Syne, sans-serif" }}>
+                  <div className="text-sm font-semibold truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
                     {companyName}
                   </div>
-                  <div className="text-[10px] text-gray-500">Legal Counsel · Investment Terms only</div>
+                  <div className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>Legal Counsel · Investment Terms only</div>
                 </div>
               </div>
             </div>
           </header>
-          <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50">
+          <main className="flex-1 overflow-y-auto min-h-0" style={{ background: "var(--lcs-surface)" }}>
             {path.endsWith("/meetings") ? <Outlet /> : <LawyerRoomView />}
           </main>
         </div>
@@ -149,17 +150,17 @@ function DealRoomLayout() {
   // Team member access gate (A2)
   if (isTeamMember && !teamAssignmentLoading && teamAssignment === null) {
     return (
-      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8">
-        <div className="grid h-14 w-14 place-items-center rounded-full bg-gray-100/30">
-          <Lock className="h-6 w-6 text-gray-500" />
+      <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-8" style={{ fontFamily: "var(--font-lcs-ui)" }}>
+        <div className="grid h-14 w-14 place-items-center rounded-full" style={{ background: "var(--lcs-surface)" }}>
+          <Lock className="h-6 w-6" style={{ color: "var(--lcs-ink-muted)" }} />
         </div>
         <div className="text-center">
-          <div className="font-semibold">Access restricted</div>
-          <div className="mt-1 text-sm text-gray-500 max-w-sm">
+          <div className="font-semibold" style={{ color: "var(--lcs-ink)" }}>Access restricted</div>
+          <div className="mt-1 text-sm max-w-sm" style={{ color: "var(--lcs-ink-muted)" }}>
             You haven't been assigned to this deal room. Ask your team admin to give you access.
           </div>
         </div>
-        <Link to="/app/deal-rooms" className="mt-2 text-sm text-brand hover:underline inline-flex items-center gap-1">
+        <Link to="/app/deal-rooms" className="mt-2 text-sm hover:underline inline-flex items-center gap-1" style={{ color: "var(--lcs-accent)" }}>
           <ArrowLeft className="h-4 w-4" /> Back to deal rooms
         </Link>
       </div>
@@ -173,29 +174,31 @@ function DealRoomLayout() {
       <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] relative">
         {/* ── Top header bar ─────────────────────────────────────── */}
         <header
-          className="shrink-0 border-b bg-white border-[rgba(0,0,0,0.08)]"
+          className="shrink-0 border-b"
+          style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)" }}
           data-testid="deal-stage-bar"
         >
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="flex items-center gap-2.5 min-w-0">
               <Link
                 to={"/app/deal-rooms" as any}
-                className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-foreground hover:bg-accent shrink-0"
+                className="grid h-8 w-8 place-items-center shrink-0"
+                style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                 title="All deal rooms"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Link>
               <div
-                className="grid h-8 w-8 place-items-center rounded-lg shrink-0 font-semibold text-foreground"
-                style={{ background: "var(--gradient-brand)" }}
+                className="grid h-8 w-8 place-items-center shrink-0 font-semibold"
+                style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-accent)", color: "var(--lcs-white)" }}
               >
                 {companyName[0] ?? "D"}
               </div>
               <div className="min-w-0 hidden sm:block">
-                <div className="text-sm font-semibold text-gray-900 truncate" style={{ fontFamily: "Syne, sans-serif" }}>
+                <div className="text-sm font-semibold truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
                   {companyName}
                 </div>
-                <div className="text-[10px] text-gray-500">
+                <div className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
                   {isInvestor ? "Founder · Deal Room" : "Investor · Deal Room"}
                   {connectionOrigin && (
                     <> · Connected via directory request · {new Date((connectionOrigin as any).responded_at ?? (connectionOrigin as any).created_at).toLocaleDateString()}</>
@@ -209,7 +212,8 @@ function DealRoomLayout() {
             <div className="flex items-center gap-2 shrink-0 ml-auto">
               <button
                 onClick={() => setActivityOpen(true)}
-                className="grid h-9 w-9 place-items-center rounded-lg text-gray-500 hover:text-foreground hover:bg-gray-100"
+                className="grid h-9 w-9 place-items-center"
+                style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                 title="Activity"
                 data-testid="open-activity"
               >
@@ -217,8 +221,8 @@ function DealRoomLayout() {
               </button>
               <button
                 onClick={() => setAiOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-foreground"
-                style={{ background: "var(--gradient-brand)" }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold"
+                style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-accent)", color: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
                 data-testid="open-ai"
               >
                 <Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Ask AI</span>
@@ -228,7 +232,7 @@ function DealRoomLayout() {
         </header>
 
         {/* ── Main content — each tab renders here via Outlet ────── */}
-        <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50">
+        <main className="flex-1 overflow-y-auto min-h-0" style={{ background: "var(--lcs-surface)" }}>
           <StageApprovalBanner ctx={ctx} />
           <Outlet />
         </main>
@@ -238,12 +242,13 @@ function DealRoomLayout() {
           <>
             <div className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm" onClick={() => setActivityOpen(false)} />
             <aside
-              className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l border-[rgba(0,0,0,0.08)] flex flex-col bg-white"
+              className="fixed top-0 bottom-0 right-0 z-40 w-full sm:w-[420px] border-l flex flex-col"
+              style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}
               data-testid="activity-drawer"
             >
-              <div className="h-14 border-b border-[rgba(0,0,0,0.08)] flex items-center justify-between px-4">
-                <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Activity</div>
-                <button onClick={() => setActivityOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground"><X className="h-4 w-4" /></button>
+              <div className="h-14 border-b flex items-center justify-between px-4" style={{ borderColor: "var(--lcs-line)" }}>
+                <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Activity</div>
+                <button onClick={() => setActivityOpen(false)} className="grid h-8 w-8 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}><X className="h-4 w-4" /></button>
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto">
                 <Timeline dealRoomId={dealRoomId} />
@@ -255,17 +260,17 @@ function DealRoomLayout() {
         {/* ── AI slide-over ───────────────────────────────────────── */}
         {aiOpen && (
           <>
-            <div className="fixed inset-0 z-30 bg-foreground/20 backdrop-blur-sm" onClick={() => setAiOpen(false)} />
-            <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l border-[rgba(0,0,0,0.08)] bg-white shadow-xl flex flex-col" data-testid="ai-panel">
-              <div className="h-14 border-b border-[rgba(0,0,0,0.08)] flex items-center justify-between px-4">
+            <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm" onClick={() => setAiOpen(false)} />
+            <aside className="fixed top-16 bottom-0 right-0 z-40 w-full sm:w-[440px] border-l flex flex-col" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }} data-testid="ai-panel">
+              <div className="h-14 border-b flex items-center justify-between px-4" style={{ borderColor: "var(--lcs-line)" }}>
                 <div className="flex items-center gap-2">
-                  <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-brand text-brand-foreground"><Sparkles className="h-3.5 w-3.5" /></div>
+                  <div className="grid h-7 w-7 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-accent)", color: "var(--lcs-white)" }}><Sparkles className="h-3.5 w-3.5" /></div>
                   <div>
-                    <div className="text-sm font-semibold leading-tight">Deal Room AI</div>
-                    <div className="text-[10px] text-gray-500">{companyName}</div>
+                    <div className="text-sm font-semibold leading-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Deal Room AI</div>
+                    <div className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>{companyName}</div>
                   </div>
                 </div>
-                <button onClick={() => setAiOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-gray-500 hover:bg-accent hover:text-foreground" data-testid="close-ai"><X className="h-4 w-4" /></button>
+                <button onClick={() => setAiOpen(false)} className="grid h-8 w-8 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }} data-testid="close-ai"><X className="h-4 w-4" /></button>
               </div>
               <div className="flex-1 min-h-0">
                 <AIChat
@@ -308,10 +313,11 @@ function StageApprovalBanner({ ctx }: { ctx: DealRoomContext }) {
   if (!isApprover || !pendingTransition) return null;
   return (
     <div
-      className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3"
+      className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border px-4 py-3"
+      style={{ borderRadius: "var(--radius-lcs-control)", borderColor: "var(--lcs-attention)", background: "var(--lcs-attention-wash)", fontFamily: "var(--font-lcs-ui)" }}
       data-testid="stage-approval-banner"
     >
-      <div className="text-sm text-amber-900">
+      <div className="text-sm" style={{ color: "var(--lcs-attention)" }}>
         <span className="font-semibold">{pendingTransition.requested_by === investorUserId ? "Investor" : "Founder"}</span>
         {" "}has requested to advance to{" "}
         <span className="font-semibold">{pendingTransition.to_stage.replace(/_/g, " ")}</span>.
@@ -319,7 +325,8 @@ function StageApprovalBanner({ ctx }: { ctx: DealRoomContext }) {
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={() => doRejectTransition(pendingTransition.id)}
-          className="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+          className="border px-3 py-1.5 text-xs font-semibold"
+          style={{ borderRadius: "var(--radius-lcs-control)", borderColor: "var(--lcs-attention)", color: "var(--lcs-attention)" }}
           data-testid="stage-reject-btn"
         >
           Decline
@@ -327,8 +334,8 @@ function StageApprovalBanner({ ctx }: { ctx: DealRoomContext }) {
         <button
           onClick={() => doApproveTransition(pendingTransition.id)}
           disabled={stageApproving}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
-          style={{ background: "#10B981" }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+          style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-satisfied)", color: "var(--lcs-white)" }}
           data-testid="stage-approve-btn"
         >
           {stageApproving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
@@ -388,39 +395,47 @@ function StageTabBar({
 
   return (
     <div className="relative min-w-0 flex-1" data-testid="stage-pills">
-      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b border-[rgba(0,0,0,0.08)] bg-white">
+      <nav ref={scrollRef} className="flex flex-nowrap overflow-x-auto border-b" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
         {STAGES.map((stage) => {
           const active = activeStageKey === stage.key;
           const accessible = canAccess(stage.key);
-          const className = active
-            ? "hs-gradient text-white rounded-t-lg px-4 py-2 text-sm font-medium whitespace-nowrap"
-            : accessible
-              ? "text-gray-600 px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg whitespace-nowrap"
-              : "text-[#71717A] px-4 py-2 text-sm cursor-not-allowed whitespace-nowrap";
+          const style: React.CSSProperties = {
+            fontFamily: "var(--font-lcs-ui)",
+            borderRadius: "var(--radius-lcs-control) var(--radius-lcs-control) 0 0",
+            padding: "8px 16px",
+            fontSize: "14px",
+            whiteSpace: "nowrap",
+            ...(active
+              ? { background: "var(--lcs-accent)", color: "var(--lcs-white)", fontWeight: 500 }
+              : accessible
+                ? { color: "var(--lcs-ink-muted)" }
+                : { color: "var(--lcs-line)", cursor: "not-allowed" }),
+          };
+          // Decorative stage icons removed (CLAUDE.md §13) — a locked stage's
+          // real meaning (workflow rank not yet reached) is now expressed by
+          // a real Lucide Lock icon keyed off this component's own
+          // canAccess() check, not a data-file emoji string.
           return accessible ? (
             <Link
               key={stage.key}
               to={`/app/deal-rooms/$id/${stagePath(stage.key)}` as any}
               params={{ id: dealRoomId }}
-              className={className}
+              style={style}
               data-testid={`stage-pill-${stage.key}`}
               data-state={active ? "current" : "available"}
             >
-              <span className="inline-flex items-center gap-1.5">
-                {stage.icon && <span aria-hidden="true">{stage.icon}</span>}
-                {stage.label}
-              </span>
+              {stage.label}
             </Link>
           ) : (
             <button
               key={stage.key}
               disabled
-              className={className}
+              style={style}
               data-testid={`stage-pill-${stage.key}`}
               data-state="locked"
             >
               <span className="inline-flex items-center gap-1.5">
-                {stage.icon && <span aria-hidden="true">{stage.icon}</span>}
+                <Lock className="h-3 w-3" aria-hidden="true" />
                 {stage.label}
               </span>
             </button>
@@ -428,10 +443,10 @@ function StageTabBar({
         })}
       </nav>
       {canScrollLeft && (
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6" style={{ background: "linear-gradient(to right, var(--lcs-white), transparent)" }} />
       )}
       {canScrollRight && (
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6" style={{ background: "linear-gradient(to left, var(--lcs-white), transparent)" }} />
       )}
     </div>
   );

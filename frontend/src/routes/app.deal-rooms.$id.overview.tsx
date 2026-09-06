@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { fetchNdaDocument, type NdaDocument } from "@/lib/nda-fn";
 import { UI_STAGE_ORDER, stageRank, workflowStageLabel, type DealRoomStageKey } from "@/lib/deal-room-stages";
 import { useDealRoom } from "@/hooks/useDealRoom";
-import { ReferenceLine, StatusLabel, V2Button, V2Skeleton, V2EmptyState } from "@/components/v2";
+import { LcsReferenceLine, LcsStatusPill, LcsButton, LcsSkeleton, LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/overview")({
   component: OverviewPage,
@@ -177,16 +177,16 @@ function OverviewPage() {
   // because nothing gated on this).
   if (roomLoading) {
     return (
-      <div className="mx-auto max-w-[1440px] font-v2-ui" style={{ padding: "48px" }}>
-        <V2Skeleton style={{ height: "96px" }} />
-        <V2Skeleton style={{ height: "64px", marginTop: "16px" }} />
-        <V2Skeleton style={{ height: "160px", marginTop: "16px" }} />
+      <div className="mx-auto max-w-[1440px]" style={{ padding: "48px", fontFamily: "var(--font-lcs-ui)" }}>
+        <LcsSkeleton style={{ height: "96px" }} />
+        <LcsSkeleton style={{ height: "64px", marginTop: "16px" }} />
+        <LcsSkeleton style={{ height: "160px", marginTop: "16px" }} />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-[1440px] font-v2-ui text-v2-ink" style={{ padding: "48px", display: "flex", flexDirection: "column", gap: "32px" }}>
+    <div className="mx-auto max-w-[1440px]" style={{ padding: "48px", fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)", display: "flex", flexDirection: "column", gap: "32px" }}>
       {/* Figma frame 55:1828 ("Unified Spine — Founder Command Center"),
           content region 55:1910 only, per CLAUDE.md §0a — card shape
           (25px padding, 8px radius, #e6e9ef border, 0px 4px 6px
@@ -198,7 +198,7 @@ function OverviewPage() {
           design authority, the internal workflow is the content
           authority — never force real sections into the frame's literal
           cell count. */}
-      <ReferenceLine
+      <LcsReferenceLine
         refNo={(dealRoom as any)?.reference_no}
         caption={dealRoom?.created_at ? `Deal room · opened ${format(new Date(dealRoom.created_at), "d MMMM yyyy")}` : null}
       />
@@ -207,21 +207,21 @@ function OverviewPage() {
           17px-padding/4px-radius stat cards right, exact Figma shape. */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="font-semibold" style={{ fontFamily: "var(--font-v2-ui)", fontSize: "32px", letterSpacing: "-0.02em", color: "var(--v2-ink)" }}>
+          <h1 className="font-semibold" style={{ fontFamily: "var(--font-lcs-ui)", fontSize: "32px", letterSpacing: "-0.02em", color: "var(--lcs-ink)" }}>
             {companyName}
           </h1>
-          <p className="mt-1" style={{ fontSize: "15px", color: "var(--v2-ink-secondary)" }}>
+          <p className="mt-1" style={{ fontSize: "15px", color: "var(--lcs-ink-muted)" }}>
             {startup?.tagline || startup?.description || "No tagline yet"}
           </p>
         </div>
         <div className="flex items-start" style={{ gap: "24px" }}>
-          <div className="bg-white border border-v2-rule" style={{ minWidth: "160px", padding: "17px", borderRadius: "4px" }}>
-            <div style={{ fontFamily: "var(--font-v2-data)", fontSize: "12px", letterSpacing: "0.05em", color: "var(--v2-ink-secondary)" }}>Days open</div>
-            <div className="font-semibold" style={{ fontSize: "32px", letterSpacing: "-0.01em", color: "var(--v2-ink)" }}>{daysOpen}</div>
+          <div className="border" style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", minWidth: "160px", padding: "17px", borderRadius: "var(--radius-lcs-control)" }}>
+            <div style={{ fontFamily: "var(--font-lcs-data)", fontSize: "12px", letterSpacing: "0.05em", color: "var(--lcs-ink-muted)" }}>Days open</div>
+            <div className="font-semibold" style={{ fontSize: "32px", letterSpacing: "-0.01em", color: "var(--lcs-ink)" }}>{daysOpen}</div>
           </div>
-          <div className="bg-white border border-v2-rule" style={{ minWidth: "160px", padding: "17px", borderRadius: "4px" }}>
-            <div style={{ fontFamily: "var(--font-v2-data)", fontSize: "12px", letterSpacing: "0.05em", color: "var(--v2-ink-secondary)" }}>Workflow</div>
-            <div className="font-semibold" style={{ fontSize: "32px", letterSpacing: "-0.01em", color: "var(--v2-ink)" }}>
+          <div className="border" style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", minWidth: "160px", padding: "17px", borderRadius: "var(--radius-lcs-control)" }}>
+            <div style={{ fontFamily: "var(--font-lcs-data)", fontSize: "12px", letterSpacing: "0.05em", color: "var(--lcs-ink-muted)" }}>Workflow</div>
+            <div className="font-semibold" style={{ fontSize: "32px", letterSpacing: "-0.01em", color: "var(--lcs-ink)" }}>
               {progressStages.find((s) => s.key === dealRoom?.workflow_stage)?.label ?? workflowStageLabel(dealRoom?.workflow_stage)}
             </div>
           </div>
@@ -233,22 +233,21 @@ function OverviewPage() {
           (24px Geist title) with border-bottom, 24px internal gap. */}
       {(() => {
         const cardStyle: React.CSSProperties = {
-          background: "#fff",
-          border: "1px solid var(--v2-rule)",
-          borderRadius: "8px",
+          background: "var(--lcs-white)",
+          border: "1px solid var(--lcs-line)",
+          borderRadius: "var(--radius-lcs-control)",
           padding: "25px",
-          boxShadow: "0px 4px 6px rgba(0,0,0,0.02)",
           display: "flex",
           flexDirection: "column",
           gap: "24px",
         };
         const cardHeaderStyle: React.CSSProperties = {
-          borderBottom: "1px solid var(--v2-rule)",
+          borderBottom: "1px solid var(--lcs-line)",
           paddingBottom: "17px",
-          fontFamily: "var(--font-v2-ui)",
+          fontFamily: "var(--font-lcs-ui)",
           fontSize: "24px",
           fontWeight: 500,
-          color: "var(--v2-ink)",
+          color: "var(--lcs-ink)",
         };
         return (
           <>
@@ -257,47 +256,47 @@ function OverviewPage() {
               <div style={cardHeaderStyle}>Founder</div>
               <div className="flex items-start gap-3">
                 {startup?.logo_url ? (
-                  <img src={startup.logo_url} alt="" className="h-12 w-12 shrink-0 border border-v2-rule object-cover" style={{ borderRadius: "var(--v2-radius)" }} />
+                  <img src={startup.logo_url} alt="" className="h-12 w-12 shrink-0 border object-cover" style={{ borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }} />
                 ) : (
                   <div
-                    className="flex h-12 w-12 shrink-0 items-center justify-center bg-v2-accent text-white font-semibold"
-                    style={{ borderRadius: "var(--v2-radius)", fontSize: "13px" }}
+                    className="flex h-12 w-12 shrink-0 items-center justify-center font-semibold"
+                    style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)", borderRadius: "var(--radius-lcs-control)", fontSize: "13px" }}
                   >
                     {companyInitial}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <h2 className="truncate text-v2-ink font-semibold" style={{ fontSize: "15px" }}>{companyName}</h2>
+                  <h2 className="truncate font-semibold" style={{ color: "var(--lcs-ink)", fontSize: "15px" }}>{companyName}</h2>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
                     {startup?.stage && (
-                      <span className="bg-v2-accent-wash text-v2-accent px-2 py-0.5 font-medium" style={{ borderRadius: "var(--v2-radius)", fontSize: "11.5px" }}>{startup.stage}</span>
+                      <span className="px-2 py-0.5 font-medium" style={{ background: "var(--lcs-progress-wash)", color: "var(--lcs-accent)", borderRadius: "var(--radius-lcs-control)", fontSize: "11.5px" }}>{startup.stage}</span>
                     )}
-                    {startup?.sector && <span className="text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>{startup.sector}</span>}
+                    {startup?.sector && <span style={{ color: "var(--lcs-ink-muted)", fontSize: "12.5px" }}>{startup.sector}</span>}
                   </div>
                 </div>
               </div>
-              <p className="line-clamp-2 text-v2-ink-secondary" style={{ fontSize: "13px" }}>
+              <p className="line-clamp-2" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>
                 {startup?.tagline || startup?.description || "No tagline yet"}
               </p>
-              <div className="flex flex-wrap gap-4 text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>
+              <div className="flex flex-wrap gap-4" style={{ color: "var(--lcs-ink-muted)", fontSize: "12.5px" }}>
                 {startup?.country && <span>{startup.country}</span>}
                 <span>Founded: {formatValue(startup?.founded_year)}</span>
                 <span>Team: {formatValue(startup?.team_size)}</span>
               </div>
               {founderKeyPeople.length > 0 && (
-                <div className="flex flex-wrap gap-3 border-t border-v2-rule-light pt-3">
+                <div className="flex flex-wrap gap-3 border-t pt-3" style={{ borderColor: "var(--lcs-line)" }}>
                   {(founderKeyPeople as any[]).map((person) => (
                     <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
                       {person.photo_url ? (
                         <img src={person.photo_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-v2-accent text-white flex items-center justify-center font-semibold shrink-0" style={{ fontSize: "11px" }}>
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center font-semibold shrink-0" style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)", fontSize: "11px" }}>
                           {initials(person.name)}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="text-v2-ink font-medium truncate" style={{ fontSize: "13px" }}>{person.name ?? "Team member"}</div>
-                        {person.title && <div className="text-v2-ink-muted truncate" style={{ fontSize: "11.5px" }}>{person.title}</div>}
+                        <div className="font-medium truncate" style={{ color: "var(--lcs-ink)", fontSize: "13px" }}>{person.name ?? "Team member"}</div>
+                        {person.title && <div className="truncate" style={{ color: "var(--lcs-ink-muted)", fontSize: "11.5px" }}>{person.title}</div>}
                       </div>
                     </div>
                   ))}
@@ -312,38 +311,38 @@ function OverviewPage() {
                 <>
                   <div className="flex items-start gap-3">
                     {investorProfile?.avatar_url ? (
-                      <img src={investorProfile.avatar_url} alt="" className="h-12 w-12 shrink-0 border border-v2-rule object-cover" style={{ borderRadius: "var(--v2-radius)" }} />
+                      <img src={investorProfile.avatar_url} alt="" className="h-12 w-12 shrink-0 border object-cover" style={{ borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }} />
                     ) : (
                       <div
-                        className="flex h-12 w-12 shrink-0 items-center justify-center bg-v2-accent text-white font-semibold"
-                        style={{ borderRadius: "var(--v2-radius)", fontSize: "13px" }}
+                        className="flex h-12 w-12 shrink-0 items-center justify-center font-semibold"
+                        style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)", borderRadius: "var(--radius-lcs-control)", fontSize: "13px" }}
                       >
                         {initials(dealRoom.investor_name)}
                       </div>
                     )}
                     <div className="min-w-0">
-                      <h2 className="truncate text-v2-ink font-semibold" style={{ fontSize: "15px" }}>{dealRoom.investor_name}</h2>
-                      {dealRoom?.investor_company && <div className="text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>{dealRoom.investor_company}</div>}
+                      <h2 className="truncate font-semibold" style={{ color: "var(--lcs-ink)", fontSize: "15px" }}>{dealRoom.investor_name}</h2>
+                      {dealRoom?.investor_company && <div style={{ color: "var(--lcs-ink-muted)", fontSize: "12.5px" }}>{dealRoom.investor_company}</div>}
                     </div>
                   </div>
-                  <p className="line-clamp-2 text-v2-ink-secondary" style={{ fontSize: "13px" }}>
+                  <p className="line-clamp-2" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>
                     {investorProfile?.thesis || investorProfile?.thesis_statement || "No thesis shared yet"}
                   </p>
-                  {sectors && <div className="text-v2-ink-secondary" style={{ fontSize: "12.5px" }}>{sectors}</div>}
+                  {sectors && <div style={{ color: "var(--lcs-ink-muted)", fontSize: "12.5px" }}>{sectors}</div>}
                   {investorKeyPeople.length > 0 && (
-                    <div className="flex flex-wrap gap-3 border-t border-v2-rule-light pt-3">
+                    <div className="flex flex-wrap gap-3 border-t pt-3" style={{ borderColor: "var(--lcs-line)" }}>
                       {(investorKeyPeople as any[]).map((person) => (
                         <div key={person.id} className="flex items-center gap-2 min-w-[140px]">
                           {person.avatar_url ? (
                             <img src={person.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                           ) : (
-                            <div className="w-9 h-9 rounded-full bg-v2-accent text-white flex items-center justify-center font-semibold shrink-0" style={{ fontSize: "11px" }}>
+                            <div className="w-9 h-9 rounded-full flex items-center justify-center font-semibold shrink-0" style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)", fontSize: "11px" }}>
                               {initials(person.name)}
                             </div>
                           )}
                           <div className="min-w-0">
-                            <div className="text-v2-ink font-medium truncate" style={{ fontSize: "13px" }}>{person.name ?? "Team member"}</div>
-                            {person.designation && <div className="text-v2-ink-muted truncate" style={{ fontSize: "11.5px" }}>{person.designation}</div>}
+                            <div className="font-medium truncate" style={{ color: "var(--lcs-ink)", fontSize: "13px" }}>{person.name ?? "Team member"}</div>
+                            {person.designation && <div className="truncate" style={{ color: "var(--lcs-ink-muted)", fontSize: "11.5px" }}>{person.designation}</div>}
                           </div>
                         </div>
                       ))}
@@ -351,7 +350,7 @@ function OverviewPage() {
                   )}
                 </>
               ) : (
-                <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>Investor not assigned</p>
+                <p style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>Investor not assigned</p>
               )}
             </div>
 
@@ -375,8 +374,8 @@ function OverviewPage() {
                   ["Team size", formatValue(startup?.team_size)],
                 ].map(([label, value]) => (
                   <div key={label}>
-                    <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{label}</div>
-                    <div className="mt-1 text-v2-ink font-semibold font-v2-data" style={{ fontSize: "22px" }}>{value}</div>
+                    <div style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>{label}</div>
+                    <div className="mt-1 font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-data)", fontSize: "22px" }}>{value}</div>
                   </div>
                 ))}
               </div>
@@ -387,23 +386,21 @@ function OverviewPage() {
               <div style={cardHeaderStyle}>NDA and confidentiality</div>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="grid h-9 w-9 shrink-0 place-items-center border border-v2-rule" style={{ borderRadius: "var(--v2-radius)" }}>
-                    <Shield className="h-4 w-4 text-v2-satisfied" />
+                  <div className="grid h-9 w-9 shrink-0 place-items-center border" style={{ borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}>
+                    <Shield className="h-4 w-4" style={{ color: "var(--lcs-satisfied)" }} />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-v2-ink">NDA and confidentiality agreement</div>
+                    <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>NDA and confidentiality agreement</div>
                     {ndaDoc ? (
-                      <div className="mt-1">
-                        <StatusLabel tone="satisfied">
-                          Signed by {ndaSigners.length} {ndaSigners.length === 1 ? "party" : "parties"}
-                        </StatusLabel>
-                        <span className="text-v2-ink-muted ml-2" style={{ fontSize: "11px" }}>
+                      <div className="mt-1 flex items-center">
+                        <LcsStatusPill status="satisfied" label={`Signed by ${ndaSigners.length} ${ndaSigners.length === 1 ? "party" : "parties"}`} />
+                        <span className="ml-2" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                           v{ndaDoc.version} · updated {formatDistanceToNow(new Date(ndaDoc.updated_at), { addSuffix: true })}
                         </span>
                       </div>
                     ) : (
                       <div className="mt-1">
-                        <StatusLabel tone="attention">Pending</StatusLabel>
+                        <LcsStatusPill status="attention" label="Pending" />
                       </div>
                     )}
                   </div>
@@ -411,29 +408,29 @@ function OverviewPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   {ndaDoc && (
                     <>
-                      <V2Button variant="quiet" onClick={() => setNdaModalOpen(true)}>
+                      <LcsButton variant="text-link" onClick={() => setNdaModalOpen(true)}>
                         View full NDA
-                      </V2Button>
-                      <V2Button variant="secondary" onClick={handlePrintNda}>
+                      </LcsButton>
+                      <LcsButton variant="secondary" onClick={handlePrintNda}>
                         <Download className="h-3.5 w-3.5" /> Download PDF
-                      </V2Button>
+                      </LcsButton>
                     </>
                   )}
                 </div>
               </div>
 
               {ndaSigners.length > 0 && (
-                <div className="border-t border-v2-rule-light pt-4 space-y-2">
+                <div className="border-t pt-4 space-y-2" style={{ borderColor: "var(--lcs-line)" }}>
                   {(ndaSigners as any[]).map((signer, i) => (
                     <div key={i} className="flex items-center justify-between" style={{ fontSize: "12px" }}>
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-v2-satisfied shrink-0" />
-                        <span className="font-medium text-v2-ink">{signer.signer_full_name || "—"}</span>
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--lcs-satisfied)" }} />
+                        <span className="font-medium" style={{ color: "var(--lcs-ink)" }}>{signer.signer_full_name || "—"}</span>
                         {signer.signer_company && (
-                          <span className="text-v2-ink-muted">· {signer.signer_company}</span>
+                          <span style={{ color: "var(--lcs-ink-muted)" }}>· {signer.signer_company}</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-v2-ink-muted">
+                      <div className="flex items-center gap-2" style={{ color: "var(--lcs-ink-muted)" }}>
                         <span className="capitalize">{signer.role}</span>
                         <span>·</span>
                         <span>{signer.accepted_at ? format(new Date(signer.accepted_at), "MMM d, yyyy") : "—"}</span>
@@ -453,28 +450,28 @@ function OverviewPage() {
           onClick={() => setNdaModalOpen(false)}
         >
           <div
-            className="w-full max-w-2xl max-h-[85vh] bg-v2-panel border border-v2-rule overflow-hidden flex flex-col"
-            style={{ borderRadius: "var(--v2-radius)" }}
+            className="w-full max-w-2xl max-h-[85vh] border overflow-hidden flex flex-col"
+            style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-v2-rule shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderColor: "var(--lcs-line)" }}>
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-v2-satisfied" />
+                <Shield className="h-5 w-5" style={{ color: "var(--lcs-satisfied)" }} />
                 <div>
-                  <div className="font-semibold text-sm text-v2-ink">Non-disclosure agreement</div>
-                  <div className="text-v2-ink-muted" style={{ fontSize: "11.5px" }}>
+                  <div className="font-semibold text-sm" style={{ color: "var(--lcs-ink)" }}>Non-disclosure agreement</div>
+                  <div style={{ color: "var(--lcs-ink-muted)", fontSize: "11.5px" }}>
                     {companyName} · v{ndaDoc.version} · {ndaSigners.length} {ndaSigners.length === 1 ? "party" : "parties"}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <V2Button variant="secondary" onClick={handlePrintNda}>
+                <LcsButton variant="secondary" onClick={handlePrintNda}>
                   <Download className="h-3.5 w-3.5" /> Download PDF
-                </V2Button>
+                </LcsButton>
                 <button
                   onClick={() => setNdaModalOpen(false)}
-                  className="p-1.5 hover:bg-v2-accent-wash transition-colors text-v2-ink-muted"
-                  style={{ borderRadius: "var(--v2-radius)" }}
+                  className="p-1.5 transition-colors"
+                  style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />
@@ -482,7 +479,7 @@ function OverviewPage() {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <pre className="text-xs leading-relaxed text-v2-ink-secondary whitespace-pre-wrap font-v2-doc">
+              <pre className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                 {ndaDoc.nda_text}
               </pre>
             </div>
@@ -507,11 +504,10 @@ function OverviewPage() {
 
       <div
         style={{
-          background: "#fff",
-          border: "1px solid var(--v2-rule)",
-          borderRadius: "8px",
+          background: "var(--lcs-white)",
+          border: "1px solid var(--lcs-line)",
+          borderRadius: "var(--radius-lcs-control)",
           padding: "25px",
-          boxShadow: "0px 4px 6px rgba(0,0,0,0.02)",
           display: "flex",
           flexDirection: "column",
           gap: "24px",
@@ -519,28 +515,28 @@ function OverviewPage() {
       >
         <div
           style={{
-            borderBottom: "1px solid var(--v2-rule)",
+            borderBottom: "1px solid var(--lcs-line)",
             paddingBottom: "17px",
-            fontFamily: "var(--font-v2-ui)",
+            fontFamily: "var(--font-lcs-ui)",
             fontSize: "24px",
             fontWeight: 500,
-            color: "var(--v2-ink)",
+            color: "var(--lcs-ink)",
           }}
         >
           Recent activity
         </div>
         {recentActivity.length === 0 ? (
-          <V2EmptyState text="No activity recorded for this room yet." />
+          <LcsEmptyState text="No activity recorded for this room yet." />
         ) : (
           <div className="space-y-3">
             {(recentActivity as any[]).map((activity) => (
               <div key={activity.id} className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-v2-accent mt-1.5 flex-shrink-0" style={{ borderRadius: "50%" }} />
-                <div className="min-w-0 text-sm text-v2-ink-secondary">
-                  <span className="font-semibold text-v2-ink">{activity.actor_name ?? "Someone"}</span>
+                <div className="w-1.5 h-1.5 mt-1.5 flex-shrink-0" style={{ background: "var(--lcs-accent)", borderRadius: "50%" }} />
+                <div className="min-w-0 text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
+                  <span className="font-semibold" style={{ color: "var(--lcs-ink)" }}>{activity.actor_name ?? "Someone"}</span>
                   <span> · {activity.action_type ?? activity.target_label ?? "Activity"}</span>
                 </div>
-                <div className="ml-auto whitespace-nowrap text-v2-ink-muted" style={{ fontSize: "11px" }}>
+                <div className="ml-auto whitespace-nowrap" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                   {activity.created_at ? new Date(activity.created_at).toLocaleDateString() : ""}
                 </div>
               </div>
@@ -551,11 +547,10 @@ function OverviewPage() {
 
       <div
         style={{
-          background: "#fff",
-          border: "1px solid var(--v2-rule)",
-          borderRadius: "8px",
+          background: "var(--lcs-white)",
+          border: "1px solid var(--lcs-line)",
+          borderRadius: "var(--radius-lcs-control)",
           padding: "25px",
-          boxShadow: "0px 4px 6px rgba(0,0,0,0.02)",
         }}
         data-testid="stage-progress-bar"
       >
@@ -565,11 +560,11 @@ function OverviewPage() {
             const isCurrent = rank === workflowRank;
             const isComplete = rank < workflowRank;
             const dotColor = isCurrent
-              ? "var(--v2-accent)"
+              ? "var(--lcs-accent)"
               : isComplete
-                ? "var(--v2-satisfied)"
-                : "var(--v2-rule)";
-            const lineColor = rank < workflowRank ? "var(--v2-satisfied)" : "var(--v2-rule-light)";
+                ? "var(--lcs-satisfied)"
+                : "var(--lcs-line)";
+            const lineColor = rank < workflowRank ? "var(--lcs-satisfied)" : "var(--lcs-line)";
             return (
               <div key={stage.key} className="flex flex-1 items-start last:flex-none">
                 <div className="flex min-w-[64px] flex-col items-center gap-2">
@@ -578,7 +573,7 @@ function OverviewPage() {
                     style={{ borderRadius: "50%", background: dotColor }}
                     data-testid={`stage-progress-dot-${stage.key}`}
                   />
-                  <div className="text-center text-v2-ink-muted" style={{ fontSize: "11px" }}>{stage.label}</div>
+                  <div className="text-center" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>{stage.label}</div>
                 </div>
                 {index < progressStages.length - 1 && <div className="mt-1.5 h-px flex-1" style={{ background: lineColor }} />}
               </div>
@@ -588,9 +583,9 @@ function OverviewPage() {
         {stageRank(dealRoom?.workflow_stage) !== stageRank("closing") && (
           <div className="mt-5 flex justify-end">
             {pendingTransition ? (
-              <span className="text-v2-attention px-3 py-2" style={{ fontSize: "12px" }}>Stage advance pending approval</span>
+              <span className="px-3 py-2" style={{ color: "var(--lcs-attention)", fontSize: "12px" }}>Stage advance pending approval</span>
             ) : (
-              <V2Button
+              <LcsButton
                 variant="primary"
                 onClick={onRequestNextStage}
                 disabled={stageRequesting}
@@ -598,7 +593,7 @@ function OverviewPage() {
               >
                 {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Request next stage
-              </V2Button>
+              </LcsButton>
             )}
           </div>
         )}

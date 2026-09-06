@@ -10,21 +10,18 @@ import {
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { DDAnalysisPanel } from "@/components/app/DDAnalysisPanel";
-import { LcsEmptyState } from "@/components/lcs";
+import { LcsEmptyState, LcsButton, LcsStatusPill, type LcsStatus } from "@/components/lcs";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/diligence")({
   component: DiligencePage,
 });
 
-const DD_CATEGORY_COLORS: Record<string, string> = {
-  Team: "bg-blue-50 text-blue-700  ",
-  Market: "bg-green-50 text-green-700  ",
-  Financials: "bg-purple-50 text-purple-700  ",
-  Legal: "bg-amber-50 text-amber-700  ",
-  Product: "bg-indigo-50 text-indigo-700  ",
-  Traction: "bg-pink-50 text-pink-700  ",
-};
+// 6-color decorative category palette removed — Group 6 Phase-0 decision 5:
+// these are category LABELS (Team/Market/Financials/Legal/Product/Traction),
+// not states, and color-coding them would falsely imply some are "more
+// attention" than others. Plain muted text chip with a border, no
+// color-coding at all, for every category uniformly.
 
 const DD_STATUS_CYCLE: Record<string, string> = {
   pending: "in_progress",
@@ -33,21 +30,36 @@ const DD_STATUS_CYCLE: Record<string, string> = {
   flagged: "pending",
 };
 
+function CategoryChip({ category }: { category: string }) {
+  return (
+    <span
+      className="text-[10px] font-medium border px-2 py-0.5"
+      style={{ color: "var(--lcs-ink-muted)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}
+    >
+      {category}
+    </span>
+  );
+}
+
+// Genuine 4-state workflow (pending/in_progress/complete/flagged) — a real
+// state, not decorative — mapped onto the closed status vocabulary:
+// complete→satisfied, in_progress→in-progress, flagged→attention (no red,
+// per "attention amber covers errors too"), pending→pending.
 function StatusCircle({ status }: { status: string }) {
   if (status === "complete") return (
-    <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-      <Check className="h-3.5 w-3.5 text-foreground" />
+    <div className="h-6 w-6 rounded-full flex items-center justify-center shrink-0" style={{ background: "var(--lcs-satisfied)" }}>
+      <Check className="h-3.5 w-3.5" style={{ color: "var(--lcs-white)" }} />
     </div>
   );
   if (status === "in_progress") return (
-    <div className="h-6 w-6 rounded-full border-2 border-amber-400 bg-amber-50 shrink-0" />
+    <div className="h-6 w-6 rounded-full shrink-0" style={{ border: "2px solid var(--lcs-progress)", background: "var(--lcs-progress-wash)" }} />
   );
   if (status === "flagged") return (
-    <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center shrink-0">
-      <AlertCircle className="h-3.5 w-3.5 text-foreground" />
+    <div className="h-6 w-6 rounded-full flex items-center justify-center shrink-0" style={{ background: "var(--lcs-attention)" }}>
+      <AlertCircle className="h-3.5 w-3.5" style={{ color: "var(--lcs-white)" }} />
     </div>
   );
-  return <div className="h-6 w-6 rounded-full border-2 border-gray-300 shrink-0" />;
+  return <div className="h-6 w-6 rounded-full shrink-0" style={{ border: "2px solid var(--lcs-line)" }} />;
 }
 
 function DiligencePage() {
@@ -367,46 +379,46 @@ function DiligencePage() {
     }
 
     return (
-      <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
+      <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6" style={{ fontFamily: "var(--font-lcs-ui)" }}>
         {fGoals.length === 0 ? (
-          <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-12 text-center">
-            <ClipboardList className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-            <p className="text-sm font-semibold text-gray-900 mb-1">Due diligence not started</p>
-            <p className="text-sm text-gray-500 ">You will see their diligence goals and progress here once they begin.</p>
+          <div className="border px-6 py-12 text-center" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+            <ClipboardList className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--lcs-line)" }} />
+            <p className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)" }}>Due diligence not started</p>
+            <p className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>You will see their diligence goals and progress here once they begin.</p>
           </div>
         ) : (
           <>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Diligence Report</h2>
-              {lastUpdated && <p className="text-sm text-gray-500 mt-0.5">Updated by investor · {lastUpdated}</p>}
+              <h2 className="text-xl font-bold" style={{ color: "var(--lcs-ink)" }}>Diligence Report</h2>
+              {lastUpdated && <p className="text-sm mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Updated by investor · {lastUpdated}</p>}
             </div>
 
-            <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
+            <div className="border px-6 py-5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
               <div className="flex items-center gap-4 flex-wrap mb-4">
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 ">{fTotal} total goals</span>
-                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ">{fCompleted} complete</span>
-                {fFlagged > 0 && <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700 ">{fFlagged} flagged</span>}
+                <LcsStatusPill status="pending" label={`${fTotal} total goals`} dot={false} />
+                <LcsStatusPill status="satisfied" label={`${fCompleted} complete`} dot={false} />
+                {fFlagged > 0 && <LcsStatusPill status="attention" label={`${fFlagged} flagged`} dot={false} />}
               </div>
-              <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-                <div className="h-2 rounded-full transition-all" style={{ width: `${fPct}%`, background: "var(--gradient-brand)" }} />
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--lcs-line)" }}>
+                <div className="h-2 rounded-full transition-all" style={{ width: `${fPct}%`, background: "var(--lcs-accent)" }} />
               </div>
-              <p className="mt-1.5 text-xs text-gray-500 ">{fPct}% complete</p>
+              <p className="mt-1.5 text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{fPct}% complete</p>
             </div>
 
             {fCategories.map((cat) => {
               const catGoals = fGoals.filter((g: any) => g.category === cat);
               return (
-                <div key={cat} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(0,0,0,0.08)] ">
-                    <span className="text-sm font-semibold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>{cat}</span>
-                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", DD_CATEGORY_COLORS[cat] ?? "bg-gray-100 text-gray-600  ")}>{catGoals.length}</span>
+                <div key={cat} className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+                  <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "var(--lcs-line)" }}>
+                    <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{cat}</span>
+                    <span className="px-2 py-0.5 text-[10px] font-medium" style={{ borderRadius: "9999px", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>{catGoals.length}</span>
                   </div>
-                  <div className="divide-y divide-gray-100 ">
+                  <div className="divide-y" style={{ borderColor: "var(--lcs-line)" }}>
                     {catGoals.map((g: any) => (
                       <div key={g.id} className="flex items-center gap-3 px-5 py-3">
                         <StatusCircle status={g.status} />
-                        <span className={cn("text-sm flex-1", g.status === "complete" ? "line-through text-[#71717A] " : "text-gray-900 ")}>{g.goal_text}</span>
-                        {g.status === "flagged" && <span className="text-[10px] rounded-full bg-red-50 px-2 py-0.5 text-red-600 font-medium">Flagged</span>}
+                        <span className="text-sm flex-1" style={{ color: "var(--lcs-ink)", textDecoration: g.status === "complete" ? "line-through" : "none" }}>{g.goal_text}</span>
+                        {g.status === "flagged" && <LcsStatusPill status="attention" label="Flagged" dot={false} />}
                       </div>
                     ))}
                   </div>
@@ -414,29 +426,28 @@ function DiligencePage() {
               );
             })}
 
-            <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
-              <div className="text-sm font-semibold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</div>
+            <div className="border px-6 py-5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+              <div className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)" }}>AI Analysis</div>
               {analysisShared && ddAnalysisParsed ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <span className={cn("rounded-full px-3 py-1 text-xs font-semibold",
-                      ddAnalysisParsed.risk_level === "low" ? "bg-green-50 text-green-700  " :
-                      ddAnalysisParsed.risk_level === "high" ? "bg-red-50 text-red-700  " :
-                      "bg-amber-50 text-amber-700  "
-                    )}>
-                      {ddAnalysisParsed.risk_level?.toUpperCase() ?? "—"} RISK
-                    </span>
+                    {/* Genuine 3-state risk vocabulary — low/medium/high — mapped
+                        onto satisfied/in-progress/attention, no forced adverse. */}
+                    <LcsStatusPill
+                      status={ddAnalysisParsed.risk_level === "low" ? "satisfied" : ddAnalysisParsed.risk_level === "high" ? "attention" : "in-progress"}
+                      label={`${ddAnalysisParsed.risk_level?.toUpperCase() ?? "—"} RISK`}
+                    />
                   </div>
-                  <p className="text-sm text-gray-700 leading-relaxed">{ddAnalysisParsed.summary}</p>
-                  <div style={{ borderLeft: "3px solid var(--brand)" }} className="pl-4 py-1">
-                    <div className="text-xs font-semibold text-gray-500 mb-1">Recommendation</div>
-                    <p className="text-sm text-gray-800 ">{ddAnalysisParsed.recommendation}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{ddAnalysisParsed.summary}</p>
+                  <div style={{ borderLeft: "3px solid var(--lcs-accent)" }} className="pl-4 py-1">
+                    <div className="text-xs font-semibold mb-1" style={{ color: "var(--lcs-ink-muted)" }}>Recommendation</div>
+                    <p className="text-sm" style={{ color: "var(--lcs-ink)" }}>{ddAnalysisParsed.recommendation}</p>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-500">Not shared</p>
-                  <p className="text-xs text-[#71717A] mt-1">Investors can choose to share their analysis with you.</p>
+                  <p className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>Not shared</p>
+                  <p className="text-xs mt-1" style={{ color: "var(--lcs-ink-muted)" }}>Investors can choose to share their analysis with you.</p>
                 </div>
               )}
             </div>
@@ -447,51 +458,48 @@ function DiligencePage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6" style={{ fontFamily: "var(--font-lcs-ui)" }}>
 
       {showOnboarding && (
-        <div className="bg-white border border-brand/20 rounded-none px-6 py-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg" style={{ background: "rgba(124,58,237,0.08)" }}>
-            <ClipboardList className="h-6 w-6 text-brand" />
+        <div className="border px-6 py-6 text-center" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-progress-wash)" }}>
+            <ClipboardList className="h-6 w-6" style={{ color: "var(--lcs-accent)" }} />
           </div>
-          <h3 className="text-base font-bold text-gray-900 mb-1" style={{ fontFamily: "Syne, sans-serif" }}>Set up your diligence goals</h3>
-          <p className="text-sm text-gray-500 max-w-sm mx-auto mb-5">
+          <h3 className="text-base font-bold mb-1" style={{ color: "var(--lcs-ink)" }}>Set up your diligence goals</h3>
+          <p className="text-sm max-w-sm mx-auto mb-5" style={{ color: "var(--lcs-ink-muted)" }}>
             Choose from standard goals or add your own. Goals guide your diligence and generate a structured report.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <button
+            <LcsButton
+              variant="primary"
               onClick={seedStandardGoals}
               disabled={seedingStandard}
-              className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-foreground disabled:opacity-50"
-              style={{ background: "var(--gradient-brand)" }}
               data-testid="dd-use-standard-goals-btn"
             >
               {seedingStandard ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
               Use standard goals
-            </button>
-            <button
+            </LcsButton>
+            <LcsButton
+              variant="secondary"
               onClick={() => { setOnboardingDone(true); setShowOnboarding(false); }}
-              className="rounded-lg border border-[rgba(0,0,0,0.08)] px-5 py-2.5 text-sm font-medium text-gray-700 "
             >
               Start from scratch
-            </button>
+            </LcsButton>
           </div>
         </div>
       )}
 
       {(!showOnboarding || onboardingDone) && (
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
-          <div className="flex items-center gap-0 border-b border-[rgba(0,0,0,0.08)] overflow-x-auto px-4 pt-3">
+        <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="flex items-center gap-0 border-b overflow-x-auto px-4 pt-3" style={{ borderColor: "var(--lcs-line)" }}>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={cn(
-                  "px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors",
-                  activeCategory === cat
-                    ? "border-brand text-brand"
-                    : "border-transparent text-gray-600 hover:text-gray-900 ",
-                )}
+                className="px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors"
+                style={activeCategory === cat
+                  ? { borderColor: "var(--lcs-accent)", color: "var(--lcs-accent)" }
+                  : { borderColor: "transparent", color: "var(--lcs-ink-muted)" }}
               >
                 {cat}
               </button>
@@ -501,11 +509,11 @@ function DiligencePage() {
           {totalCount > 0 && (
             <div className="px-5 pt-4 pb-2">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-gray-500 ">{completedCount} / {totalCount} goals complete</span>
-                <span className="text-xs font-semibold text-brand">{progressPct}%</span>
+                <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{completedCount} / {totalCount} goals complete</span>
+                <span className="text-xs font-semibold" style={{ color: "var(--lcs-accent)" }}>{progressPct}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
-                <div className="h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%`, background: "var(--gradient-brand)" }} />
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--lcs-line)" }}>
+                <div className="h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%`, background: "var(--lcs-accent)" }} />
               </div>
             </div>
           )}
@@ -518,7 +526,7 @@ function DiligencePage() {
             {filteredGoals.map((goal: any) => {
               const isExpanded = expandedGoalId === goal.id;
               return (
-                <div key={goal.id} className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none p-4">
+                <div key={goal.id} className="border p-4" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
                   <div className="flex items-start gap-3">
                     <button
                       onClick={() => cycleStatus(goal)}
@@ -535,11 +543,13 @@ function DiligencePage() {
                         className="text-left w-full"
                       >
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={cn("text-sm font-medium", DD_CATEGORY_COLORS[goal.category] ?? "bg-gray-100 text-gray-600  ", "rounded-full px-2 py-0.5 text-[10px]")}>{goal.category}</span>
-                          {goal.is_standard && <span className="text-[10px] rounded-full bg-gray-100 px-2 py-0.5 text-gray-500 ">Standard</span>}
-                          {goal.due_by && <span className="text-[10px] text-[#71717A] ">Due {format(new Date(goal.due_by), "MMM d")}</span>}
+                          <CategoryChip category={goal.category} />
+                          {goal.is_standard && (
+                            <span className="text-[10px] px-2 py-0.5" style={{ borderRadius: "9999px", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>Standard</span>
+                          )}
+                          {goal.due_by && <span className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>Due {format(new Date(goal.due_by), "MMM d")}</span>}
                         </div>
-                        <p className={cn("mt-1 text-sm", goal.status === "complete" ? "line-through text-[#71717A] " : "text-gray-900 ")}>
+                        <p className="mt-1 text-sm" style={{ color: "var(--lcs-ink)", textDecoration: goal.status === "complete" ? "line-through" : "none" }}>
                           {goal.goal_text}
                         </p>
                       </button>
@@ -552,27 +562,25 @@ function DiligencePage() {
                             onBlur={(e) => saveNote(goal.id, e.target.value)}
                             rows={3}
                             placeholder="Notes..."
-                            className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
+                            className="w-full resize-none border px-3 py-2.5 text-sm outline-none"
+                            style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                           />
-                          {savingNoteId === goal.id && <span className="text-[10px] text-[#71717A] ">Saving…</span>}
+                          {savingNoteId === goal.id && <span className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>Saving…</span>}
                           <div className="flex items-center gap-2">
-                            <label className="text-xs text-gray-500 ">Due date</label>
+                            <label className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Due date</label>
                             <input
                               type="date"
                               value={goalDueDates[goal.id] ?? ""}
                               onChange={(e) => setGoalDueDates((prev) => ({ ...prev, [goal.id]: e.target.value }))}
                               onBlur={(e) => saveDueDate(goal.id, e.target.value)}
-                              className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-900 outline-none"
+                              className="border px-3 py-1.5 text-sm outline-none"
+                              style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                             />
                           </div>
                           {goal.status !== "complete" && (
-                            <button
-                              onClick={() => markComplete(goal.id)}
-                              className="rounded-lg px-4 py-2 text-sm font-medium text-foreground"
-                              style={{ background: "#10B981" }}
-                            >
+                            <LcsButton variant="primary" onClick={() => markComplete(goal.id)}>
                               Mark complete
-                            </button>
+                            </LcsButton>
                           )}
                         </div>
                       )}
@@ -582,13 +590,15 @@ function DiligencePage() {
                       <button
                         onClick={() => flagGoal(goal)}
                         title="Flag"
-                        className="rounded-lg p-1.5 text-[#71717A] hover:text-red-500"
+                        className="p-1.5 transition-colors hover:text-[var(--lcs-attention)]"
+                        style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                       >
                         <AlertTriangle className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
-                        className="rounded-lg p-1.5 text-[#71717A] hover:text-red-500"
+                        className="p-1.5 transition-colors hover:text-[var(--lcs-attention)]"
+                        style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                         title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -600,12 +610,13 @@ function DiligencePage() {
             })}
 
             {addGoalOpen ? (
-              <div className="rounded-lg border border-brand/20 bg-accent p-4 space-y-3">
+              <div className="border p-4 space-y-3" style={{ borderColor: "var(--lcs-accent)", background: "var(--lcs-progress-wash)", borderRadius: "var(--radius-lcs-control)" }}>
                 <div className="grid grid-cols-3 gap-2">
                   <select
                     value={newGoalCategory}
                     onChange={(e) => setNewGoalCategory(e.target.value)}
-                    className="col-span-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none"
+                    className="col-span-1 border px-3 py-2 text-sm outline-none"
+                    style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                   >
                     {["Team", "Market", "Financials", "Legal", "Product", "Traction"].map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -615,27 +626,28 @@ function DiligencePage() {
                     value={newGoalText}
                     onChange={(e) => setNewGoalText(e.target.value)}
                     placeholder="Describe the goal..."
-                    className="col-span-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
+                    className="col-span-2 border px-3 py-2 text-sm outline-none"
+                    style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                     onKeyDown={(e) => { if (e.key === "Enter") addCustomGoal(); }}
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setAddGoalOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
-                  <button
+                  <LcsButton variant="secondary" onClick={() => setAddGoalOpen(false)}>Cancel</LcsButton>
+                  <LcsButton
+                    variant="primary"
                     onClick={addCustomGoal}
                     disabled={!newGoalText.trim() || addingGoal}
-                    className="rounded-lg px-4 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
-                    style={{ background: "var(--gradient-brand)" }}
                     data-testid="dd-add-goal-confirm-btn"
                   >
                     {addingGoal ? "Adding…" : "Add goal"}
-                  </button>
+                  </LcsButton>
                 </div>
               </div>
             ) : (
               <button
                 onClick={() => setAddGoalOpen(true)}
-                className="w-full rounded-none border border-dashed border-gray-300 py-3 text-sm text-gray-500 hover:border-brand hover:text-brand flex items-center justify-center gap-2"
+                className="w-full border border-dashed py-3 text-sm flex items-center justify-center gap-2 transition-colors hover:border-[var(--lcs-accent)] hover:text-[var(--lcs-accent)]"
+                style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)" }}
                 data-testid="dd-add-goal-btn"
               >
                 <Plus className="h-4 w-4" /> Add custom goal
@@ -645,67 +657,74 @@ function DiligencePage() {
         </div>
       )}
 
-      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+      <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
         <button
           onClick={() => setAnalysisOpen((v) => !v)}
           className="w-full flex items-center justify-between px-5 py-4"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-brand" />
-            <span className="text-sm font-semibold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>AI Analysis</span>
+            <Sparkles className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>AI Analysis</span>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <LcsButton
+              variant="secondary"
               onClick={(e) => { e.stopPropagation(); runAnalysis(); }}
               disabled={runningAnalysis || allGoals.length === 0}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-1.5 text-xs font-medium text-brand hover:bg-accent disabled:opacity-40"
               data-testid="dd-run-analysis-btn"
             >
               {runningAnalysis ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
               Run analysis
-            </button>
-            {analysisOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
+            </LcsButton>
+            {analysisOpen ? <ChevronUp className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />}
           </div>
         </button>
 
         {analysisOpen && (
-          <div className="border-t border-[rgba(0,0,0,0.08)] px-5 py-5">
+          <div className="border-t px-5 py-5" style={{ borderColor: "var(--lcs-line)" }}>
             {!analysisResult && !runningAnalysis && (
-              <p className="text-sm text-[#71717A] text-center py-4">Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
+              <p className="text-sm text-center py-4" style={{ color: "var(--lcs-ink-muted)" }}>Click "Run analysis" to generate an AI diligence report based on your goals and Q&A thread.</p>
             )}
             {runningAnalysis && (
               <div className="flex items-center justify-center gap-2 py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-brand" />
-                <span className="text-sm text-gray-500 ">Analysing…</span>
+                <Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--lcs-accent)" }} />
+                <span className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>Analysing…</span>
               </div>
             )}
             {analysisResult && !runningAnalysis && (
               <div className="space-y-5">
                 <div className="flex items-center gap-3">
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-bold",
-                    analysisResult.risk_level === "low" ? "bg-green-50 text-green-700  " :
-                    analysisResult.risk_level === "high" ? "bg-red-50 text-red-700  " :
-                    "bg-amber-50 text-amber-700  "
-                  )}>
-                    {(analysisResult.risk_level ?? "medium").toUpperCase()} RISK
-                  </span>
+                  <LcsStatusPill
+                    status={analysisResult.risk_level === "low" ? "satisfied" : analysisResult.risk_level === "high" ? "attention" : "in-progress"}
+                    label={`${(analysisResult.risk_level ?? "medium").toUpperCase()} RISK`}
+                  />
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed">{analysisResult.summary}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink-muted)" }}>{analysisResult.summary}</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Strengths/Risks/Flags — evaluative labels, not neutral
+                      categories (unlike DD_CATEGORY_COLORS above), so the
+                      "categories aren't states" reasoning doesn't apply here.
+                      Mapped onto the existing closed status vocabulary:
+                      Strengths→satisfied, Risks/Flags→attention — consistent
+                      with every other genuine-state mapping in this file
+                      (StatusCircle, the risk-level pills). No new tone
+                      invented; "flags" and "risks" share the same tone
+                      deliberately, since both are adverse signals and the
+                      vocabulary has no third negative tier. */}
                   {[
-                    { label: "Strengths", items: analysisResult.strengths ?? [], color: "text-green-600 ", dot: "bg-green-500" },
-                    { label: "Risks", items: analysisResult.risks ?? [], color: "text-red-600 ", dot: "bg-red-500" },
-                    { label: "Flags", items: analysisResult.flags ?? [], color: "text-amber-600 ", dot: "bg-amber-500" },
-                  ].map(({ label, items, color, dot }) => (
+                    { label: "Strengths", items: analysisResult.strengths ?? [], tone: "var(--lcs-satisfied)" },
+                    { label: "Risks", items: analysisResult.risks ?? [], tone: "var(--lcs-attention)" },
+                    { label: "Flags", items: analysisResult.flags ?? [], tone: "var(--lcs-attention)" },
+                  ].map(({ label, items, tone }) => (
                     <div key={label}>
-                      <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{label}</div>
+                      <div className="text-xs font-semibold mb-2 uppercase tracking-wide" style={{ color: "var(--lcs-ink-muted)" }}>{label}</div>
                       {(items as string[]).length === 0 ? (
-                        <p className="text-xs text-[#71717A] italic">None identified</p>
+                        <p className="text-xs italic" style={{ color: "var(--lcs-ink-muted)" }}>None identified</p>
                       ) : (
                         <ul className="space-y-1.5">
                           {(items as string[]).map((item, i) => (
-                            <li key={i} className={cn("flex items-start gap-1.5 text-xs", color)}>
-                              <div className={cn("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", dot)} />
+                            <li key={i} className="flex items-start gap-1.5 text-xs" style={{ color: tone }}>
+                              <div className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: tone }} />
                               {item}
                             </li>
                           ))}
@@ -714,9 +733,9 @@ function DiligencePage() {
                     </div>
                   ))}
                 </div>
-                <div style={{ borderLeft: "3px solid var(--brand)" }} className="pl-4 py-1">
-                  <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Recommendation</div>
-                  <p className="text-sm text-gray-800 leading-relaxed">{analysisResult.recommendation}</p>
+                <div style={{ borderLeft: "3px solid var(--lcs-accent)" }} className="pl-4 py-1">
+                  <div className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: "var(--lcs-ink-muted)" }}>Recommendation</div>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink)" }}>{analysisResult.recommendation}</p>
                 </div>
               </div>
             )}
@@ -725,45 +744,45 @@ function DiligencePage() {
       </div>
 
       <div className="space-y-3">
-        <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider text-xs" style={{ fontFamily: "Syne, sans-serif" }}>Research from previous stages</div>
+        <div className="text-sm font-semibold uppercase tracking-wider text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Research from previous stages</div>
 
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+        <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
           <button
             onClick={() => setQaSummaryOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
           >
-            <span className="text-sm font-semibold text-gray-900 ">Q&A Summary</span>
-            {qaSummaryOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Q&A Summary</span>
+            {qaSummaryOpen ? <ChevronUp className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />}
           </button>
           {qaSummaryOpen && (
-            <div className="border-t border-[rgba(0,0,0,0.08)] px-5 py-4">
+            <div className="border-t px-5 py-4" style={{ borderColor: "var(--lcs-line)" }}>
               {qaSummaryNote ? (
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{qaSummaryNote.content}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: "var(--lcs-ink-muted)" }}>{qaSummaryNote.content}</p>
               ) : (
-                <p className="text-sm text-[#71717A]">Not generated</p>
+                <p className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>Not generated</p>
               )}
             </div>
           )}
         </div>
 
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+        <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
           <button
             onClick={() => setVaultNotesOpen((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-4"
           >
-            <span className="text-sm font-semibold text-gray-900 ">Notes from Information Vault</span>
-            {vaultNotesOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Notes from Information Vault</span>
+            {vaultNotesOpen ? <ChevronUp className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />}
           </button>
           {vaultNotesOpen && (
-            <div className="border-t border-[rgba(0,0,0,0.08)] divide-y divide-gray-100 ">
+            <div className="border-t divide-y" style={{ borderColor: "var(--lcs-line)" }}>
               {(vaultNotes as any[]).length === 0 ? (
-                <p className="px-5 py-4 text-sm text-[#71717A]">No notes</p>
+                <p className="px-5 py-4 text-sm" style={{ color: "var(--lcs-ink-muted)" }}>No notes</p>
               ) : (
                 (vaultNotes as any[]).map((note: any) => (
                   <div key={note.id} className="px-5 py-4">
-                    <div className="text-sm font-medium text-gray-900 mb-0.5">{note.title}</div>
-                    <p className="text-xs text-gray-500 line-clamp-2">{note.content?.slice(0, 100)}{(note.content?.length ?? 0) > 100 ? "…" : ""}</p>
-                    <p className="text-[10px] text-[#71717A] mt-1">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
+                    <div className="text-sm font-medium mb-0.5" style={{ color: "var(--lcs-ink)" }}>{note.title}</div>
+                    <p className="text-xs line-clamp-2" style={{ color: "var(--lcs-ink-muted)" }}>{note.content?.slice(0, 100)}{(note.content?.length ?? 0) > 100 ? "…" : ""}</p>
+                    <p className="text-[10px] mt-1" style={{ color: "var(--lcs-ink-muted)" }}>{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</p>
                   </div>
                 ))
               )}
@@ -778,18 +797,17 @@ function DiligencePage() {
           same day. Its submit handler was an inline console.log: it wrote
           nothing and nothing read it. See that file's note and CLAUDE.md
           §20.9. "Request next stage" is untouched — a real action. */}
-      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
+      <div className="border px-6 py-5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
         <div className="flex items-center justify-end gap-4 flex-wrap">
-          <button
+          <LcsButton
+            variant="primary"
             onClick={onRequestNextStage}
             disabled={stageRequesting}
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
-            style={{ background: "var(--gradient-brand)" }}
             data-testid="dd-next-stage"
           >
             {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Request next stage →
-          </button>
+          </LcsButton>
         </div>
       </div>
 

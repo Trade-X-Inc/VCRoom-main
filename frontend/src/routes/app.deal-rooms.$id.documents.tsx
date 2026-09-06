@@ -14,9 +14,8 @@ import {
 } from "@/lib/actions/deal-room-documents";
 import { roomGetWorkflowState } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
-import {
-  V2Button, LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
-} from "@/components/v2";
+import { LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td } from "@/components/v2";
+import { LcsButton, LcsStatusPill, LcsEmptyState } from "@/components/lcs";
 import { Dropzone } from "@/components/app/Dropzone";
 import { Stage2Gate } from "@/components/app/Stage2Gate";
 import { generateDocSummary } from "@/lib/ai-secure-fn";
@@ -25,7 +24,6 @@ import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
 import { AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { triggerDocumentUploadedEmail } from "@/lib/email/triggers";
 import { useGeneratedNdaDocs } from "@/lib/store";
-import { LcsEmptyState } from "@/components/lcs";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/documents")({
@@ -86,28 +84,28 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl bg-v2-panel border border-v2-rule overflow-hidden font-v2-ui"
-        style={{ borderRadius: "var(--v2-radius)" }}
+        className="w-full max-w-4xl border overflow-hidden"
+        style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)", fontFamily: "var(--font-lcs-ui)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}>
-          <div className="text-v2-ink font-medium truncate" style={{ fontSize: "13.5px" }}>{displayName}</div>
-          <V2Button variant="quiet" onClick={onClose} style={{ height: "28px", padding: "0 6px" }}>
+        <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--lcs-line)" }}>
+          <div className="font-medium truncate" style={{ color: "var(--lcs-ink)", fontSize: "13.5px" }}>{displayName}</div>
+          <LcsButton variant="text-link" onClick={onClose} style={{ height: "28px", padding: "0 6px" }}>
             <X className="h-4 w-4" />
-          </V2Button>
+          </LcsButton>
         </div>
         <div className="p-6">
           {!url ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-v2-ink-muted" />
+              <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--lcs-ink-muted)" }} />
             </div>
           ) : isImage ? (
-            <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto" style={{ borderRadius: "var(--v2-radius)" }} />
+            <img src={url} alt={displayName} className="max-w-full max-h-[60vh] object-contain mx-auto" style={{ borderRadius: "var(--radius-lcs-control)" }} />
           ) : isPdf ? (
             <iframe
               src={url}
-              className="w-full h-[70vh] border border-v2-rule"
-              style={{ borderRadius: "var(--v2-radius)" }}
+              className="w-full h-[70vh] border"
+              style={{ borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}
               title={displayName}
             />
           ) : (
@@ -119,12 +117,12 @@ function DocPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
             // preview is strictly better than a third-party-routed one, and the
             // download path is a recorded, in-platform action.
             <div className="flex flex-col items-center gap-4 py-8 text-center">
-              <div className="grid h-16 w-16 place-items-center bg-v2-surface" style={{ borderRadius: "var(--v2-radius)" }}>
-                <FileText className="h-8 w-8 text-v2-ink-muted" />
+              <div className="grid h-16 w-16 place-items-center" style={{ background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                <FileText className="h-8 w-8" style={{ color: "var(--lcs-ink-muted)" }} />
               </div>
-              <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>Preview not available for this file type.</p>
+              <p style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>Preview not available for this file type.</p>
               <a href={url} download={displayName}>
-                <V2Button variant="primary"><Download className="h-4 w-4" /> Download to view</V2Button>
+                <LcsButton variant="primary"><Download className="h-4 w-4" /> Download to view</LcsButton>
               </a>
             </div>
           )}
@@ -495,17 +493,20 @@ function DocumentsPage() {
   }, {});
 
   return (
-    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+    <div className="p-8 max-w-5xl mx-auto" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 border border-v2-rule bg-v2-panel p-1" style={{ borderRadius: "var(--v2-radius)" }}>
+        {/* Segmented pill toggle — same treatment as the chip-rail tabs below
+            (active = solid accent fill + white text, inactive = transparent),
+            per Group 6 Phase-0's tab-grammar consistency decision. */}
+        <div className="flex items-center gap-1 border p-1" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", borderRadius: "var(--radius-lcs-control)" }}>
           <button
             onClick={() => setActiveVaultTab("documents")}
             className="px-4 py-1.5 font-medium transition-colors"
             style={{
-              borderRadius: "var(--v2-radius)",
+              borderRadius: "var(--radius-lcs-control)",
               fontSize: "13px",
-              background: activeVaultTab === "documents" ? "var(--v2-accent)" : "transparent",
-              color: activeVaultTab === "documents" ? "#fff" : "var(--v2-ink-muted)",
+              background: activeVaultTab === "documents" ? "var(--lcs-accent)" : "transparent",
+              color: activeVaultTab === "documents" ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
             }}
           >
             Documents
@@ -515,10 +516,10 @@ function DocumentsPage() {
             onClick={() => setActiveVaultTab("links")}
             className="px-4 py-1.5 font-medium transition-colors"
             style={{
-              borderRadius: "var(--v2-radius)",
+              borderRadius: "var(--radius-lcs-control)",
               fontSize: "13px",
-              background: activeVaultTab === "links" ? "var(--v2-accent)" : "transparent",
-              color: activeVaultTab === "links" ? "#fff" : "var(--v2-ink-muted)",
+              background: activeVaultTab === "links" ? "var(--lcs-accent)" : "transparent",
+              color: activeVaultTab === "links" ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
             }}
           >
             Links
@@ -527,14 +528,14 @@ function DocumentsPage() {
         </div>
         <div className="flex gap-2">
           {activeVaultTab === "documents" && isFounder && (
-            <V2Button variant="secondary" onClick={() => setShowLibrary(true)}>
+            <LcsButton variant="secondary" onClick={() => setShowLibrary(true)}>
               <Plus className="h-4 w-4" /> Add from library
-            </V2Button>
+            </LcsButton>
           )}
           {activeVaultTab === "links" && (
-            <V2Button variant="primary" onClick={() => setShowAddLink(true)}>
+            <LcsButton variant="primary" onClick={() => setShowAddLink(true)}>
               <Plus className="h-4 w-4" /> Add link
-            </V2Button>
+            </LcsButton>
           )}
         </div>
       </div>
@@ -544,21 +545,21 @@ function DocumentsPage() {
       {(platformDocs as any[]).length > 0 && (
         <div className="mt-5 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <h3 className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Platform documents</h3>
-            <span className="text-v2-ink-muted" style={{ fontSize: "11px" }}>
+            <h3 className="font-medium" style={{ color: "var(--lcs-ink)", fontSize: "13.5px" }}>Platform documents</h3>
+            <span style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
               {(platformDocs as any[]).length} structured
             </span>
           </div>
           {isInvestor && <Stage2Gate stage2Unlocked={stage2Unlocked} />}
           {isInvestor && platformDocsSplit.stage1.length > 0 && (
             <div className="mb-2">
-              <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Stage 1 — Initial review</div>
+              <div className="uppercase font-medium mb-2" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>Stage 1 — Initial review</div>
               <PlatformDocList docs={platformDocsSplit.stage1} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} />
             </div>
           )}
           {isInvestor && platformDocsSplit.stage2.length > 0 && stage2Unlocked && (
             <div>
-              <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Stage 2 — Full diligence</div>
+              <div className="uppercase font-medium mb-2" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>Stage 2 — Full diligence</div>
               <PlatformDocList docs={platformDocsSplit.stage2} onView={(doc) => { setViewingDoc(doc); trackDocumentView({ founderDocumentId: doc.id }); }} />
             </div>
           )}
@@ -570,23 +571,23 @@ function DocumentsPage() {
 
       {(platformDocs as any[]).length > 0 && (docs as any[]).length > 0 && (
         <div className="flex items-center gap-3 mb-5">
-          <div className="flex-1" style={{ height: "1px", background: "var(--v2-rule-light)" }} />
-          <span className="text-v2-ink-muted uppercase" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Uploaded files</span>
-          <div className="flex-1" style={{ height: "1px", background: "var(--v2-rule-light)" }} />
+          <div className="flex-1" style={{ height: "1px", background: "var(--lcs-line)" }} />
+          <span className="uppercase" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>Uploaded files</span>
+          <div className="flex-1" style={{ height: "1px", background: "var(--lcs-line)" }} />
         </div>
       )}
 
       {isFounder && (
         <div className="mt-5 space-y-3">
-          <div className="border border-v2-rule bg-v2-surface px-4 py-3" style={{ borderRadius: "var(--v2-radius)" }}>
-            <div className="text-v2-ink-secondary" style={{ fontSize: "12px" }}>
+          <div className="border px-4 py-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+            <div style={{ color: "var(--lcs-ink-muted)", fontSize: "12px" }}>
               Documents shared here are visible to the investor and appear in their workstation automatically.
             </div>
             <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
               {["PDF", "PPTX", "DOCX", "XLSX", "CSV", "PNG/JPG"].map((ext) => (
-                <span key={ext} className="border border-v2-rule px-1.5 py-0.5 font-medium uppercase text-v2-ink-muted" style={{ borderRadius: "var(--v2-radius)", fontSize: "10px" }}>{ext}</span>
+                <span key={ext} className="border px-1.5 py-0.5 font-medium uppercase" style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)", borderRadius: "var(--radius-lcs-control)", fontSize: "10px" }}>{ext}</span>
               ))}
-              <span className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Max 50 MB per file</span>
+              <span style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Max 50 MB per file</span>
             </div>
           </div>
           <Dropzone
@@ -628,7 +629,11 @@ function DocumentsPage() {
         </div>
       )}
 
-      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
+      {/* Chip-rail tabs — same active/inactive treatment as the segmented
+          pill toggle above (solid accent fill + white text when active,
+          transparent + bordered when inactive), per Group 6 Phase-0's
+          tab-grammar consistency decision. */}
+      <div className="flex gap-1 mt-5 pb-2 overflow-x-auto" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
         {DOC_CATEGORIES.map((cat) => {
           const count = cat === "All" ? (docs as any[]).length : (catCounts[cat] ?? 0);
           const active = activeDocTab === cat;
@@ -636,13 +641,14 @@ function DocumentsPage() {
             <button
               key={cat}
               onClick={() => setActiveDocTab(cat)}
-              className="shrink-0 inline-flex items-center gap-1 px-3 py-1 transition-colors font-v2-ui"
+              className="shrink-0 inline-flex items-center gap-1 px-3 py-1 transition-colors"
               style={{
-                borderRadius: "var(--v2-radius)",
+                fontFamily: "var(--font-lcs-ui)",
+                borderRadius: "var(--radius-lcs-control)",
                 fontSize: "12px",
-                background: active ? "var(--v2-accent)" : "transparent",
-                color: active ? "#fff" : "var(--v2-ink-secondary)",
-                border: active ? "none" : "1px solid var(--v2-rule)",
+                background: active ? "var(--lcs-accent)" : "transparent",
+                color: active ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
+                border: active ? "none" : "1px solid var(--lcs-line)",
               }}
             >
               {cat}
@@ -663,39 +669,39 @@ function DocumentsPage() {
           onClick={() => setShowLibrary(false)}
         >
           <div
-            className="w-full max-w-lg bg-v2-panel border border-v2-rule font-v2-ui"
-            style={{ borderRadius: "var(--v2-radius)" }}
+            className="w-full max-w-lg border"
+            style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)", fontFamily: "var(--font-lcs-ui)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}>
-              <div className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Add from document library</div>
-              <V2Button variant="quiet" onClick={() => setShowLibrary(false)} style={{ height: "28px", padding: "0 6px" }}>
+            <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--lcs-line)" }}>
+              <div className="font-medium" style={{ color: "var(--lcs-ink)", fontSize: "13.5px" }}>Add from document library</div>
+              <LcsButton variant="text-link" onClick={() => setShowLibrary(false)} style={{ height: "28px", padding: "0 6px" }}>
                 <X className="h-4 w-4" />
-              </V2Button>
+              </LcsButton>
             </div>
             <div className="p-3 max-h-80 overflow-y-auto">
-              {libLoading && <div className="text-v2-ink-muted p-3" style={{ fontSize: "13px" }}>Loading</div>}
+              {libLoading && <div className="p-3" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>Loading</div>}
               {!libLoading && (libraryDocs as any[]).length === 0 && (
-                <div className="text-v2-ink-muted p-3 text-center py-6" style={{ fontSize: "13px" }}>
+                <div className="p-3 text-center py-6" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>
                   <FileText className="h-8 w-8 mx-auto mb-2" />
                   No documents to add. Upload documents from the main documents page first.
                 </div>
               )}
               {(libraryDocs as any[]).map((doc) => (
-                <div key={doc.id} className="flex items-center gap-3 p-3 hover:bg-v2-accent-wash" style={{ borderRadius: "var(--v2-radius)" }}>
-                  <div className="grid h-8 w-8 place-items-center bg-v2-surface shrink-0" style={{ borderRadius: "var(--v2-radius)" }}>
-                    <FileText className="h-4 w-4 text-v2-accent" />
+                <div key={doc.id} className="flex items-center gap-3 p-3 hover:bg-[var(--lcs-progress-wash)]" style={{ borderRadius: "var(--radius-lcs-control)" }}>
+                  <div className="grid h-8 w-8 place-items-center shrink-0" style={{ background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                    <FileText className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate text-v2-ink" style={{ fontSize: "13px" }}>
+                    <div className="font-medium truncate" style={{ color: "var(--lcs-ink)", fontSize: "13px" }}>
                       {doc.name || doc.storage_path?.split("/").pop() || "Document"}
                     </div>
-                    {doc.category && <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>{doc.category}</div>}
+                    {doc.category && <div style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>{doc.category}</div>}
                   </div>
-                  <V2Button variant="primary" onClick={() => addFromLibrary(doc.id)} disabled={addingFromLib === doc.id} style={{ height: "28px", fontSize: "11px" }}>
+                  <LcsButton variant="primary" onClick={() => addFromLibrary(doc.id)} disabled={addingFromLib === doc.id} style={{ height: "28px", fontSize: "11px" }}>
                     {addingFromLib === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
                     Add
-                  </V2Button>
+                  </LcsButton>
                 </div>
               ))}
             </div>
@@ -705,19 +711,19 @@ function DocumentsPage() {
 
       {ndaDocs.length > 0 && (
         <div className="mt-5">
-          <div className="text-v2-ink-muted uppercase font-medium mb-2" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>System generated</div>
-          <div className="border border-v2-rule bg-v2-panel divide-y" style={{ borderRadius: "var(--v2-radius)", borderColor: "var(--v2-rule-light)" }}>
+          <div className="uppercase font-medium mb-2" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>System generated</div>
+          <div className="border divide-y" style={{ background: "var(--lcs-white)", borderRadius: "var(--radius-lcs-control)", borderColor: "var(--lcs-line)" }}>
             {ndaDocs.map((d) => (
-              <div key={d.name} className="flex items-center gap-3 px-5 py-3" style={{ borderColor: "var(--v2-rule-light)" }}>
-                <div className="grid h-8 w-8 place-items-center bg-v2-satisfied-wash" style={{ borderRadius: "var(--v2-radius)" }}>
-                  <Shield className="h-4 w-4 text-v2-satisfied" />
+              <div key={d.name} className="flex items-center gap-3 px-5 py-3" style={{ borderColor: "var(--lcs-line)" }}>
+                <div className="grid h-8 w-8 place-items-center" style={{ background: "var(--lcs-satisfied-wash)", borderRadius: "var(--radius-lcs-control)" }}>
+                  <Shield className="h-4 w-4" style={{ color: "var(--lcs-satisfied)" }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate text-v2-ink" style={{ fontSize: "13px" }}>{d.name}</div>
-                  <div className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Auto-generated NDA · {new Date(d.createdAt).toLocaleDateString()}</div>
+                  <div className="font-medium truncate" style={{ color: "var(--lcs-ink)", fontSize: "13px" }}>{d.name}</div>
+                  <div style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Auto-generated NDA · {new Date(d.createdAt).toLocaleDateString()}</div>
                 </div>
-                <StatusLabel tone="satisfied">Signed by all</StatusLabel>
-                <V2Button variant="quiet" style={{ height: "28px", padding: "0 6px" }}><Download className="h-4 w-4" /></V2Button>
+                <LcsStatusPill status="satisfied" label="Signed by all" />
+                <LcsButton variant="text-link" style={{ height: "28px", padding: "0 6px" }}><Download className="h-4 w-4" /></LcsButton>
               </div>
             ))}
           </div>
@@ -754,11 +760,11 @@ function DocumentsPage() {
                     <Tr key={doc.id}>
                       <Td>
                         <div className="flex items-center gap-2">
-                          <FileIcon className="h-3.5 w-3.5 text-v2-ink-muted shrink-0" />
-                          <span className="font-medium text-v2-ink truncate">{displayName}</span>
-                          {isPinned && <StatusLabel tone="neutral" dot={false}>Pinned</StatusLabel>}
+                          <FileIcon className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--lcs-ink-muted)" }} />
+                          <span className="font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{displayName}</span>
+                          {isPinned && <LcsStatusPill status="pending" label="Pinned" dot={false} />}
                         </div>
-                        <div className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+                        <div className="mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                           {new Date(doc.created_at).toLocaleDateString()}
                         </div>
                       </Td>
@@ -767,31 +773,31 @@ function DocumentsPage() {
                       <Td numeric>{fileSize || "—"}</Td>
                       <Td numeric>
                         <div className="flex items-center justify-end gap-1">
-                          <V2Button
-                            variant="quiet"
+                          <LcsButton
+                            variant="text-link"
                             onClick={() => { setPreviewDoc(doc); trackDocumentView({ documentId: doc.id }); }}
                             style={{ height: "28px", padding: "0 6px" }}
                             title="Preview"
                           >
                             <Eye className="h-3.5 w-3.5" />
-                          </V2Button>
-                          <V2Button
-                            variant="quiet"
+                          </LcsButton>
+                          <LcsButton
+                            variant="text-link"
                             onClick={() => handleDownload(doc.storage_path)}
                             style={{ height: "28px", padding: "0 6px" }}
                             title="Download"
                           >
                             <Download className="h-3.5 w-3.5" />
-                          </V2Button>
+                          </LcsButton>
                           {isFounder && (
-                            <V2Button
-                              variant="quiet"
+                            <LcsButton
+                              variant="text-link"
                               onClick={() => handleDocRemove(doc)}
                               style={{ height: "28px", padding: "0 6px" }}
                               title="Remove from deal room"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
-                            </V2Button>
+                            </LcsButton>
                           )}
                         </div>
                       </Td>
@@ -803,32 +809,32 @@ function DocumentsPage() {
                             <div>
                               <button
                                 onClick={() => toggleSummary(doc.id)}
-                                className="flex items-center gap-1.5 text-v2-accent hover:underline w-full text-left"
-                                style={{ fontSize: "11.5px" }}
+                                className="flex items-center gap-1.5 hover:underline w-full text-left"
+                                style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)", fontSize: "11.5px" }}
                               >
                                 <Sparkles className="h-3.5 w-3.5 shrink-0" />
                                 <span className="flex-1">AI summary</span>
-                                <StatusLabel tone="neutral" dot={false}>{doc.summary_edited ? "Edited" : "Generated"}</StatusLabel>
+                                <LcsStatusPill status="pending" label={doc.summary_edited ? "Edited" : "Generated"} dot={false} />
                                 {isSummaryExpanded(doc.id)
                                   ? <ChevronUp className="h-3 w-3 shrink-0" />
                                   : <ChevronDown className="h-3 w-3 shrink-0" />}
                               </button>
                               {isSummaryExpanded(doc.id) && (
-                                <div className="mt-2 bg-v2-surface px-3 py-3" style={{ borderInlineStart: "2px solid var(--v2-accent)", borderRadius: "var(--v2-radius)" }}>
+                                <div className="mt-2 px-3 py-3" style={{ background: "var(--lcs-surface)", borderInlineStart: "2px solid var(--lcs-accent)", borderRadius: "var(--radius-lcs-control)" }}>
                                   {isEditing ? (
                                     <div className="space-y-2">
                                       <textarea
                                         value={summaryEdits[doc.id] ?? ""}
                                         onChange={(e) => setSummaryEdits((s) => ({ ...s, [doc.id]: e.target.value }))}
                                         rows={4}
-                                        className="w-full border border-v2-rule bg-v2-panel px-3 py-2 resize-none focus:outline-none font-v2-ui"
-                                        style={{ borderRadius: "var(--v2-radius)", fontSize: "12px" }}
+                                        className="w-full border px-3 py-2 resize-none focus:outline-none"
+                                        style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)", borderRadius: "var(--radius-lcs-control)", fontSize: "12px" }}
                                       />
                                       <div className="flex gap-2">
-                                        <V2Button variant="quiet" onClick={() => setEditingSummaryId(null)} style={{ height: "26px", fontSize: "11px" }}>
+                                        <LcsButton variant="text-link" onClick={() => setEditingSummaryId(null)} style={{ height: "26px", fontSize: "11px" }}>
                                           Cancel
-                                        </V2Button>
-                                        <V2Button
+                                        </LcsButton>
+                                        <LcsButton
                                           variant="primary"
                                           style={{ height: "26px", fontSize: "11px" }}
                                           onClick={async () => {
@@ -845,21 +851,21 @@ function DocumentsPage() {
                                           }}
                                         >
                                           Save
-                                        </V2Button>
+                                        </LcsButton>
                                       </div>
                                     </div>
                                   ) : (
                                     <>
-                                      <p className="text-v2-ink whitespace-pre-line" style={{ fontSize: "13px", lineHeight: 1.55 }}>
+                                      <p className="whitespace-pre-line" style={{ color: "var(--lcs-ink)", fontSize: "13px", lineHeight: 1.55 }}>
                                         {doc.ai_summary}
                                       </p>
                                       <div className="flex gap-2 mt-2">
-                                        <V2Button variant="quiet" onClick={() => generateSummary(doc)} disabled={isGenerating} style={{ height: "24px", fontSize: "10.5px" }}>
+                                        <LcsButton variant="text-link" onClick={() => generateSummary(doc)} disabled={isGenerating} style={{ height: "24px", fontSize: "10.5px" }}>
                                           {isGenerating ? "Regenerating" : "Regenerate"}
-                                        </V2Button>
+                                        </LcsButton>
                                         {isFounder && (
-                                          <V2Button
-                                            variant="quiet"
+                                          <LcsButton
+                                            variant="text-link"
                                             style={{ height: "24px", fontSize: "10.5px" }}
                                             onClick={() => {
                                               setEditingSummaryId(doc.id);
@@ -867,7 +873,7 @@ function DocumentsPage() {
                                             }}
                                           >
                                             Edit
-                                          </V2Button>
+                                          </LcsButton>
                                         )}
                                       </div>
                                     </>
@@ -877,14 +883,14 @@ function DocumentsPage() {
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
-                              <Sparkles className="h-3.5 w-3.5 text-v2-accent shrink-0" />
-                              <span className="text-v2-accent font-medium flex-1" style={{ fontSize: "11.5px" }}>AI summary</span>
-                              <span className="text-v2-ink-muted" style={{ fontSize: "11px" }}>Not generated</span>
-                              <V2Button variant="secondary" onClick={() => generateSummary(doc)} disabled={isGenerating} style={{ height: "26px", fontSize: "11px" }}>
+                              <Sparkles className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--lcs-accent)" }} />
+                              <span className="font-medium flex-1" style={{ color: "var(--lcs-accent)", fontSize: "11.5px" }}>AI summary</span>
+                              <span style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Not generated</span>
+                              <LcsButton variant="secondary" onClick={() => generateSummary(doc)} disabled={isGenerating} style={{ height: "26px", fontSize: "11px" }}>
                                 {isGenerating
                                   ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating</>
                                   : <><Sparkles className="h-3 w-3" /> Generate</>}
-                              </V2Button>
+                              </LcsButton>
                             </div>
                           )}
                         </Td>
@@ -903,9 +909,9 @@ function DocumentsPage() {
           <LcsEmptyState title="No documents" text="Documents shared in this deal room appear here." />
           {isFounder && (
             <label className="-mt-4 cursor-pointer">
-              <V2Button variant="primary" style={{ pointerEvents: "none" }}>
+              <LcsButton variant="primary" style={{ pointerEvents: "none" }}>
                 <Upload className="h-4 w-4" /> Upload
-              </V2Button>
+              </LcsButton>
               <input
                 type="file"
                 className="sr-only"
@@ -960,24 +966,24 @@ function DocumentsPage() {
 
       {activeDocTab !== "All" && expectedForTab.length > 0 && (
         <div className="pb-4">
-          <div className="text-v2-ink-muted uppercase font-medium mb-2 mt-4" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>
+          <div className="uppercase font-medium mb-2 mt-4" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>
             Recommended for this category
           </div>
-          <div className="border border-v2-rule divide-y overflow-hidden" style={{ borderRadius: "var(--v2-radius)", borderStyle: "dashed", borderColor: "var(--v2-rule)" }}>
+          <div className="border divide-y overflow-hidden" style={{ borderRadius: "var(--radius-lcs-control)", borderStyle: "dashed", borderColor: "var(--lcs-line)" }}>
             {expectedForTab.map((expected) => (
-              <div key={expected.name} className="flex items-center gap-3 px-4 py-3 bg-v2-surface" style={{ borderColor: "var(--v2-rule-light)" }}>
-                <div className="grid h-8 w-8 place-items-center bg-v2-panel border border-v2-rule shrink-0" style={{ borderRadius: "var(--v2-radius)" }}>
-                  <FileText className="h-4 w-4 text-v2-ink-muted" />
+              <div key={expected.name} className="flex items-center gap-3 px-4 py-3" style={{ background: "var(--lcs-surface)", borderColor: "var(--lcs-line)" }}>
+                <div className="grid h-8 w-8 place-items-center border shrink-0" style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}>
+                  <FileText className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>{expected.name}</div>
-                  <StatusLabel tone="attention" dot={false}>Not provided</StatusLabel>
+                  <div style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>{expected.name}</div>
+                  <LcsStatusPill status="attention" label="Not provided" dot={false} />
                 </div>
                 {isFounder && (
                   <label className="cursor-pointer shrink-0">
-                    <V2Button variant="secondary" style={{ pointerEvents: "none" }}>
+                    <LcsButton variant="secondary" style={{ pointerEvents: "none" }}>
                       <Upload className="h-3 w-3" /> Upload
-                    </V2Button>
+                    </LcsButton>
                     <input
                       type="file"
                       className="sr-only"
@@ -1036,10 +1042,10 @@ function DocumentsPage() {
         <div className="mt-8">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="font-medium flex items-center gap-2 text-v2-ink" style={{ fontSize: "13.5px" }}>
-                <StatusLabel tone="satisfied" dot={false}>Investor documents</StatusLabel>
+              <h3 className="font-medium flex items-center gap-2" style={{ color: "var(--lcs-ink)", fontSize: "13.5px" }}>
+                <LcsStatusPill status="satisfied" label="Investor documents" dot={false} />
               </h3>
-              <p className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+              <p className="mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                 {isInvestor
                   ? "Only you can upload here. Choose visibility per document."
                   : "Documents shared with you by the investor."}
@@ -1060,9 +1066,9 @@ function DocumentsPage() {
           )}
 
           {visibleInvestorDocs.length === 0 && isInvestor && (
-            <div className="border p-8 text-center" style={{ borderRadius: "var(--v2-radius)", borderStyle: "dashed", borderColor: "var(--v2-rule)" }}>
-              <FileText className="h-8 w-8 mx-auto mb-2 text-v2-ink-muted" />
-              <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>No investor documents</p>
+            <div className="border p-8 text-center" style={{ borderRadius: "var(--radius-lcs-control)", borderStyle: "dashed", borderColor: "var(--lcs-line)" }}>
+              <FileText className="h-8 w-8 mx-auto mb-2" style={{ color: "var(--lcs-ink-muted)" }} />
+              <p style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>No investor documents</p>
             </div>
           )}
 
@@ -1089,10 +1095,10 @@ function DocumentsPage() {
                       <Tr key={doc.id} status="satisfied">
                         <Td>
                           <div className="flex items-center gap-2">
-                            <FileIcon className="h-3.5 w-3.5 text-v2-ink-muted shrink-0" />
-                            <span className="font-medium text-v2-ink truncate">{displayName}</span>
+                            <FileIcon className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--lcs-ink-muted)" }} />
+                            <span className="font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{displayName}</span>
                           </div>
-                          <div className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+                          <div className="mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                             {new Date(doc.created_at).toLocaleDateString()}
                           </div>
                         </Td>
@@ -1106,11 +1112,12 @@ function DocumentsPage() {
                                   onClick={() => updateDocVisibility(doc.id, v)}
                                   className="px-2 py-1 font-medium transition-colors"
                                   style={{
-                                    borderRadius: "var(--v2-radius)",
+                                    fontFamily: "var(--font-lcs-ui)",
+                                    borderRadius: "var(--radius-lcs-control)",
                                     fontSize: "10.5px",
-                                    background: currentVisibility === v ? "var(--v2-accent-wash)" : "transparent",
-                                    color: currentVisibility === v ? "var(--v2-accent)" : "var(--v2-ink-muted)",
-                                    border: currentVisibility === v ? "1px solid var(--v2-accent)" : "1px solid transparent",
+                                    background: currentVisibility === v ? "var(--lcs-progress-wash)" : "transparent",
+                                    color: currentVisibility === v ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                                    border: currentVisibility === v ? "1px solid var(--lcs-accent)" : "1px solid transparent",
                                   }}
                                 >
                                   {v === "shared" ? "Shared" : "Private"}
@@ -1118,18 +1125,18 @@ function DocumentsPage() {
                               ))}
                             </div>
                           ) : (
-                            <StatusLabel tone="satisfied" dot={false}>Shared</StatusLabel>
+                            <LcsStatusPill status="satisfied" label="Shared" dot={false} />
                           )}
                         </Td>
                         <Td numeric>
                           <div className="flex items-center justify-end gap-1">
-                            <V2Button variant="quiet" onClick={() => handleDownload(doc.storage_path)} style={{ height: "28px", padding: "0 6px" }} title="Download">
+                            <LcsButton variant="text-link" onClick={() => handleDownload(doc.storage_path)} style={{ height: "28px", padding: "0 6px" }} title="Download">
                               <Download className="h-3.5 w-3.5" />
-                            </V2Button>
+                            </LcsButton>
                             {isInvestor && (
-                              <V2Button variant="quiet" onClick={() => removeInvestorDoc(doc.id)} style={{ height: "28px", padding: "0 6px" }} title="Remove">
+                              <LcsButton variant="text-link" onClick={() => removeInvestorDoc(doc.id)} style={{ height: "28px", padding: "0 6px" }} title="Remove">
                                 <Trash2 className="h-3.5 w-3.5" />
-                              </V2Button>
+                              </LcsButton>
                             )}
                           </div>
                         </Td>
@@ -1147,14 +1154,14 @@ function DocumentsPage() {
       {activeVaultTab === "links" && (
         <div className="mt-5">
           {(dealRoomLinks as any[]).length === 0 && (
-            <div className="border p-10 text-center" style={{ borderRadius: "var(--v2-radius)", borderStyle: "dashed", borderColor: "var(--v2-rule)" }}>
-              <LinkIcon className="h-8 w-8 mx-auto mb-2 text-v2-ink-muted" />
-              <p className="font-medium text-v2-ink" style={{ fontSize: "13.5px" }}>No links</p>
-              <p className="text-v2-ink-muted mt-1" style={{ fontSize: "12px" }}>Add product videos, recordings, external documents, or any URL.</p>
+            <div className="border p-10 text-center" style={{ borderRadius: "var(--radius-lcs-control)", borderStyle: "dashed", borderColor: "var(--lcs-line)" }}>
+              <LinkIcon className="h-8 w-8 mx-auto mb-2" style={{ color: "var(--lcs-ink-muted)" }} />
+              <p className="font-medium" style={{ color: "var(--lcs-ink)", fontSize: "13.5px" }}>No links</p>
+              <p className="mt-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "12px" }}>Add product videos, recordings, external documents, or any URL.</p>
               <div className="mt-4">
-                <V2Button variant="primary" onClick={() => setShowAddLink(true)}>
+                <LcsButton variant="primary" onClick={() => setShowAddLink(true)}>
                   <Plus className="h-4 w-4" /> Add first link
-                </V2Button>
+                </LcsButton>
               </div>
             </div>
           )}
@@ -1173,24 +1180,24 @@ function DocumentsPage() {
                     <Tr key={link.id}>
                       <Td>
                         <div className="flex items-center gap-2">
-                          <LinkIcon className="h-3.5 w-3.5 text-v2-ink-muted shrink-0" />
-                          <span className="font-medium text-v2-ink truncate">{link.name}</span>
+                          <LinkIcon className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--lcs-ink-muted)" }} />
+                          <span className="font-medium truncate" style={{ color: "var(--lcs-ink)" }}>{link.name}</span>
                         </div>
                       </Td>
                       <Td>
-                        <span className="text-v2-ink-secondary truncate block">{link.url}</span>
+                        <span className="truncate block" style={{ color: "var(--lcs-ink-muted)" }}>{link.url}</span>
                       </Td>
                       <Td numeric>
                         <div className="flex items-center justify-end gap-1">
                           <a href={link.url} target="_blank" rel="noopener noreferrer" title="Open link">
-                            <V2Button variant="quiet" style={{ height: "28px", padding: "0 6px", pointerEvents: "none" }}>
+                            <LcsButton variant="text-link" style={{ height: "28px", padding: "0 6px", pointerEvents: "none" }}>
                               <ExternalLink className="h-3.5 w-3.5" />
-                            </V2Button>
+                            </LcsButton>
                           </a>
                           {link.uploader_id === userId && (
-                            <V2Button variant="quiet" onClick={() => removeLink(link.id)} style={{ height: "28px", padding: "0 6px" }} title="Remove link">
+                            <LcsButton variant="text-link" onClick={() => removeLink(link.id)} style={{ height: "28px", padding: "0 6px" }} title="Remove link">
                               <Trash2 className="h-3.5 w-3.5" />
-                            </V2Button>
+                            </LcsButton>
                           )}
                         </div>
                       </Td>
@@ -1210,44 +1217,44 @@ function DocumentsPage() {
           onClick={() => setShowAddLink(false)}
         >
           <div
-            className="w-full max-w-md bg-v2-panel border border-v2-rule font-v2-ui"
-            style={{ borderRadius: "var(--v2-radius)" }}
+            className="w-full max-w-md border"
+            style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)", fontFamily: "var(--font-lcs-ui)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--v2-rule)" }}>
-              <div className="text-v2-ink font-medium" style={{ fontSize: "13.5px" }}>Add a link</div>
-              <V2Button variant="quiet" onClick={() => setShowAddLink(false)} style={{ height: "28px", padding: "0 6px" }}>
+            <div className="flex items-center justify-between px-5" style={{ height: "40px", borderBottom: "1px solid var(--lcs-line)" }}>
+              <div className="font-medium" style={{ color: "var(--lcs-ink)", fontSize: "13.5px" }}>Add a link</div>
+              <LcsButton variant="text-link" onClick={() => setShowAddLink(false)} style={{ height: "28px", padding: "0 6px" }}>
                 <X className="h-4 w-4" />
-              </V2Button>
+              </LcsButton>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="text-v2-ink-muted uppercase mb-1.5 block" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>Link name</label>
+                <label className="uppercase mb-1.5 block" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>Link name</label>
                 <input
                   value={linkName}
                   onChange={(e) => setLinkName(e.target.value)}
                   placeholder="e.g. Product demo video, financial model"
-                  className="w-full border border-v2-rule bg-v2-panel px-3 focus:outline-none font-v2-ui"
-                  style={{ height: "36px", borderRadius: "var(--v2-radius)", fontSize: "13.5px" }}
+                  className="w-full border px-3 focus:outline-none"
+                  style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)", height: "36px", borderRadius: "var(--radius-lcs-control)", fontSize: "13.5px" }}
                 />
               </div>
               <div>
-                <label className="text-v2-ink-muted uppercase mb-1.5 block" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>URL</label>
+                <label className="uppercase mb-1.5 block" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>URL</label>
                 <input
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://"
                   type="url"
-                  className="w-full border border-v2-rule bg-v2-panel px-3 focus:outline-none font-v2-ui"
-                  style={{ height: "36px", borderRadius: "var(--v2-radius)", fontSize: "13.5px" }}
+                  className="w-full border px-3 focus:outline-none"
+                  style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)", height: "36px", borderRadius: "var(--radius-lcs-control)", fontSize: "13.5px" }}
                 />
               </div>
               <div className="flex justify-end gap-2 pt-1">
-                <V2Button variant="secondary" onClick={() => setShowAddLink(false)}>Cancel</V2Button>
-                <V2Button variant="primary" onClick={addLink} disabled={!linkName.trim() || !linkUrl.trim() || addingLink}>
+                <LcsButton variant="secondary" onClick={() => setShowAddLink(false)}>Cancel</LcsButton>
+                <LcsButton variant="primary" onClick={addLink} disabled={!linkName.trim() || !linkUrl.trim() || addingLink}>
                   {addingLink ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                   Add link
-                </V2Button>
+                </LcsButton>
               </div>
             </div>
           </div>
@@ -1262,37 +1269,37 @@ function DocumentsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(22,24,28,0.4)" }}
           onClick={() => setViewingDoc(null)}>
-          <div className="bg-v2-panel border border-v2-rule w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col font-v2-ui"
-            style={{ borderRadius: "var(--v2-radius)" }}
+          <div className="border w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            style={{ background: "var(--lcs-white)", borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)", fontFamily: "var(--font-lcs-ui)" }}
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6" style={{ borderBottom: "1px solid var(--v2-rule)" }}>
+            <div className="flex items-center justify-between p-6" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
               <div>
-                <h2 className="font-medium text-v2-ink" style={{ fontSize: "15px" }}>{viewingDoc.title}</h2>
-                <p className="text-v2-ink-muted mt-1" style={{ fontSize: "11px" }}>
+                <h2 className="font-medium" style={{ color: "var(--lcs-ink)", fontSize: "15px" }}>{viewingDoc.title}</h2>
+                <p className="mt-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                   {viewingDoc.completeness_score}% complete · Updated {formatRelativeTime(viewingDoc.updated_at)}
                 </p>
               </div>
-              <V2Button variant="quiet" onClick={() => setViewingDoc(null)} style={{ height: "28px", padding: "0 6px" }}>
+              <LcsButton variant="text-link" onClick={() => setViewingDoc(null)} style={{ height: "28px", padding: "0 6px" }}>
                 <X className="h-4 w-4" />
-              </V2Button>
+              </LcsButton>
             </div>
             <div className="overflow-y-auto p-6 space-y-4 flex-1">
               {viewingDoc.content && Object.entries(viewingDoc.content as Record<string, string>)
                 .filter(([, v]) => v && String(v).trim())
                 .map(([key, value]) => (
                   <div key={key}>
-                    <p className="text-v2-ink-muted uppercase mb-1" style={{ fontSize: "11px", letterSpacing: "0.09em" }}>{key.replace(/_/g, " ")}</p>
-                    <p className="text-v2-ink-secondary whitespace-pre-wrap" style={{ fontSize: "13px", lineHeight: 1.55 }}>{String(value)}</p>
+                    <p className="uppercase mb-1" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px", letterSpacing: "0.09em" }}>{key.replace(/_/g, " ")}</p>
+                    <p className="whitespace-pre-wrap" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px", lineHeight: 1.55 }}>{String(value)}</p>
                   </div>
                 ))
               }
               {(!viewingDoc.content || Object.keys(viewingDoc.content).length === 0) && (
-                <p className="text-v2-ink-muted text-center py-8" style={{ fontSize: "13px" }}>No content available</p>
+                <p className="text-center py-8" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>No content available</p>
               )}
             </div>
             {viewingDoc.ai_feedback && (viewingDoc.ai_feedback as Record<string, unknown>).overall_score && (
-              <div className="p-4 flex items-center gap-3" style={{ borderTop: "1px solid var(--v2-rule)" }}>
-                <div className="text-v2-ink-muted" style={{ fontSize: "11.5px" }}>
+              <div className="p-4 flex items-center gap-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+                <div style={{ color: "var(--lcs-ink-muted)", fontSize: "11.5px" }}>
                   {String((viewingDoc.ai_feedback as Record<string, unknown>).summary ?? "").substring(0, 120)}
                 </div>
               </div>
@@ -1313,19 +1320,24 @@ function PlatformDocList({ docs, onView, showStage }: { docs: any[]; onView: (do
     <div className="space-y-2">
       {docs.map((doc: any) => (
         <div key={doc.id}
-          className="flex items-center justify-between px-4 py-3 border border-v2-rule bg-v2-panel hover:bg-v2-accent-wash transition-colors"
-          style={{ borderRadius: "var(--v2-radius)" }}>
+          className="flex items-center justify-between px-4 py-3 border transition-colors hover:bg-[var(--lcs-progress-wash)]"
+          style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)", borderRadius: "var(--radius-lcs-control)" }}>
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 flex items-center justify-center bg-v2-accent-wash text-v2-accent shrink-0" style={{ borderRadius: "var(--v2-radius)", fontSize: "13px" }}>≡</div>
+            {/* Decorative "≡" glyph replaced with a real icon — CLAUDE.md §13
+                bans decorative iconography regardless of colour, same standard
+                already applied to Group 1's search-modal type-icons. */}
+            <div className="w-8 h-8 flex items-center justify-center shrink-0" style={{ background: "var(--lcs-progress-wash)", color: "var(--lcs-accent)", borderRadius: "var(--radius-lcs-control)" }}>
+              <FileText className="h-4 w-4" />
+            </div>
             <div className="min-w-0">
-              <p className="font-medium text-v2-ink truncate" style={{ fontSize: "13px" }}>{doc.title}</p>
-              <p className="text-v2-ink-muted mt-0.5" style={{ fontSize: "11px" }}>
+              <p className="font-medium truncate" style={{ color: "var(--lcs-ink)", fontSize: "13px" }}>{doc.title}</p>
+              <p className="mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>
                 {doc.document_templates?.category
                   ? doc.document_templates.category.charAt(0).toUpperCase() + doc.document_templates.category.slice(1)
                   : "Document"}
                 {" · "}Updated {formatRelativeTime(doc.updated_at)}
                 {showStage && (
-                  <> {" · "}<span className="font-medium text-v2-accent">
+                  <> {" · "}<span className="font-medium" style={{ color: "var(--lcs-accent)" }}>
                     Stage {(doc.deal_room_stage ?? 1) === 2 ? "2 — Full diligence" : "1 — Initial review"}
                   </span></>
                 )}
@@ -1333,12 +1345,10 @@ function PlatformDocList({ docs, onView, showStage }: { docs: any[]; onView: (do
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <StatusLabel tone={doc.status === "complete" ? "satisfied" : "attention"} dot={false}>
-              {doc.status === "complete" ? "Complete" : "In progress"}
-            </StatusLabel>
-            <V2Button variant="secondary" onClick={() => onView(doc)} style={{ height: "28px", fontSize: "11px" }}>
+            <LcsStatusPill status={doc.status === "complete" ? "satisfied" : "attention"} label={doc.status === "complete" ? "Complete" : "In progress"} dot={false} />
+            <LcsButton variant="secondary" onClick={() => onView(doc)} style={{ height: "28px", fontSize: "11px" }}>
               View
-            </V2Button>
+            </LcsButton>
           </div>
         </div>
       ))}

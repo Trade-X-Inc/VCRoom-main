@@ -10,7 +10,7 @@ import { roomGetWorkflowState } from "@/lib/actions/deal-room-core";
 import { cn } from "@/lib/utils";
 import { getQASuggestions } from "@/lib/qa-suggestions-fn";
 import { completeQaAndGenerateReport } from "@/lib/qa-report-fn";
-import { LcsEmptyState } from "@/components/lcs";
+import { LcsEmptyState, LcsButton, LcsStatusPill, LcsModal } from "@/components/lcs";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/qa")({
@@ -282,11 +282,11 @@ function QAPage() {
   const unansweredCount = openQuestions.length;
 
   return (
-    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6" style={{ fontFamily: "var(--font-lcs-ui)" }}>
       {isCompleted && (
-        <div className="flex items-center gap-3 rounded-none border border-border/60 bg-card px-5 py-3">
-          <CheckCircle2 className="h-4 w-4 text-[#10B981] shrink-0" />
-          <span className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 border px-5 py-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-satisfied)" }} />
+          <span className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
             Q&A marked complete on {new Date(roomData!.qa_completed_at!).toLocaleDateString()}. Report saved to Information Vault.
           </span>
         </div>
@@ -296,105 +296,107 @@ function QAPage() {
 
         <div className="flex flex-col gap-4 sm:order-2 sm:w-72 shrink-0">
 
-          <div className="rounded-none border border-border/60 bg-card px-5 py-4 space-y-4">
+          <div className="border px-5 py-4 space-y-4" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Status</span>
+              <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Status</span>
               {isInvestor && !isCompleted && (
-                <button
+                <LcsButton
+                  variant="primary"
                   onClick={() => setShowCompleteConfirm(true)}
                   disabled={completingQA}
-                  className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
                   data-testid="qa-mark-complete-btn"
                 >
                   {completingQA ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
                   Mark complete
-                </button>
+                </LcsButton>
               )}
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-muted-foreground">{questionCount} of {MAX_QUESTIONS} questions used</span>
-                {isAtLimit && <span className="text-[10px] font-semibold text-[#F59E0B]">Limit reached</span>}
+                <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{questionCount} of {MAX_QUESTIONS} questions used</span>
+                {isAtLimit && <span className="text-[10px] font-semibold" style={{ color: "var(--lcs-attention)" }}>Limit reached</span>}
               </div>
-              <div className="h-1.5 w-full rounded-full bg-border/40 overflow-hidden">
+              <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "var(--lcs-line)" }}>
                 <div
-                  className="h-full rounded-full hs-gradient transition-all"
-                  style={{ width: `${(questionCount / MAX_QUESTIONS) * 100}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${(questionCount / MAX_QUESTIONS) * 100}%`, background: "var(--lcs-accent)" }}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-lg border border-border/40 bg-background px-3 py-2">
-                <div className="text-muted-foreground mb-0.5">Answered</div>
-                <div className="font-semibold text-foreground">{answeredCount}</div>
+              <div className="border px-3 py-2" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                <div className="mb-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Answered</div>
+                <div className="font-semibold" style={{ color: "var(--lcs-ink)" }}>{answeredCount}</div>
               </div>
-              <div className="rounded-lg border border-border/40 bg-background px-3 py-2">
-                <div className="text-muted-foreground mb-0.5">Open</div>
-                <div className="font-semibold text-foreground">{unansweredCount}</div>
+              <div className="border px-3 py-2" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}>
+                <div className="mb-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Open</div>
+                <div className="font-semibold" style={{ color: "var(--lcs-ink)" }}>{unansweredCount}</div>
               </div>
             </div>
 
             {avgResponseHours !== null && (
-              <div className="text-xs text-muted-foreground">
-                Avg response time: <span className="font-medium text-foreground">{avgResponseHours}h</span>
+              <div className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>
+                Avg response time: <span className="font-medium" style={{ color: "var(--lcs-ink)" }}>{avgResponseHours}h</span>
               </div>
             )}
           </div>
 
           {isInvestor && (
-            <div className="rounded-none border border-border/60 bg-card px-5 py-4 space-y-3">
+            <div className="border px-5 py-4 space-y-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
               <div>
-                <div className="text-sm font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>Suggested questions</div>
-                <div className="text-xs text-muted-foreground mt-0.5">Generated from {companyName}'s documents</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Suggested questions</div>
+                <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>Generated from {companyName}'s documents</div>
               </div>
 
               {suggestions.length === 0 ? (
-                <p className="text-xs text-muted-foreground">Click "Generate" to get AI-suggested due diligence questions.</p>
+                <p className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>Click "Generate" to get AI-suggested due diligence questions.</p>
               ) : (
                 <div className="space-y-2">
                   {suggestions.map((s, i) => (
                     <button
                       key={i}
                       onClick={() => setSuggestionInput(s.text)}
-                      className="w-full text-left rounded-lg border border-border/40 bg-background px-3 py-2.5 hover:border-brand/40 transition-colors"
+                      className="w-full text-left border px-3 py-2.5 transition-colors hover:border-[var(--lcs-accent)]"
+                      style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", borderRadius: "var(--radius-lcs-control)" }}
                     >
-                      <div className="text-xs text-foreground leading-relaxed">{s.text}</div>
-                      <div className="text-[10px] text-muted-foreground mt-1">Source: {s.source}</div>
+                      <div className="text-xs leading-relaxed" style={{ color: "var(--lcs-ink)" }}>{s.text}</div>
+                      <div className="text-[10px] mt-1" style={{ color: "var(--lcs-ink-muted)" }}>Source: {s.source}</div>
                     </button>
                   ))}
                 </div>
               )}
 
-              <button
+              <LcsButton
+                variant="text-link"
                 onClick={fetchSuggestions}
                 disabled={loadingSuggestions || isAtLimit || isCompleted}
-                className="inline-flex items-center gap-1.5 text-xs text-brand hover:opacity-80 disabled:opacity-40"
               >
                 {loadingSuggestions ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                 {suggestions.length === 0 ? "Generate suggestions" : "Generate more"}
-              </button>
+              </LcsButton>
             </div>
           )}
 
           {isInvestor && (
-            <button
+            <LcsButton
+              variant="secondary"
               onClick={generateSummary}
               disabled={summarising || rows.length === 0}
-              className="inline-flex items-center justify-center gap-1.5 rounded-none border border-border/60 bg-card px-4 py-3 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-40"
+              className="justify-center"
               data-testid="qa-ai-summary-btn"
             >
               {summarising ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
               Generate AI summary
-            </button>
+            </LcsButton>
           )}
         </div>
 
         <div className="flex-1 sm:order-1 space-y-4" data-testid="qa-thread">
 
           {isInvestor && !isCompleted && (
-            <div className="rounded-none border border-border/60 bg-card px-4 py-3 space-y-2">
+            <div className="border px-4 py-3 space-y-2" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
               <textarea
                 value={suggestionInput || askText}
                 onChange={(e) => {
@@ -410,20 +412,20 @@ function QAPage() {
                 rows={2}
                 placeholder={isAtLimit ? "Question limit reached (10/10)" : "Ask a question…"}
                 disabled={isAtLimit}
-                className="w-full resize-none rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand disabled:opacity-50"
-                style={{ maxHeight: 96 }}
+                className="w-full resize-none border px-3 py-2.5 text-sm outline-none disabled:opacity-50"
+                style={{ maxHeight: 96, borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                 data-testid="qa-ask-input"
               />
               <div className="flex items-center justify-end">
-                <button
+                <LcsButton
+                  variant="primary"
                   onClick={() => sendQuestion(suggestionInput || askText)}
                   disabled={!(suggestionInput || askText).trim() || sending || isAtLimit}
-                  className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
                   data-testid="qa-send-btn"
                 >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   Ask
-                </button>
+                </LcsButton>
               </div>
             </div>
           )}
@@ -442,43 +444,40 @@ function QAPage() {
               return (
                 <div
                   key={q.id}
-                  className={cn(
-                    "rounded-none border bg-card",
-                    isAnswered
-                      ? "border-border/60"
-                      : "border-border",
-                  )}
+                  className="border"
+                  // Open questions keep the full-strength line; answered ones
+                  // dim to 60% — preserves the original v1 prominence signal
+                  // (an open question visually recedes less than an answered
+                  // one) independent of the "Open"/"Answered" LcsStatusPill
+                  // text, which conveys the same fact but not the same visual
+                  // weight. Confirmed against --border's two literal opacities
+                  // in the pre-restyle source before restoring this.
+                  style={{ borderColor: isAnswered ? "color-mix(in srgb, var(--lcs-line) 60%, transparent)" : "var(--lcs-line)", background: "var(--lcs-white)" }}
                 >
                   <div className="px-4 py-3 flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-full bg-accent border border-brand/20 flex items-center justify-center text-xs font-bold text-brand shrink-0">
+                    <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: "var(--lcs-progress-wash)", color: "var(--lcs-accent)" }}>
                       {(q.sender_name ?? "I").charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-semibold text-foreground">{q.sender_name}</span>
-                        <span className="text-[10px] rounded-full bg-background border border-border/60 px-1.5 py-px text-muted-foreground font-medium capitalize">{q.sender_role}</span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-xs font-semibold" style={{ color: "var(--lcs-ink)" }}>{q.sender_name}</span>
+                        <span className="text-[10px] rounded-full border px-1.5 py-px font-medium capitalize" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>{q.sender_role}</span>
+                        <span className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
                           {formatDistanceToNow(new Date(q.created_at), { addSuffix: true })}
                         </span>
-                        <span className="ml-auto text-[10px] font-semibold text-muted-foreground">#{qNum}</span>
-                        <span className={cn(
-                          "text-[10px] font-semibold rounded-full px-2 py-px",
-                          isAnswered
-                            ? "bg-[#10B981]/10 text-[#10B981]"
-                            : "bg-border/40 text-muted-foreground",
-                        )}>
-                          {isAnswered ? "Answered" : "Open"}
-                        </span>
+                        <span className="ml-auto text-[10px] font-semibold" style={{ color: "var(--lcs-ink-muted)" }}>#{qNum}</span>
+                        <LcsStatusPill status={isAnswered ? "satisfied" : "pending"} label={isAnswered ? "Answered" : "Open"} dot={false} />
                       </div>
-                      <p className="mt-1.5 text-sm text-foreground leading-relaxed">{q.content}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "var(--lcs-ink)" }}>{q.content}</p>
                     </div>
                   </div>
 
                   {isAnswered ? (
-                    <div className="border-t border-border/40">
+                    <div className="border-t" style={{ borderColor: "var(--lcs-line)" }}>
                       <button
                         onClick={() => setExpandedAnswers((prev) => ({ ...prev, [q.id]: !prev[q.id] }))}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-xs transition-colors"
+                        style={{ color: "var(--lcs-ink-muted)" }}
                       >
                         <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
                         {expanded ? "Hide answer" : "View answer"}
@@ -487,17 +486,17 @@ function QAPage() {
                       {expanded && (
                         <div className="px-4 pb-3 pt-1">
                           <div className="flex items-start gap-3">
-                            <div className="h-7 w-7 rounded-full bg-border/40 flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
+                            <div className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: "var(--lcs-line)", color: "var(--lcs-ink-muted)" }}>
                               {(ans.sender_name ?? "F").charAt(0).toUpperCase()}
                             </div>
-                            <p className="text-sm text-foreground leading-relaxed">{ans.content}</p>
+                            <p className="text-sm leading-relaxed" style={{ color: "var(--lcs-ink)" }}>{ans.content}</p>
                           </div>
                         </div>
                       )}
                     </div>
                   ) : isFounder ? (
-                    <div className="border-t border-border/40 px-4 py-3 space-y-2">
-                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <div className="border-t px-4 py-3 space-y-2" style={{ borderColor: "var(--lcs-line)" }}>
+                      <div className="flex items-center gap-1.5 text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
                         <Lock className="h-3 w-3" />
                         Type your answer — no paste
                       </div>
@@ -511,26 +510,27 @@ function QAPage() {
                         maxLength={500}
                         rows={3}
                         placeholder="Type your answer here…"
-                        className="w-full resize-none rounded-lg border border-border/60 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-brand"
+                        className="w-full resize-none border px-3 py-2.5 text-sm outline-none"
+                        style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                         data-testid={`qa-answer-input-${q.id}`}
                       />
                       <div className="flex items-center justify-between">
-                        <span className={cn("text-[10px]", charsLeft < 50 ? "text-[#EF4444] font-semibold" : "text-muted-foreground")}>
+                        <span className="text-[10px]" style={{ color: charsLeft < 50 ? "var(--lcs-attention)" : "var(--lcs-ink-muted)", fontWeight: charsLeft < 50 ? 600 : 400 }}>
                           {charsLeft} characters remaining
                         </span>
-                        <button
+                        <LcsButton
+                          variant="primary"
                           onClick={() => sendAnswer(q.id)}
                           disabled={!draft.trim() || answerSending[q.id]}
-                          className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
                         >
                           {answerSending[q.id] ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                           Send answer
-                        </button>
+                        </LcsButton>
                       </div>
                     </div>
                   ) : (
-                    <div className="border-t border-border/40 px-4 py-2.5">
-                      <span className="text-xs text-muted-foreground italic">Awaiting answer…</span>
+                    <div className="border-t px-4 py-2.5" style={{ borderColor: "var(--lcs-line)" }}>
+                      <span className="text-xs italic" style={{ color: "var(--lcs-ink-muted)" }}>Awaiting answer…</span>
                     </div>
                   )}
                 </div>
@@ -541,49 +541,40 @@ function QAPage() {
       </div>
 
       {showCompleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card p-6 shadow-elev space-y-4">
-            <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
-              Mark Q&amp;A as complete?
-            </h3>
-            {unansweredCount > 0 && (
-              <div className="rounded-lg border border-[#F59E0B]/30 bg-[#F59E0B]/5 px-4 py-3 text-sm text-[#F59E0B]">
-                {unansweredCount} question{unansweredCount !== 1 ? "s are" : " is"} still unanswered. The report will include all answered questions only.
-              </div>
-            )}
-            <p className="text-sm text-muted-foreground">
-              This will generate the Q&amp;A report and save it to the Information Vault. Both parties will see it.
-            </p>
-            <div className="flex items-center justify-end gap-3">
-              <button
-                onClick={() => setShowCompleteConfirm(false)}
-                className="rounded-lg border border-border/60 px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={triggerCompletion}
-                disabled={completingQA}
-                className="inline-flex items-center gap-2 rounded-lg hs-gradient px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
-              >
+        <LcsModal
+          title="Mark Q&A as complete?"
+          onClose={() => setShowCompleteConfirm(false)}
+          footer={
+            <>
+              <LcsButton variant="secondary" onClick={() => setShowCompleteConfirm(false)}>Cancel</LcsButton>
+              <LcsButton variant="primary" onClick={triggerCompletion} disabled={completingQA}>
                 {completingQA ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Confirm
-              </button>
+              </LcsButton>
+            </>
+          }
+        >
+          {unansweredCount > 0 && (
+            <div className="border px-4 py-3 text-sm" style={{ borderColor: "var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)" }}>
+              {unansweredCount} question{unansweredCount !== 1 ? "s are" : " is"} still unanswered. The report will include all answered questions only.
             </div>
-          </div>
-        </div>
+          )}
+          <p className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
+            This will generate the Q&amp;A report and save it to the Information Vault. Both parties will see it.
+          </p>
+        </LcsModal>
       )}
 
       <div className="flex items-center justify-end">
-        <button
+        <LcsButton
+          variant="primary"
           onClick={onRequestNextStage}
           disabled={stageRequesting}
-          className="inline-flex items-center gap-1.5 rounded-lg hs-gradient px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           data-testid="qa-next-stage"
         >
           {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           Request next stage →
-        </button>
+        </LcsButton>
       </div>
     </div>
   );

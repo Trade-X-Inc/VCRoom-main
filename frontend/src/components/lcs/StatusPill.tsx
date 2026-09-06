@@ -19,7 +19,7 @@ const TONE: Record<LcsStatus, { fg: string; wash: string }> = {
   attention: { fg: "var(--lcs-attention)", wash: "var(--lcs-attention-wash)" },
 };
 
-export function StatusPill({ status, label }: { status: LcsStatus; label?: string }) {
+export function StatusPill({ status, label, dot = true }: { status: LcsStatus; label?: string; dot?: boolean }) {
   const tone = TONE[status];
   return (
     <span
@@ -31,11 +31,13 @@ export function StatusPill({ status, label }: { status: LcsStatus; label?: strin
         borderRadius: "var(--radius-lcs-control)",
       }}
     >
-      <span
-        aria-hidden="true"
-        className="inline-block size-1.5 rounded-full shrink-0"
-        style={{ background: tone.fg }}
-      />
+      {dot && (
+        <span
+          aria-hidden="true"
+          className="inline-block size-1.5 rounded-full shrink-0"
+          style={{ background: tone.fg }}
+        />
+      )}
       {label ?? LABEL[status]}
     </span>
   );

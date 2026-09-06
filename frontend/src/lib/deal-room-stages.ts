@@ -9,14 +9,20 @@ export type DealRoomStageKey =
   | "term_sheet"
   | "closing";
 
-export const STAGES: { key: DealRoomStageKey; label: string; icon: string | null }[] = [
-  { key: "overview", label: "Overview", icon: "⬛" },
-  { key: "information_vault", label: "Information Vault", icon: null },
-  { key: "meetings", label: "Interviews", icon: null },
-  { key: "qa", label: "Q&A", icon: null },
-  { key: "due_diligence", label: "Due Diligence", icon: null },
-  { key: "term_sheet", label: "Term Sheet", icon: "🔒" },
-  { key: "closing", label: "Closing", icon: "🔒" },
+// Decorative emoji icons (⬛, 🔒) removed 6 Sep 2026 — CLAUDE.md §13 bans
+// decorative iconography regardless of colour. The lock's real semantic
+// meaning (a locked/inaccessible stage) is now expressed by the shell's
+// StageTabBar rendering a real Lucide Lock icon directly, keyed off its own
+// existing canAccess() check rather than this data field — no consumer of
+// this shape's `icon` field needed the string form once that changed.
+export const STAGES: { key: DealRoomStageKey; label: string }[] = [
+  { key: "overview", label: "Overview" },
+  { key: "information_vault", label: "Information Vault" },
+  { key: "meetings", label: "Interviews" },
+  { key: "qa", label: "Q&A" },
+  { key: "due_diligence", label: "Due Diligence" },
+  { key: "term_sheet", label: "Term Sheet" },
+  { key: "closing", label: "Closing" },
 ];
 
 export const UI_STAGE_ORDER: DealRoomStageKey[] = [
