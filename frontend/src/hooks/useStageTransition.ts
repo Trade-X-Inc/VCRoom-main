@@ -15,12 +15,18 @@ export interface TransitionRow {
   resolved_at: string | null;
 }
 
+// Build Step 1 (7 Sep 2026): canonical 5-stage sequence, matching
+// deal-room-fn.ts's DealStage exactly. Previously used the old
+// information_vault/qa/due_diligence/term_sheet/closing vocabulary — that
+// set diverged from the DB's canonical values, so requestNextStage() would
+// have kept producing to_stage values the new advance_workflow_stage() RPC
+// and its BEFORE UPDATE guard reject as non-adjacent/invalid.
 const STAGE_ORDER = [
-  "information_vault",
+  "nda_signed",
   "qa",
-  "due_diligence",
+  "diligence",
   "term_sheet",
-  "closing",
+  "closing_confirmed",
 ] as const;
 
 function nextStage(current: string): string | null {
@@ -121,8 +127,9 @@ export function useStageTransition({
       return;
     }
 
-    // due_diligence → term_sheet by investor requires no approval
-    const needsApproval = !(currentStage === "due_diligence" && isInvestor);
+    // diligence → term_sheet by investor requires no approval (was
+    // due_diligence, the value collapsed into diligence — Build Step 1)
+    const needsApproval = !(currentStage === "diligence" && isInvestor);
 
     setRequesting(true);
     try {
@@ -192,12 +199,20 @@ export function useStageTransition({
         .eq("id", transitionId);
       if (updateErr) throw updateErr;
 
-      // Advance the deal room workflow_stage
-      const { error: roomErr } = await supabase
-        .from("deal_rooms")
-        .update({ workflow_stage: transition.to_stage })
-        .eq("id", dealRoomId);
-      if (roomErr) throw roomErr;
+      // Advance the deal room workflow_stage — via the sanctioned RPC
+      // (Build Step 1), not a direct .update(). The RPC derives the caller
+      // via auth.uid(), checks they're a founder/investor principal, and
+      // validates old->new adjacency against the canonical sequence before
+      // writing; a BEFORE UPDATE trigger enforces the same adjacency rule
+      // as defense-in-depth for any write that bypasses this RPC.
+      const { data: advanceResult, error: rpcErr } = await supabase.rpc("advance_workflow_stage", {
+        p_deal_room_id: dealRoomId,
+        p_to_stage: transition.to_stage,
+      });
+      const advanceRow = Array.isArray(advanceResult) ? advanceResult[0] : advanceResult;
+      if (rpcErr || !advanceRow?.ok) {
+        throw new Error(advanceRow?.error || rpcErr?.message || "Could not advance stage");
+      }
 
       // Notify the requester (if different from approver)
       if (transition.requested_by && transition.requested_by !== userId) {

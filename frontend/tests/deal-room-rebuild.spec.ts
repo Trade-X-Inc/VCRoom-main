@@ -8,6 +8,19 @@
  * 5. Meeting skip — skipMeeting sets meeting_type='skipped'
  * 6. Term sheet send — stage2_unlocked=true, term_sheet_sent_at set, stage=term_sheet
  * 7. AI panel opens/closes
+ *
+ * Build Step 1 (7 Sep 2026) note: every workflow_stage value this file
+ * writes (nda_signed, diligence, term_sheet) is already a canonical value
+ * under the new 5-stage sequence — no write in this file needed to change.
+ * NOT fixed here, flagged as pre-existing and out of scope for this build:
+ * this file targets /app/deal-room/$id (singular) and pill test-ids/labels
+ * (stage-pill-nda_signed, stage-pill-diligence, "NDA & Profiles", "Stage 1
+ * Review", "Closed") that don't match the live route (/app/deal-rooms/$id,
+ * plural) or the live StageTabBar's actual pill vocabulary
+ * (DealRoomStageKey: overview/information_vault/meetings/qa/due_diligence/
+ * term_sheet/closing, from deal-room-stages.ts — a UI-side key set,
+ * untouched by this build's workflow_stage canonicalization). This
+ * predates this build and is a separate defect.
  */
 
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";
@@ -151,7 +164,7 @@ test.beforeAll(async () => {
     investor_email: INVESTOR_EMAIL,
     investor_company: "Test Ventures",
     status: "active",
-    workflow_stage: "nda_signed",
+    workflow_stage: "nda_signed", // canonical value, unchanged (Build Step 1)
     stage_entered_at: new Date().toISOString(),
     meetings_completed: 0,
     meetings_max: 3,
@@ -241,7 +254,8 @@ test("3. Stage pills — current active, future locked", async ({ browser }) => 
     startup_id: STARTUP_ID, created_by: FOUNDER_ID,
     investor_name: "PW Pill Test", investor_email: INVESTOR_EMAIL,
     investor_company: "Test Ventures", status: "active",
-    workflow_stage: "nda_signed", stage_entered_at: new Date().toISOString(),
+    workflow_stage: "nda_signed", // canonical value, unchanged (Build Step 1)
+    stage_entered_at: new Date().toISOString(),
     meetings_completed: 0, meetings_max: 3, stage2_unlocked: false,
   });
   const pillRoomId = rows[0].id;

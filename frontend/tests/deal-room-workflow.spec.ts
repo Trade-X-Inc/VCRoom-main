@@ -11,6 +11,28 @@
  * 5. Send term sheet → confirm stage2_unlocked=true, workflow_stage='stage2_diligence'
  * 6. Stage 2 docs blocked before unlock, visible after (confirmed via Stage2Gate element)
  * 7. Accept term sheet → workflow_stage='closed', term_sheet_accepted_at set
+ *
+ * BUILD STEP 1 FINDING (7 Sep 2026), NOT FIXED — flagged rather than
+ * force-renamed: this file writes workflow_stage values ('stage1_review',
+ * 'meetings', 'stage2_diligence') that were NEVER in the live DB CHECK
+ * constraint, even before this build's canonical-sequence migration —
+ * these PATCHes have been failing with a raw 23514 constraint violation in
+ * production independent of anything in this pass (they were vocabulary 2
+ * from deal-room-workflow-fn.ts, a file whose own DB_ALLOWED_WORKFLOW_STAGES
+ * constant already excluded these exact two values, contradicting its own
+ * WorkflowStage type — see the now-deleted advanceWorkflowStage). Its UI
+ * assertions ([data-testid=workflow-stepper], [data-testid=next-action-
+ * callout], [data-testid=stage-aware-overview]) target WorkflowStepper /
+ * StageAwareOverviewPanel, deleted as dead code in the internal-UI
+ * migration's Group 0 (27 Aug 2026, CLAUDE.md) — only that file's
+ * Stage2Gate export survived, extracted to its own component. This spec
+ * was already fully broken/orphaned before this build; a vocabulary rename
+ * cannot make it pass, since the UI it targets no longer exists. Rewriting
+ * it against the current live UI (StageTabBar, the LCS deal-room shell) is
+ * a separate, larger task than a canonical-value rename and is out of
+ * scope here — flagged, not silently left looking current. The one
+ * genuinely canonical-unchanged value it writes (workflow_stage:
+ * 'nda_signed' at line 144, and 'term_sheet' at line 483) needed no edit.
  */
 
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";

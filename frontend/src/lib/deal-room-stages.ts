@@ -39,17 +39,30 @@ export const UI_STAGE_ORDER: DealRoomStageKey[] = [
 // onto the older DealStage enum (a separate, pre-existing workflow model
 // this branch does not touch), so it inherits information_vault's
 // unlock rank in stageRank() below rather than adding a new DealStage value.
+//
+// Build Step 1 (7 Sep 2026): DealStage's own value set was collapsed to the
+// canonical 5-stage sequence (nda_signed/qa/diligence/term_sheet/
+// closing_confirmed) — updated here to match. initial_review no longer
+// exists as a distinct DealStage value (collapsed into qa); "closed" is
+// gone from workflow_stage entirely (renamed closing_confirmed, to stop
+// colliding with deal_rooms.status='closed', a different column/event).
 export const UI_TO_DEAL_STAGE: Record<Exclude<DealRoomStageKey, "overview" | "meetings">, DealStage> = {
-  information_vault: "initial_review",
-  qa: "initial_review",
+  information_vault: "qa",
+  qa: "qa",
   due_diligence: "diligence",
   term_sheet: "term_sheet",
-  closing: "closed",
+  closing: "closing_confirmed",
 };
 
+// stageRank() reconciles this file's 7-key UI vocabulary against the DB's
+// canonical 5-value workflow_stage. Post-collapse, "diligence"/"due_diligence"
+// and "qa"/"initial_review" are no longer two live DB values each — the DB
+// only ever writes the canonical name now — but the extra branches are kept
+// harmlessly (a defensive no-op for any pre-migration/cached value that
+// hasn't round-tripped yet), not because they're still both live DB values.
 export function stageRank(stage?: string | null): number {
   const normalized = stage ?? "";
-  if (normalized === "closing" || normalized === "closed") return UI_STAGE_ORDER.indexOf("closing");
+  if (normalized === "closing" || normalized === "closing_confirmed" || normalized === "closed") return UI_STAGE_ORDER.indexOf("closing");
   if (normalized === "term_sheet") return UI_STAGE_ORDER.indexOf("term_sheet");
   if (normalized === "due_diligence" || normalized === "diligence") return UI_STAGE_ORDER.indexOf("due_diligence");
   if (normalized === "qa" || normalized === "initial_review") return UI_STAGE_ORDER.indexOf("qa");
@@ -66,10 +79,10 @@ export function workflowStageLabel(stage?: string | null) {
 
 export const STAGE_SHORT: Record<DealStage, string> = {
   nda_signed: "Information Vault",
-  initial_review: "Q&A",
+  qa: "Q&A",
   diligence: "Due Diligence",
   term_sheet: "Term Sheet",
-  closed: "Closing",
+  closing_confirmed: "Closing",
 };
 
 /** Route-key ↔ tab-path mapping for the split /deal-rooms/:id/* routes. */

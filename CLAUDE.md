@@ -160,6 +160,7 @@ These were found the hard way. Each cost hours.
 - A function that is RPC-reachable, takes a caller-supplied ID, and returns data is a data-exposure surface regardless of `search_path`. RLS helpers belong in an unexposed schema.
 - Revoking `EXECUTE` from `authenticated` does not work for RLS helpers — policy expressions run as the querying user.
 - `REVOKE TEMPORARY ... FROM authenticated` is a no-op. `TEMPORARY` is granted to `PUBLIC`.
+- **A migration that both backfills a value AND changes the CHECK constraint governing that value must drop/change the constraint BEFORE the backfill, never after.** The old constraint stays in force against any `UPDATE` issued before it's dropped, so writing the new (soon-to-be-valid) value first raises a `23514` check violation against the constraint still being replaced. Found live 7 Sep 2026 (Build Step 1, `workflow_stage` canonical-sequence migration): the migration was authored backfill-then-constraint-change and failed on first apply with exactly this error. **Logic-trace review does not catch this — the ordering only surfaces when the migration is actually run**, since a static read of "backfill row X, then redefine the constraint" looks correct in isolation; the failure is purely about statement execution order against a constraint that's still live in between. Correct order: drop old constraint → backfill → add new constraint → any dependent triggers/functions.
 
 ### 7.3 Cloudflare and the worker
 

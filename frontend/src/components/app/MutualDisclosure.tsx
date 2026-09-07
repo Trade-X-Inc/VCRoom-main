@@ -8,29 +8,36 @@ import { V2EmptyState } from "@/components/v2";
  * Two-column mutual disclosure block for the deal room Information tab.
  * "What you see about them" | "What they see about you" — identical layout
  * both sides. Locked until the room advances past nda_signed (workflow_stage
- * in initial_review/qa/diligence/due_diligence/term_sheet/closing/closed —
- * see sync_deal_room_profile_disclosure() in Supabase, the same set that
- * gates deal_room_profile_disclosures, which RLS enforces on
+ * in qa/diligence/term_sheet/closing_confirmed — see
+ * sync_deal_room_profile_disclosure() in Supabase, the same set that gates
+ * deal_room_profile_disclosures, which RLS enforces on
  * investor_profiles/team_member_details/investor_team_member_details reads).
  * This component reads the same gate client-side purely to decide what UI to
  * show; the actual security boundary is the RLS policy — a locked room
  * simply returns no row for the counterparty's investor_profiles query, so
  * there is nothing to leak even if this client-side check were bypassed.
  *
- * due_diligence and closing were added 9 Aug 2026 (previously missing here
- * and in the DB trigger both — advancing a room from qa into due_diligence,
- * the very next step in useStageTransition.ts's STAGE_ORDER, silently
- * revoked the investor's disclosure row and the founder's counterpart).
+ * Build Step 1 (7 Sep 2026): workflow_stage's value set was collapsed to the
+ * canonical 5-stage sequence and this list updated to match — the prior
+ * 7-value list (initial_review/qa/diligence/due_diligence/term_sheet/
+ * closing/closed) collapses to 4 values here since qa/diligence now each
+ * cover what two names covered before, and "closed" is gone from
+ * workflow_stage entirely (renamed closing_confirmed). nda_signed remains
+ * deliberately excluded — pre-diligence stage, matching the 9 Aug 2026
+ * precedent this list already established.
+ *
  * Keep this list identical to sync_deal_room_profile_disclosure()'s; a
  * future divergence here doesn't reopen the security gap (RLS still governs)
  * but does silently disable these queries for a stage the server has
- * actually unlocked, which reads as a bug.
+ * actually unlocked, which reads as a bug. (This exact failure mode is why
+ * this comment exists — see the 9 Aug 2026 fix this build step's own
+ * migration continues.)
  */
 export function MutualDisclosure() {
   const { dealRoomId, room, isInvestor, isFounder, investorUserId, founderUserId, startupId } = useDealRoom();
 
   const workflowStage = (room as any)?.workflow_stage as string | undefined;
-  const unlocked = !!workflowStage && ["initial_review", "qa", "diligence", "due_diligence", "term_sheet", "closing", "closed"].includes(workflowStage);
+  const unlocked = !!workflowStage && ["qa", "diligence", "term_sheet", "closing_confirmed"].includes(workflowStage);
 
   // Founder's own public profile fields (small, safe subset) for the locked state.
   const { data: founderPublic } = useQuery({
