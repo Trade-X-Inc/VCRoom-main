@@ -37,6 +37,13 @@
 @import "@fontsource/ibm-plex-sans/600.css";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
+/* LCS body-copy serif — added 7 Sep 2026 for the founder/investor/team
+   welcome-screen family (PRIMITIVES.md, "LCS body-copy serif — Lora").
+   Confirmed with the founder as a genuine third LCS type family, not a
+   substitution for IBM Plex Sans. Scoped to --font-lcs-serif; the base
+   UI/data faces above are unaffected and remain the default for every
+   other LCS surface. */
+@import "@fontsource/lora/400.css";
 @plugin "@tailwindcss/typography";
 
 /* ── Mobile globals ──────────────────────────────────────────────── */
@@ -156,6 +163,7 @@ img { max-width: 100%; height: auto; }
   --color-lcs-attention-wash: var(--lcs-attention-wash);
   --font-lcs-ui: "IBM Plex Sans", system-ui, sans-serif;
   --font-lcs-data: "IBM Plex Mono", ui-monospace, monospace;
+  --font-lcs-serif: "Lora", Georgia, serif;
 }
 
 :root {

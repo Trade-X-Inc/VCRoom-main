@@ -1,270 +1,269 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import {
   useRaiseProgress,
-  nextIncomplete,
   SECTION_LABELS,
-  type RaiseProgress,
 } from "@/hooks/useRaiseProgress";
-import { LcsPageHeader, LcsCard, LcsEmptyState, LcsButton, LcsStatusPill, type LcsStatus } from "@/components/lcs";
+import { LcsCard, LcsEmptyState, LcsButton } from "@/components/lcs";
 
 /**
- * /app — the founder-owner home. A worklist, not a dashboard: one honest
- * headline, one primary action computed from the real logged-in account's
- * own state, a 4-phase status strip (Prepare/Present/Engage/Close — the
- * founder's own outer raise journey, distinct from the 7-state deal-room
- * lifecycle that governs one open room), and a 3-panel worklist
- * (Waiting on you / Waiting on them / Expiring soon), each empty-but-
- * labeled when there's no data. No role switcher — a real user has
- * exactly one role, read from their account, never a manual toggle. No
- * invented content, no placeholder companies, no fabricated security/
- * crypto claims anywhere. Per the Post-login Home Dashboard design brief
- * and its correction brief (6 Sep 2026).
+ * /app — the founder-owner home. Pulled from the approved Figma frame
+ * (kDYUyEq60J0T2i24b6GzAv, node 220:611, "home-founder-empty") and wired
+ * to real data — no design interpretation, no fabricated content. Renders
+ * as content only, inside the real running AdminShell chrome (the
+ * frame's own navy sidebar is not built here — AdminShell is out of
+ * scope for this pass, confirmed 7 Sep 2026).
+ *
+ * Two corrections applied against the frame's literal copy, both
+ * confirmed rather than assumed, before any of this was wired:
+ * - "0 of 14 fields confirmed" had no real 14-field model anywhere in
+ *   the data — rewritten to the real 6-section useRaiseProgress count.
+ * - "Connect bank details" had no real backing field anywhere (no
+ *   bank-connection concept exists in this product — Foundation §15
+ *   excludes money movement/custody outright) — dropped, not replaced
+ *   with an invented 4th item. The checklist is 3 real items.
  */
 
-const PHASES: { key: string; label: string; text: string; criteria: (p?: RaiseProgress) => string }[] = [
-  {
-    key: "prepare",
-    label: "Prepare",
-    text: "Build your pack — profile, documents, verification.",
-    criteria: (p) => (p ? `${p.prepareDone} of ${p.prepareTotal} confirmed` : "0 of 6 confirmed"),
-  },
-  {
-    key: "present",
-    label: "Present",
-    text: "Publish and share with investors you choose.",
-    criteria: () => "Pack must be ready",
-  },
-  {
-    key: "engage",
-    label: "Engage",
-    text: "Answer questions, negotiate terms in a deal room.",
-    criteria: () => "A room must be open",
-  },
-  {
-    key: "close",
-    label: "Close",
-    text: "Confirm terms with both sides and close the raise.",
-    criteria: () => "Mutual confirmation",
-  },
+const CHECKLIST_ITEMS: {
+  key: string;
+  label: string;
+  done: (p?: { logoUrl: string | null; teamMembersCount: number; companyName: string | null }) => boolean;
+}[] = [
+  { key: "company", label: "Company information", done: (p) => !!p?.companyName },
+  { key: "logo", label: "Upload logo", done: (p) => !!p?.logoUrl },
+  { key: "team", label: "Add team members", done: (p) => (p?.teamMembersCount ?? 0) > 0 },
 ];
 
-function phaseStatus(index: number, p?: RaiseProgress): LcsStatus {
-  if (!p) return index === 0 ? "in-progress" : "pending";
-  const prepareDone = p.prepareDone === p.prepareTotal;
-  const anySectionStarted = p.prepareDone > 0 || Object.values(p.sections).some((s) => s !== "not-started");
-  if (index === 0) return prepareDone ? "satisfied" : anySectionStarted ? "in-progress" : "pending";
-  if (index === 1) return p.goLiveDone ? "satisfied" : prepareDone ? "in-progress" : "pending";
-  if (index === 2) return p.closedRooms > 0 || p.closingRooms > 0 ? "satisfied" : p.activeRooms > 0 ? "in-progress" : "pending";
-  if (index === 3) return p.closedRooms > 0 ? "satisfied" : p.closingRooms > 0 ? "in-progress" : "pending";
-  return "pending";
-}
+const TUTORIALS = [
+  "How to build your pack",
+  "Understanding deal rooms",
+  "Preparing for due diligence",
+  "Your first investor brief",
+];
 
-const PHASE_STATUS_LABEL: Record<LcsStatus, string> = {
-  pending: "Not started",
-  "in-progress": "In progress",
-  satisfied: "Complete",
-  attention: "Needs attention",
-};
+const PLATFORM_CARDS: { title: string; text: string }[] = [
+  { title: "Deal Room", text: "Private spaces for each investor conversation" },
+  { title: "Data Room", text: "Secure document sharing with granular access control" },
+  { title: "Due Diligence Station", text: "Manage questionnaires and evidence requests" },
+  { title: "Checklists", text: "Track requirements across your raise" },
+  { title: "Documents", text: "Central vault for all your fundraising documents" },
+  { title: "How It Works", text: "Step-by-step guide to your fundraising workflow" },
+];
 
 export function RaiseHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { data: p } = useRaiseProgress();
-  const next = nextIncomplete(p);
 
   const firstName = user?.email?.split("@")[0] ?? "Founder";
   const hasStartup = !!p?.startupId;
-  const prepareComplete = !!p && p.prepareDone === p.prepareTotal;
   const prepareTotal = p?.prepareTotal ?? 6;
   const prepareDone = p?.prepareDone ?? 0;
-  const preparePct = prepareTotal > 0 ? Math.round((prepareDone / prepareTotal) * 100) : 0;
-
-  const headline = !hasStartup
-    ? "Build your pack to start sharing with investors."
-    : prepareComplete
-      ? p.goLiveDone
-        ? "Your profile is live. Here's what's moving."
-        : "Your pack is ready — go live to start sharing."
-      : `Next: ${next ? SECTION_LABELS[next] : "finish your pack"}.`;
-
-  const subhead = !hasStartup
-    ? "Deal rooms open once your profile, documents, and verification are confirmed."
-    : (p?.companyName ?? `Welcome, ${firstName}`);
+  const prepareComplete = !!p && p.prepareDone === p.prepareTotal;
 
   const primaryAction = !hasStartup || !prepareComplete
-    ? { to: "/app/prepare" as const, label: "Go to Pack Builder" }
+    ? { to: "/app/prepare" as const, label: "Start building your pack" }
     : !p?.goLiveDone
       ? { to: "/app/go-live" as const, label: "Go live" }
       : { to: "/app/deal-rooms" as const, label: "View deal rooms" };
 
-  // "Waiting on you" — real, on-you pack items not yet complete.
+  // "Waiting on you" — real, on-you pack items not yet complete. Carried
+  // byte-identical from the prior worklist logic.
   const onYou = p
     ? (Object.keys(p.sections) as Array<keyof typeof p.sections>).filter(
         (k) => p.sections[k] !== "complete",
       )
     : [];
 
-  // "Waiting on them" — real, in-flight rooms where the next move isn't the founder's.
+  // "Waiting on them" — real, in-flight rooms where the next move isn't
+  // the founder's. Carried byte-identical from the prior worklist logic.
   const activeRooms = p?.activeRooms ?? 0;
   const closingRooms = p?.closingRooms ?? 0;
+  const waitingOnThemCount = activeRooms + closingRooms;
 
   return (
-    <div className="p-6 lg:p-12 max-w-4xl mx-auto" data-testid="raise-home">
-      <div className="p-5 flex flex-col gap-5" style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}>
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
-          <div className="max-w-xl">
+    <div className="flex flex-col gap-6 p-6 lg:p-8" data-testid="raise-home">
+      {/* Welcome header */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div
+              className="text-[11px] font-bold uppercase"
+              style={{ color: "#e65100", fontFamily: "var(--font-lcs-data)" }}
+            >
+              Required step
+            </div>
             <h1
-              className="text-[22px] font-semibold leading-snug"
+              className="text-[28px] font-bold leading-tight mt-1"
               style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
             >
-              {headline}
+              Welcome to Lengdon
             </h1>
-            <p className="text-[13px] mt-1.5 leading-relaxed" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
-              {subhead}
+            <p className="text-[14px] mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-serif)" }}>
+              Your closing infrastructure for private capital fundraising.
             </p>
           </div>
-          <LcsButton variant="primary" onClick={() => navigate({ to: primaryAction.to })} className="shrink-0">
-            {primaryAction.label}
-          </LcsButton>
+          <div
+            className="px-2.5 py-1.5 shrink-0"
+            style={{ background: "var(--lcs-accent)", borderRadius: "var(--radius-lcs-control)" }}
+          >
+            <span className="text-[11px] font-bold text-white" style={{ fontFamily: "var(--font-lcs-data)" }}>
+              FOUNDER
+            </span>
+          </div>
         </div>
 
-        <div className="pt-1">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] uppercase tracking-wide font-medium" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
-              Pack progress
-            </span>
-            <span className="text-[12px] font-semibold tabular-nums" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-data)" }}>
-              {prepareDone}/{prepareTotal} ({preparePct}%)
-            </span>
-          </div>
-          <div className="h-1.5" style={{ background: "var(--lcs-line)" }}>
-            <div className="h-full" style={{ width: `${preparePct}%`, background: "var(--lcs-accent)" }} />
-          </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[12px]" style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-data)" }}>
+            {prepareDone} of {prepareTotal} sections confirmed
+          </span>
+          <LcsButton variant="primary" onClick={() => navigate({ to: primaryAction.to })} className="shrink-0">
+            {primaryAction.label}
+            <ArrowRight className="h-4 w-4" />
+          </LcsButton>
         </div>
       </div>
 
-      <div className="mt-5">
-        <div className="text-[11px] uppercase tracking-wide font-medium mb-2.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
-          How it works
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {PHASES.map((phase, i) => {
-            const status = phaseStatus(i, p);
-            const isCurrent = status === "in-progress";
+      {/* Complete your profile */}
+      <LcsCard title="Complete your profile" onViewAll={() => navigate({ to: "/app/prepare" })}>
+        <div className="p-4 flex flex-col gap-2.5">
+          {CHECKLIST_ITEMS.map((item) => {
+            const done = item.done(p);
             return (
-              <div
-                key={phase.key}
-                className="p-4 flex flex-col justify-between"
-                style={{
-                  background: "var(--lcs-white)",
-                  border: isCurrent ? "1px solid var(--lcs-accent)" : "1px solid var(--lcs-line)",
-                  borderLeftWidth: isCurrent ? 3 : 1,
-                }}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span
-                      className="text-[11px] font-semibold tabular-nums"
-                      style={{ fontFamily: "var(--font-lcs-data)", color: isCurrent ? "var(--lcs-accent)" : "var(--lcs-ink-muted)" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <LcsStatusPill status={status} label={PHASE_STATUS_LABEL[status]} />
-                  </div>
-                  <div className="text-[14px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
-                    {phase.label}
-                  </div>
-                  <p className="text-[12px] mt-1 leading-relaxed" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
-                    {phase.text}
-                  </p>
-                </div>
+              <div key={item.key} className="flex items-center gap-3">
                 <div
-                  className="mt-3 pt-2.5 flex items-center justify-between text-[11px]"
-                  style={{ borderTop: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+                  className="grid place-items-center shrink-0 size-5"
+                  style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-surface)" }}
                 >
-                  <span>Criteria</span>
-                  <span>{phase.criteria(p)}</span>
+                  <div
+                    className="size-3.5"
+                    style={{
+                      borderRadius: "50%",
+                      border: `1.5px solid ${done ? "var(--lcs-satisfied)" : "var(--lcs-ink-muted)"}`,
+                      background: done ? "var(--lcs-satisfied)" : "transparent",
+                    }}
+                  />
                 </div>
+                <span className="text-[14px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-serif)" }}>
+                  {item.label}
+                </span>
               </div>
             );
           })}
         </div>
+      </LcsCard>
+
+      {/* Getting started - Tutorials */}
+      <LcsCard title="Getting started - Tutorials">
+        <div className="p-4 flex flex-col gap-2.5">
+          {TUTORIALS.map((title) => (
+            <div key={title} className="flex items-center justify-between gap-3">
+              <span className="text-[14px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-serif)" }}>
+                {title}
+              </span>
+              <Link
+                to="/app/support"
+                className="text-[12px] font-bold shrink-0"
+                style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-data)" }}
+              >
+                View
+              </Link>
+            </div>
+          ))}
+        </div>
+      </LcsCard>
+
+      {/* Platform overview */}
+      <div className="flex flex-col gap-3">
+        <div className="text-[16px] font-bold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+          Platform overview
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {PLATFORM_CARDS.map((card) => (
+            <div
+              key={card.title}
+              className="p-4 flex flex-col gap-2"
+              style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}
+            >
+              <div className="text-[14px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                {card.title}
+              </div>
+              <p className="text-[14px] leading-relaxed" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-serif)" }}>
+                {card.text}
+              </p>
+              <span className="text-[12px] font-bold" style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-data)" }}>
+                Learn more
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        <LcsCard title="Waiting on you">
-          {!hasStartup ? (
-            <div className="p-4">
-              <LcsEmptyState text="Nothing to confirm yet — start by building your pack." />
-            </div>
-          ) : onYou.length === 0 ? (
-            <div className="p-4">
-              <LcsEmptyState text="Nothing waiting on you right now." />
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              {onYou.map((k, i) => (
-                <Link
-                  key={k}
-                  to="/app/prepare"
-                  className="flex items-center justify-between px-4 py-3"
-                  style={{ borderTop: i === 0 ? undefined : "1px solid var(--lcs-line)" }}
-                  data-testid={`home-onyou-${k}`}
-                >
-                  <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
-                    {SECTION_LABELS[k]}
-                  </span>
-                  <LcsStatusPill
-                    status={p!.sections[k] === "in-progress" ? "in-progress" : "pending"}
-                    label={p!.sections[k] === "in-progress" ? "In progress" : "Not started"}
-                  />
-                </Link>
-              ))}
-            </div>
-          )}
-        </LcsCard>
+      {/* Worklist */}
+      <div className="flex flex-col gap-3">
+        <div className="text-[16px] font-bold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+          Worklist
+        </div>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <LcsCard title="Waiting on you" count={hasStartup ? onYou.length : undefined}>
+            {!hasStartup ? (
+              <LcsEmptyState text="Nothing here yet. Tasks will appear as you share your brief and investors respond." />
+            ) : onYou.length === 0 ? (
+              <LcsEmptyState text="Nothing here yet. Tasks will appear as you share your brief and investors respond." />
+            ) : (
+              <div className="flex flex-col">
+                {onYou.map((k, i) => (
+                  <Link
+                    key={k}
+                    to="/app/prepare"
+                    className="flex items-center justify-between px-4 py-3"
+                    style={{ borderTop: i === 0 ? undefined : "1px solid var(--lcs-line)" }}
+                    data-testid={`home-onyou-${k}`}
+                  >
+                    <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                      {SECTION_LABELS[k]}
+                    </span>
+                    <span className="text-[12px]" style={{ color: p!.sections[k] === "in-progress" ? "var(--lcs-progress)" : "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
+                      {p!.sections[k] === "in-progress" ? "In progress" : "Not started"}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </LcsCard>
 
-        <LcsCard title="Waiting on them">
-          {!hasStartup || activeRooms === 0 ? (
-            <div className="p-4">
-              <LcsEmptyState text="No deal rooms yet — this fills once investors are in one." />
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
-                  Active deal rooms
-                </span>
-                <div className="flex items-center gap-2">
+          <LcsCard title="Waiting on them" count={hasStartup && waitingOnThemCount > 0 ? waitingOnThemCount : undefined}>
+            {!hasStartup || activeRooms === 0 ? (
+              <LcsEmptyState text="Items you've sent to investors will appear here once you begin sharing." />
+            ) : (
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                    Active deal rooms
+                  </span>
                   <span className="text-[13px] font-semibold tabular-nums" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink)" }}>
                     {activeRooms}
                   </span>
-                  <LcsStatusPill status="in-progress" label="Active" />
                 </div>
-              </div>
-              {closingRooms > 0 && (
-                <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
-                  <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
-                    In closing
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-semibold tabular-nums" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-ink)" }}>
+                {closingRooms > 0 && (
+                  <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+                    <span className="text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                      In closing
+                    </span>
+                    <span className="text-[13px] font-semibold tabular-nums" style={{ fontFamily: "var(--font-lcs-data)", color: "var(--lcs-attention)" }}>
                       {closingRooms}
                     </span>
-                    <LcsStatusPill status="attention" label="Awaiting close" />
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-        </LcsCard>
+                )}
+              </div>
+            )}
+          </LcsCard>
 
-        <LcsCard title="Expiring soon">
-          <div className="p-4">
-            <LcsEmptyState text="NDA windows and term sheet deadlines appear here as they approach." />
-          </div>
-        </LcsCard>
+          <LcsCard title="Expiring soon">
+            <LcsEmptyState text="No upcoming deadlines. Time-sensitive items will surface here automatically." />
+          </LcsCard>
+        </div>
       </div>
     </div>
   );

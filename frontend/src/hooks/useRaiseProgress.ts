@@ -20,6 +20,8 @@ export interface RaiseProgress {
   companyName: string | null;
   profilePct: number;
   profilePublished: boolean;
+  logoUrl: string | null;
+  teamMembersCount: number;
   sections: {
     profile: SectionStatus;
     documents: SectionStatus;
@@ -75,7 +77,7 @@ export function useRaiseProgress() {
       const { data: startup, error: sErr } = await supabase
         .from("startups")
         .select(
-          "id, company_name, profile_published, tagline, sector, stage, country, funding_target, description, problem, solution, why_us, revenue_model, use_of_funds, founder_name",
+          "id, company_name, profile_published, tagline, sector, stage, country, funding_target, description, problem, solution, why_us, revenue_model, use_of_funds, founder_name, logo_url",
         )
         .eq("founder_id", user!.id)
         .maybeSingle();
@@ -86,6 +88,8 @@ export function useRaiseProgress() {
         companyName: null,
         profilePct: 0,
         profilePublished: false,
+        logoUrl: null,
+        teamMembersCount: 0,
         sections: {
           profile: "not-started",
           documents: "not-started",
@@ -136,7 +140,7 @@ export function useRaiseProgress() {
       // uncaught one (CLAUDE.md §7.4). The other four queries below still
       // log-and-continue on their own errors; that's unchanged — only the
       // gateway call's swallow-to-[] is removed.
-      const [docs, verif, claims, badges, roomsResult] = await Promise.all([
+      const [docs, verif, claims, badges, team, roomsResult] = await Promise.all([
         supabase
           .from("founder_documents")
           .select("id", { count: "exact", head: true })
@@ -154,9 +158,13 @@ export function useRaiseProgress() {
           .from("profile_badges")
           .select("id", { count: "exact", head: true })
           .eq("startup_id", startup.id),
+        supabase
+          .from("team_members")
+          .select("id", { count: "exact", head: true })
+          .eq("startup_id", startup.id),
         callAction<{ rooms: any[] }>(roomListProgressFounder, startup.id, { startupId: startup.id }),
       ]);
-      for (const r of [docs, verif, claims, badges]) {
+      for (const r of [docs, verif, claims, badges, team]) {
         if (r.error) console.error("[raise] progress fetch failed:", r.error);
       }
 
@@ -167,6 +175,7 @@ export function useRaiseProgress() {
         (c) => c.ai_verdict === "verified",
       ).length;
       const badgeCount = badges.count ?? 0;
+      const teamMembersCount = team.count ?? 0;
       const roomRows = roomsResult.rooms ?? [];
 
       const status = (done: boolean, started: boolean): SectionStatus =>
@@ -201,6 +210,8 @@ export function useRaiseProgress() {
         companyName: startup.company_name,
         profilePct,
         profilePublished: startup.profile_published === true,
+        logoUrl: startup.logo_url,
+        teamMembersCount,
         sections,
         prepareDone,
         prepareTotal: ORDER.length,

@@ -25,6 +25,7 @@ greppable, no special cases — same convention, extended by one generation.
 | `#1F4E8C` accent | `--lcs-accent` | `bg-lcs-accent`, `text-lcs-accent` |
 | Pending / In progress / Satisfied / Attention (+ wash) | `--lcs-pending*` / `--lcs-progress*` / `--lcs-satisfied*` / `--lcs-attention*` | `text-lcs-satisfied`, `bg-lcs-attention-wash`, … |
 | IBM Plex Sans / IBM Plex Mono | `--font-lcs-ui` / `--font-lcs-data` | `font-lcs-ui`, `font-lcs-data` |
+| Lora | `--font-lcs-serif` | `font-lcs-serif` |
 
 Base palette + accent are the PDF's literal hex values. **The four status
 "-wash" tint values are NOT given literal hex codes in the PDF** — derived
@@ -85,6 +86,14 @@ fills with accent" — a chart series is not a control, so it doesn't
 violate that constraint). **No new chart-specific color was introduced**
 — do not invent a second accent-adjacent tone for data visualization;
 reach for `--lcs-accent` first.
+
+## LCS body-copy serif — Lora, added 7 Sep 2026 (welcome/home screens, founder-approved)
+
+**A third LCS type family, `--font-lcs-serif` (Lora, 400 weight, self-hosted via `@fontsource/lora`), is now real** — not a substitution for `--font-lcs-ui`, a deliberate addition. Confirmed with the founder directly rather than assumed: the two-face system (`PRIMITIVES.md`'s opening table, IBM Plex Sans/IBM Plex Mono) was correct for every LCS surface built before this one, but the five founder/investor/team welcome-and-home screens (Figma file `kDYUyEq60J0T2i24b6GzAv`, nodes `220:611`/`220:702`/`220:784`, pulled via Figma MCP) consistently use a serif for all body/description copy — checklist item labels, tutorial titles, feature-card descriptions, worklist empty-state text — across all three role variants, not a one-off. That consistency is what made this a real token decision rather than an isolated screen quirk to special-case.
+
+**Scope: body copy only.** Headings (`Inter` in the source frames) map onto the existing `--font-lcs-ui` (IBM Plex Sans) — the frames' choice of `Inter` for headings was not carried forward as a fourth family; Lora is the only genuinely new face, reserved for body/description text specifically. Mono/data figures (`JetBrains Mono` in the frames) already map onto the existing `--font-lcs-data` (IBM Plex Mono) — no change there either. This keeps the addition to exactly one new face for exactly one new role (body-copy serif), not a wholesale swap of the type system.
+
+**Not a general-purpose substitute for `--font-lcs-ui` on other surfaces.** Every LCS primitive and every screen built before this one keeps IBM Plex Sans for its body text — `--font-lcs-serif` is additive, scoped to the welcome/home screen family this token was added for, until/unless a future decision deliberately extends it elsewhere. Reaching for it on an unrelated screen without that decision would be exactly the kind of undocumented drift this file exists to prevent.
 
 ## Chat-bubble radius — open, not resolved (Group 6.5 / Group 7 recon, 6 Sep 2026)
 

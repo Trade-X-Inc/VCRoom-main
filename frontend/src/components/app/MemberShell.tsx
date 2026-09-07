@@ -10,7 +10,7 @@ import { useAccountContext } from "@/hooks/useAccountContext";
 import { NotificationBell } from "@/components/app/NotificationBell";
 import { UserMenu } from "@/components/app/UserMenu";
 import { cn } from "@/lib/utils";
-import { ROLE_LABELS, FOUNDER_PERMISSIONS } from "@/lib/roles";
+import { ROLE_LABELS, ROLE_DESCRIPTIONS, FOUNDER_PERMISSIONS } from "@/lib/roles";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { X as CloseIcon } from "lucide-react";
@@ -119,6 +119,7 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
   });
 
   const roleLabel = ROLE_LABELS[ctx.role] ?? ctx.role;
+  const roleDescription = ROLE_DESCRIPTIONS[ctx.role] ?? "";
   const canUseAI = FOUNDER_PERMISSIONS[ctx.role]?.use_ai_advisor ?? false;
   const canEditProfile = FOUNDER_PERMISSIONS[ctx.role]?.edit_profile ?? false;
   const assignedCount = assignedRooms.length;
@@ -201,6 +202,7 @@ export function MemberShell({ children }: { children?: React.ReactNode }) {
               <div className="text-xs font-medium truncate" style={{ color: "var(--v2-ink)" }}>{ctx.companyName ?? "Team"}</div>
               <div className="text-[10px] truncate flex items-center gap-1" style={{ color: "var(--v2-ink-muted)" }}>
                 <span
+                  title={roleDescription || undefined}
                   style={{
                     background: "var(--v2-accent-wash)", color: "var(--v2-accent)",
                     padding: "1px 6px", borderRadius: "var(--v2-radius)", fontSize: 10, fontWeight: 600,
