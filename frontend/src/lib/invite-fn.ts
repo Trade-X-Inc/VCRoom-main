@@ -64,7 +64,7 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
         invited_by: data.invitedBy,
         expires_at: expiresAt,
       })
-      .select("token")
+      .select("id, token")
       .single();
 
     if (dbErr || !invite) {
@@ -88,17 +88,21 @@ export const sendInviteEmail = createServerFn({ method: "POST" })
       if (existingUser?.id) {
         const roomName = data.startupName ?? data.dealRoomName ?? "a deal room";
         const senderName = data.founderName ?? "A founder";
-        // NOTE: notifications has no deal_room_id column and kind is NOT NULL —
-        // the previous insert failed silently on every call.
-        const { error: notifErr } = await client.from("notifications").insert({
-          user_id: existingUser.id,
-          kind: "deal_room_invite",
-          title: "You have been invited to a deal room",
-          body: `${senderName} invited you to the ${roomName} deal room`,
-          type: "deal_room_invite",
-          read: false,
-          meta: { deal_room_id: data.dealRoomId },
-          action_url: inviteLink,
+        // Cross-user insert (recipient, not caller) — notifications_own
+        // (ALL, qual user_id = auth.uid()) rejects this from the plain
+        // client since R40 dropped the broader cross-user insert policies.
+        // Routed through a SECURITY DEFINER RPC that re-verifies a matching
+        // invites row exists before writing, rather than granting this
+        // client a general cross-user notification ability. `type` dropped
+        // — redundant with `kind` (not, as previously stated, a
+        // nonexistent column; verified against live schema).
+        const { error: notifErr } = await client.rpc("notify_invite_recipient", {
+          p_invite_id: invite.id,
+          p_recipient_user_id: existingUser.id,
+          p_deal_room_id: data.dealRoomId,
+          p_title: "You have been invited to a deal room",
+          p_body: `${senderName} invited you to the ${roomName} deal room`,
+          p_action_url: inviteLink,
         });
         if (notifErr) console.error("[invite] notification insert failed:", notifErr.message);
       }

@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CreditCard, Clock } from "lucide-react";
-import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { LcsButton, LcsStatusPill } from "@/components/lcs";
 
@@ -18,22 +17,19 @@ function fmtDate(d: string | null | undefined): string {
 }
 
 function BillingSettings() {
-  const { user } = useAuth();
   const {
     subscription, limits, isTrialing, isActive, isPastDue, isCancelled,
     trialEndsAt, trialDaysRemaining, planName, isLoading,
   } = useSubscription();
 
-  // Group 4 restyle (3 Sep 2026): tokens/structure only. These figures
-  // ($99/$299 investor, $49/$199 founder) are the plan_limits values —
-  // CLAUDE.md §20.2 already flags them BLOCKING against the published
-  // Foundation pricing (a re-modelling, not a copy fix, per that entry).
-  // Left byte-identical here deliberately; do not touch pending that
-  // reconciliation.
-  const isInvestor = user?.role === "investor";
-  const upgradePlans = isInvestor
-    ? [{ name: "Investor Growth", price: 99 }, { name: "Investor Pro", price: 299 }]
-    : [{ name: "Founder Pro", price: 49 }, { name: "Founder Scale", price: 199 }];
+  // Build Step 0 hardening, fix 3 of 3 (7 Sep 2026): the plan_limits-derived
+  // tier names/prices ($99/$299 investor, $49/$199 founder) previously
+  // rendered here directly contradict the published 4-tier fee-by-event
+  // model on /product/pricing — both surfaces are live today. CLAUDE.md
+  // §20.2 flags this BLOCKING; reconciling the two models is its own
+  // product decision + migration, explicitly out of scope for this pass.
+  // Minimum fix: stop rendering EITHER model's specific tier names/prices
+  // in the trial-upgrade CTA below.
 
   if (isLoading) {
     return <div className="text-sm py-8" style={{ color: "var(--lcs-ink-muted)" }}>Loading billing…</div>;
@@ -62,15 +58,8 @@ function BillingSettings() {
               )}
             </div>
             <p className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
-              Choose a plan before your trial ends to keep access.
+              Plan management is being finalized. Your access continues during your trial.
             </p>
-            <div className="flex gap-2 flex-wrap pt-1">
-              {upgradePlans.map((p) => (
-                <Link key={p.name} to={"/pricing" as any}>
-                  <LcsButton variant="primary">{p.name} ${p.price}/mo</LcsButton>
-                </Link>
-              ))}
-            </div>
           </div>
         )}
 
