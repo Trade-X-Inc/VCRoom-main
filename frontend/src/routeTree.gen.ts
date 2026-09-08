@@ -19,6 +19,7 @@ import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as DocsV2RouteImport } from './routes/docs-v2'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +28,7 @@ import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as LegalIndexRouteImport } from './routes/legal.index'
 import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
+import { Route as DocsV2IndexRouteImport } from './routes/docs-v2.index'
 import { Route as DealsPreviewIndexRouteImport } from './routes/deals-preview.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ToolsValuationCalculatorRouteImport } from './routes/tools.valuation-calculator'
@@ -59,6 +61,7 @@ import { Route as ForFoundersRouteImport } from './routes/for.founders'
 import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
 import { Route as ForAngelsRouteImport } from './routes/for.angels'
 import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
+import { Route as DocsV2SplatRouteImport } from './routes/docs-v2.$'
 import { Route as DealsPreviewVaultRouteImport } from './routes/deals-preview.vault'
 import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
 import { Route as DealsPreviewRequestsRouteImport } from './routes/deals-preview.requests'
@@ -243,6 +246,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsV2Route = DocsV2RouteImport.update({
+  id: '/docs-v2',
+  path: '/docs-v2',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
@@ -282,6 +290,11 @@ const GlossaryIndexRoute = GlossaryIndexRouteImport.update({
   id: '/glossary/',
   path: '/glossary/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsV2IndexRoute = DocsV2IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsV2Route,
 } as any)
 const DealsPreviewIndexRoute = DealsPreviewIndexRouteImport.update({
   id: '/deals-preview/',
@@ -443,6 +456,11 @@ const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
   id: '/for/advisors',
   path: '/for/advisors',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsV2SplatRoute = DocsV2SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => DocsV2Route,
 } as any)
 const DealsPreviewVaultRoute = DealsPreviewVaultRouteImport.update({
   id: '/deals-preview/vault',
@@ -1159,6 +1177,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/docs': typeof DocsRoute
+  '/docs-v2': typeof DocsV2RouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite': typeof InviteRoute
@@ -1203,6 +1222,7 @@ export interface FileRoutesByFullPath {
   '/deals-preview/requests': typeof DealsPreviewRequestsRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/deals-preview/vault': typeof DealsPreviewVaultRoute
+  '/docs-v2/$': typeof DocsV2SplatRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1235,6 +1255,7 @@ export interface FileRoutesByFullPath {
   '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app/': typeof AppIndexRoute
   '/deals-preview/': typeof DealsPreviewIndexRoute
+  '/docs-v2/': typeof DocsV2IndexRoute
   '/glossary/': typeof GlossaryIndexRoute
   '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
@@ -1386,6 +1407,7 @@ export interface FileRoutesByTo {
   '/deals-preview/requests': typeof DealsPreviewRequestsRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/deals-preview/vault': typeof DealsPreviewVaultRoute
+  '/docs-v2/$': typeof DocsV2SplatRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1418,6 +1440,7 @@ export interface FileRoutesByTo {
   '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app': typeof AppIndexRoute
   '/deals-preview': typeof DealsPreviewIndexRoute
+  '/docs-v2': typeof DocsV2IndexRoute
   '/glossary': typeof GlossaryIndexRoute
   '/legal': typeof LegalIndexRoute
   '/resources': typeof ResourcesIndexRoute
@@ -1528,6 +1551,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/docs': typeof DocsRoute
+  '/docs-v2': typeof DocsV2RouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite': typeof InviteRoute
@@ -1572,6 +1596,7 @@ export interface FileRoutesById {
   '/deals-preview/requests': typeof DealsPreviewRequestsRoute
   '/deals-preview/team': typeof DealsPreviewTeamRoute
   '/deals-preview/vault': typeof DealsPreviewVaultRoute
+  '/docs-v2/$': typeof DocsV2SplatRoute
   '/for/advisors': typeof ForAdvisorsRoute
   '/for/angels': typeof ForAngelsRoute
   '/for/family-offices': typeof ForFamilyOfficesRoute
@@ -1604,6 +1629,7 @@ export interface FileRoutesById {
   '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app/': typeof AppIndexRoute
   '/deals-preview/': typeof DealsPreviewIndexRoute
+  '/docs-v2/': typeof DocsV2IndexRoute
   '/glossary/': typeof GlossaryIndexRoute
   '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
@@ -1715,6 +1741,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/docs'
+    | '/docs-v2'
     | '/feedback'
     | '/forgot-password'
     | '/invite'
@@ -1759,6 +1786,7 @@ export interface FileRouteTypes {
     | '/deals-preview/requests'
     | '/deals-preview/team'
     | '/deals-preview/vault'
+    | '/docs-v2/$'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1791,6 +1819,7 @@ export interface FileRouteTypes {
     | '/tools/valuation-calculator'
     | '/app/'
     | '/deals-preview/'
+    | '/docs-v2/'
     | '/glossary/'
     | '/legal/'
     | '/resources/'
@@ -1942,6 +1971,7 @@ export interface FileRouteTypes {
     | '/deals-preview/requests'
     | '/deals-preview/team'
     | '/deals-preview/vault'
+    | '/docs-v2/$'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -1974,6 +2004,7 @@ export interface FileRouteTypes {
     | '/tools/valuation-calculator'
     | '/app'
     | '/deals-preview'
+    | '/docs-v2'
     | '/glossary'
     | '/legal'
     | '/resources'
@@ -2083,6 +2114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/docs'
+    | '/docs-v2'
     | '/feedback'
     | '/forgot-password'
     | '/invite'
@@ -2127,6 +2159,7 @@ export interface FileRouteTypes {
     | '/deals-preview/requests'
     | '/deals-preview/team'
     | '/deals-preview/vault'
+    | '/docs-v2/$'
     | '/for/advisors'
     | '/for/angels'
     | '/for/family-offices'
@@ -2159,6 +2192,7 @@ export interface FileRouteTypes {
     | '/tools/valuation-calculator'
     | '/app/'
     | '/deals-preview/'
+    | '/docs-v2/'
     | '/glossary/'
     | '/legal/'
     | '/resources/'
@@ -2269,6 +2303,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   DocsRoute: typeof DocsRoute
+  DocsV2Route: typeof DocsV2RouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   InviteRoute: typeof InviteRoute
@@ -2423,6 +2458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs-v2': {
+      id: '/docs-v2'
+      path: '/docs-v2'
+      fullPath: '/docs-v2'
+      preLoaderRoute: typeof DocsV2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
@@ -2478,6 +2520,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/glossary/'
       preLoaderRoute: typeof GlossaryIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs-v2/': {
+      id: '/docs-v2/'
+      path: '/'
+      fullPath: '/docs-v2/'
+      preLoaderRoute: typeof DocsV2IndexRouteImport
+      parentRoute: typeof DocsV2Route
     }
     '/deals-preview/': {
       id: '/deals-preview/'
@@ -2702,6 +2751,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/for/advisors'
       preLoaderRoute: typeof ForAdvisorsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs-v2/$': {
+      id: '/docs-v2/$'
+      path: '/$'
+      fullPath: '/docs-v2/$'
+      preLoaderRoute: typeof DocsV2SplatRouteImport
+      parentRoute: typeof DocsV2Route
     }
     '/deals-preview/vault': {
       id: '/deals-preview/vault'
@@ -3894,6 +3950,19 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface DocsV2RouteChildren {
+  DocsV2SplatRoute: typeof DocsV2SplatRoute
+  DocsV2IndexRoute: typeof DocsV2IndexRoute
+}
+
+const DocsV2RouteChildren: DocsV2RouteChildren = {
+  DocsV2SplatRoute: DocsV2SplatRoute,
+  DocsV2IndexRoute: DocsV2IndexRoute,
+}
+
+const DocsV2RouteWithChildren =
+  DocsV2Route._addFileChildren(DocsV2RouteChildren)
+
 interface JoinRouteChildren {
   JoinTeamTokenRoute: typeof JoinTeamTokenRoute
 }
@@ -3908,6 +3977,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   DocsRoute: DocsRoute,
+  DocsV2Route: DocsV2RouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   InviteRoute: InviteRoute,
