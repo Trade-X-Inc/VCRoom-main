@@ -261,7 +261,7 @@ function DocsLayout() {
           {sidebar}
         </aside>
 
-        <main id="main-content" className="lg:px-10" style={{ minWidth: 0, flex: 1, padding: "32px 0" }}>
+        <main id="main-content" className="lg:px-10" style={{ minWidth: 0, flex: 1, padding: "32px 0 32px 40px" }}>
           <nav
             aria-label="Breadcrumb"
             style={{ marginBottom: "24px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px", fontFamily: UI, fontSize: "13px", color: INK_3 }}
