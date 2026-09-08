@@ -232,7 +232,7 @@ function HeroSection() {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center justify-end flex-1">
+          <div className="hidden lg:flex items-start justify-end flex-1 pt-24">
             <ProductCard />
           </div>
         </div>
