@@ -10,11 +10,11 @@ export const AI_PAGES: Record<string, DocPage> = {
       slug: "ai",
       title: "AI on Lengdon",
       description:
-        "How AI is architected on Lengdon: two separate agents, a confirm-first rule for anything visible to another party, and explicit scope on every feature.",
+        "How AI is scoped on Lengdon: every request is bounded to what the requesting user can already see, a confirm-first rule for anything visible to another party, and explicit scope on every feature.",
       updated: UPDATED,
       toc: [
         { id: "philosophy", label: "Philosophy" },
-        { id: "two-agents", label: "Two agents, never one" },
+        { id: "scoping", label: "How requests are scoped" },
         { id: "confirm-first", label: "The confirm-first rule" },
         { id: "features", label: "AI features" },
         { id: "confrontational-dd", label: "Confrontational DD analysis" },
@@ -39,14 +39,15 @@ export const AI_PAGES: Record<string, DocPage> = {
           feature — every AI page in these docs carries an explicit "does / doesn't" block.
         </P>
 
-        <H2 id="two-agents">Two agents, never one</H2>
+        <H2 id="scoping">How requests are scoped</H2>
         <P>
-          Founders and investors talk to two separate agents with separate system prompts,
-          separate tool sets, and separate contexts. The founder agent cannot see any investor's
-          pipeline; the investor agent cannot see another investor's watchlist or a founder's
-          private data. Where the two sides legitimately share context — inside a deal room — the
-          agent works through the room's shared data and nothing else. The agents share
-          infrastructure (the model router and rate limiting) but never context.
+          Every AI request runs through server-side functions that read data under the same Row
+          Level Security your own account is bound by — there is no separate, wider-access path
+          for AI. A founder's request can never pull in an investor's pipeline; an investor's
+          request can never pull in another investor's watchlist or a founder's private data.
+          Where the two sides legitimately share context — inside a deal room — the request draws
+          only on that room's shared data. This is a scoping guarantee enforced by the same
+          authorization every query already goes through, not a separate AI-specific mechanism.
         </P>
 
         <H2 id="confirm-first">The confirm-first rule</H2>
@@ -194,9 +195,8 @@ export const AI_PAGES: Record<string, DocPage> = {
           rows={[
             ["AI panel conversation", "Your message plus page context from your own data"],
             ["Document review / summary", "The text of the specific document you requested analysis on"],
-            ["Deal brief / investment memo", "The company's profile or watchlist data you can already see"],
-            ["Intake parsing", "The text you pasted or files you uploaded to the parser"],
-            ["Verification classification", "The evidence document you submitted to the slot"],
+            ["Investment memo", "The company's profile or watchlist data you can already see"],
+            ["Confrontational DD analysis", "Every document's extracted contents in the deal room, plus stated claims"],
           ]}
         />
         <P>

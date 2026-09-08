@@ -96,8 +96,8 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           Text extraction from uploaded files (PDF, DOCX, PPTX, XLSX, CSV) happens client-side, in
           your browser. Nothing is sent to an AI provider as a side effect of uploading. Document
           content is transmitted to a third-party AI model only when you take an explicit action
-          that requires it — generating a summary, a deal brief, or running verification
-          classification. The full policy is on <A href="/docs/ai/data-handling">AI data handling</A>.
+          that requires it — generating a summary, an investment memo, or requesting a document
+          review. The full policy is on <A href="/docs/ai/data-handling">AI data handling</A>.
         </P>
 
         <H2 id="infrastructure">Infrastructure</H2>
@@ -187,8 +187,8 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           attestation — the SOC 2 Type II compliance referenced in these docs belongs to Supabase,
           our infrastructure provider. Uploaded documents are encrypted at rest but not end-to-end
           encrypted: the platform can technically read stored files, which is what allows AI
-          summaries and verification to work. If your threat model requires zero platform access to
-          file contents, do not upload those files.
+          summaries and document review to work. If your threat model requires zero platform access
+          to file contents, do not upload those files.
         </P>
       </>
     ),
@@ -324,7 +324,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
               updates are validated with the same rigor as reads.
             </>,
             <>
-              <strong>Public pages</strong> (published profiles, verification reports) read through
+              <strong>Public pages</strong> (published founder and investor profiles) read through
               policies that require an explicit published flag — unpublished data is invisible even
               to a direct API call.
             </>,

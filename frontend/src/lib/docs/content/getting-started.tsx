@@ -10,7 +10,7 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
       slug: "",
       title: "Lengdon Documentation",
       description:
-        "Documentation for Lengdon — the agentic fundraising platform. Feature guides, security posture, and changelog.",
+        "Documentation for Lengdon — closing infrastructure for private capital. Feature guides, security posture, and changelog.",
       updated: UPDATED,
       toc: [
         { id: "what", label: "What Lengdon is" },
@@ -61,8 +61,8 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
         <DocTable
           head={["Section", "Covers"]}
           rows={[
-            [<A href="/docs/founders">For founders</A>, "Profile, vault, deal rooms, Q&A, NDA, verification, team, AI"],
-            [<A href="/docs/investors">For investors</A>, "Intake, deal flow, pipeline, decisions, DD, memos, fund team"],
+            [<A href="/docs/founders">For founders</A>, "Profile, vault, deal rooms, Q&A, NDA, team, AI"],
+            [<A href="/docs/investors">For investors</A>, "Watchlist, deal flow, pipeline, decisions, DD, memos, fund team"],
             [<A href="/docs/deal-rooms">Deal rooms</A>, "The six-stage workflow and every panel in it"],
             [<A href="/docs/ai">AI</A>, "Architecture, each AI feature, and the data-handling policy"],
             [<A href="/docs/security">Security</A>, "Encryption, RLS, NDA framework, responsible disclosure"],
