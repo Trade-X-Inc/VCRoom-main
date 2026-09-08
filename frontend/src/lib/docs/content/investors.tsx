@@ -102,7 +102,7 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
       slug: "investors/deal-flow",
       title: "Deal flow inbox",
       description:
-        "The inbound deal queue: thesis-matched companies with cached AI briefs and one-click watchlist routing.",
+        "Where founder briefs shared directly with you arrive, with cached AI briefs and one-click watchlist routing.",
       updated: UPDATED,
       toc: [
         { id: "overview", label: "Overview" },
@@ -113,16 +113,16 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          The deal flow inbox is where inbound reaches you: founders whose verified profiles match
-          your thesis. It exists to replace the cold-email pile with a queue that is already
-          filtered by stage, sector, and geography before you see it.
+          The deal flow inbox is where inbound reaches you: a founder shares their brief with you
+          directly. There is no directory to browse and no matching to opt into — access to a
+          founder's pack starts with an invitation from the founder.
         </Lead>
 
         <H2 id="how">How it works</H2>
         <Steps
           items={[
-            <>Companies appear in the inbox when their profile matches your thesis settings.</>,
-            <>Each card shows the verified profile summary — what was checked, and what wasn't.</>,
+            <>A founder shares their brief with you directly — you're notified when it arrives.</>,
+            <>Open the pack and review it against the founder's own stated evidence tiers.</>,
             <>Generate an AI brief for anything that looks interesting before committing meeting time.</>,
             <>Route each company: add to watchlist to track it, or move on.</>,
           ]}

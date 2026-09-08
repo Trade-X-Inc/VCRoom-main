@@ -23,16 +23,18 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
       <>
         <Lead>
           Lengdon is a global fundraising platform for founders and investors:
-          verified profiles, NDA-gated deal rooms, structured diligence, and recorded decisions —
-          with an AI layer that drafts the work and never acts on your behalf without confirmation.
+          NDA-gated deal rooms, an evidence ladder for every disclosed fact, structured diligence,
+          and recorded decisions — with an AI layer that drafts the work and never acts on your
+          behalf without confirmation.
         </Lead>
 
         <H2 id="what">What Lengdon is</H2>
         <P>
-          The platform replaces the warm-intro bottleneck with structure. Founders build a profile
-          whose claims are actually checked; investors set a thesis and see matched, verified
-          companies; deals progress inside deal rooms through six explicit stages; and every deal
-          ends in a recorded decision — including a Pass with a reason the founder receives.
+          The platform gives a raise a structure: founders build a profile where every field
+          carries its own evidence tier — Preferred, Alternative, or Minimum — instead of a single
+          unqualified claim; deals progress inside deal rooms through six explicit closing gates;
+          and every deal ends in a recorded decision — including a Pass with a reason the founder
+          receives.
         </P>
 
         <H2 id="start">Where to start</H2>
@@ -41,7 +43,7 @@ export const GETTING_STARTED_PAGES: Record<string, DocPage> = {
             <>
               <strong>Founders:</strong> start with the <A href="/docs/founders">founder feature map</A>,
               then the <A href="/docs/founders/profile">company profile</A> — everything downstream
-              (matching, verification, the AI panel) depends on it.
+              (the evidence ladder, deal rooms, the AI panel) depends on it.
             </>,
             <>
               <strong>Investors:</strong> start with the <A href="/docs/investors">investor feature map</A>,

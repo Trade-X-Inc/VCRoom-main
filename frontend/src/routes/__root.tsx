@@ -103,7 +103,7 @@ const JSON_LD = JSON.stringify({
       "@type": "SoftwareApplication",
       "name": "Lengdon",
       "url": "https://lengdon.com",
-      "description": "A fundraising platform where founders and investors meet, run due diligence, hold structured interviews, negotiate terms, and close deals — entirely in-platform.",
+      "description": "A fundraising platform where founders and investors meet, run due diligence, negotiate terms, and close deals — entirely in-platform.",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free during beta" },

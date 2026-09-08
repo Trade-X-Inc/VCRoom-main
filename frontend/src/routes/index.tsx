@@ -670,7 +670,7 @@ const PROCESS_PHASES_V2 = [
   {
     num: "05", title: "PAYMENT",
     party: "Investor + Founder confirm",
-    desc: "Investor uploads verified proof of transfer. Founder confirms receipt. Both confirmations are required to proceed. The system records each action independently.",
+    desc: "Investor confirms transfer. Founder confirms receipt. Both confirmations are required to proceed. The system records each action independently.",
     img: "/images/homepage/process-payment.jpg",
     imgAlt: "Person completing a financial transaction on laptop",
     bg: "#0a2540",

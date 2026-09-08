@@ -38,7 +38,7 @@ const GATES = [
   {
     num: "05", title: "Payment",
     party: "Investor + Founder confirm",
-    desc: "Investor uploads verified proof of transfer. Founder confirms receipt. Both confirmations are required to advance to Close. Neither party can proceed to the final gate without the other's acknowledgement.",
+    desc: "Investor confirms transfer. Founder confirms receipt. Both confirmations are required to advance to Close. Neither party can proceed to the final gate without the other's acknowledgement.",
     detail: "Dual confirmation required. The system records each action independently.",
   },
   {

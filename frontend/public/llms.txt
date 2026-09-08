@@ -1,23 +1,26 @@
 # Lengdon
 
-> The fundraising platform where verified founders and investors meet, run
-> due diligence, negotiate terms, and close deals — entirely in-platform.
+> The closing infrastructure for private capital fundraising — a deal room,
+> a diligence checklist, and a term sheet that all point to the same
+> reference number, entirely in-platform.
 
 Built by Venture Tech LLC, DIFC FinTech Hive, Dubai, UAE.
 
 ## What it does
 
-- Verified profiles for both founders and investors (five-tier verification,
-  built from real documents, not self-reported claims).
 - Private NDA-gated deal rooms: document sharing, structured due diligence,
   AI document analysis, Q&A.
-- Structured video interviews (five stages: Introduction, Product Demo,
-  Financial Discussion, Terms Discussion, Investment Terms) with AI note
-  extraction, source-cited to the transcript.
+- An evidence ladder for every disclosed fact — Preferred, Alternative, or
+  Minimum evidence, shown inline on the field itself. No verification score,
+  no percentage: the reader sees the evidence tier and draws their own
+  conclusion.
 - Per-term negotiation across four instrument types (SAFE, Equity, Debt,
   Company Sale) with a full audit trail.
-- In-platform closing: signed agreement, payment confirmation, auto-generated
-  invoices, permanent read-only archive.
+- A six-gate closing sequence — Counsel, Agreement, Conditions, Signing,
+  Payment, Close — each gate assigned to a named owner and enforced in
+  order. Investor and founder each confirm the payment step independently;
+  mutual confirmation at Close seals a permanent, exportable record. Lengdon
+  records the transfer confirmation — it does not move money itself.
 
 ## Fee model
 
@@ -29,8 +32,6 @@ if a deal doesn't close. Investors: free at launch.
 
 - [Homepage](https://lengdon.com/): product overview, FAQ, pricing preview.
 - [Pricing](https://lengdon.com/pricing): full pricing detail.
-- [Trust & Verification](https://lengdon.com/trust): how the verification
-  tiers work.
 - [About](https://lengdon.com/about): company and team.
 - [Docs](https://lengdon.com/docs): full product documentation for
   founders, investors, deal rooms, and the AI features.
