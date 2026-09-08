@@ -35,8 +35,8 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           items={[
             <>All traffic is encrypted in transit with TLS; data is encrypted at rest with AES-256.</>,
             <>
-              Row Level Security is enabled on all 107 database tables — every query is scoped to
-              the requesting user. Verified against the production database on 8 July 2026.
+              Row Level Security is enabled on all 137 database tables — every query is scoped to
+              the requesting user. Verified against the production database on 8 September 2026.
             </>,
             <>
               No deal document is visible to a counterparty before a mutual NDA is signed inside the
@@ -69,7 +69,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
 
         <H2 id="access-control">Access control</H2>
         <P>
-          Authorization is enforced in the database, not just the application. Every one of the 107
+          Authorization is enforced in the database, not just the application. Every one of the 137
           tables in the production schema has PostgreSQL Row Level Security enabled, which means a
           query can only return rows the authenticated user is entitled to see — even if
           application code has a bug, the database refuses to serve another user's data. Details and
@@ -275,7 +275,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
       updated: UPDATED,
       toc: [
         { id: "what", label: "What RLS gives you" },
-        { id: "coverage", label: "Coverage: 107 of 107" },
+        { id: "coverage", label: "Coverage: 137 of 137" },
         { id: "patterns", label: "Policy patterns" },
         { id: "verification", label: "How we verify it" },
       ],
@@ -298,12 +298,13 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           skipped by client code.
         </P>
 
-        <H2 id="coverage">Coverage: 107 of 107</H2>
+        <H2 id="coverage">Coverage: 137 of 137</H2>
         <P>
-          As of 8 July 2026, the production database contains 107 tables in the public schema, and
-          all 107 have RLS enabled — zero exceptions. Coverage is verified automatically against the
-          live database on every deploy, not inferred from migration files, so a new table cannot go
-          live unprotected without the check catching it.
+          As of 8 September 2026, the production database contains 137 tables in the public schema,
+          and all 137 have RLS enabled — zero exceptions. This count grows as the product does; what
+          stays constant is that RLS coverage is verified automatically against the live database on
+          every deploy, not inferred from migration files, so a new table cannot go live unprotected
+          without the check catching it.
         </P>
 
         <H2 id="patterns">Policy patterns</H2>

@@ -4,13 +4,16 @@ import { H2, Lead } from "../primitives";
 // Entries are derived from the actual git history of this repository —
 // curated for readability, not invented. Grouped by month, newest first.
 
-interface ChangeEntry {
+export interface ChangeEntry {
   date: string; // ISO
   area: string; // feature area tag
   text: string;
 }
 
-const CHANGELOG: { month: string; entries: ChangeEntry[] }[] = [
+// Exported as CHANGELOG so /resources/changelog (resources.changelog.tsx)
+// can import this one real data source directly, instead of carrying its
+// own duplicate copy — see that file's header comment.
+export const CHANGELOG: { month: string; entries: ChangeEntry[] }[] = [
   {
     month: "August 2026",
     entries: [

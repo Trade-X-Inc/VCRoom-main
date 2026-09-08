@@ -19,19 +19,19 @@ const SECTIONS = [
     slug: "getting-started",
     icon: "01",
     articles: [
-      { title: "What is Lengdon?", desc: "The six-gate close infrastructure platform explained." },
+      { title: "What is Lengdon?", desc: "The six-gate closing infrastructure explained." },
       { title: "Creating your account", desc: "Founder vs investor accounts, and what changes." },
-      { title: "Your first transaction room", desc: "Step-by-step: room setup, party invitation, and gate 1." },
+      { title: "Your first deal room", desc: "Step-by-step: room setup, inviting the other party, and gate 1." },
       { title: "Understanding the six-gate sequence", desc: "What each gate requires and why the order matters." },
     ],
   },
   {
-    title: "Transaction rooms",
+    title: "Deal rooms",
     slug: "rooms",
     icon: "02",
     articles: [
-      { title: "Room types and use cases", desc: "Equity rounds, SAFEs, SPVs, M&A, secondary transfers." },
-      { title: "Inviting parties and observers", desc: "Principal vs observer access. How per-person NDAs work." },
+      { title: "Room types and use cases", desc: "SAFE, Equity, Debt, and Company Sale instruments." },
+      { title: "Inviting the other party", desc: "How access starts, and how per-person NDA acceptance works." },
       { title: "Document management by gate", desc: "Which documents attach to which gates and why." },
       { title: "Condition management", desc: "Defining and confirming condition precedents within a room." },
     ],
@@ -43,10 +43,10 @@ const SECTIONS = [
     articles: [
       { title: "Gate 1: Counsel", desc: "Legal review confirmation by both parties." },
       { title: "Gate 2: Agreement", desc: "Term acceptance and document execution." },
-      { title: "Gate 3: Conditions", desc: "Condition precedent satisfaction and verification." },
+      { title: "Gate 3: Conditions", desc: "Condition precedent satisfaction, each with a named owner." },
       { title: "Gate 4: Signing", desc: "Formal execution of transaction documents." },
-      { title: "Gate 5: Payment", desc: "Capital transfer confirmation and verification." },
-      { title: "Gate 6: Close", desc: "Final confirmation, seal, and dual export." },
+      { title: "Gate 5: Payment", desc: "Investor confirms transfer, founder confirms receipt." },
+      { title: "Gate 6: Close", desc: "Mutual confirmation seals the record permanently." },
     ],
   },
   {
@@ -55,8 +55,8 @@ const SECTIONS = [
     icon: "04",
     articles: [
       { title: "How the audit log works", desc: "Append-only, tamper-evident. What that means." },
-      { title: "The sealed close export", desc: "What's in it, how to read it, how to store it." },
-      { title: "Registry verification", desc: "Verifying your export against the registry reference." },
+      { title: "Evidence tiers", desc: "Preferred, Alternative, or Minimum — shown inline on every disclosed field." },
+      { title: "Reference numbers", desc: "How every deal room, document, and record gets a checkable reference." },
       { title: "Legal defensibility", desc: "How Lengdon records are used in disputes and audits." },
     ],
   },
@@ -66,20 +66,9 @@ const SECTIONS = [
     icon: "05",
     articles: [
       { title: "Encryption at rest and in transit", desc: "What is encrypted, how, and with what keys." },
-      { title: "Per-person NDA enforcement", desc: "How individual NDAs bind access in practice." },
-      { title: "Access control and permissions", desc: "Gate-scoped access. Who can see what and when." },
-      { title: "Data residency and retention", desc: "Where your data lives and how long it is retained." },
-    ],
-  },
-  {
-    title: "API & integrations",
-    slug: "api",
-    icon: "06",
-    articles: [
-      { title: "API overview", desc: "REST API for room creation, gate management, and record retrieval." },
-      { title: "Webhooks", desc: "Real-time events for gate confirmations and close events." },
-      { title: "Authentication", desc: "API keys, OAuth, and token scoping." },
-      { title: "Rate limits and quotas", desc: "Request limits by plan tier." },
+      { title: "Per-person NDA enforcement", desc: "Each person who enters a room accepts the NDA individually." },
+      { title: "Access control and permissions", desc: "Row Level Security scoped to each account. Who can see what and when." },
+      { title: "Data storage and retention", desc: "Where your data lives and how long it is retained." },
     ],
   },
 ];
@@ -136,17 +125,17 @@ function Docs() {
             <div className="p-10 border-r border-[#e6e9ef]">
               <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-4">Quick start</div>
               <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">New to Lengdon?</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">Create an account and open your first transaction room in under 10 minutes.</p>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">Create an account and open your first deal room in under 10 minutes.</p>
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
                 Create account →
               </Link>
             </div>
             <div className="p-10">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-4">For developers</div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">API integration</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">REST API, webhooks, and SDKs for embedding Lengdon's close infrastructure in your product.</p>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-4">Questions</div>
+              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">Need something specific?</h3>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">Reach out and we'll walk you through how a deal room fits your transaction.</p>
               <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-block border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
-                Request API access →
+                Contact us →
               </Link>
             </div>
           </div>

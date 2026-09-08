@@ -22,8 +22,8 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
     Body: () => (
       <>
         <Lead>
-          The founder side of Lengdon is built around one loop: build a profile, get
-          discovered by investors whose thesis you match, open a deal room, and get a real decision
+          The founder side of Lengdon is built around one loop: build a profile, share it directly
+          with the investors you're talking to, open a deal room, and get a real decision
           — Invest, Hold, or Pass with a reason — instead of silence.
         </Lead>
 
@@ -93,8 +93,8 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
         <Lead>
           Your company profile is the structured record investors see — company details,
           problem and solution, market sizing, traction, financials, and team. It exists because
-          investors filter by structured data, not prose: a complete profile is what makes you
-          appear in a matched investor's feed.
+          investors filter by structured data, not prose: a complete profile is what makes your
+          public page and your deal room hold up under a real look.
         </Lead>
 
         <H2 id="how">How it works</H2>
