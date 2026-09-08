@@ -123,7 +123,7 @@ function SignIn() {
           </h2>
 
           <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[15px] leading-[1.75] max-w-[340px]">
-            Every action taken in your transaction room is recorded and encrypted. Both parties receive the same append-only record — neither can revoke the other's copy.
+            Every action taken in your deal room is recorded and encrypted. Both parties see the same append-only record — neither can edit or revoke the other's view of it.
           </p>
         </div>
 
@@ -172,7 +172,7 @@ function SignIn() {
                 Sign in
               </h1>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px] mt-2">
-                Access your transaction rooms and records.
+                Access your deal rooms and records.
               </p>
             </div>
 
@@ -275,7 +275,7 @@ function SignIn() {
                 New to Lengdon?
               </div>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px] mb-4 leading-[1.55]">
-                Free to start. Your first transaction room is open the moment you sign up.
+                Free to start. Your first deal room is open the moment you sign up.
               </p>
               <Link
                 to="/sign-up"

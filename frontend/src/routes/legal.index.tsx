@@ -13,14 +13,14 @@ const DOCS = [
   {
     title: "Privacy Policy",
     path: "/legal/privacy",
-    desc: "How Lengdon collects, processes, and protects personal data. Applicable to all users and transaction room participants.",
+    desc: "How Lengdon collects, processes, and protects personal data. Applicable to all users and deal room participants.",
     updated: "1 Aug 2025",
     tag: "",
   },
   {
     title: "Terms of Service",
     path: "/legal/terms",
-    desc: "The agreement governing use of the Lengdon platform, including account obligations, transaction room rules, and limitation of liability.",
+    desc: "The agreement governing use of the Lengdon platform, including account obligations, deal room rules, and limitation of liability.",
     updated: "1 Aug 2025",
     tag: "",
   },

@@ -121,7 +121,7 @@ function Dilution() {
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px] max-w-[480px]">Model is clear. Close the round with Lengdon — a six-gate process both parties execute and a sealed record both parties keep.</p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px] max-w-[480px]">Model is clear. Close the round with Lengdon — a six-gate process both parties execute, and one sealed record both parties can always see.</p>
             <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">Close this round</Link>
           </div>
         </section>

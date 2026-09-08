@@ -117,7 +117,7 @@ function ProductCard() {
         <div className="bg-[#0a2540] px-5 py-4 flex items-center justify-between">
           <div>
             <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[14px] tracking-[-0.2px]">
-              Transaction Room #000042
+              Deal Room #000042
             </div>
             <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[11px] mt-0.5 tracking-[0.3px]">
               ROM Capital · Technology Sector
@@ -298,6 +298,10 @@ const RECORD_ENTRIES = [
   },
 ];
 
+// Corrected 8 Sep 2026: "Sealed export — Both parties receive a signed
+// copy at close" removed from the three-property list below — no
+// export capability of any kind exists (CLAUDE.md §12, §20.15).
+// Replaced with a real property of the record itself.
 function AppendOnlyRecordSection() {
   return (
     <section className="bg-white border-b border-[#e6e9ef] py-24 max-w-[1440px] mx-auto w-full overflow-hidden">
@@ -321,7 +325,7 @@ function AppendOnlyRecordSection() {
                 {[
                   { prop: "Append-only", desc: "No deletes. No edits. Additions only." },
                   { prop: "Tamper-evident", desc: "Each entry references its predecessor." },
-                  { prop: "Sealed export", desc: "Both parties receive a signed copy at close." },
+                  { prop: "Permanent", desc: "The sealed record stays inspectable by both parties, unchanged, for the life of the deal." },
                 ].map((item) => (
                   <div key={item.prop} className="flex gap-4">
                     <div className="w-2 h-2 rounded-full bg-[#0a2540] mt-1.5 shrink-0" />
@@ -872,6 +876,11 @@ function InfrastructureBannerSection() {
 }
 
 // ── SECURITY & TRUST ──────────────────────────────────────
+// Corrected 8 Sep 2026: "data residency" removed from the trust-signal
+// list below — no per-room jurisdiction-selection feature exists
+// anywhere in the deal-room code (verified against a live query of the
+// real production Supabase project: single region, no per-room
+// override).
 function SecuritySection() {
   return (
     <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
@@ -882,7 +891,7 @@ function SecuritySection() {
             SECURITY<br />&amp; TRUST
           </h2>
           <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] max-w-[400px] mb-10">
-            Encryption at rest and in transit; mandatory multi-factor authentication; role-scoped access; per-person NDAs; the append-only record; data residency; no money movement, no custody, no escrow.
+            Encryption at rest and in transit; mandatory multi-factor authentication; role-scoped access; per-person NDAs; the append-only record; no money movement, no custody, no escrow.
           </p>
           <Link to="/legal/privacy" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="flex items-center gap-2 text-[#0a2540] text-[14px] hover:opacity-60 transition-opacity">
             Read the Privacy Policy <span>→</span>

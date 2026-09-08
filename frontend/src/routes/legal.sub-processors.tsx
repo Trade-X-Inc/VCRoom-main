@@ -4,19 +4,30 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/SubProcessors.tsx.
+//
+// Corrected 8 Sep 2026: this table listed vendors that don't match the
+// real infrastructure this codebase actually runs on — unreviewed
+// boilerplate from the Figma-export source, never checked against real
+// state. "PlanetScale / Vitess" -> Supabase (the real database, real
+// throughout CLAUDE.md §5/§12: PostgreSQL, AWS-backed). "SendGrid
+// (Twilio)" -> Resend (the real transactional email provider — see
+// lib/email/templates.ts, lib/email/triggers.ts). "Vercel" -> Cloudflare
+// Pages/Workers (the real deploy target — CLAUDE.md §5/§12, "Never run
+// npm run deploy... Git integration deploys"). AWS, Cloudflare (CDN
+// row), Stripe, and Sentry were checked and left as-is — consistent with
+// real usage. "Transaction room" wording also corrected to "deal room."
 
 export const Route = createFileRoute("/legal/sub-processors")({
   component: SubProcessors,
 });
 
 const PROCESSORS = [
-  { name: "Amazon Web Services (AWS)", category: "Cloud infrastructure", location: "United States / EU", purpose: "Hosting, compute, storage, and database services for the Lengdon platform." },
-  { name: "Cloudflare", category: "CDN & security", location: "United States / Global", purpose: "Content delivery, DDoS protection, and TLS termination for platform traffic." },
+  { name: "Amazon Web Services (AWS)", category: "Cloud infrastructure", location: "United States / EU", purpose: "Underlying hosting, compute, and storage for the Lengdon platform's database and file infrastructure." },
+  { name: "Cloudflare", category: "CDN, security & hosting", location: "United States / Global", purpose: "Content delivery, DDoS protection, TLS termination, and application hosting via Cloudflare Pages and Workers." },
   { name: "Stripe", category: "Payment processing", location: "United States", purpose: "Payment method storage and processing for Lengdon subscription billing. Not used for transaction payment confirmation in closing rooms." },
-  { name: "SendGrid (Twilio)", category: "Transactional email", location: "United States", purpose: "Delivery of system notifications, gate confirmation emails, and account verification messages." },
-  { name: "PlanetScale / Vitess", category: "Database", location: "United States", purpose: "Relational database hosting for transaction room data, audit logs, and user accounts." },
+  { name: "Resend", category: "Transactional email", location: "United States", purpose: "Delivery of system notifications, gate confirmation emails, and account verification messages." },
+  { name: "Supabase", category: "Database & authentication", location: "United States / EU", purpose: "PostgreSQL database hosting, authentication, and file storage for deal room data, audit logs, and user accounts." },
   { name: "Sentry", category: "Error monitoring", location: "United States", purpose: "Application error tracking and performance monitoring. PII is scrubbed before transmission." },
-  { name: "Vercel", category: "Frontend delivery", location: "United States / Global edge", purpose: "Serving of the Lengdon web application to end users." },
 ];
 
 function SubProcessors() {

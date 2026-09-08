@@ -6,6 +6,12 @@ import { PageHero } from "@/components/site/PageHero";
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/for/Founders.tsx. Own distinct
 // steps+benefits+quote structure — not built from SimpleAudiencePage.
+//
+// Corrected 8 Sep 2026: "A record that's yours" claimed a "sealed,
+// signed export... portable, verifiable" and the fourth step was titled
+// "Export at close" ("Both parties receive a sealed, signed copy") — no
+// export capability of any kind exists (CLAUDE.md §12, §20.15). Both
+// reworded to describe the real permanent, in-room record.
 
 export const Route = createFileRoute("/for/founders")({
   component: Founders,
@@ -22,7 +28,7 @@ const BENEFITS = [
   },
   {
     title: "A record that's yours.",
-    body: "At close, you receive a sealed, signed export of the full audit trail. It belongs to you — not the investor, not the platform. It's portable, verifiable, and permanent.",
+    body: "At close, the full audit trail seals — append-only, unchanged from that point on. It belongs to you and the investor jointly, not the platform, and it stays permanent for the life of the room.",
   },
   {
     title: "Per-person confidentiality.",
@@ -31,10 +37,10 @@ const BENEFITS = [
 ];
 
 const STEPS = [
-  { num: "01", title: "Initialize a room", desc: "Create a transaction room in minutes. Add the transaction details, invite your counsel, and set the parameters." },
+  { num: "01", title: "Initialize a room", desc: "Create a deal room in minutes. Add the deal details, invite your counsel, and set the parameters." },
   { num: "02", title: "Invite both counsel teams", desc: "Gate 1 requires both legal teams to be confirmed before any data is shared. No one gets access before counsel is in place." },
   { num: "03", title: "Run the six gates", desc: "The system guides both parties through Agreement, Conditions, Signing, Payment, and Close in strict sequence." },
-  { num: "04", title: "Export at close", desc: "Both parties receive a sealed, signed copy of the complete audit trail. You own your record." },
+  { num: "04", title: "Seal the record", desc: "Mutual confirmation seals the complete audit trail — permanent, append-only, unchanged from that point forward." },
 ];
 
 function Founders() {

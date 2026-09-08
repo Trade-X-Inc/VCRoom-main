@@ -30,7 +30,7 @@ const SECTIONS = [
   },
   {
     title: "5. Security measures",
-    body: "Lengdon implements technical and organizational measures appropriate to the risks, including: encryption of Personal Data at rest using AES-256 and in transit using TLS 1.3; access controls requiring individual authentication for each transaction room participant; append-only audit logging of all access and processing activities; regular penetration testing and vulnerability assessments; employee training on data protection obligations.",
+    body: "Lengdon implements technical and organizational measures appropriate to the risks, including: encryption of Personal Data at rest using AES-256 and in transit using TLS 1.3; access controls requiring individual authentication for each deal room participant; append-only audit logging of all access and processing activities; regular penetration testing and vulnerability assessments; employee training on data protection obligations.",
   },
   {
     title: "6. Sub-processors",

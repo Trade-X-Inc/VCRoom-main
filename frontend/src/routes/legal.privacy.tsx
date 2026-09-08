@@ -34,7 +34,7 @@ For data protection enquiries: privacy@lengdon.com`,
 
 Identity data: Full name, as provided at account creation and NDA confirmation.
 Contact data: Email address and, where provided, a telephone number.
-Transaction data: Actions taken within a transaction room — confirmations, document accesses, signing events, payment confirmations. This data forms part of the append-only audit record.
+Transaction data: Actions taken within a deal room — confirmations, document accesses, signing events, payment confirmations. This data forms part of the append-only audit record.
 Authentication data: Login events, MFA events, session data. We do not store passwords in plain text.
 Technical data: IP address, device type, browser type, and access timestamps. Collected for security and fraud prevention purposes.
 
@@ -44,7 +44,7 @@ We do not collect payment card data. We do not handle, process, or store financi
     title: "How we use your data",
     content: `We use personal data for the following purposes:
 
-To operate the Lengdon platform: Providing the transaction room infrastructure, enforcing the six-gate closing sequence, and generating the append-only audit record.
+To operate the Lengdon platform: Providing the deal room infrastructure, enforcing the six-gate closing sequence, and generating the append-only audit record.
 To comply with legal obligations: Maintaining records as required under applicable law, including data protection law, anti-money laundering regulations, and contract law.
 To protect the security of the platform: Detecting and preventing fraud, unauthorised access, and abuse.
 To communicate with you: Responding to enquiries, sending transactional notifications (gate status, signatures required), and, where you have consented, sending product updates.
@@ -62,13 +62,13 @@ Consent (Article 6(1)(a) UK GDPR): Where you have opted in to receive product co
   },
   {
     title: "The append-only audit record",
-    content: `A core feature of Lengdon is the append-only audit record — a tamper-evident log of every action taken in a transaction room.
+    content: `A core feature of Lengdon is the append-only audit record — a tamper-evident log of every action taken in a deal room.
 
 This record contains personal data (names, roles, timestamps, actions). It cannot be deleted or modified after creation — this is a fundamental design property, not a limitation.
 
 Both parties to a transaction receive a copy of the complete audit record at close. This is a contractual commitment, not optional behaviour.
 
-Because the audit record is append-only, we cannot fulfil requests to delete personal data contained within it where that data is part of the legally required closing record. We will inform you of this limitation before you enter a transaction room.
+Because the audit record is append-only, we cannot fulfil requests to delete personal data contained within it where that data is part of the legally required closing record. We will inform you of this limitation before you enter a deal room.
 
 We retain audit records for a minimum of seven years following close, and for as long as reasonably required by applicable law.`,
   },
@@ -89,9 +89,7 @@ You also have the right to lodge a complaint with the Information Commissioner's
   },
   {
     title: "Data transfers",
-    content: `Lengdon operates data residency selection at the transaction room level. When you create a room, you select the jurisdiction (UK, EU, or US) and data for that room is stored accordingly.
-
-Account-level data (your profile, authentication records) is stored in the UK.
+    content: `Lengdon's database and file storage are hosted on Supabase infrastructure. Per-deal-room jurisdiction selection is not available today — all data is stored in a single region, disclosed on request.
 
 Where we transfer data outside the UK or EEA, we ensure that appropriate safeguards are in place (Standard Contractual Clauses or adequacy decisions).`,
   },

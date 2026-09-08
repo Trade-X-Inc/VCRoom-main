@@ -9,6 +9,15 @@ import { PageHero } from "@/components/site/PageHero";
 // detail pages (sectors.energy.tsx etc.) have no counterpart and are
 // tracked separately in DELETED-PUBLIC-ROUTES.md as founder-decision
 // items, not silently dropped.
+//
+// Corrected 8 Sep 2026: "secondary transactions" / "Secondary share
+// transfer" / "GP-led secondary" all removed — Foundation Document §15
+// explicitly excludes a secondary market in unlisted shares; these
+// described Lengdon as a venue for exactly that, not merely used
+// different wording than the audit's literal "secondary transfers"
+// search term. "Sealed export" also removed here (no export capability
+// exists — CLAUDE.md §12, §20.15) and "transaction room" corrected to
+// "deal room."
 
 export const Route = createFileRoute("/sectors/")({
   component: Sectors,
@@ -18,8 +27,8 @@ const SECTORS = [
   {
     name: "Technology & SaaS",
     tag: "Most common",
-    desc: "Software companies raising seed through growth rounds. Typical use cases: priced equity rounds, SAFE conversions, secondary transactions.",
-    examples: ["Seed equity close", "Series A / B priced round", "SAFE conversion at priced round", "Secondary share transfer"],
+    desc: "Software companies raising seed through growth rounds. Typical use cases: priced equity rounds, SAFE conversions, bridge notes.",
+    examples: ["Seed equity close", "Series A / B priced round", "SAFE conversion at priced round", "Bridge note conversion"],
   },
   {
     name: "Venture-Backed Startups",
@@ -54,8 +63,8 @@ const SECTORS = [
   {
     name: "SPV & Syndicate Vehicles",
     tag: "",
-    desc: "Multi-LP vehicles closing into a single investment. Each LP signs individually; each LP receives their own sealed export at close.",
-    examples: ["AngelList-style SPV close", "GP-led secondary via SPV", "Scout fund investment", "Syndicate formation"],
+    desc: "Multi-LP vehicles closing into a single investment. Each LP signs individually; each LP can reference their own record at close by its own number.",
+    examples: ["AngelList-style SPV close", "Scout fund investment", "Syndicate formation", "Multi-LP commitment close"],
   },
   {
     name: "Emerging Markets",
@@ -126,7 +135,7 @@ function Sectors() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">Your sector. Your close.</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Start with a transaction room. No setup call required.</p>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Start with a deal room. No setup call required.</p>
             </div>
             <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
               Open a room

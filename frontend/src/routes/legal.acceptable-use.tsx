@@ -4,6 +4,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/AcceptableUse.tsx.
+//
+// Corrected 8 Sep 2026: this page had four distinct problems beyond
+// stale "transaction room" wording (corrected throughout to "deal
+// room"). "Secondary, or transfer transactions" as a PERMITTED use
+// directly named the Foundation §15-excluded secondary-market activity
+// as something the platform supports -- removed. "Using Lengdon's API
+// and webhooks to integrate closing infrastructure" claimed a public
+// API that does not exist -- removed. "Sealed close records" / "sealed
+// records" / "both parties' exports remain valid" all asserted the
+// fabricated export capability (CLAUDE.md §12, §20.15) -- reworded to
+// describe the real append-only in-room record.
 
 export const Route = createFileRoute("/legal/acceptable-use")({
   component: AcceptableUse,
@@ -11,20 +22,19 @@ export const Route = createFileRoute("/legal/acceptable-use")({
 
 const ALLOWED = [
   "Closing legitimate private capital transactions between consenting, identified parties",
-  "Raising equity financing for operating businesses through structured transaction rooms",
-  "Conducting M&A, secondary, or transfer transactions with proper legal counsel",
+  "Raising equity financing for operating businesses through structured deal rooms",
+  "Conducting M&A transactions with proper legal counsel",
   "Managing SPV and syndicate closes where all participants are properly identified",
-  "Using Lengdon's API and webhooks to integrate closing infrastructure into compliant platforms",
-  "Generating and retaining sealed close records for legitimate audit, regulatory, and legal purposes",
+  "Generating and retaining permanent, append-only close records for legitimate audit, regulatory, and legal purposes",
 ];
 
 const PROHIBITED = [
   {
     category: "Fraudulent transactions",
     items: [
-      "Creating transaction rooms for non-existent companies or fictitious transactions",
+      "Creating deal rooms for non-existent companies or fictitious transactions",
       "Using Lengdon to manufacture false audit records or to simulate a close that did not occur",
-      "Impersonating legal entities, individuals, or counsel in transaction rooms",
+      "Impersonating legal entities, individuals, or counsel in deal rooms",
     ],
   },
   {
@@ -38,18 +48,18 @@ const PROHIBITED = [
   {
     category: "Platform misuse",
     items: [
-      "Attempting to modify, tamper with, or circumvent the immutability of audit logs or sealed records",
+      "Attempting to modify, tamper with, or circumvent the append-only, tamper-evident nature of audit logs or closed records",
       "Using the platform to harass, coerce, or misrepresent terms to counterparties",
-      "Automated creation of transaction rooms at scale without legitimate underlying transactions",
-      "Attempting to access transaction rooms, records, or accounts that you are not authorized to access",
+      "Automated creation of deal rooms at scale without legitimate underlying transactions",
+      "Attempting to access deal rooms, records, or accounts that you are not authorized to access",
     ],
   },
   {
     category: "Content restrictions",
     items: [
-      "Uploading malware, spyware, or malicious code to transaction rooms",
+      "Uploading malware, spyware, or malicious code to deal rooms",
       "Uploading content that violates applicable laws, including child safety laws",
-      "Using transaction room document storage to host unrelated content",
+      "Using deal room document storage to host unrelated content",
     ],
   },
 ];
@@ -112,7 +122,7 @@ function AcceptableUse() {
           <div className="mt-16 border border-[#e6e9ef] p-8">
             <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[16px] tracking-[-0.3px] mb-3">Enforcement</h3>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.75]">
-              Lengdon reserves the right to investigate suspected violations of this policy and to suspend or terminate accounts found to be in violation. We may report violations to applicable regulatory or law enforcement authorities where required. The immutability of sealed close records is preserved even upon account termination — both parties' exports remain valid and accessible.
+              Lengdon reserves the right to investigate suspected violations of this policy and to suspend or terminate accounts found to be in violation. We may report violations to applicable regulatory or law enforcement authorities where required. The append-only close record is preserved even upon account termination — it remains unchanged and accessible to both parties.
             </p>
           </div>
 

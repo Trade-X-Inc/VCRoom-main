@@ -6,6 +6,16 @@ import { PageHero } from "@/components/site/PageHero";
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/for/VentureCapital.tsx. Own distinct
 // capabilities-grid + fund-lifecycle structure.
+//
+// Corrected 8 Sep 2026: "secondary transactions" removed from the
+// supported-use-case list, and the entire "Secondary transfer" /
+// "Transfer room" stage removed from the fund-lifecycle table below —
+// Foundation Document §15 explicitly excludes a secondary market in
+// unlisted shares; this page had built a specific room type and
+// mechanism around exactly that exclusion. Every "sealed record"
+// reference (three total) reworded — the phrase implied an exportable
+// artifact; no export capability of any kind exists (CLAUDE.md §12,
+// §20.15). The real append-only record mechanism is kept.
 
 export const Route = createFileRoute("/for/venture-capital")({
   component: VentureCapital,
@@ -14,7 +24,7 @@ export const Route = createFileRoute("/for/venture-capital")({
 const CAPABILITIES = [
   {
     label: "Portfolio-wide consistency",
-    body: "Standardize how every portfolio company runs its close. Same six-gate sequence, same NDA format, same sealed record — across every deal you lead or follow.",
+    body: "Standardize how every portfolio company runs its close. Same six-gate sequence, same NDA format, same append-only record — across every deal you lead or follow.",
   },
   {
     label: "Lead investor controls",
@@ -84,7 +94,7 @@ function VentureCapital() {
                 FROM FIRST<br />CLOSE TO EXIT.
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75] mb-8">
-                Use Lengdon for initial investment closes, follow-on rounds, secondary transactions, and eventual M&A or IPO preparation. Each transaction produces its own sealed record — and they accumulate into a complete history of the investment.
+                Use Lengdon for initial investment closes, follow-on rounds, and eventual M&A preparation. Each closing produces its own permanent, append-only record — and they accumulate into a complete history of the investment.
               </p>
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
                 Start your first room
@@ -94,8 +104,7 @@ function VentureCapital() {
               {[
                 { stage: "Initial close", note: "Lead investor sets structure, conditions are mapped, NDAs signed by all parties" },
                 { stage: "Follow-on round", note: "New room initialized with pro-rata terms, existing investors re-invited" },
-                { stage: "Secondary transfer", note: "Transfer room tracks both buyer and seller consent through all six gates" },
-                { stage: "Exit / M&A prep", note: "Acquisition room with full diligence gate, condition precedents, and sealed record for buyer" },
+                { stage: "Exit / M&A prep", note: "Acquisition room with full diligence gate, condition precedents, and a permanent record for the buyer" },
               ].map((s) => (
                 <div key={s.stage} className="flex gap-5 p-6">
                   <div className="w-1.5 h-1.5 bg-[#d4af37] mt-1.5 shrink-0" />

@@ -68,7 +68,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
     },
     {
       q: "What countries does Lengdon support?",
-      a: "Lengdon is a global platform: founders and investors from any jurisdiction can use it, wherever they are based. Registry verification covers 140+ jurisdictions including the UAE, Saudi Arabia, Qatar, Bahrain, the UK, and the US.",
+      a: "Lengdon is a global platform: founders and investors from any jurisdiction can use it, wherever they are based, including the UAE, Saudi Arabia, Qatar, Bahrain, the UK, and the US.",
     },
     {
       q: "How does the success fee work?",

@@ -40,7 +40,7 @@ export const Route = createFileRoute("/company/contact")({
 
 const REASONS = [
   "Book a product demo",
-  "Institutional / Firm plan inquiry",
+  "Institutional / enterprise inquiry",
   "Security documentation request",
   "Press or media",
   "Partnership inquiry",

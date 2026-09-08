@@ -6,6 +6,17 @@ import { PageHero } from "@/components/site/PageHero";
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/for/PrivateEquity.tsx. Own distinct
 // numbered-differentiators + stats-row + quote structure.
+//
+// Corrected 8 Sep 2026: "The sealed export produced at close" removed —
+// no export capability exists (CLAUDE.md §12, §20.15) — replaced with
+// the real permanent, in-room record. A second pass found two more
+// problems on the same page: differentiator 03, "Fund-to-fund transfer
+// ready," was built entirely around "secondary sales" — Foundation
+// Document §15 explicitly excludes a secondary market in unlisted
+// shares — rewritten around a real, non-excluded PE use case (co-
+// investment and follow-on structuring). The stats row's "Sealed record
+// retention — Export yours at close, permanently" repeated the same
+// export fabrication a second time on this page and is corrected too.
 
 export const Route = createFileRoute("/for/private-equity")({
   component: PrivateEquity,
@@ -24,13 +35,13 @@ const DIFFERENTIATORS = [
   },
   {
     num: "03",
-    title: "Fund-to-fund transfer ready",
-    body: "Manage secondary sales, LP transfers, and co-investment entries with the same structured room format. Every party signs their own agreement. Every action is individually attributed.",
+    title: "Co-investment and follow-on ready",
+    body: "Manage co-investment entries and follow-on rounds with the same structured room format. Every party signs their own agreement. Every action is individually attributed.",
   },
   {
     num: "04",
     title: "Post-close record integrity",
-    body: "The sealed export produced at close is legally defensible. It cannot be modified after sealing. Both parties receive identical copies — no dispute about what was agreed or when.",
+    body: "The record produced at close is append-only and tamper-evident. It cannot be modified after the fact. Both parties see the same history — no dispute about what was agreed or when.",
   },
 ];
 
@@ -75,7 +86,7 @@ function PrivateEquity() {
             {[
               { stat: "6", label: "Gates enforced in sequence", sub: "Non-negotiable close structure" },
               { stat: "100%", label: "Party-attributed actions", sub: "Every click, every confirm, logged" },
-              { stat: "∞", label: "Sealed record retention", sub: "Export yours at close, permanently" },
+              { stat: "∞", label: "Sealed record retention", sub: "Preserved, unchanged, permanently" },
             ].map((s) => (
               <div key={s.stat} className="p-10 flex flex-col gap-2">
                 <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[56px] leading-none tracking-[-3px]">{s.stat}</div>

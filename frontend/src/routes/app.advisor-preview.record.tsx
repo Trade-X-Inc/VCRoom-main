@@ -102,7 +102,7 @@ function AdvisorRecordPreview() {
           className="font-bold"
           style={{ fontSize: "11px", letterSpacing: "0.055em", color: "var(--v2-ink-muted)", textTransform: "uppercase" }}
         >
-          Sealed transaction record
+          Sealed deal record
         </span>
       </div>
 

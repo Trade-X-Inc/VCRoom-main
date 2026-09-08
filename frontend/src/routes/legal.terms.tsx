@@ -12,6 +12,19 @@ import { PageHero } from "@/components/site/PageHero";
 // delivery mechanism itself is not yet live — CLAUDE.md §12/§20.6 —
 // the append-only record it describes is real).
 //
+// Corrected 8 Sep 2026: that prior pass's own replacement text ("Both
+// parties receive a copy of the complete record at close" / "the
+// record received by both parties" / "Any record copies already
+// delivered to you remain yours") still asserted delivery of an
+// exported file, just in different wording than the literal "sealed
+// copy"/"sealed export" strings it searched for — a real instance of
+// this session's own standing lesson that a targeted string match can
+// miss the same underlying claim stated differently. No export
+// capability of any kind exists (CLAUDE.md §12, §20.15); rewritten to
+// describe the real mechanism (the record stays in the room,
+// inspectable by both parties, nothing is exported or delivered).
+// "Transaction room(s)" also corrected to "deal room(s)" throughout.
+//
 // FLAGGED, NOT CHANGED: "Governing law" (below) still names England and
 // Wales courts/law — this is a legal-substance decision (jurisdiction
 // clause), not an entity-name mechanical swap, and was outside the
@@ -28,7 +41,7 @@ const SECTIONS = [
     title: "Agreement to terms",
     content: `These Terms of Service ("Terms") govern your access to and use of the Lengdon platform, operated by Venture Tech LLC ("Lengdon", "we", "us"), a company under incorporation in the DIFC FinTech Hive, Dubai, United Arab Emirates.
 
-By creating an account or participating in a transaction room, you agree to these Terms. If you do not agree, do not use the platform.
+By creating an account or participating in a deal room, you agree to these Terms. If you do not agree, do not use the platform.
 
 These Terms were last updated: 26 August 2026.`,
   },
@@ -42,7 +55,7 @@ Lengdon is not:
 — An escrow or custodial service
 — A party to any transaction conducted on the platform
 
-We do not provide investment advice, legal advice, or financial services. We provide infrastructure. All decisions made within a transaction room are made by the parties themselves.`,
+We do not provide investment advice, legal advice, or financial services. We provide infrastructure. All decisions made within a deal room are made by the parties themselves.`,
   },
   {
     title: "Your account",
@@ -53,16 +66,16 @@ You may not share your credentials with any other person. Each individual must h
 You must provide accurate information when creating your account. Providing false information is grounds for immediate account termination.`,
   },
   {
-    title: "Transaction rooms",
-    content: `A transaction room ("Room") is a structured environment in which two or more parties conduct the six-gate closing sequence.
+    title: "Deal rooms",
+    content: `A deal room ("Room") is a structured environment in which two or more parties conduct the six-gate closing sequence.
 
 Each Room is created by a room initiator and exists until the transaction closes, is terminated by mutual agreement, or is terminated by Lengdon for violation of these Terms.
 
-The append-only audit record of a Room is the permanent log of all actions taken in that Room. It cannot be modified or deleted. Both parties receive a copy of the complete record at close.
+The append-only audit record of a Room is the permanent log of all actions taken in that Room. It cannot be modified or deleted, and it stays accessible to both parties within the Room for as long as the Room exists.
 
 By participating in a Room, you acknowledge that:
 — Your actions in the Room will be recorded in the append-only audit record
-— Your personal data will be included in the record received by both parties
+— Your personal data will be included in the record, visible to both parties
 — The audit record cannot be deleted after creation`,
   },
   {
@@ -82,7 +95,7 @@ Violation of these restrictions may result in immediate account termination and 
     title: "Intellectual property",
     content: `The Lengdon platform, including its software, design, and documentation, is owned by Venture Tech LLC and protected by applicable intellectual property laws.
 
-Your transaction data — the records of your actions, your documents, your confirmations — belongs to you and the other parties in your transaction. Lengdon does not claim ownership of transaction content.
+Your deal data — the records of your actions, your documents, your confirmations — belongs to you and the other parties in your transaction. Lengdon does not claim ownership of transaction content.
 
 The append-only audit record is jointly owned by all parties to the transaction. Lengdon holds a copy as part of its record retention obligations.`,
   },
@@ -100,11 +113,11 @@ Nothing in these Terms limits our liability for death or personal injury caused 
   },
   {
     title: "Termination",
-    content: `You may close your account at any time by contacting hello@lengdon.com. Closing your account does not delete data from closed transaction rooms (see "Transaction rooms" above).
+    content: `You may close your account at any time by contacting hello@lengdon.com. Closing your account does not delete data from closed deal rooms (see "Deal rooms" above).
 
 We may suspend or terminate your account if you violate these Terms, if we are required to do so by law, or if continued operation would create legal or regulatory risk for Lengdon.
 
-On termination, your access to the platform ceases. Any record copies already delivered to you remain yours.`,
+On termination, your access to the platform ceases. Records from Rooms you were a party to are retained per our data retention obligations, described in the Privacy Policy.`,
   },
   {
     title: "Governing law",

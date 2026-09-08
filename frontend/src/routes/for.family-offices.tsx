@@ -7,6 +7,16 @@ import { PageHero } from "@/components/site/PageHero";
 // LENGDONPUBLIC-NEW's src/pages/for/FamilyOffices.tsx. Uses a 3-column
 // feature grid (vs. the 2-column grid SimpleAudiencePage assumes) — not
 // built from that shared component to keep the exact column count.
+//
+// Corrected 8 Sep 2026: the source named a "Firm plan" pricing tier with
+// "unlimited rooms" — no such tier exists (see CLAUDE.md §20.2, which
+// tracks the real, still-unresolved pricing model as a blocking item).
+// Reworded to describe the real, tier-independent capability instead of
+// naming a plan that isn't real. Also removed "Custom data residency" —
+// no per-room jurisdiction-selection feature exists anywhere in the
+// deal-room code (verified against a live query of the real production
+// Supabase project: single region, ap-southeast-1, no per-room override)
+// — replaced with a real capability instead.
 
 export const Route = createFileRoute("/for/family-offices")({
   component: FamilyOffices,
@@ -17,8 +27,8 @@ const FEATURES = [
   { title: "Permanent record retention", desc: "Transactions close — records don't expire. Every deal you run through Lengdon contributes to a permanent, auditable history of your capital deployment." },
   { title: "Compliance-ready audit trail", desc: "Every action is timestamped, encrypted, and appended to a tamper-evident log. The audit trail is ready for compliance review, fund reporting, or legal proceedings without any additional work." },
   { title: "Per-portfolio room architecture", desc: "Each transaction gets its own isolated room. Access is scoped to the individuals named in that room — no cross-contamination between portfolio companies or investment vehicles." },
-  { title: "Custom data residency", desc: "Select the jurisdiction for each transaction room. Data stays in the elected jurisdiction. This is configurable per-room, not per-account." },
-  { title: "Unlimited rooms on Firm plan", desc: "Run as many concurrent transactions as your deployment schedule requires. The Firm plan gives you unlimited rooms with no per-transaction incremental cost." },
+  { title: "One room per transaction", desc: "Run as many concurrent deals as your deployment schedule requires. Each gets its own room — nothing is shared or aggregated across transactions." },
+  { title: "Individually scoped access", desc: "Every person you name into a room signs their own NDA and is individually logged. Nothing is visible to a party until they're explicitly added." },
 ];
 
 function FamilyOffices() {

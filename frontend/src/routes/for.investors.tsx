@@ -7,16 +7,23 @@ import { PageHero } from "@/components/site/PageHero";
 // LENGDONPUBLIC-NEW's src/pages/for/Investors.tsx. Own distinct
 // features+investor-type-nav+quote structure — not built from
 // SimpleAudiencePage.
+//
+// Corrected 8 Sep 2026: "Sealed audit export" removed — no export
+// capability exists (CLAUDE.md §12, §20.15) — replaced with the real
+// permanent, in-room record. The testimonial quote referenced the same
+// fabricated "sealed export" as an attributed factual claim, which is
+// worse than an unattributed one (§7.4); reworded to describe the real
+// mechanism. "Transaction room" corrected to "deal room."
 
 export const Route = createFileRoute("/for/investors")({
   component: Investors,
 });
 
 const FEATURES = [
-  { title: "Receive structured rooms", desc: "Founders invite you into a sequenced transaction room. Every gate is enforced — you see exactly what stage the deal is at and what remains before close." },
+  { title: "Receive structured rooms", desc: "Founders invite you into a sequenced deal room. Every gate is enforced — you see exactly what stage the deal is at and what remains before close." },
   { title: "Per-investor NDA", desc: "You sign your own NDA — not a catch-all company-level agreement. Your access is individually logged and keyed to your identity." },
   { title: "Condition visibility", desc: "Track every outstanding condition in real time. Regulatory approvals, board consents, third-party sign-offs — all mapped against the close sequence." },
-  { title: "Sealed audit export", desc: "At close, you receive a permanent, sealed export of the full transaction record. It cannot be edited or revoked by the other party." },
+  { title: "Permanent audit record", desc: "At close, the full deal record is locked in place — append-only, nothing further can be edited or removed by either party." },
 ];
 
 const INVESTOR_TYPES = [
@@ -85,7 +92,7 @@ function Investors() {
           <div className="max-w-[700px]">
             <div className="w-8 h-px bg-[#d4af37]/60 mb-8" />
             <blockquote style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[24px] leading-[1.4] tracking-[-0.5px] mb-6">
-              "The first time I used Lengdon on a deal, I realized I'd never had a proper record of any of my prior transactions. Now every close generates a sealed export I keep in my files permanently."
+              "The first time I used Lengdon on a deal, I realized I'd never had a proper record of any of my prior deals. Now every close leaves a permanent, append-only record I can point back to whenever I need it."
             </blockquote>
             <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[13px]">Angel investor, Series A round, 2026</div>
           </div>

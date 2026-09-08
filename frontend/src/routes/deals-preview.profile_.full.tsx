@@ -125,7 +125,7 @@ function FullProfile() {
               <div className="p-4 flex flex-col gap-3">
                 <LcsTextField label="Company name" value={form.name} onChange={set("name")} placeholder="Atlas Robotics" />
                 <LcsTextField label="Legal entity name" value={form.legalEntityName} onChange={set("legalEntityName")} placeholder="Full registered legal name (if different from trading name)" />
-                <LcsTextField label="Company registration number" value={form.registrationNumber} onChange={set("registrationNumber")} placeholder="e.g. 0001234 (Companies House), CL1234 (DIFC)" helper="Optional but improves registry verification accuracy" />
+                <LcsTextField label="Company registration number" value={form.registrationNumber} onChange={set("registrationNumber")} placeholder="e.g. 0001234 (Companies House), CL1234 (DIFC)" helper="Optional, used to confirm your company's registered legal identity" />
                 <LcsTextField label="Tagline" value={form.tagline} onChange={set("tagline")} placeholder="One line that explains your company" />
                 <div className="grid sm:grid-cols-2 gap-3">
                   <LcsTextField label="Website" value={form.website} onChange={set("website")} placeholder="https://example.com" />

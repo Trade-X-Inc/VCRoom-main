@@ -1341,7 +1341,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
                   className="w-full px-4 py-3 text-sm outline-none transition-colors"
                   style={{ borderRadius: "var(--radius-lcs-control)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
                 />
-                <p className="text-xs mt-1" style={{ color: "var(--lcs-ink-muted)" }}>Optional but improves registry verification accuracy</p>
+                <p className="text-xs mt-1" style={{ color: "var(--lcs-ink-muted)" }}>Optional, used to confirm your company's registered legal identity</p>
               </div>
 
               <Field label="Tagline" value={form.tagline} onChange={field("tagline")} placeholder="One line that explains your company" />

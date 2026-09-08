@@ -23,6 +23,19 @@ import { PageHero } from "@/components/site/PageHero";
 // "record export" (the export/registry delivery mechanism is not yet
 // live — CLAUDE.md §12/§20.6).
 //
+// Corrected 8 Sep 2026: the FAQ's own "both parties can still export a
+// copy of the record" line was missed by the pass above and still
+// asserted the export capability as live fact -- no export capability
+// of any kind exists (CLAUDE.md §12, §20.15). Fixed to describe the
+// real mechanism (the record itself stays inspectable in the room).
+// "One transaction room" corrected to "One deal room." Also removed
+// "Data residency options" from the Institutional plan's feature list --
+// no per-room jurisdiction-selection feature exists anywhere in the
+// deal-room code (verified against a live query of the real production
+// Supabase project). Pricing tiers, figures and plan names themselves
+// are UNTOUCHED -- those are the still-open §20.2 item and out of scope
+// for this pass.
+//
 // NOTE ON FIGURES: the instruction specified point prices (Standard
 // $799/mo, Deploying seat $3,999/seat/yr). CLAUDE.md §20.2's existing
 // record of the Foundation Document shows these as ranges instead
@@ -44,7 +57,7 @@ const PLANS = [
     period: "once, at first close",
     desc: "One transaction. One room. Full six-gate sequence and append-only record, billed once the deal closes.",
     features: [
-      "One transaction room",
+      "One deal room",
       "Six-gate enforced sequence",
       "Per-person NDA enforcement",
       "Append-only audit record",
@@ -91,9 +104,9 @@ const PLANS = [
     desc: "For large institutions with specific compliance, data residency, and integration requirements.",
     features: [
       "All features in Deploying seat",
-      "Data residency options",
       "SSO & identity provider integration",
       "Dedicated account manager",
+      "Custom compliance requirements, discussed directly",
     ],
     cta: "Contact us",
     href: "/company/contact",
@@ -108,7 +121,7 @@ const FAQS = [
   },
   {
     q: "What happens to the room if the transaction falls through?",
-    a: "The room and its append-only audit record are preserved. Both parties can still export a copy of the record, which documents exactly what happened and where the transaction ended.",
+    a: "The room and its append-only audit record are preserved. Both parties can still open the room and review exactly what happened and where the transaction ended.",
   },
   {
     q: "When am I billed on the Direct plan?",

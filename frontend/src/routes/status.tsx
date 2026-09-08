@@ -12,17 +12,22 @@ import { PageHero } from "@/components/site/PageHero";
 // table visual pattern the rest of the site already uses (no new
 // pattern introduced), with real, wired service links (status page,
 // support) instead of fabricated content.
+//
+// Corrected 8 Sep 2026: "Sealed export service" removed from the
+// monitored-services list — no export capability of any kind exists to
+// monitor (CLAUDE.md §12, §20.15). Removed rather than replaced; the
+// list doesn't need padding to a specific count. "Transaction room" also
+// corrected to "Deal room."
 
 export const Route = createFileRoute("/status")({
   component: Status,
 });
 
 const SERVICES = [
-  "Transaction room infrastructure",
+  "Deal room infrastructure",
   "Audit record service",
   "Authentication & MFA",
   "Document delivery",
-  "Sealed export service",
   "Web application",
 ];
 

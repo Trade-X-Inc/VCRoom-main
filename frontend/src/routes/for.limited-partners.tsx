@@ -6,6 +6,17 @@ import { PageHero } from "@/components/site/PageHero";
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/for/LimitedPartners.tsx. Own distinct
 // two-column-lists + record-value-prop structure.
+//
+// Corrected 8 Sep 2026: the source's central value proposition on this
+// page was "your own sealed export at close" / "the Lengdon sealed
+// export" — there is no export capability of any kind (see CLAUDE.md
+// §12, §20.15, and §7.4's standing rule against rendering a
+// verifiable-looking artifact of a capability that doesn't exist). The
+// real, permanent thing an LP gets is the append-only audit record
+// itself, inspectable in the room and citable by its reference number —
+// not a downloadable file. Rewritten to describe that instead of the
+// export. "Transaction room" also corrected to "deal room" (the real
+// product vocabulary) in the same pass.
 
 export const Route = createFileRoute("/for/limited-partners")({
   component: LimitedPartners,
@@ -20,7 +31,7 @@ function LimitedPartners() {
           eyebrow="Who it's for · Limited Partners"
           title="YOUR CAPITAL."
           titleOutline="YOUR RECORD."
-          subtitle="As an LP, you commit capital to funds and co-investments. Lengdon ensures that every transaction you participate in produces a permanent, sealed record that belongs to you — independent of any GP system."
+          subtitle="As an LP, you commit capital to funds and co-investments. Lengdon ensures that every deal you participate in produces a permanent, append-only record you can reference — independent of any GP system."
           cta={{ label: "Create LP account", to: "/sign-up" }}
         />
 
@@ -36,14 +47,14 @@ function LimitedPartners() {
             <div className="p-10">
               <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-5">For co-investments</h3>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.75] mb-6">
-                When you co-invest alongside a GP, you're invited into the transaction room as a principal. You sign your own NDA, review conditions, and receive your own sealed export at close.
+                When you co-invest alongside a GP, you're invited into the deal room as a principal. You sign your own NDA, review conditions, and can reference the record at close by its own number.
               </p>
               <ul className="flex flex-col gap-3">
                 {[
                   "Individual NDA — not GP-aggregated",
                   "Per-gate visibility into conditions",
-                  "Your own sealed close export",
-                  "Independently verifiable record",
+                  "A reference number for your own close",
+                  "An append-only, tamper-evident record",
                 ].map((pt) => (
                   <li key={pt} className="flex items-start gap-3">
                     <div className="w-1.5 h-1.5 bg-[#d4af37] mt-1.5 shrink-0" />
@@ -82,20 +93,20 @@ function LimitedPartners() {
                 <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Why it matters</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-6">
-                THE RECORD<br />OUTLASTS THE<br />RELATIONSHIP.
+                A RECORD<br />YOU CAN<br />POINT TO.
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75]">
-                GPs change platforms. Portals get shut down. Deal documents get migrated, lost, or consolidated by fund administrators. The Lengdon sealed export is a standalone file — it doesn't depend on any platform remaining operational to be readable.
+                GPs change platforms. Portals get shut down. Deal documents get migrated, lost, or consolidated by fund administrators. Every entry in a Lengdon deal room's record is append-only and tamper-evident — nothing in it can be edited or deleted after the fact, and the whole history stays inspectable for the life of the room.
               </p>
             </div>
             <div className="bg-[#f8f9fb] border border-[#e6e9ef] p-8">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase mb-6">At every close, you receive</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase mb-6">At every close, the room holds</div>
               <div className="flex flex-col gap-4">
                 {[
                   { label: "Complete gate log", detail: "Every action by every party, timestamped and attributed" },
                   { label: "All signed agreements", detail: "NDA, term sheet, subscription docs — full set" },
                   { label: "Condition record", detail: "Each condition, who confirmed it, when" },
-                  { label: "Sealed reference", detail: "Reference number for the complete record at time of close" },
+                  { label: "A reference number", detail: "Checkable reference for the complete record at time of close" },
                 ].map((r) => (
                   <div key={r.label} className="flex gap-4 pb-4 border-b border-[#e6e9ef] last:border-b-0 last:pb-0">
                     <div className="w-2 h-2 bg-[#0a2540] mt-1 shrink-0" />

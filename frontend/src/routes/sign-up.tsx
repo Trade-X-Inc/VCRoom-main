@@ -53,7 +53,7 @@ export const Route = createFileRoute('/sign-up')({
 type Role = 'founder' | 'investor' | ''
 
 const ROLE_OPTIONS: { id: Role; label: string; desc: string }[] = [
-  { id: 'founder', label: 'Founder', desc: 'Raising capital or running a transaction room' },
+  { id: 'founder', label: 'Founder', desc: 'Raising capital or running a deal room' },
   { id: 'investor', label: 'Investor', desc: 'Angel, VC, PE, family office, or syndicate' },
 ]
 
@@ -374,7 +374,7 @@ function SignUp() {
                     Your details
                   </h1>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
-                    These are used for your transaction room identity and NDA signing.
+                    These are used for your deal room identity and NDA signing.
                   </p>
                 </div>
 

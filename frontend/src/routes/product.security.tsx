@@ -15,6 +15,14 @@ import { PageHero } from "@/components/site/PageHero";
 // tamper-evident vocabulary rule (no "cryptographic", "hash", "block",
 // "chain", "immutable" — the mechanism is described as append-only and
 // tamper-evident instead).
+//
+// Corrected 8 Sep 2026: "Data residency" claimed per-room UK/EU/US
+// jurisdiction selection at room creation — no such feature exists
+// anywhere in the deal-room code (verified against a live query of the
+// real production Supabase project: single region, no per-room
+// override). "Independent record" claimed both parties "receive a copy"
+// at close — no export/delivery mechanism of any kind exists (CLAUDE.md
+// §12, §20.15). Both rewritten to describe what's real.
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
@@ -46,12 +54,12 @@ const PILLARS = [
     body: "Lengdon never handles, holds, escrows, or routes funds. Payment confirmation is recorded — proof of transfer is uploaded and counter-confirmed — but no financial instrument passes through our infrastructure.",
   },
   {
-    title: "Data residency",
-    body: "Transaction data is stored in the jurisdiction elected at room creation. UK, EU, and US options are available. Data does not leave the elected jurisdiction. For institutional requirements, additional residency options are available on request.",
+    title: "Reference-checkable record",
+    body: "Every closed deal gets a unique reference number that identifies its record without exposing terms, party identities, or document content. Both parties can cite it at any point after close.",
   },
   {
     title: "Independent record",
-    body: "Both parties receive a copy of the full audit trail at close. The record is independent of the Lengdon platform — it documents exactly what happened without requiring access to our systems.",
+    body: "The full audit trail is preserved after close, unchanged, for both parties. It documents exactly what happened — every gate, confirmation, and signature — for as long as the deal room exists.",
   },
 ];
 

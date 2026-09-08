@@ -3,6 +3,10 @@ import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/for/Angels.tsx.
+//
+// Corrected 8 Sep 2026: "Sealed record at close" claimed a "sealed,
+// signed export" — no export capability of any kind exists (CLAUDE.md
+// §12, §20.15). Reworded to describe the real permanent record.
 
 export const Route = createFileRoute("/for/angels")({
   component: Angels,
@@ -22,7 +26,7 @@ function Angels() {
         { title: "Formal structure for informal deals", desc: "Angel investments often lack the process that institutional deals have. Lengdon gives you the same closing infrastructure regardless of deal size." },
         { title: "Independent signing workflow", desc: "Sign documents in your own time, with your own counsel present — not in a shared session where pressure can be applied." },
         { title: "Payment proof confirmation", desc: "Upload your proof of transfer. The founder confirms receipt. Both confirmations are in the record before the room closes." },
-        { title: "Sealed record at close", desc: "You receive a sealed, signed export of the full audit trail. Your investment, your record — independent of any platform." },
+        { title: "Permanent record at close", desc: "The full audit trail is sealed and preserved, unchanged, for as long as the deal room exists — your investment, your record, always visible to you." },
       ]}
       ctaTitle="Start with one room."
       ctaSubtitle="One transaction. One room. Flat fee. No subscription."
