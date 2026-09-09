@@ -210,16 +210,16 @@ function HeroSection() {
             </div>
 
             <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
-              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">INFRASTRUCTURE</span>
-              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">FOR PRIVATE</span>
+              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
+              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
               <span className="block text-[clamp(64px,8vw,120px)]"
                 style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
-                CAPITAL.
+                WAY TO CLOSE
               </span>
             </h1>
 
             <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#425466] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
-              Lengdon closes private capital transactions. From room setup to close, both parties confirm every step — and every confirmation is written to a permanent record.
+              Lengdon structures the transaction between the term sheet and the close — giving founders and investors one shared environment to manage diligence, documentation, approvals, and execution.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
