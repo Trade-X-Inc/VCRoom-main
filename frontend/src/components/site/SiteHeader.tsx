@@ -104,7 +104,7 @@ function NavItem({ label, items }: { label: string; items: NavLink[] }) {
   return (
     <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button
-        className="flex items-center gap-1 transition-colors duration-200"
+        className="flex items-center gap-1 whitespace-nowrap transition-colors duration-200"
         style={{ fontFamily: FONT_REGULAR, fontSize: "13px", letterSpacing: "0.1px", color: open ? INK : INK_MUTED }}
         onClick={() => setOpen((p) => !p)}
         aria-expanded={open}
@@ -160,14 +160,14 @@ export function SiteHeader() {
             />
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-5 lg:gap-8">
             <NavItem label="Product" items={PRODUCT_LINKS} />
             <NavItem label="Who it's for" items={FOR_LINKS} />
             <NavItem label="Resources" items={RESOURCES_LINKS} />
             <NavItem label="Company" items={COMPANY_LINKS} />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 lg:gap-4">
             {user ? (
               <Link
                 to={dashboardUrl as any}
@@ -181,7 +181,7 @@ export function SiteHeader() {
                 <Link
                   to="/sign-in"
                   search={{ redirect: "/app" }}
-                  className="hidden sm:inline-flex transition-colors duration-200"
+                  className="hidden sm:inline-flex whitespace-nowrap transition-colors duration-200"
                   style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: "13px", textDecoration: "none" }}
                 >
                   Sign in
@@ -189,8 +189,8 @@ export function SiteHeader() {
                 <Link
                   to="/sign-up"
                   search={{ role: "founder" } as any}
-                  className="hidden sm:inline-flex transition-colors duration-200"
-                  style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 28px", textDecoration: "none" }}
+                  className="hidden sm:inline-flex whitespace-nowrap transition-colors duration-200"
+                  style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 16px", textDecoration: "none" }}
                 >
                   Join the waitlist
                 </Link>

@@ -39,7 +39,7 @@ ${previewText ? `<div style="display:none;max-height:0;overflow:hidden;">${previ
 <div class="wrapper">
   <div class="card">
     <div class="header">
-      <div class="logo">Hocky<span class="logo-dot">stick</span></div>
+      <div class="logo">Len<span class="logo-dot">gdon</span></div>
       <div style="color:#a1a1aa;font-size:12px;margin-top:4px;">Where deals get done</div>
     </div>
     <div class="body">

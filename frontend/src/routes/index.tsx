@@ -201,7 +201,7 @@ function HeroSection() {
 
       <div className="relative z-10 flex-1 flex items-center max-w-[1280px] mx-auto w-full px-10 pt-28 pb-12">
         <div className="flex items-center justify-between gap-8 w-full">
-          <div className="flex flex-col gap-8 max-w-[600px]">
+          <div className="flex flex-col gap-8 max-w-[600px] min-w-0">
             <div className="flex items-center gap-3">
               <div className="w-4 h-px bg-[#0a2540]/40" />
               <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase">
@@ -222,11 +222,11 @@ function HeroSection() {
               Lengdon closes private capital transactions. From room setup to close, both parties confirm every step — and every confirmation is written to a permanent record.
             </p>
 
-            <div className="flex items-center gap-4">
-              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-9 py-4 transition-colors duration-200">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-9 py-4 transition-colors duration-200 text-center">
                 Join the waitlist
               </Link>
-              <Link to="/product/how-it-works" style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] hover:text-[#0a2540] text-[14px] px-9 py-4 transition-all duration-200">
+              <Link to="/product/how-it-works" style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] hover:text-[#0a2540] text-[14px] px-9 py-4 transition-all duration-200 text-center">
                 See how it works →
               </Link>
             </div>
@@ -737,7 +737,7 @@ function ProcessSection() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 min-w-0 flex flex-col">
           {PROCESS_PHASES_V2.map((phase, i) => {
             const isOpen = openPhase === phase.num;
             const isLast = i === PROCESS_PHASES_V2.length - 1;
@@ -983,8 +983,8 @@ function AudienceSection() {
         </Reveal>
       </div>
 
-      <div className="flex min-h-[560px]">
-        <div className="w-[280px] xl:w-[320px] shrink-0 border-r border-[#e6e9ef] flex flex-col">
+      <div className="flex flex-col lg:flex-row lg:min-h-[560px]">
+        <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 border-r border-[#e6e9ef] flex flex-col">
           {AUDIENCES.map((a, i) => (
             <button
               key={a.role}
@@ -1012,7 +1012,7 @@ function AudienceSection() {
         </div>
 
         <div className="flex-1 flex flex-col lg:flex-row">
-          <div className="flex-1 px-12 xl:px-16 py-12 flex flex-col justify-between">
+          <div className="flex-1 min-w-0 px-12 xl:px-16 py-12 flex flex-col justify-between">
             <div className="flex flex-col gap-7">
               <div className="flex items-center gap-3">
                 <div className="w-4 h-px bg-[#d4af37]/60" />

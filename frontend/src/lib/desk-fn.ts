@@ -302,7 +302,7 @@ function buildEmailHtml(senderName: string, body: string): string {
 <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
 <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
 <div style="background:#0a0a0b;padding:28px 32px;text-align:center;">
-  <div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.5px;">Hocky<span style="color:#7c3aed;">stick</span></div>
+  <div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.5px;">Len<span style="color:#7c3aed;">gdon</span></div>
   <div style="color:#a1a1aa;font-size:12px;margin-top:4px;">Where deals get done</div>
 </div>
 <div style="padding:32px;">${escaped}</div>
