@@ -43,7 +43,7 @@ const SECTIONS = [
     articles: [
       { title: "Gate 1: Counsel", desc: "Legal review confirmation by both parties." },
       { title: "Gate 2: Agreement", desc: "Term acceptance and document execution." },
-      { title: "Gate 3: Conditions", desc: "Condition precedent satisfaction, each with a named owner." },
+      { title: "Gate 3: Conditions", desc: "Condition precedent tracking. The gate itself is enforced; which party clears which condition is agreed between them directly." },
       { title: "Gate 4: Signing", desc: "Formal execution of transaction documents." },
       { title: "Gate 5: Payment", desc: "Investor confirms transfer, founder confirms receipt." },
       { title: "Gate 6: Close", desc: "Mutual confirmation seals the record permanently." },
@@ -55,7 +55,7 @@ const SECTIONS = [
     icon: "04",
     articles: [
       { title: "How the audit log works", desc: "Append-only, tamper-evident. What that means." },
-      { title: "Evidence tiers", desc: "Preferred, Alternative, or Minimum — shown inline on every disclosed field." },
+      { title: "Evidence tiers", desc: "The Preferred, Alternative, or Minimum evidence standard every disclosure is built against." },
       { title: "Reference numbers", desc: "How every deal room, document, and record gets a checkable reference." },
       { title: "Legal defensibility", desc: "How Lengdon records are used in disputes and audits." },
     ],

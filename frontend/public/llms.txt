@@ -37,15 +37,16 @@ only at closing. No fee if a deal doesn't close.
   record, and who the product is built for.
 - [Pricing](https://lengdon.com/product/pricing): full pricing detail.
 - [About](https://lengdon.com/company/about): company origin and entity detail.
-- [Docs](https://lengdon.com/docs): full product documentation for
-  founders, investors, deal rooms, and the AI features.
-- [Blog](https://lengdon.com/blog): fundraising and deal-flow articles.
+- [Docs](https://lengdon.com/docs): getting started, deal rooms, the
+  gate sequence, audit and records, and security.
+- [Blog](https://lengdon.com/resources/blog): closing infrastructure, security,
+  compliance, and the structural gaps in private capital transactions.
 - [Free calculators](https://lengdon.com/tools): valuation, burn rate,
   runway, COGS, cap table, SAFE note, and dilution calculators — no signup
   required.
 
 ## Docs
 
-Full documentation lives at https://lengdon.com/docs, organized by
-founder features, investor features, deal rooms, and AI. The security model
-and platform changelog are at /docs/security and /docs/changelog.
+Full documentation lives at https://lengdon.com/docs, organized into
+getting started, deal rooms, the gate sequence, audit and records, and
+security. The platform changelog is at /resources/changelog.
