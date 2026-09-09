@@ -185,13 +185,23 @@ export const approveConnectionRequest = createServerFn({ method: "POST" })
 
     // Reuse a room left over from a previously interrupted approval of the
     // same pair — keeps retries idempotent instead of piling up rooms.
+    // Filters on workflow_stage='nda_signed' specifically (the fresh-creation
+    // value, Build Step 1's canonical sequence start) rather than matching
+    // a room at any stage: an interrupted approval never gets past this
+    // function's own insert before hitting the discovery_requests PATCH
+    // that marks it done, so a leftover room is always still at its
+    // just-created value. Matching any stage would risk reusing an
+    // unrelated, already-progressed room between the same pair instead of
+    // creating a fresh one for a genuinely new approval.
     const leftover: any[] = await sbFetch(
       url, key,
-      `deal_rooms?startup_id=eq.${startup.id}&investor_user_id=eq.${request.investor_id}&workflow_stage=eq.information_vault&status=eq.active&select=id&order=created_at.desc&limit=1`,
+      `deal_rooms?startup_id=eq.${startup.id}&investor_user_id=eq.${request.investor_id}&workflow_stage=eq.nda_signed&status=eq.active&select=id&order=created_at.desc&limit=1`,
       "GET"
     ).catch(() => []);
 
-    // Create the deal room at the Information Vault stage — the NDA gate on
+    // Create the deal room at the canonical sequence start (nda_signed) —
+    // a clean single INSERT, never insert-then-advance, so Build Step 1's
+    // UPDATE-only ordering trigger never fires on creation. The NDA gate on
     // the deal room page fires automatically for any member without an
     // nda_acceptances row, so no extra gating is needed here.
     let dealRoomId: string | undefined = leftover?.[0]?.id;
@@ -199,7 +209,7 @@ export const approveConnectionRequest = createServerFn({ method: "POST" })
       const rooms: any[] = await sbFetch(url, key, "deal_rooms", "POST", {
         startup_id: startup.id,
         status: "active",
-        workflow_stage: "information_vault",
+        workflow_stage: "nda_signed",
         investor_name: investorName,
         investor_company: fundName,
         investor_email: investorEmail,
