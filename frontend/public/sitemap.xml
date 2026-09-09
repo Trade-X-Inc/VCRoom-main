@@ -5,88 +5,208 @@
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
   </url>
+
   <url>
-    <loc>https://lengdon.com/how-it-works</loc>
+    <loc>https://lengdon.com/product/how-it-works</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/for-founders</loc>
+    <loc>https://lengdon.com/product/pricing</loc>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/for-investors</loc>
-    <priority>0.9</priority>
+    <loc>https://lengdon.com/product/security</loc>
+    <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/pricing</loc>
-    <priority>0.9</priority>
+    <loc>https://lengdon.com/product/compare</loc>
+    <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/about</loc>
+    <loc>https://lengdon.com/product/compare/datasite</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/terms</loc>
-    <priority>0.3</priority>
-    <changefreq>yearly</changefreq>
+    <loc>https://lengdon.com/product/compare/dealroom</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/privacy</loc>
-    <priority>0.3</priority>
-    <changefreq>yearly</changefreq>
+    <loc>https://lengdon.com/product/compare/docsend</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/blog</loc>
-    <priority>0.9</priority>
-    <changefreq>daily</changefreq>
+    <loc>https://lengdon.com/product/compare/firmex</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/blog/gcc-founders-winning-vc-deals-2026</loc>
+    <loc>https://lengdon.com/product/compare/ideals</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://lengdon.com/for/founders</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/blog/why-founders-lose-deals-before-first-meeting</loc>
+    <loc>https://lengdon.com/for/investors</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://lengdon.com/for/venture-capital</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/private-equity</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/syndicates</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/angels</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/family-offices</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/limited-partners</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/spvs</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/for/advisors</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://lengdon.com/sectors</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://lengdon.com/company/about</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/company/careers</loc>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/company/contact</loc>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://lengdon.com/legal</loc>
+    <priority>0.4</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/legal/terms</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/legal/privacy</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/legal/acceptable-use</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/legal/dpa</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/legal/sub-processors</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
   <url>
     <loc>https://lengdon.com/resources</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/resources/schedule</loc>
+    <loc>https://lengdon.com/resources/blog</loc>
+    <priority>0.8</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/resources/changelog</loc>
+    <priority>0.5</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://lengdon.com/docs</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
+
+  <url>
+    <loc>https://lengdon.com/glossary</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
   <url>
     <loc>https://lengdon.com/registry</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/feedback</loc>
-    <priority>0.4</priority>
-    <changefreq>monthly</changefreq>
+    <loc>https://lengdon.com/status</loc>
+    <priority>0.3</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/contact</loc>
-    <priority>0.5</priority>
+    <loc>https://lengdon.com/feedback</loc>
+    <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
+
   <url>
     <loc>https://lengdon.com/tools</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://lengdon.com/tools/valuation</loc>
+    <loc>https://lengdon.com/tools/valuation-calculator</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -118,181 +238,6 @@
   <url>
     <loc>https://lengdon.com/tools/dilution</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/profile</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/deal-rooms</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/vault</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/qa</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/nda</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/team</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/founders/ai</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors/deal-flow</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors/pipeline</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors/decisions</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors/due-diligence</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors/analysis</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/investors/team</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/stages</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/overview</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/information-vault</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/qa</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/due-diligence</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/term-sheet</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/deal-rooms/closing</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/ai</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/ai/operator-panel</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/ai/data-handling</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/security</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/security/overview</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/security/data</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/security/access-control</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/security/nda</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/security/disclosure</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/tools</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://lengdon.com/docs/changelog</loc>
-    <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
 </urlset>
