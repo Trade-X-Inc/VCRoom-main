@@ -152,8 +152,12 @@ export function SiteHeader() {
         style={{ borderBottom: `1px solid ${RULE}` }}
       >
         <div className="max-w-[1280px] mx-auto px-10 h-16 flex items-center justify-between">
-          <Link to="/" style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, color: INK, fontSize: "20px", letterSpacing: "-0.5px", textDecoration: "none" }}>
-            Lengdon
+          <Link to="/" className="shrink-0" style={{ textDecoration: "none" }}>
+            <img
+              src="/lengdon-logo-full.png"
+              alt="Lengdon"
+              style={{ height: "36px", width: "auto", display: "block" }}
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">

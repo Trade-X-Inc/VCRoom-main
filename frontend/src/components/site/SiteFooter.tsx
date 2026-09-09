@@ -185,9 +185,11 @@ export function SiteFooter() {
     <footer className="bg-white max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16">
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-10 mb-12 pb-12 border-b" style={{ borderColor: RULE }}>
         <div className="col-span-2 lg:col-span-1">
-          <div style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, color: INK, fontSize: "16px", letterSpacing: "-0.3px", marginBottom: "12px" }}>
-            Lengdon
-          </div>
+          <img
+            src="/lengdon-logo-full.png"
+            alt="Lengdon"
+            style={{ height: "30px", width: "auto", display: "block", marginBottom: "12px" }}
+          />
           <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: "13px", lineHeight: 1.6, maxWidth: "240px" }}>
             Closing infrastructure for private capital. Built for the next generation of institutional finance.
           </p>
