@@ -10,29 +10,33 @@ Built by Venture Tech LLC, DIFC FinTech Hive, Dubai, UAE.
 
 - Private NDA-gated deal rooms: document sharing, structured due diligence,
   AI document analysis, Q&A.
-- An evidence ladder for every disclosed fact — Preferred, Alternative, or
-  Minimum evidence, shown inline on the field itself. No verification score,
-  no percentage: the reader sees the evidence tier and draws their own
-  conclusion.
+- Every disclosure Lengdon publishes is built against a public evidence
+  standard — Preferred, Alternative, or Minimum evidence per field. No
+  verification score, no percentage: the standard states what backs a
+  claim, not whether it's true.
 - Per-term negotiation across four instrument types (SAFE, Equity, Debt,
   Company Sale) with a full audit trail.
 - A six-gate closing sequence — Counsel, Agreement, Conditions, Signing,
-  Payment, Close — each gate assigned to a named owner and enforced in
-  order. Investor and founder each confirm the payment step independently;
-  mutual confirmation at Close seals a permanent, exportable record. Lengdon
+  Payment, Close — enforced in order: a room cannot advance to the next
+  gate until the current one is confirmed. Investor and founder each
+  confirm the payment step independently; mutual confirmation at Close
+  seals a permanent record that stays accessible to both parties. Lengdon
   records the transfer confirmation — it does not move money itself.
 
 ## Fee model
 
-Free during beta. After beta: $49/month for founders. A 1.5% success fee on
-closed deals (minimum $500, maximum $15,000), charged only at closing. No fee
-if a deal doesn't close. Investors: free at launch.
+Free during beta. After beta, pricing is fee-by-event rather than a flat
+subscription — a one-time fee at first close, or a monthly fee while a raise
+is active. Full current tiers: https://lengdon.com/product/pricing. A 1.5%
+success fee applies on closed deals (minimum $500, maximum $15,000), charged
+only at closing. No fee if a deal doesn't close.
 
 ## Key pages
 
-- [Homepage](https://lengdon.com/): product overview, FAQ, pricing preview.
-- [Pricing](https://lengdon.com/pricing): full pricing detail.
-- [About](https://lengdon.com/about): company and team.
+- [Homepage](https://lengdon.com/): the six-gate sequence, the append-only
+  record, and who the product is built for.
+- [Pricing](https://lengdon.com/product/pricing): full pricing detail.
+- [About](https://lengdon.com/company/about): company origin and entity detail.
 - [Docs](https://lengdon.com/docs): full product documentation for
   founders, investors, deal rooms, and the AI features.
 - [Blog](https://lengdon.com/blog): fundraising and deal-flow articles.

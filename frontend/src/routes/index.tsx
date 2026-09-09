@@ -219,7 +219,7 @@ function HeroSection() {
             </h1>
 
             <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#425466] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
-              Lengdon closes private capital transactions. From room setup to sealed close — a sequenced, encrypted record of every action taken by both parties.
+              Lengdon closes private capital transactions. From room setup to close, both parties confirm every step — and every confirmation is written to a permanent record.
             </p>
 
             <div className="flex items-center gap-4">
@@ -657,8 +657,8 @@ const PROCESS_PHASES_V2 = [
   },
   {
     num: "03", title: "CONDITIONS",
-    party: "Owner of each condition",
-    desc: "Each prerequisite is assigned to a named owner and tracked until satisfied. The system enforces completion order — conditions cannot be resequenced or skipped.",
+    party: "Tracked to satisfaction",
+    desc: "Each condition precedent is added to the checklist and tracked until satisfied. The gate itself is enforced — the transaction cannot advance to Signing until every condition is marked complete.",
     img: "/images/homepage/process-conditions.jpg",
     imgAlt: "Compliance checklist documentation",
     bg: "#0a2540",
@@ -682,7 +682,7 @@ const PROCESS_PHASES_V2 = [
   {
     num: "06", title: "CLOSE",
     party: "Both parties, independently",
-    desc: "Mutual confirmation seals the record permanently. Both parties export a signed copy of the complete audit trail. The room is archived. Nothing changes after this point.",
+    desc: "Mutual confirmation seals the record permanently. The complete audit trail stops accepting new entries and stays accessible to both parties. Nothing changes after this point.",
     img: "/images/homepage/process-close.jpg",
     imgAlt: "Wooden wax seal stamp on a table",
     bg: "#0d1b2e",
@@ -912,22 +912,34 @@ function SecuritySection() {
 // ── WHO IT'S FOR ──────────────────────────────────────────
 const AUDIENCES = [
   {
-    role: "Founder",
-    tag: "RAISING CAPITAL",
-    desc: "You're raising from angels, syndicates, or funds. You need a sequenced process that protects you and your investor equally — and leaves a permanent, exportable record of every commitment made.",
-    uses: ["Structured data room by gate", "Per-person NDA enforcement", "Condition precedent tracking", "Signed close record you own"],
+    role: "VC Firm",
+    tag: "VENTURE CAPITAL",
+    desc: "You deploy capital across a portfolio. You need closing infrastructure your legal, compliance, and operations teams can rely on — consistent room structure, an enforced gate sequence, and a record that stays intact for the life of each room.",
+    uses: ["Portfolio-wide room consistency", "Append-only audit record per transaction", "Enforced gate sequence, not convention", "Record persists after close"],
   },
   {
-    role: "Advisors & Agents",
-    tag: "DEAL FACILITATION",
-    desc: "You coordinate transactions between parties and need full visibility without being a principal. Lengdon gives you a neutral record of every action taken on both sides — without you holding the data.",
-    uses: ["Read-only observer access", "Append-only audit trail", "Multi-party coordination", "Neutral infrastructure"],
+    role: "PE Firm",
+    tag: "PRIVATE EQUITY",
+    desc: "Your transactions are complex and multi-party. Lengdon enforces the same gate sequence regardless of transaction size — conditions, signatures, and payment confirmation, each recorded independently by the parties who confirm them.",
+    uses: ["Enforced closing sequence", "Multi-party NDA, per person", "Independent payment confirmation", "Permanent record per closing"],
+  },
+  {
+    role: "Syndicate Lead",
+    tag: "INVESTOR COORDINATION",
+    desc: "You coordinate a group of investors into a single closing. Each investor in the room follows the same gate sequence, and each payment confirmation is recorded individually — so the record shows exactly who confirmed what, not just that the round closed.",
+    uses: ["Multi-investor room", "Per-investor payment confirmation", "Shared gate sequence for the group", "Individually attributed record"],
   },
   {
     role: "Angels",
     tag: "INDIVIDUAL INVESTOR",
-    desc: "You invest personally. You need a formal closing process that protects your capital and leaves a clear record — even when investing alongside others or into early-stage companies without legal teams.",
-    uses: ["Formal structure for informal deals", "Payment proof confirmation", "Independent signing workflow", "Exportable close record"],
+    desc: "You invest personally, often alongside others or into early-stage companies with no legal team yet. Lengdon gives you the same formal closing process a fund would use — independent signing, payment confirmation, and a record that's yours to reference.",
+    uses: ["Formal process for informal deals", "Payment proof confirmation", "Independent signing, no joint session", "Permanent record of your close"],
+  },
+  {
+    role: "Advisors & Agents",
+    tag: "DEAL FACILITATION",
+    desc: "You coordinate a transaction between parties without being a principal. Lengdon gives you visibility scoped to your role, and a neutral record of every action taken by both sides — without you holding or controlling the data.",
+    uses: ["Role-scoped access, not full visibility", "Append-only audit trail", "Multi-party coordination", "Neutral, non-principal infrastructure"],
   },
   {
     role: "Legal",
@@ -938,26 +950,14 @@ const AUDIENCES = [
   {
     role: "Analyst",
     tag: "DUE DILIGENCE",
-    desc: "You evaluate deals. You need a data room that is consistent in structure, a diligence list that actually tracks ownership, and a record of every document accessed and every condition cleared.",
-    uses: ["Structured conditions checklist", "Document access log", "Consistent room architecture", "Exportable diligence record"],
+    desc: "You evaluate deals. You need a data room that is consistent in structure, a diligence checklist that tracks status, and a record of every document accessed and every condition cleared.",
+    uses: ["Diligence checklist by category", "Document access log", "Consistent room architecture", "Full diligence record"],
   },
   {
-    role: "VC Firm",
-    tag: "VENTURE CAPITAL",
-    desc: "You deploy capital at scale. You need closing infrastructure that your legal, compliance, and ops teams can rely on — with consistent room structure, enforced sequencing, and a record that survives the fund's lifetime.",
-    uses: ["Portfolio-wide room consistency", "Compliance-grade audit trail", "Multi-party conditions enforcement", "Fund-level record retention"],
-  },
-  {
-    role: "PE Firm",
-    tag: "PRIVATE EQUITY",
-    desc: "Your transactions are complex, multi-party, and long-running. Lengdon enforces sequencing across all conditions, all signatories, and all confirmations — with a permanent record tied to each closing event.",
-    uses: ["Complex conditions management", "Multi-signatory coordination", "Long-duration room support", "Permanent sealed close record"],
-  },
-  {
-    role: "Syndicate Lead",
-    tag: "INVESTOR COORDINATION",
-    desc: "You coordinate groups of investors into a single closing. You need a room where each investor follows the same process, conditions are tracked collectively, and the record is shared with everyone at close.",
-    uses: ["Multi-investor room architecture", "Collective conditions tracking", "Payment confirmation per investor", "Shared exportable close record"],
+    role: "Founder",
+    tag: "RAISING CAPITAL",
+    desc: "You're raising from angels, syndicates, or funds. You need a sequenced process that treats you and your investor equally — and a permanent record of every commitment made, on both sides.",
+    uses: ["Structured room by gate", "Per-person NDA enforcement", "Condition checklist tracked to satisfaction", "Permanent record of every close"],
   },
 ];
 
@@ -1112,9 +1112,9 @@ function CTASection() {
               <div className="flex flex-wrap gap-6 pt-2 border-t border-white/8">
                 {[
                   "6-gate enforced sequence",
-                  "Per-person encryption",
+                  "Per-room encryption",
                   "Permanent audit record",
-                  "Both parties export at close",
+                  "Per-person NDA, not per company",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <div className="w-1 h-1 rounded-full bg-[#d4af37]/60" />

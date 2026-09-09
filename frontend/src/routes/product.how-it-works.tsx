@@ -25,9 +25,9 @@ const GATES = [
   },
   {
     num: "03", title: "Conditions",
-    party: "Owner of each condition",
-    desc: "Conditions precedent are added to the room and assigned to named owners. Each condition must be satisfied in sequence. The system enforces completion order — conditions cannot be reordered, skipped, or marked satisfied by any party other than their assigned owner.",
-    detail: "System-enforced sequencing. Not convention, not goodwill.",
+    party: "Tracked to satisfaction",
+    desc: "Each condition precedent is added to the room and tracked until satisfied — regulatory approval, board consent, financing confirmations, whatever the deal requires. The gate itself is enforced: the room cannot advance to Signing until every condition is marked complete. Which party clears which condition, and in what order, is a matter both parties agree on directly — Lengdon enforces the boundary, not the internal workflow.",
+    detail: "The gate is enforced. Condition-by-condition sequencing inside it is not — that's between the parties.",
   },
   {
     num: "04", title: "Signing",
@@ -38,13 +38,13 @@ const GATES = [
   {
     num: "05", title: "Payment",
     party: "Investor + Founder confirm",
-    desc: "Investor confirms transfer. Founder confirms receipt. Both confirmations are required to advance to Close. Neither party can proceed to the final gate without the other's acknowledgement.",
+    desc: "Funds move directly between the parties, outside the platform. Investor confirms transfer. Founder confirms receipt. Both confirmations are required to advance to Close. Lengdon records the confirmation — it never holds, routes, or has access to the capital itself.",
     detail: "Dual confirmation required. The system records each action independently.",
   },
   {
     num: "06", title: "Close",
     party: "Both parties, independently",
-    desc: "Mutual confirmation closes the record permanently. The complete append-only audit trail stops accepting new entries. The room is archived. Nothing in the record can be changed, amended, or deleted after this point.",
+    desc: "Mutual confirmation closes the record permanently. The complete append-only audit trail stops accepting new entries and stays accessible to both parties. Nothing in the record can be changed, amended, or deleted after this point.",
     detail: "The complete record is preserved, unchanged, for both parties.",
   },
 ];
