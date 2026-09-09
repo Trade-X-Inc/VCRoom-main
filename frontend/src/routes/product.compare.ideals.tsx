@@ -12,9 +12,9 @@ export const Route = createFileRoute("/product/compare/ideals")({
 
 const ROWS = [
   { feature: "Enforced six-gate closing sequence", lengdon: true, them: false, note: "iDeals provides a virtual data room for document sharing — no enforced transaction sequence." },
-  { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "iDeals NDA workflow is document-based, not identity-bound to each participant." },
-  { feature: "Dual-party confirmation at every gate", lengdon: true, them: false, note: "iDeals has no concept of bilateral confirmation per gate." },
-  { feature: "Append-only audit trail", lengdon: true, them: false, note: "iDeals activity logs are standard — not append-only or tamper-evident." },
+  { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "iDeals NDA workflow is typically document-based rather than identity-bound to each participant." },
+  { feature: "Dual-party confirmation at every gate", lengdon: true, them: false, note: "Bilateral confirmation per gate isn't a standard data room concept." },
+  { feature: "Append-only audit trail", lengdon: true, them: false, note: "iDeals activity logs are standard access logs — not append-only or tamper-evident by design." },
   { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
   { feature: "Document storage", lengdon: true, them: true, note: "" },
   { feature: "Bulk upload and folder structure", lengdon: false, them: true, note: "Lengdon is not a general document repository. Documents are tied to gates." },

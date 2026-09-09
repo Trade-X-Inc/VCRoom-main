@@ -13,9 +13,9 @@ export const Route = createFileRoute("/product/compare/datasite")({
 
 const ROWS = [
   { feature: "Enforced six-gate closing sequence", lengdon: true, them: false, note: "Datasite is a document repository with no enforced transaction sequence." },
-  { feature: "Per-person NDA — individual, not company-level", lengdon: true, them: false, note: "Datasite access is granted at group/company level. Lengdon binds access to the individual." },
-  { feature: "Dual-party confirmation at every gate", lengdon: true, them: false, note: "Datasite requires only one party to upload. Lengdon requires both parties to confirm at each gate." },
-  { feature: "Append-only audit log", lengdon: true, them: false, note: "Datasite logs are admin-editable. Lengdon's log is append-only." },
+  { feature: "Per-person NDA — individual, not company-level", lengdon: true, them: false, note: "Datasite access is typically granted at group/company level. Lengdon binds access to the individual." },
+  { feature: "Dual-party confirmation at every gate", lengdon: true, them: false, note: "Datasite is built around single-party document upload, not dual confirmation. Lengdon requires both parties to confirm at each gate." },
+  { feature: "Append-only audit log", lengdon: true, them: false, note: "Datasite logs, like most data room logs, are admin-editable. Lengdon's log is append-only." },
   { feature: "Payment confirmation gate", lengdon: true, them: false, note: "No data room product includes a payment confirmation gate." },
   { feature: "Document storage and sharing", lengdon: true, them: true, note: "" },
   { feature: "Q&A and redline workflow", lengdon: false, them: true, note: "Lengdon is closing infrastructure, not a diligence platform. It begins after terms are agreed." },

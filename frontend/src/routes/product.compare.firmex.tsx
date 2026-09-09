@@ -26,8 +26,8 @@ export const Route = createFileRoute("/product/compare/firmex")({
 
 const ROWS = [
   { feature: "Six-gate enforced close sequence", lengdon: true, them: false, note: "Firmex has no transaction sequencing. It's a document management platform." },
-  { feature: "Per-person NDA, individually bound", lengdon: true, them: false, note: "Firmex NDA management is document-centric — not identity-level access binding." },
-  { feature: "Bilateral confirmation per gate", lengdon: true, them: false, note: "Firmex doesn't require both parties to confirm anything. Documents are uploaded; access is granted." },
+  { feature: "Per-person NDA, individually bound", lengdon: true, them: false, note: "Firmex NDA management is typically document-centric rather than identity-level access binding." },
+  { feature: "Bilateral confirmation per gate", lengdon: true, them: false, note: "Firmex is built around document upload and access grants, not a two-party confirmation requirement." },
   { feature: "Append-only audit log", lengdon: true, them: false, note: "Firmex activity logs are standard records — not append-only or tamper-evident." },
   { feature: "Payment gate confirmation", lengdon: true, them: false, note: "" },
   { feature: "Document hosting", lengdon: true, them: true, note: "" },

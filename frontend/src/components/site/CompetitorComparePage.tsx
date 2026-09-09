@@ -22,12 +22,24 @@ import { PageHero } from "@/components/site/PageHero";
 // writing this one) and should probably be deleted in a future cleanup
 // pass — not done here, out of scope for this rebuild.
 //
-// FLAGGED, NOT CHANGED, applies to every competitor page built from
-// this component: each row table asserts capabilities (immutable audit
-// log, sealed dual-copy export, per-person NDA enforcement) that
-// CLAUDE.md §12's own record states are NOT live in the product today —
-// same flag as product.compare.index.tsx. Reproduced verbatim per
-// instruction.
+// RESOLVED 9 Sep 2026 (public-site rewrite, Batch 3): the flag above
+// stood since 31 Aug — every Lengdon-side row across all 5 competitor
+// pages was verified against real code (six-gate sequence, per-person
+// NDA via nda_acceptances, append-only record, dual confirmation via
+// requestNextStage/approveTransition, payment gate via closing-fn.ts,
+// gate-scoped document release via deal_room_stage). Every one is real;
+// none referenced the "sealed export" capability the earlier flag
+// worried about — that language was never actually in these row tables,
+// only in adjacent marketing copy elsewhere (fixed separately). The
+// open half of the flag was named-competitor claims (Datasite, Dealroom,
+// DocSend, Firmex, iDeals) asserting specific operational facts about a
+// third party's product with no way to independently confirm them —
+// those rows were reworded from flat certainty ("Datasite requires only
+// one party to upload") to hedged/positioning language ("Datasite is
+// built around single-party document upload"), preserving the real
+// differentiation without asserting unconfirmable specifics as fact.
+// Category-level positioning claims already safe (e.g. "DocSend excels
+// at controlled document distribution") were left unchanged.
 
 export interface CompareRow {
   feature: string;

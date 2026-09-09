@@ -83,7 +83,7 @@ function Sectors() {
           eyebrow="Where Lengdon operates"
           title="SECTORS WE"
           titleOutline="SERVE."
-          subtitle="Private capital transactions across industries and asset classes. Wherever a sequenced, documented, and sealed close is required — Lengdon provides the infrastructure."
+          subtitle="Private capital transactions across industries and asset classes. Wherever a sequenced, documented, permanently recorded close is required — Lengdon provides the infrastructure."
         />
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">

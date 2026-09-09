@@ -13,7 +13,7 @@ export const Route = createFileRoute("/product/compare/docsend")({
 const ROWS = [
   { feature: "Enforced closing sequence (6 gates)", lengdon: true, them: false, note: "DocSend is a document analytics and sharing tool. It has no closing infrastructure." },
   { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "DocSend tracks who viewed a document. It does not enforce individual NDAs in a transaction context." },
-  { feature: "Dual-party confirmation gate logic", lengdon: true, them: false, note: "DocSend is one-directional — sender pushes, receiver views. No bilateral confirmation." },
+  { feature: "Dual-party confirmation gate logic", lengdon: true, them: false, note: "DocSend is built for one-directional sharing — sender sends, receiver views. Bilateral confirmation isn't its model." },
   { feature: "Append-only audit trail", lengdon: true, them: false, note: "DocSend analytics show views and time spent — not a transaction audit record." },
   { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
   { feature: "Document sharing with view tracking", lengdon: false, them: true, note: "DocSend excels at controlled document distribution with analytics." },
