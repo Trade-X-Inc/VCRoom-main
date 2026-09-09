@@ -23,6 +23,19 @@ import { PageHero } from "@/components/site/PageHero";
 // override). "Independent record" claimed both parties "receive a copy"
 // at close — no export/delivery mechanism of any kind exists (CLAUDE.md
 // §12, §20.15). Both rewritten to describe what's real.
+//
+// Corrected 9 Sep 2026 (public-site rewrite, Batch 2): the same "receive
+// a copy... at close" export claim survived in a second location this
+// 8 Sep pass missed — the "Shared record" item in the append-only-record
+// sidebar list below. Rewritten to match the pillar-level fix above.
+// Also added, per the task's own instruction that a procurement reviewer
+// trusts a company that volunteers its gaps: a one-line statement that
+// SOC 2 and independent penetration testing are not yet in place (the
+// 31 Aug pass removed every certification claim but never stated the
+// gap plainly, leaving certifications simply unaddressed rather than
+// disclosed), and an explicit regulatory-boundary statement (software
+// infrastructure, not a regulated financial institution, works alongside
+// regulated counsel and compliance functions rather than replacing them).
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
@@ -51,7 +64,7 @@ const PILLARS = [
   },
   {
     title: "No money movement",
-    body: "Lengdon never handles, holds, escrows, or routes funds. Payment confirmation is recorded — proof of transfer is uploaded and counter-confirmed — but no financial instrument passes through our infrastructure.",
+    body: "Lengdon is software infrastructure, not a regulated financial institution. We never handle, hold, escrow, or route funds. Payment confirmation is recorded — proof of transfer is uploaded and counter-confirmed between the parties — but no financial instrument passes through our infrastructure. We work alongside your counsel, escrow agent, and compliance function; we don't replace them.",
   },
   {
     title: "Reference-checkable record",
@@ -119,7 +132,7 @@ function Security() {
                 {[
                   { prop: "Append-only", desc: "No deletes. No edits. Additions only." },
                   { prop: "Tamper-evident", desc: "Each entry references its predecessor; a change is detectable." },
-                  { prop: "Shared record", desc: "Both parties receive a copy of the complete record at close." },
+                  { prop: "Shared record", desc: "Both parties see the same record — neither controls or can revoke the other's view of it." },
                 ].map((item) => (
                   <div key={item.prop} className="flex gap-4">
                     <div className="w-2 h-2 rounded-full bg-[#0a2540] mt-1.5 shrink-0" />
@@ -159,7 +172,7 @@ function Security() {
         <section className="bg-[#f8f9fb] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16 border-b border-[#e6e9ef]">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] max-w-[560px]">
-              Full technical documentation of our security controls and encryption implementation is available on request for institutional due diligence.
+              Full technical documentation of our security controls and encryption implementation is available on request for institutional due diligence. We do not yet hold a SOC 2 attestation or an independent penetration-test report — both are on our roadmap, not achieved today, and we say so directly rather than leave the question open.
             </p>
             <div className="flex gap-4 shrink-0">
               <Link to="/legal/privacy" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] hover:text-[#0a2540] text-[14px] px-8 py-3 transition-all duration-200">

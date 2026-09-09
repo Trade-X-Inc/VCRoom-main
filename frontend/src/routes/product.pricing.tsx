@@ -36,6 +36,19 @@ import { PageHero } from "@/components/site/PageHero";
 // are UNTOUCHED -- those are the still-open §20.2 item and out of scope
 // for this pass.
 //
+// Corrected 9 Sep 2026 (public-site rewrite, Batch 2): the Institutional
+// plan's own description sentence still said "specific compliance, data
+// residency, and integration requirements" -- the word "data residency"
+// survived in the description even though the 8 Sep pass removed it
+// from the feature-list bullet one line below. Also found and removed:
+// "API access" (Deploying seat) -- docs/standard.tsx's own API page
+// states this is "not yet published"; and "SSO & identity provider
+// integration" (Institutional) -- the real auth mechanism is
+// email/password and Google OAuth (sign-in.tsx), no SAML/SSO/identity-
+// provider integration exists anywhere in the codebase. Both replaced
+// with real, already-verified capabilities (team invite/role management,
+// per-person NDA enforcement) rather than left as gaps in the card.
+//
 // NOTE ON FIGURES: the instruction specified point prices (Standard
 // $799/mo, Deploying seat $3,999/seat/yr). CLAUDE.md §20.2's existing
 // record of the Foundation Document shows these as ranges instead
@@ -91,7 +104,7 @@ const PLANS = [
       "All features in Standard",
       "Per-seat annual pricing",
       "Priority support",
-      "API access",
+      "Team invite and role management",
     ],
     cta: "Book a demo",
     href: "/company/contact",
@@ -101,10 +114,10 @@ const PLANS = [
     name: "Institutional",
     price: "Scoped individually",
     period: "no published number",
-    desc: "For large institutions with specific compliance, data residency, and integration requirements.",
+    desc: "For large institutions with specific compliance and integration requirements.",
     features: [
       "All features in Deploying seat",
-      "SSO & identity provider integration",
+      "Per-person NDA enforcement across every room",
       "Dedicated account manager",
       "Custom compliance requirements, discussed directly",
     ],
