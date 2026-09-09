@@ -32,7 +32,7 @@ function LimitedPartners() {
           title="YOUR CAPITAL."
           titleOutline="YOUR RECORD."
           subtitle="As an LP, you commit capital to funds and co-investments. Lengdon ensures that every deal you participate in produces a permanent, append-only record you can reference — independent of any GP system."
-          cta={{ label: "Create LP account", to: "/sign-up" }}
+          cta={{ label: "Join the waitlist", to: "/sign-up" }}
         />
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
@@ -131,7 +131,7 @@ function LimitedPartners() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Create account
+                Join the waitlist
               </Link>
               <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                 Contact us →

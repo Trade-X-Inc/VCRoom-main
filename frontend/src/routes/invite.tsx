@@ -63,7 +63,7 @@ function Invite() {
           <p className="text-muted-foreground mb-6">Free during beta. No credit card required.</p>
           <Link to="/sign-up" search={{ role: "founder" } as any}
             className="inline-flex items-center gap-2 rounded-lg hs-gradient text-foreground px-8 py-3 font-semibold text-sm hover:bg-[#6d28d9] transition-colors">
-            Create your account <ArrowRight className="h-4 w-4" />
+            Join the waitlist <ArrowRight className="h-4 w-4" />
           </Link>
           {referralCode && (
             <p className="text-xs text-muted-foreground mt-4">Referral code: {referralCode}</p>

@@ -115,7 +115,7 @@ function ValuationCalculator() {
               Once your round terms are set, use Lengdon to close the transaction — sequenced, documented, and permanently recorded.
             </p>
             <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
-              Start closing with Lengdon
+              Join the waitlist
             </Link>
           </div>
         </section>

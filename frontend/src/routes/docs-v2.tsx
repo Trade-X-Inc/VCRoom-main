@@ -217,7 +217,7 @@ function DocsLayout() {
                 fontFamily: UI, fontSize: "13px", fontWeight: 500, textDecoration: "none",
               }}
             >
-              Get started
+              Join the waitlist
             </Link>
           </div>
         </div>

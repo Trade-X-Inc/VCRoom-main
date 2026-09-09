@@ -120,12 +120,12 @@ function ResourcesIndex() {
                 Ready to close your first transaction?
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
-                No credit card. No setup call. Open a room and start the sequence.
+                We're not onboarding new accounts right now. Join the waitlist and we'll reach out.
               </p>
             </div>
             <div className="flex gap-3 shrink-0">
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
-                Create account
+                Join the waitlist
               </Link>
               <Link to="/sign-in" search={{ redirect: "/app" } as any} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
                 Sign in →

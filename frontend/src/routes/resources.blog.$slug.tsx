@@ -127,7 +127,7 @@ function BlogArticle() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-8 py-3.5 transition-colors duration-200">
-              Get started free →
+              Join the waitlist →
             </Link>
             <Link to="/resources/blog" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[14px] px-8 py-3.5 transition-all duration-200">
               ← More articles

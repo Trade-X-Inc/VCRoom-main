@@ -40,7 +40,7 @@ function RunwayCalculator() {
         { label: "Projected cash-out date", value: adjustedMonths >= 999 ? "N/A" : outDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
       ]}
       ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full six-gate sequence."
-      ctaLabel="Start your room"
+      ctaLabel="Join the waitlist"
     />
   );
 }

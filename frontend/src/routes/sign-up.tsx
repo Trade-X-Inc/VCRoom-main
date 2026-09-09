@@ -1,46 +1,29 @@
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Turnstile } from '@marsidev/react-turnstile'
+import { syncContactToHubSpot } from '@/lib/hubspot'
+import { submitWaitlistEntry } from '@/lib/notion-waitlist'
 
-// Content/wiring pass, 31 Aug 2026 — pixel-exact port of
-// lengdon-public-new/src/pages/auth/SignUp.tsx (the founder's Figma
-// export — this route was not built in the earlier full-site rebuild
-// and is filled in now). Two-step flow (role selection, then account
-// details) reproduced exactly, including the step indicator and the
-// password-length strength bar.
-//
-// AUTH LOGIC UNCHANGED, per instruction and CLAUDE.md §4 (src/lib/
-// auth.tsx and src/lib/supabase.ts require confirmation to touch —
-// neither was touched). Every call is the prior implementation,
-// verbatim: supabase.auth.signUp (with the existing captchaToken
-// wiring), the users-table role upsert (saveRole), supabase.auth.
-// signInWithOAuth for Google (with the existing pending_role
-// localStorage handoff, unchanged), and the founder/investor redirect
-// split. Turnstile site key read from the same existing env var.
-//
-// One real behavioral difference from the pixel-exact source, kept
-// deliberately: the source's step-2 password field enforces an 8-char
-// minimum with a 3-bar strength indicator; the existing wired signUp
-// call and its Supabase project enforce a 6-char minimum (unchanged
-// from the pre-existing form). The bar and copy were left visually
-// as-designed (4/8/12-char thresholds are purely a UI affordance, not
-// a validation the source enforces above what the real form does) but
-// the actual `minLength` on the input and the step-2 validation check
-// use 6, matching the real backend requirement — not 8, which would
-// have silently blocked passwords the auth service accepts. Flagging
-// this rather than picking one number by guessing which was correct.
-//
-// Crypto vocabulary fixed per the sitewide rule: source's "Immutable
-// audit record" -> "Append-only audit record"; "Sealed export at
-// close" (a not-yet-live capability per CLAUDE.md §12/§20.6) ->
-// "Every action recorded, permanently" (describes what's real: the
-// append-only record itself, not export delivery).
+// Waitlist wiring pass, 9 Sep 2026 — new signups are paused; this page
+// no longer creates real accounts. AUTH LOGIC (src/lib/auth.tsx,
+// src/lib/supabase.ts) is untouched per CLAUDE.md §4 — nothing here
+// calls supabase.auth.signUp any more, so there's nothing to gate at
+// that layer; the account-creation path itself is simply not rendered.
+// Same two-step shape kept (role, then details) since the fields are
+// the same ones a waitlist entry needs. Submits to all three real
+// destinations: Supabase (waitlist_entries — same table and open
+// insert policy the footer newsletter form already uses), Notion (the
+// new "Lengdon Waitlist" database, src/lib/notion-waitlist.ts), and
+// HubSpot (via the existing, already-working syncContactToHubSpot —
+// NOT the raw fetch()-to-a-server-fn-route pattern the footer form's
+// dead HubSpot call used, which has no real HTTP handler behind it).
+// No confirmation email of any kind is sent from here — the "You're on
+// the waitlist" state below is the only acknowledgment, per instruction.
 
 export const Route = createFileRoute('/sign-up')({
   head: () => ({
     meta: [
-      { title: "Sign up | Lengdon" },
+      { title: "Join the waitlist | Lengdon" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -63,28 +46,9 @@ function SignUp() {
   const [role, setRole] = useState<Role>(search.role ?? '')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState('')
-
-  const saveRole = async (userId: string, userRole: Role, fullName: string) => {
-    const { error } = await supabase.from('users').upsert(
-      { id: userId, role: userRole, full_name: fullName, updated_at: new Date().toISOString() },
-      { onConflict: 'id' }
-    )
-    if (error) console.error('[sign-up] role save failed:', error)
-  }
-
-  const handleGoogle = async () => {
-    if (!role) return
-    localStorage.setItem('pending_role', role)
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + '/auth/callback' }
-    })
-  }
 
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,42 +59,51 @@ function SignUp() {
 
   const handleStep2 = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!role) return
-    if (!name || !email || !password) {
-      setError('All fields are required.')
-      return
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+    if (!name || !email) {
+      setError('Name and email are required.')
       return
     }
     setError('')
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { role, full_name: name },
-        captchaToken: turnstileToken || undefined,
-      }
-    })
+    try {
+      const { error: dbError } = await supabase.from('waitlist_entries').insert({
+        full_name: name,
+        email: email.trim().toLowerCase(),
+        role: role || null,
+        type: 'sign-up page',
+      })
+      if (dbError) console.error('[sign-up] waitlist insert failed:', dbError)
 
-    if (error) {
-      setError(error.message)
+      const [firstName, ...rest] = name.trim().split(' ')
+      await syncContactToHubSpot({
+        data: {
+          email: email.trim().toLowerCase(),
+          properties: {
+            firstname: firstName || '',
+            lastname: rest.join(' '),
+            lifecyclestage: 'lead',
+            hs_lead_status: 'NEW',
+            ...(role ? { user_type: role === 'founder' ? 'Founder' : 'Investor' } : {}),
+          },
+        },
+      }).catch((e) => console.error('[sign-up] HubSpot sync failed:', e))
+
+      await submitWaitlistEntry({
+        data: {
+          name,
+          email: email.trim().toLowerCase(),
+          role: role || undefined,
+          source: 'sign-up page',
+        },
+      }).catch((e) => console.error('[sign-up] Notion submit failed:', e))
+
+      setDone(true)
+    } catch (e) {
+      console.error('[sign-up] waitlist submission error:', e)
+      setError('Something went wrong. Please try again.')
+    } finally {
       setLoading(false)
-      return
-    }
-
-    if (data.user) {
-      await saveRole(data.user.id, role, name)
-
-      if (data.session) {
-        window.location.href = role === 'investor' ? '/app/investor/' : '/app'
-      } else {
-        setDone(true)
-        setLoading(false)
-      }
     }
   }
 
@@ -155,7 +128,7 @@ function SignUp() {
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-white/20" />
             <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">
-              Free to start
+              In beta
             </span>
           </div>
 
@@ -171,7 +144,7 @@ function SignUp() {
           </h2>
 
           <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[15px] leading-[1.75] max-w-[340px]">
-            No credit card. No trial timer. Fees only apply once a raise reaches its first close. Your room is yours from the moment you open it.
+            We're not onboarding new accounts right now. Join the waitlist and we'll reach out when it's your turn.
           </p>
         </div>
 
@@ -199,7 +172,7 @@ function SignUp() {
             Lengdon
           </Link>
           <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden lg:block text-[#94a3b8] text-[13px]">
-            Create your account
+            Join the waitlist
           </span>
           <div className="flex items-center gap-2 ml-auto">
             <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px]">
@@ -232,7 +205,7 @@ function SignUp() {
                   ) : s}
                 </div>
                 <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12px] ${step === s ? "text-[#0a2540]" : "text-[#c9d0db]"}`}>
-                  {s === 1 ? "Your role" : "Account details"}
+                  {s === 1 ? "Your role" : "Your details"}
                 </span>
                 {s < 2 && <div className="w-6 h-px bg-[#e6e9ef] mx-1" />}
               </div>
@@ -252,19 +225,19 @@ function SignUp() {
                 </div>
                 <div>
                   <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[28px] tracking-[-1px] mb-2">
-                    Account created
+                    You're on the waitlist
                   </h2>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.65] max-w-[320px]">
-                    We've sent a verification link to <strong>{email}</strong>. Check your inbox to activate your account.
+                    We've got your details. We'll reach out at <strong>{email}</strong> when we're ready to bring you on.
                   </p>
                 </div>
                 <div className="w-full border-t border-[#e6e9ef] pt-6">
                   <Link
-                    to="/sign-in"
+                    to="/"
                     style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
                     className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-10 py-3.5 transition-colors duration-200"
                   >
-                    Go to sign in
+                    Back to home
                   </Link>
                 </div>
               </div>
@@ -280,10 +253,10 @@ function SignUp() {
                     </span>
                   </div>
                   <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
-                    How are you using Lengdon?
+                    We're not onboarding new accounts right now
                   </h1>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
-                    Your role determines your room permissions and default view.
+                    Join the waitlist and we'll reach out. Tell us how you'd use Lengdon.
                   </p>
                 </div>
 
@@ -329,27 +302,6 @@ function SignUp() {
                   >
                     Continue
                   </button>
-
-                  <div className="flex items-center gap-4 my-2">
-                    <div className="flex-1 h-px bg-[#e6e9ef]" />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px]">or</span>
-                    <div className="flex-1 h-px bg-[#e6e9ef]" />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleGoogle}
-                    disabled={!role}
-                    style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                    className="w-full border border-[#e6e9ef] hover:border-[#0a2540]/20 hover:bg-[#f8f9fb] disabled:opacity-40 text-[#425466] text-[14px] py-3.5 transition-all duration-150 flex items-center justify-center gap-3"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                      <rect x="1" y="1" width="7" height="7" fill="#EA4335" />
-                      <rect x="10" y="1" width="7" height="7" fill="#4285F4" />
-                      <rect x="1" y="10" width="7" height="7" fill="#34A853" />
-                      <rect x="10" y="10" width="7" height="7" fill="#FBBC04" />
-                    </svg>
-                    Continue with Google{role ? ` as ${role === 'founder' ? 'Founder' : 'Investor'}` : ''}
-                  </button>
                 </form>
               </>
             )}
@@ -374,14 +326,14 @@ function SignUp() {
                     Your details
                   </h1>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
-                    These are used for your deal room identity and NDA signing.
+                    We'll use this to reach out when we're ready for you.
                   </p>
                 </div>
 
                 <form onSubmit={handleStep2} className="flex flex-col gap-5">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="signup-name" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">
-                      Full legal name
+                      Full name
                     </label>
                     <input
                       id="signup-name"
@@ -394,9 +346,6 @@ function SignUp() {
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
                       className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
                     />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8]">
-                      Used as your legal identity on NDAs and audit records.
-                    </span>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
@@ -416,44 +365,6 @@ function SignUp() {
                     />
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="signup-password" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">
-                      Password
-                    </label>
-                    <input
-                      id="signup-password"
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="At least 6 characters"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      required
-                      minLength={6}
-                      style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
-                    />
-                    {password.length > 0 && (
-                      <div className="flex gap-1 mt-1">
-                        {[3, 6, 10].map((threshold, i) => (
-                          <div
-                            key={i}
-                            className={`h-0.5 flex-1 transition-all duration-300 ${
-                              password.length >= threshold
-                                ? i === 0 ? "bg-red-400" : i === 1 ? "bg-amber-400" : "bg-emerald-500"
-                                : "bg-[#e6e9ef]"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <Turnstile
-                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''}
-                    onSuccess={(token) => setTurnstileToken(token)}
-                    options={{ theme: 'light' }}
-                  />
-
                   {error && (
                     <div className="border border-red-200 bg-red-50 px-4 py-3">
                       <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-red-700 text-[13px]">{error}</span>
@@ -462,7 +373,7 @@ function SignUp() {
 
                   <button
                     type="submit"
-                    disabled={loading || !turnstileToken}
+                    disabled={loading}
                     style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
                     className="mt-2 bg-[#0a2540] hover:bg-[#13233a] disabled:opacity-50 text-white font-semibold text-[14px] py-4 transition-colors duration-200 flex items-center justify-center gap-2"
                   >
@@ -472,32 +383,19 @@ function SignUp() {
                           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
                           <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
-                        Creating account…
+                        Joining…
                       </>
                     ) : (
-                      "Create account"
+                      "Join the waitlist"
                     )}
                   </button>
 
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px] leading-[1.6] text-center">
-                    By creating an account, you agree to our{" "}
+                    By joining the waitlist, you agree to our{" "}
                     <Link to="/legal/terms" className="text-[#94a3b8] hover:text-[#0a2540] transition-colors">Terms</Link>
                     {" "}and{" "}
                     <Link to="/legal/privacy" className="text-[#94a3b8] hover:text-[#0a2540] transition-colors">Privacy Policy</Link>.
                   </p>
-
-                  <div className="border-t border-[#e6e9ef] pt-5 flex flex-col gap-2">
-                    {[
-                      "Free to start — fees only at first close",
-                      "No credit card required",
-                      "Every action recorded, permanently",
-                    ].map((t) => (
-                      <div key={t} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-emerald-500 shrink-0" />
-                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{t}</span>
-                      </div>
-                    ))}
-                  </div>
                 </form>
               </>
             )}

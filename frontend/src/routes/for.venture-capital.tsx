@@ -97,7 +97,7 @@ function VentureCapital() {
                 Use Lengdon for initial investment closes, follow-on rounds, and eventual M&A preparation. Each closing produces its own permanent, append-only record — and they accumulate into a complete history of the investment.
               </p>
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Start your first room
+                Join the waitlist
               </Link>
             </div>
             <div className="border border-[#e6e9ef] divide-y divide-[#e6e9ef]">
@@ -128,7 +128,7 @@ function VentureCapital() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Create account
+                Join the waitlist
               </Link>
               <Link to="/product/pricing" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                 View pricing →

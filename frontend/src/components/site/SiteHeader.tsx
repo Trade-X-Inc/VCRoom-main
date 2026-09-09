@@ -188,7 +188,7 @@ export function SiteHeader() {
                   className="hidden sm:inline-flex transition-colors duration-200"
                   style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 28px", textDecoration: "none" }}
                 >
-                  Create account
+                  Join the waitlist
                 </Link>
               </>
             )}
@@ -241,7 +241,7 @@ export function SiteHeader() {
                     onClick={() => setMobileMenuOpen(false)}
                     style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, textAlign: "center", background: INK, color: "#fff", padding: "10px 0", textDecoration: "none" }}
                   >
-                    Create account
+                    Join the waitlist
                   </Link>
                 </>
               )}

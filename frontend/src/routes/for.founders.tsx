@@ -118,7 +118,7 @@ function Founders() {
             </div>
             <div className="flex gap-4 shrink-0">
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Initialize Account
+                Join the waitlist
               </Link>
               <Link to="/sign-in" search={{ redirect: "/app" } as any} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 text-white/60 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                 Sign in →

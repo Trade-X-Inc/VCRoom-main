@@ -138,7 +138,7 @@ function Sectors() {
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Start with a deal room. No setup call required.</p>
             </div>
             <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-              Open a room
+              Join the waitlist
             </Link>
           </div>
         </section>

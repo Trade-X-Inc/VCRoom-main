@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { syncContactToHubSpot } from "@/lib/hubspot";
+import { submitWaitlistEntry } from "@/lib/notion-waitlist";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
 // LENGDONPUBLIC-NEW's src/components/Footer.tsx. Same instruction as
@@ -11,11 +13,19 @@ import { supabase } from "@/lib/supabase";
 //
 // ONE deliberate addition, on explicit instruction: a compact newsletter
 // bar under the logo/tagline column (bottom-left of that column). The
-// source design has no newsletter block at all — this keeps the real,
-// already-working Supabase + HubSpot capture wiring alive rather than
-// deleting a functioning feature, built in the new footer's own visual
-// language (fonts, colors, spacing scale), not the old footer's styling.
-// No other component beyond this one addition, per instruction.
+// source design has no newsletter block at all — kept in the new
+// footer's own visual language (fonts, colors, spacing scale), not the
+// old footer's styling.
+//
+// Fixed 9 Sep 2026 (waitlist wiring task): the HubSpot half of this
+// form was dead — it called fetch("/api/hubspot-newsletter", ...), and
+// that route only exports a createServerFn with no server.handlers
+// block, so there is no real HTTP endpoint at that path. The .catch(()
+// => {}) silently swallowed the failure on every submission. Replaced
+// with syncContactToHubSpot, the same real, already-working pattern
+// used by company.contact.tsx and index.tsx. Notion added alongside
+// (submitWaitlistEntry). Copy also fixed: "Check your inbox to
+// confirm" promised a confirmation email that nothing ever sent.
 
 const FONT_SEMIBOLD = "'Geist:SemiBold', sans-serif";
 const FONT_REGULAR = "'Geist:Regular', sans-serif";
@@ -99,17 +109,24 @@ function NewsletterBar() {
   const handleSubscribe = async () => {
     if (!email.trim() || state === "loading") return;
     setState("loading");
+    const normalizedEmail = email.trim().toLowerCase();
     try {
       const { error } = await supabase
         .from("waitlist_entries")
-        .insert({ email: email.trim().toLowerCase(), full_name: "", type: "newsletter" });
+        .insert({ email: normalizedEmail, full_name: "", type: "footer newsletter" });
       if (error) throw error;
       setState("success");
-      fetch("/api/hubspot-newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
-      }).catch(() => {});
+
+      syncContactToHubSpot({
+        data: {
+          email: normalizedEmail,
+          properties: { lifecyclestage: "lead", hs_lead_status: "NEW" },
+        },
+      }).catch((e) => console.error("[footer waitlist] HubSpot sync failed:", e));
+
+      submitWaitlistEntry({
+        data: { name: normalizedEmail, email: normalizedEmail, source: "footer newsletter" },
+      }).catch((e) => console.error("[footer waitlist] Notion submit failed:", e));
     } catch {
       setState("error");
     }
@@ -118,11 +135,11 @@ function NewsletterBar() {
   return (
     <div className="mt-6">
       <p style={{ fontFamily: FONT_REGULAR, color: INK, fontSize: "13px", fontWeight: 500, margin: "0 0 6px" }}>
-        Notes on fundraising practice
+        Join the waitlist
       </p>
       {state === "success" ? (
         <p style={{ fontFamily: FONT_REGULAR, color: SATISFIED, fontSize: "12.5px", margin: 0 }}>
-          Subscribed. Check your inbox to confirm.
+          You're on the waitlist.
         </p>
       ) : (
         <div className="flex gap-2 max-w-[240px]">
@@ -150,13 +167,13 @@ function NewsletterBar() {
               opacity: state === "loading" ? 0.6 : 1,
             }}
           >
-            {state === "loading" ? "…" : "Subscribe"}
+            {state === "loading" ? "…" : "Join"}
           </button>
         </div>
       )}
       {state === "error" && (
         <p style={{ fontFamily: FONT_REGULAR, color: ADVERSE, fontSize: "12px", margin: "6px 0 0" }}>
-          Could not subscribe. Try again.
+          Could not join. Try again.
         </p>
       )}
     </div>
@@ -215,7 +232,7 @@ export function SiteFooter() {
             className="transition-colors duration-200"
             style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "12px", padding: "8px 20px", textDecoration: "none" }}
           >
-            Create account
+            Join the waitlist
           </Link>
         </div>
       </div>

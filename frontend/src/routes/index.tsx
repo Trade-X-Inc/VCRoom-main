@@ -224,7 +224,7 @@ function HeroSection() {
 
             <div className="flex items-center gap-4">
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-9 py-4 transition-colors duration-200">
-                Initialize Account
+                Join the waitlist
               </Link>
               <Link to="/product/how-it-works" style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] hover:text-[#0a2540] text-[14px] px-9 py-4 transition-all duration-200">
                 See how it works →
@@ -1102,7 +1102,7 @@ function CTASection() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f5f0e8] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-all duration-200 active:scale-95">
-                  Initialize Account
+                  Join the waitlist
                 </Link>
                 <Link to="/sign-in" search={{ redirect: "/app" }} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                   Sign in →

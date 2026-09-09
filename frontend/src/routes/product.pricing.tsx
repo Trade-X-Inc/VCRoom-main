@@ -58,6 +58,14 @@ import { PageHero } from "@/components/site/PageHero";
 // Flagged here rather than silently reconciled, since CLAUDE.md's own
 // text is the one that would need updating to match, and that's a
 // documentation change outside this task's scope.
+//
+// Added 9 Sep 2026 (waitlist wiring task): a beta banner between the
+// pricing cards and the FAQ. All 4 plan CTAs and the bottom "Get
+// started" CTA now route to the waitlist (new signups are paused).
+// Copy deliberately states only the real deferred-payment offer — no
+// invented savings figure or discount comparison (the exact fabrication
+// class this project has spent four rewrite batches removing from
+// every other page). Approved wording, option C of 3 proposed.
 
 export const Route = createFileRoute("/product/pricing")({
   component: Pricing,
@@ -76,7 +84,7 @@ const PLANS = [
       "Append-only audit record",
       "Billed only on close — nothing due until then",
     ],
-    cta: "Initialize room",
+    cta: "Join the waitlist",
     href: "/sign-up",
     primary: false,
   },
@@ -91,7 +99,7 @@ const PLANS = [
       "Billed only while a raise is active",
       "Team access management",
     ],
-    cta: "Get started",
+    cta: "Join the waitlist",
     href: "/sign-up",
     primary: true,
   },
@@ -222,6 +230,31 @@ function Pricing() {
           </div>
         </section>
 
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16 border-b border-[#e6e9ef]">
+          <div className="border border-[#0a2540]/15 bg-[#f8f9fb] p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-5 h-px bg-[#0a2540]/30" />
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">In beta</span>
+              </div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[28px] leading-[1.1] tracking-[-0.8px] mb-3">
+                Beta pricing: deferred, not discounted.
+              </h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7] max-w-[560px]">
+                Everything above is what you'll eventually pay. Right now, nothing is charged — beta access is free until we launch. Join the waitlist to get in before general availability opens.
+              </p>
+            </div>
+            <Link
+              to="/sign-up"
+              search={{ role: "founder" } as any}
+              style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
+              className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200"
+            >
+              Join the waitlist
+            </Link>
+          </div>
+        </section>
+
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
@@ -256,7 +289,7 @@ function Pricing() {
             </div>
             <div className="flex gap-3 shrink-0">
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Get started free
+                Join the waitlist
               </Link>
               <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#0a2540]/20 hover:border-[#0a2540]/40 text-[#0a2540] text-[14px] px-10 py-4 transition-all duration-200">
                 Book a call →

@@ -179,7 +179,7 @@ function Security() {
                 Read Privacy Policy →
               </Link>
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-8 py-3 transition-colors duration-200">
-                Start a room
+                Join the waitlist
               </Link>
             </div>
           </div>

@@ -39,7 +39,7 @@ function BurnRate() {
         { label: "Cash out date", value: runway >= 999 ? "Profitable" : runoutDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
       ]}
       ctaText="Planning your next raise? Lengdon closes the round once terms are agreed — sequenced, documented, permanently recorded."
-      ctaLabel="Start closing with Lengdon"
+      ctaLabel="Join the waitlist"
     />
   );
 }

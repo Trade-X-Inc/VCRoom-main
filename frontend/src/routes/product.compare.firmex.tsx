@@ -46,7 +46,7 @@ function CompareFirmex() {
           title="MANAGED FILES."
           titleOutline="VS CLOSED DEALS."
           subtitle="Firmex manages documents for M&A and financing transactions. Lengdon closes them. The two platforms represent different phases — and different definitions of 'done.'"
-          cta={{ label: "Start closing", to: "/sign-up", search: { role: "founder" } }}
+          cta={{ label: "Join the waitlist", to: "/sign-up", search: { role: "founder" } }}
         />
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
@@ -113,7 +113,7 @@ function CompareFirmex() {
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Firmex got you through diligence. Lengdon takes you to close, with a record.</p>
             </div>
             <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-              Open a room
+              Join the waitlist
             </Link>
           </div>
         </section>

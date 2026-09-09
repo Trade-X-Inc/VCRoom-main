@@ -125,9 +125,9 @@ function Docs() {
             <div className="p-10 border-r border-[#e6e9ef]">
               <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-4">Quick start</div>
               <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">New to Lengdon?</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">Create an account and open your first deal room in under 10 minutes.</p>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">We're not onboarding new accounts right now. Join the waitlist and we'll reach out.</p>
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
-                Create account →
+                Join the waitlist →
               </Link>
             </div>
             <div className="p-10">
