@@ -1,46 +1,52 @@
 # Lengdon
 
-> The fundraising platform where verified founders and investors meet, run
-> due diligence, negotiate terms, and close deals — entirely in-platform.
+> The closing infrastructure for private capital fundraising — a deal room,
+> a diligence checklist, and a term sheet that all point to the same
+> reference number, entirely in-platform.
 
 Built by Venture Tech LLC, DIFC FinTech Hive, Dubai, UAE.
 
 ## What it does
 
-- Verified profiles for both founders and investors (five-tier verification,
-  built from real documents, not self-reported claims).
 - Private NDA-gated deal rooms: document sharing, structured due diligence,
   AI document analysis, Q&A.
-- Structured video interviews (five stages: Introduction, Product Demo,
-  Financial Discussion, Terms Discussion, Investment Terms) with AI note
-  extraction, source-cited to the transcript.
+- Every disclosure Lengdon publishes is built against a public evidence
+  standard — Preferred, Alternative, or Minimum evidence per field. No
+  verification score, no percentage: the standard states what backs a
+  claim, not whether it's true.
 - Per-term negotiation across four instrument types (SAFE, Equity, Debt,
   Company Sale) with a full audit trail.
-- In-platform closing: signed agreement, payment confirmation, auto-generated
-  invoices, permanent read-only archive.
+- A six-gate closing sequence — Counsel, Agreement, Conditions, Signing,
+  Payment, Close — enforced in order: a room cannot advance to the next
+  gate until the current one is confirmed. Investor and founder each
+  confirm the payment step independently; mutual confirmation at Close
+  seals a permanent record that stays accessible to both parties. Lengdon
+  records the transfer confirmation — it does not move money itself.
 
 ## Fee model
 
-Free during beta. After beta: $49/month for founders. A 1.5% success fee on
-closed deals (minimum $500, maximum $15,000), charged only at closing. No fee
-if a deal doesn't close. Investors: free at launch.
+Free during beta. After beta, pricing is fee-by-event rather than a flat
+subscription — a one-time fee at first close, or a monthly fee while a raise
+is active. Full current tiers: https://lengdon.com/product/pricing. A 1.5%
+success fee applies on closed deals (minimum $500, maximum $15,000), charged
+only at closing. No fee if a deal doesn't close.
 
 ## Key pages
 
-- [Homepage](https://lengdon.com/): product overview, FAQ, pricing preview.
-- [Pricing](https://lengdon.com/pricing): full pricing detail.
-- [Trust & Verification](https://lengdon.com/trust): how the verification
-  tiers work.
-- [About](https://lengdon.com/about): company and team.
-- [Docs](https://lengdon.com/docs): full product documentation for
-  founders, investors, deal rooms, and the AI features.
-- [Blog](https://lengdon.com/blog): fundraising and deal-flow articles.
+- [Homepage](https://lengdon.com/): the six-gate sequence, the append-only
+  record, and who the product is built for.
+- [Pricing](https://lengdon.com/product/pricing): full pricing detail.
+- [About](https://lengdon.com/company/about): company origin and entity detail.
+- [Docs](https://lengdon.com/docs): getting started, deal rooms, the
+  gate sequence, audit and records, and security.
+- [Blog](https://lengdon.com/resources/blog): closing infrastructure, security,
+  compliance, and the structural gaps in private capital transactions.
 - [Free calculators](https://lengdon.com/tools): valuation, burn rate,
   runway, COGS, cap table, SAFE note, and dilution calculators — no signup
   required.
 
 ## Docs
 
-Full documentation lives at https://lengdon.com/docs, organized by
-founder features, investor features, deal rooms, and AI. The security model
-and platform changelog are at /docs/security and /docs/changelog.
+Full documentation lives at https://lengdon.com/docs, organized into
+getting started, deal rooms, the gate sequence, audit and records, and
+security. The platform changelog is at /resources/changelog.

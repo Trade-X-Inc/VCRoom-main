@@ -1,27 +1,35 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireUser } from "@/lib/require-user-fn";
 
+// Build Step 1 (7 Sep 2026): canonical 5-stage sequence, replacing the
+// nda_signed/initial_review/diligence/term_sheet/closed vocabulary. The
+// value set collapses two prior overlapping vocabularies and renames the
+// terminal value away from "closed" — that literal string is reserved for
+// deal_rooms.status='closed' (the real, trigger-guarded close event via
+// finalize_deal_close()), a DIFFERENT event that was previously colliding
+// with this column's own "closed" value in review/grep. See CLAUDE.md's
+// deal-room lifecycle vocabulary entries.
 export type DealStage =
   | "nda_signed"
-  | "initial_review"
+  | "qa"
   | "diligence"
   | "term_sheet"
-  | "closed";
+  | "closing_confirmed";
 
 export const DEAL_STAGES: DealStage[] = [
   "nda_signed",
-  "initial_review",
+  "qa",
   "diligence",
   "term_sheet",
-  "closed",
+  "closing_confirmed",
 ];
 
 export const STAGE_LABELS: Record<DealStage, string> = {
   nda_signed: "NDA & Profiles",
-  initial_review: "Stage 1 Review",
+  qa: "Q&A",
   diligence: "Diligence",
   term_sheet: "Term Sheet",
-  closed: "Closed",
+  closing_confirmed: "Closing",
 };
 
 export const BLOCKED_CATEGORIES = [
@@ -135,38 +143,6 @@ async function principalRoomMember(
   if (role !== "founder" && role !== "investor") return { ok: false, error: "not_authorized" };
   return { ok: true, uid: auth.uid };
 }
-
-// ── advanceDealStage ──────────────────────────────────────────────────────────
-
-type AdvanceStageInput = {
-  deal_room_id: string;
-  to_stage: DealStage;
-  accessToken: string;
-};
-
-export const advanceDealStage = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as AdvanceStageInput)
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    const { url, key } = getAdmin();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
-    if (!auth.ok) return { ok: false, error: auth.error };
-    const now = new Date().toISOString();
-    await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", {
-      workflow_stage: data.to_stage,
-      stage_entered_at: now,
-      updated_at: now,
-    });
-    await logActivity(
-      url,
-      key,
-      data.deal_room_id,
-      auth.uid,
-      `Advanced deal to ${STAGE_LABELS[data.to_stage] ?? data.to_stage}`,
-      { to_stage: data.to_stage },
-    );
-    return { ok: true };
-  });
 
 // ── skipMeeting ───────────────────────────────────────────────────────────────
 
@@ -367,97 +343,6 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
     return { ok: true, id };
   });
 
-// ── sendTermSheet ─────────────────────────────────────────────────────────────
-
-type SendTermSheetInput = {
-  deal_room_id: string;
-  accessToken: string;
-  valuation?: number | null;
-  investment_amount?: number | null;
-  equity_pct?: number | null;
-  instrument_type?: string | null;
-  pro_rata?: boolean;
-  board_seat?: boolean;
-  doc_path?: string | null;
-};
-
-export const sendTermSheet = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as SendTermSheetInput)
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    const { url, key } = getAdmin();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
-    if (!auth.ok) return { ok: false, error: auth.error };
-    const now = new Date().toISOString();
-
-    const patch: Record<string, unknown> = {
-      term_sheet_status: "sent",
-      term_sheet_sent_at: now,
-      workflow_stage: "term_sheet",
-      stage_entered_at: now,
-      stage2_unlocked: true,
-      stage2_unlocked_at: now,
-      updated_at: now,
-    };
-    if (data.valuation !== undefined) patch.term_sheet_valuation = data.valuation;
-    if (data.investment_amount !== undefined) patch.term_sheet_investment_amount = data.investment_amount;
-    if (data.equity_pct !== undefined) patch.term_sheet_equity_pct = data.equity_pct;
-    if (data.instrument_type !== undefined) patch.term_sheet_type = data.instrument_type;
-    if (data.pro_rata !== undefined) patch.term_sheet_pro_rata = data.pro_rata;
-    if (data.board_seat !== undefined) patch.term_sheet_board_seat = data.board_seat;
-    if (data.doc_path !== undefined) patch.term_sheet_doc_path = data.doc_path;
-
-    await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", patch);
-    await logActivity(url, key, data.deal_room_id, auth.uid, "Sent a term sheet", {
-      amount: data.investment_amount,
-      valuation: data.valuation,
-    });
-    return { ok: true };
-  });
-
-// ── respondToTermSheet (founder) ────────────────────────────────────────────
-
-type RespondTermSheetInput = {
-  deal_room_id: string;
-  accessToken: string;
-  response: "accepted" | "countered" | "rejected";
-};
-
-export const respondToTermSheet = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as RespondTermSheetInput)
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    const { url, key } = getAdmin();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
-    if (!auth.ok) return { ok: false, error: auth.error };
-    const now = new Date().toISOString();
-
-    const patch: Record<string, unknown> = {
-      term_sheet_status: data.response,
-      updated_at: now,
-    };
-    if (data.response === "accepted") {
-      patch.term_sheet_accepted_at = now;
-      patch.workflow_stage = "closed";
-      patch.stage_entered_at = now;
-      patch.closed_at_workflow = now;
-    }
-    await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", patch);
-    await logActivity(
-      url,
-      key,
-      data.deal_room_id,
-      auth.uid,
-      data.response === "accepted"
-        ? "Accepted the term sheet"
-        : data.response === "countered"
-          ? "Requested changes to the term sheet"
-          : "Declined the term sheet",
-      { response: data.response },
-    );
-    return { ok: true };
-  });
-
 // ── createDocumentRequest ──────────────────────────────────────────────────
 
 type CreateDocRequestInput = {
@@ -562,39 +447,6 @@ export const respondToDocumentRequest = createServerFn({ method: "POST" })
       `Responded to a document request: ${data.response}`,
       { request_id: data.request_id, response: data.response },
     );
-    return { ok: true };
-  });
-
-// ── passDeal ──────────────────────────────────────────────────────────────────
-
-type PassDealInput = {
-  deal_room_id: string;
-  accessToken: string;
-  reason_category: string;
-  context?: string;
-  reconsider_if?: string;
-};
-
-export const passDeal = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as PassDealInput)
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    const { url, key } = getAdmin();
-    if (!url || !key) return { ok: false, error: "db_unavailable" };
-    const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
-    if (!auth.ok) return { ok: false, error: auth.error };
-    const now = new Date().toISOString();
-
-    await sbFetch(url, key, `deal_rooms?id=eq.${data.deal_room_id}`, "PATCH", {
-      workflow_stage: "closed",
-      closed_at_workflow: now,
-      stage_entered_at: now,
-      updated_at: now,
-    });
-    await logActivity(url, key, data.deal_room_id, auth.uid, "Investor passed on deal", {
-      reason_category: data.reason_category,
-      context: data.context ?? null,
-      reconsider_if: data.reconsider_if ?? null,
-    });
     return { ok: true };
   });
 

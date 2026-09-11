@@ -36,7 +36,7 @@ const THINKING_LABELS = [
 ];
 
 const FOUNDER_PROMPTS = ["What should I fix first?", "How is my profile?", "Explain my score"];
-const INVESTOR_PROMPTS = ["Summarise my pipeline", "Any stale deals?", "What matches my thesis?"];
+const INVESTOR_PROMPTS = ["Summarise my pipeline", "Any stale deals?", "What's outstanding on my active deals?"];
 
 function parseConfirmCard(content: string): ConfirmCard | null {
   try {
@@ -107,8 +107,8 @@ function ThinkingAnimation({ stillWorking }: { stillWorking?: boolean }) {
   return (
     <div className="flex justify-start">
       <div
-        className="max-w-[85%] rounded-[0_12px_12px_12px] px-3 py-2.5"
-        style={{ background: "var(--ai-bubble-bg, #f3f4f6)" }}
+        className="max-w-[85%] px-3 py-2.5"
+        style={{ background: "var(--lcs-surface)" }}
         data-testid="ai-thinking"
       >
         {/* Neural bars */}
@@ -116,9 +116,10 @@ function ThinkingAnimation({ stillWorking }: { stillWorking?: boolean }) {
           {[0, 0.2, 0.4].map((delay, i) => (
             <div
               key={i}
-              className="w-4 h-1 rounded-full"
+              className="w-4 h-1"
               style={{
-                background: i === 0 ? "var(--gradient-brand)" : i === 1 ? "#A855F7" : "#6B21A8",
+                background: "var(--lcs-accent)",
+                opacity: i === 0 ? 1 : i === 1 ? 0.7 : 0.45,
                 animation: `hs-bar${i + 1} ${1.2 + i * 0.3}s ease-in-out infinite`,
                 animationDelay: `${delay}s`,
               }}
@@ -132,14 +133,14 @@ function ThinkingAnimation({ stillWorking }: { stillWorking?: boolean }) {
               key={i}
               className="w-2 h-2 rounded-full"
               style={{
-                background: "var(--gradient-brand)",
+                background: "var(--lcs-accent)",
                 animation: "hs-dot-pulse 1.2s ease-in-out infinite",
                 animationDelay: `${delay}s`,
               }}
             />
           ))}
         </div>
-        <div className="text-[11px]" style={{ color: "rgba(168,85,247,0.7)" }}>
+        <div className="text-[11px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
           {stillWorking ? "Still working — this may take a moment..." : THINKING_LABELS[labelIdx]}
         </div>
       </div>
@@ -168,13 +169,13 @@ function MessageBubble({
     return (
       <div className="flex flex-col items-end gap-1">
         <div
-          className="max-w-[80%] rounded-[12px_12px_0_12px] px-3 py-2.5 text-sm text-foreground leading-relaxed"
-          style={{ background: "var(--gradient-brand)" }}
+          className="max-w-[80%] px-3 py-2.5 text-sm leading-relaxed"
+          style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
           data-testid="ai-message"
         >
           {msg.content}
         </div>
-        <span className="text-[11px] pr-1" style={{ color: "var(--muted-foreground)" }}>
+        <span className="text-[11px] pr-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
           {formatTime(msg.timestamp)}
         </span>
       </div>
@@ -186,29 +187,30 @@ function MessageBubble({
     return (
       <div className="flex flex-col items-start gap-1">
         <div
-          className="rounded-xl p-3 mt-1 text-sm max-w-[85%]"
-          style={{ background: "var(--ai-bubble-bg, #f3f4f6)", border: "1px solid rgba(124,58,237,0.4)" }}
+          className="p-3 mt-1 text-sm max-w-[85%]"
+          style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}
           data-testid="ai-message"
         >
-          <div className="font-semibold mb-1 text-gray-900 ">About to: {card.action}</div>
-          <div className="text-xs mb-3 text-gray-500 ">{card.description}</div>
+          <div className="font-semibold mb-1" style={{ color: "var(--lcs-ink)" }}>About to: {card.action}</div>
+          <div className="text-xs mb-3" style={{ color: "var(--lcs-ink-muted)" }}>{card.description}</div>
           <div className="flex gap-2">
             <button
               onClick={onCancel}
-              className="rounded px-3 py-1 text-sm border border-gray-300 text-gray-500 hover:text-gray-900 transition-colors"
+              className="px-3 py-1 text-sm border transition-colors"
+              style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)" }}
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="rounded px-3 py-1 text-sm text-foreground transition-opacity hover:opacity-90"
-              style={{ background: "var(--gradient-brand)" }}
+              className="px-3 py-1 text-sm transition-opacity hover:opacity-90"
+              style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)" }}
             >
               Confirm
             </button>
           </div>
         </div>
-        <span className="text-[11px] pl-1 text-[#71717A] ">
+        <span className="text-[11px] pl-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
           {formatTime(msg.timestamp)}
         </span>
       </div>
@@ -218,13 +220,13 @@ function MessageBubble({
   return (
     <div className="flex flex-col items-start gap-1">
       <div
-        className="max-w-[85%] rounded-[0_12px_12px_12px] px-3 py-2.5 text-sm leading-relaxed text-gray-900 "
-        style={{ background: "var(--ai-bubble-bg, #f3f4f6)" }}
+        className="max-w-[85%] px-3 py-2.5 text-sm leading-relaxed"
+        style={{ background: "var(--lcs-surface)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
         data-testid="ai-message"
       >
         {msg.content}
       </div>
-      <span className="text-[11px] pl-1 text-[#71717A] ">
+      <span className="text-[11px] pl-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
         {formatTime(msg.timestamp)}
       </span>
     </div>
@@ -533,20 +535,22 @@ export function AIOperatorPanel({
       {/* Mobile backdrop — tap outside to dismiss */}
       {isMobile && (
         <div
-          className="fixed inset-0 z-40 bg-black/50"
+          className="fixed inset-0"
+          style={{ zIndex: 40, background: "rgba(26,26,25,0.4)" }}
           onClick={() => setIsOpen(false)}
         />
       )}
 
       <div
         data-testid="ai-panel"
-        className="relative flex shrink-0 flex-col max-md:fixed max-md:inset-0 max-md:z-50 max-md:w-full max-md:max-w-none max-md:min-w-0 bg-white "
+        className="relative flex shrink-0 flex-col max-md:fixed max-md:inset-0 max-md:w-full max-md:max-w-none max-md:min-w-0"
         style={{
           width: isMobile ? undefined : panelWidth,
           minWidth: isMobile ? undefined : 280,
           maxWidth: isMobile ? undefined : 640,
-          borderLeft: "1px solid",
-          borderColor: "rgba(229,231,235,1)",
+          zIndex: 50,
+          background: "var(--lcs-white)",
+          borderInlineStart: "1px solid var(--lcs-line)",
           transition: "width 250ms ease",
         }}
       >
@@ -554,23 +558,23 @@ export function AIOperatorPanel({
         {!isMobile && (
           <div
             onMouseDown={startResize}
-            className="absolute left-0 top-0 h-full z-10 transition-colors"
-            style={{ width: 4, cursor: "col-resize", background: "rgba(124,58,237,0.08)" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.3)"; }}
-            onMouseLeave={(e) => { if (!isResizing.current) (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)"; }}
+            className="absolute left-0 top-0 h-full transition-colors"
+            style={{ width: 4, zIndex: 10, cursor: "col-resize", background: "transparent" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--lcs-progress-wash)"; }}
+            onMouseLeave={(e) => { if (!isResizing.current) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
           />
         )}
 
         {/* Header */}
         <div
-          className="flex shrink-0 items-center justify-between pl-5 pr-2 bg-gray-50 "
-          style={{ height: 56, borderBottom: "1px solid", borderColor: "rgba(229,231,235,1)" }}
+          className="flex shrink-0 items-center justify-between pl-5 pr-2"
+          style={{ height: 48, background: "var(--lcs-surface)", borderBottom: "1px solid var(--lcs-line)" }}
         >
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-base leading-none" style={{ color: "var(--brand)" }}>✦</span>
-            <span className="text-sm font-semibold text-gray-900 ">AI</span>
-            <span className="text-sm text-[#71717A]">·</span>
-            <span className="text-sm text-gray-500 truncate">{pageContext.pageName}</span>
+            <span className="text-base leading-none" style={{ color: "var(--lcs-accent)" }}>✦</span>
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>AI</span>
+            <span className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>·</span>
+            <span className="text-sm truncate" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{pageContext.pageName}</span>
           </div>
 
           <div className="flex items-center gap-0.5 shrink-0">
@@ -580,10 +584,10 @@ export function AIOperatorPanel({
                 key={sz}
                 onClick={() => setSize(sz)}
                 title={sz === "S" ? "Narrow" : "Wide"}
-                className="grid h-8 w-8 place-items-center rounded-lg text-xs font-semibold transition-colors"
+                className="grid h-8 w-8 place-items-center text-xs font-semibold transition-colors"
                 style={{
-                  background: activeSize === sz ? "rgba(124,58,237,0.1)" : "transparent",
-                  color: activeSize === sz ? "var(--brand)" : "#6B7280",
+                  background: activeSize === sz ? "var(--lcs-progress-wash)" : "transparent",
+                  color: activeSize === sz ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
                 }}
               >
                 {sz}
@@ -592,7 +596,8 @@ export function AIOperatorPanel({
             <button
               onClick={() => setIsOpen(false)}
               data-testid="ai-panel-close"
-              className="grid h-8 w-8 place-items-center rounded-lg text-gray-500 hover:text-gray-900 transition-colors text-lg leading-none"
+              className="grid h-8 w-8 place-items-center transition-colors text-lg leading-none"
+              style={{ color: "var(--lcs-ink-muted)" }}
               aria-label="Close AI panel"
             >
               <X className="h-4 w-4" />
@@ -603,14 +608,14 @@ export function AIOperatorPanel({
         {/* Gated view — founder profile below 40% complete */}
         {isGated ? (
           <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col items-center justify-center gap-4 text-center">
-            <div className="text-4xl" style={{ color: "var(--brand)" }}>✦</div>
-            <p className="text-sm text-gray-700 leading-relaxed max-w-xs">
+            <div className="text-4xl" style={{ color: "var(--lcs-accent)" }}>✦</div>
+            <p className="text-sm leading-relaxed max-w-xs" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
               Your profile is {completenessPercent}% complete. I can give better guidance once you have a company description, at least one document, and your funding stage set.
             </p>
             <Link
               to="/app/profile-builder"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors"
-              style={{ background: "var(--gradient-brand)" }}
+              className="px-4 py-2 text-sm font-medium transition-colors"
+              style={{ background: "var(--lcs-accent)", color: "var(--lcs-white)", fontFamily: "var(--font-lcs-ui)" }}
             >
               Complete your profile →
             </Link>
@@ -623,9 +628,9 @@ export function AIOperatorPanel({
             /* Empty state */
             <div className="flex flex-col items-center justify-center h-full gap-5 pb-8 select-none">
               <div>
-                <div className="text-4xl text-center mb-3" style={{ color: "var(--brand)" }}>✦</div>
-                <div className="text-sm font-semibold text-gray-900 text-center">AI Advisor</div>
-                <div className="text-sm text-gray-500 text-center mt-1">
+                <div className="text-4xl text-center mb-3" style={{ color: "var(--lcs-accent)" }}>✦</div>
+                <div className="text-sm font-semibold text-center" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>AI Advisor</div>
+                <div className="text-sm text-center mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                   Ask about your raise, profile, or next steps.
                 </div>
               </div>
@@ -634,15 +639,15 @@ export function AIOperatorPanel({
                   <button
                     key={prompt}
                     onClick={() => handleSend(prompt)}
-                    className="rounded-full px-3 py-1.5 text-sm border transition-colors"
-                    style={{ borderColor: "rgba(209,213,219,1)", color: "#6B7280" }}
+                    className="px-3 py-1.5 text-sm border transition-colors"
+                    style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor = "var(--brand)";
-                      (e.currentTarget as HTMLElement).style.color = "var(--brand)";
+                      (e.currentTarget as HTMLElement).style.borderColor = "var(--lcs-accent)";
+                      (e.currentTarget as HTMLElement).style.color = "var(--lcs-accent)";
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(209,213,219,1)";
-                      (e.currentTarget as HTMLElement).style.color = "#6B7280";
+                      (e.currentTarget as HTMLElement).style.borderColor = "var(--lcs-line)";
+                      (e.currentTarget as HTMLElement).style.color = "var(--lcs-ink-muted)";
                     }}
                   >
                     {prompt}
@@ -666,8 +671,8 @@ export function AIOperatorPanel({
 
         {/* Input bar */}
         <div
-          className="shrink-0 px-3 py-3 bg-white "
-          style={{ borderTop: "1px solid rgba(229,231,235,1)" }}
+          className="shrink-0 px-3 py-3"
+          style={{ background: "var(--lcs-white)", borderTop: "1px solid var(--lcs-line)" }}
         >
           <div className="relative">
             <textarea
@@ -679,32 +684,31 @@ export function AIOperatorPanel({
               disabled={isLoading}
               rows={1}
               data-testid="ai-panel-input"
-              className="w-full resize-none rounded-lg pr-12 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none disabled:opacity-50 transition-colors"
+              className="w-full resize-none pr-12 px-3 py-2.5 text-sm focus:outline-none disabled:opacity-50 transition-colors"
               style={{
                 minHeight: 40,
                 maxHeight: 96,
                 lineHeight: "20px",
-                background: "rgba(243,244,246,1)",
-                border: "1px solid rgba(229,231,235,1)",
+                background: "var(--lcs-surface)",
+                border: "1px solid var(--lcs-line)",
+                color: "var(--lcs-ink)",
+                fontFamily: "var(--font-lcs-ui)",
               }}
-              onFocus={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "var(--brand)"; }}
-              onBlur={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "rgba(229,231,235,1)"; }}
+              onFocus={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "var(--lcs-accent)"; }}
+              onBlur={(e) => { (e.target as HTMLTextAreaElement).style.borderColor = "var(--lcs-line)"; }}
             />
             <button
               onClick={() => handleSend()}
               disabled={isLoading || !inputValue.trim()}
               data-testid="ai-panel-send"
               aria-label="Send"
-              className="absolute right-2 bottom-2 grid h-8 w-8 place-items-center rounded-lg text-foreground transition-opacity"
+              className="absolute right-2 bottom-2 grid h-8 w-8 place-items-center transition-opacity"
               style={{
-                background: "var(--gradient-brand)",
+                background: "var(--lcs-accent)",
+                color: "var(--lcs-white)",
                 opacity: (isLoading || !inputValue.trim()) ? 0.4 : 1,
                 cursor: (isLoading || !inputValue.trim()) ? "not-allowed" : "pointer",
               }}
-              onMouseEnter={(e) => {
-                if (!isLoading && inputValue.trim()) (e.currentTarget as HTMLElement).style.background = "#6D28D9";
-              }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--gradient-brand)"; }}
             >
               <ArrowUp className="h-4 w-4" />
             </button>

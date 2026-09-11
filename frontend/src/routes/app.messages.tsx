@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { EmptyState } from "@/components/system";
+import { LcsButton, LcsEmptyState, LcsModal, LcsTextField, LcsSelectField, LcsTextareaField } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/messages")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -101,7 +101,7 @@ function initials(name: string) {
 }
 
 function colorFromId(id: string) {
-  const COLORS = ["var(--brand)", "#10B981", "#F59E0B", "#3B82F6", "#EC4899", "#14B8A6", "#8B5CF6", "#F97316"];
+  const COLORS = ["var(--lcs-accent)", "#10B981", "#F59E0B", "#3B82F6", "#EC4899", "#14B8A6", "#8B5CF6", "#F97316"];
   let h = 0;
   for (let i = 0; i < id.length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
   return COLORS[Math.abs(h) % COLORS.length];
@@ -125,24 +125,41 @@ function groupByDate(entries: ActivityEntry[]) {
   return groups;
 }
 
+// Status-color mapping, reported and approved before building (see the
+// Group-4b color-mapping report): a real 4-way ordinal severity, not a
+// decorative palette. urgent = attention (the one alarm-worthy state);
+// high = accent (elevated, not urgent); medium/low share the neutral
+// muted tone, differentiated only by label — LCS has no 5th tone and
+// low-vs-medium isn't a state distinction worth a dedicated color.
 const PRIORITY_CFG: Record<TaskPriority, { label: string; bg: string; text: string }> = {
-  urgent: { label: "Urgent", bg: "rgba(239,68,68,0.15)",   text: "#EF4444" },
-  high:   { label: "High",   bg: "rgba(245,158,11,0.15)",  text: "#F59E0B" },
-  medium: { label: "Medium", bg: "rgba(59,130,246,0.15)",  text: "#3B82F6" },
-  low:    { label: "Low",    bg: "var(--hs-bg-secondary)", text: "var(--hs-text-muted)" },
+  urgent: { label: "Urgent", bg: "var(--lcs-attention-wash)", text: "var(--lcs-attention)" },
+  high:   { label: "High",   bg: "var(--lcs-progress-wash)",  text: "var(--lcs-accent)" },
+  medium: { label: "Medium", bg: "var(--lcs-surface)",        text: "var(--lcs-ink-muted)" },
+  low:    { label: "Low",    bg: "var(--lcs-surface)",        text: "var(--lcs-ink-muted)" },
 };
 
+// Maps onto LCS's 4-status vocabulary almost by name: todo=pending
+// (muted), in_progress=accent, review=attention (here "attention" means
+// "needs a human's eyes," the same underlying signal as its usual
+// error/blocker meaning), done=satisfied.
 const STATUS_COLS: { key: TaskStatus; label: string; color: string }[] = [
-  { key: "todo",        label: "Todo",        color: "var(--hs-text-secondary)" },
-  { key: "in_progress", label: "In Progress", color: "#F59E0B" },
-  { key: "review",      label: "Review",      color: "#3B82F6" },
-  { key: "done",        label: "Done",        color: "#10B981" },
+  { key: "todo",        label: "Todo",        color: "var(--lcs-ink-muted)" },
+  { key: "in_progress", label: "In Progress", color: "var(--lcs-accent)" },
+  { key: "review",      label: "Review",      color: "var(--lcs-attention)" },
+  { key: "done",        label: "Done",        color: "var(--lcs-satisfied)" },
 ];
 
+// Collapsed from 8 decorative hues to LCS's 4-status vocabulary: these
+// event types don't represent different *states*, just different event
+// *kinds* — all equally "something happened, neutral-to-positive" except
+// rejected (the one genuine negative outcome) and approved (reuses
+// satisfied, consistent with task `done` elsewhere in this file).
 const ACTION_COLORS: Record<string, string> = {
-  upload: "#3B82F6", decision: "var(--brand)", connect: "#10B981",
-  message: "var(--faint)", approved: "#10B981", rejected: "#EF4444",
-  invite: "#F59E0B", profile_update: "#A855F7", default: "var(--faint)",
+  rejected: "var(--lcs-attention)",
+  approved: "var(--lcs-satisfied)",
+  upload: "var(--lcs-accent)", decision: "var(--lcs-accent)", connect: "var(--lcs-accent)",
+  invite: "var(--lcs-accent)",
+  message: "var(--lcs-ink-muted)", profile_update: "var(--lcs-ink-muted)", default: "var(--lcs-ink-muted)",
 };
 
 function actionColor(type: string) {
@@ -153,11 +170,16 @@ function actionColor(type: string) {
 }
 
 // ── Avatar ────────────────────────────────────────────────────────────────
+// colorFromId's rainbow palette is NOT a status-color violation — it's a
+// hash-based per-person visual identifier (so distinct people are
+// distinguishable in a chat/mention list), not a communicator of state.
+// Left as-is per the color-mapping report; collapsing to 4 tones would
+// make people harder to tell apart for zero LCS-compliance benefit.
 
 function Avatar({ name, userId, size = 28 }: { name: string; userId: string; size?: number }) {
   const bg = colorFromId(userId);
   return (
-    <div style={{ width: size, height: size, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: size * 0.38, fontWeight: 700, color: "var(--foreground)" }}>
+    <div style={{ width: size, height: size, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: size * 0.38, fontWeight: 700, color: "#fff", fontFamily: "var(--font-lcs-ui)" }}>
       {initials(name || "?")}
     </div>
   );
@@ -269,11 +291,11 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
   return (
     <div className="flex flex-col h-full">
       {/* Channel subheader */}
-      <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
-        <Hash className="h-4 w-4" style={{ color: "var(--hs-text-muted)" }} />
-        <span className="font-semibold text-sm" style={{ color: "var(--hs-text-primary)" }}>{activeChannel?.name ?? "general"}</span>
+      <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+        <Hash className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
+        <span className="font-semibold text-sm" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{activeChannel?.name ?? "general"}</span>
         {activeChannel?.description && (
-          <span className="text-xs ml-2" style={{ color: "var(--hs-text-muted)" }}>— {activeChannel.description}</span>
+          <span className="text-xs ml-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>— {activeChannel.description}</span>
         )}
       </div>
 
@@ -281,8 +303,8 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
       {pinnedMessages.length > 0 && (
         <button
           onClick={() => setShowPinned((v) => !v)}
-          className="flex items-center gap-2 px-4 py-2 text-xs transition-colors hover:bg-accent"
-          style={{ borderBottom: "1px solid var(--hs-border)", color: "var(--hs-text-muted)", background: "var(--hs-bg-secondary)" }}
+          className="flex items-center gap-2 px-4 py-2 text-xs transition-colors"
+          style={{ borderBottom: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)", background: "var(--lcs-surface)", fontFamily: "var(--font-lcs-ui)" }}
         >
           <Pin className="h-3 w-3" />
           {pinnedMessages.length} pinned message{pinnedMessages.length !== 1 ? "s" : ""}
@@ -290,20 +312,20 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
         </button>
       )}
       {showPinned && (
-        <div className="px-4 py-2 space-y-1" style={{ borderBottom: "1px solid var(--hs-border)", background: "rgba(124,58,237,0.04)" }}>
+        <div className="px-4 py-2 space-y-1" style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-progress-wash)" }}>
           {pinnedMessages.map((m) => (
-            <div key={m.id} className="text-xs rounded-lg px-3 py-2" style={{ background: "var(--hs-bg-secondary)", border: "1px solid rgba(124,58,237,0.2)" }}>
-              <span className="font-medium" style={{ color: "var(--hs-text-secondary)" }}>{m.sender_name}: </span>
-              <span style={{ color: "var(--hs-text-primary)" }}>{m.content}</span>
+            <div key={m.id} className="px-3 py-2" style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}>
+              <span className="text-xs font-medium" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{m.sender_name}: </span>
+              <span className="text-xs" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{m.content}</span>
             </div>
           ))}
         </div>
       )}
 
       {/* Messages scroll area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "var(--hs-bg-primary)" }} data-testid="message-list">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "var(--lcs-white)" }} data-testid="message-list">
         {topMessages.length === 0 && (
-          <EmptyState kind="empty" title="No messages" />
+          <LcsEmptyState title="No messages" text="Start the conversation with your team." />
         )}
         {topMessages.map((msg) => {
           const replies = threadReplies(msg.id);
@@ -314,30 +336,30 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
                 <Avatar name={msg.sender_name} userId={msg.user_id} size={28} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 mb-0.5">
-                    <span className="text-sm font-semibold" style={{ color: "var(--hs-text-primary)" }}>{msg.sender_name}</span>
-                    <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>{relTime(msg.created_at)}</span>
-                    {msg.pinned && <Pin className="h-3 w-3" style={{ color: "#F59E0B" }} />}
+                    <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{msg.sender_name}</span>
+                    <span className="text-[11px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{relTime(msg.created_at)}</span>
+                    {msg.pinned && <Pin className="h-3 w-3" style={{ color: "var(--lcs-accent)" }} />}
                   </div>
-                  <div className="text-sm whitespace-pre-wrap" style={{ color: "var(--hs-text-secondary)" }}>{msg.content}</div>
+                  <div className="text-sm whitespace-pre-wrap" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{msg.content}</div>
                   {replies.length > 0 && (
                     <button
                       onClick={() => setExpandedThreads((s) => { const n = new Set(s); n.has(msg.id) ? n.delete(msg.id) : n.add(msg.id); return n; })}
                       className="flex items-center gap-1.5 mt-1.5 text-[11px] hover:underline"
-                      style={{ color: "var(--brand)" }}
+                      style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}
                     >
                       {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                       {replies.length} {replies.length === 1 ? "reply" : "replies"}
                     </button>
                   )}
                   {expanded && (
-                    <div className="ml-4 mt-2 space-y-2 pl-3" style={{ borderLeft: "2px solid var(--hs-border)" }}>
+                    <div className="ml-4 mt-2 space-y-2 pl-3" style={{ borderLeft: "2px solid var(--lcs-line)" }}>
                       {replies.map((r) => (
                         <div key={r.id} className="flex items-start gap-2">
                           <Avatar name={r.sender_name} userId={r.user_id} size={20} />
                           <div>
-                            <span className="text-xs font-semibold" style={{ color: "var(--hs-text-primary)" }}>{r.sender_name}</span>
-                            <span className="text-[10px] ml-2" style={{ color: "var(--hs-text-muted)" }}>{relTime(r.created_at)}</span>
-                            <div className="text-xs" style={{ color: "var(--hs-text-secondary)" }}>{r.content}</div>
+                            <span className="text-xs font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{r.sender_name}</span>
+                            <span className="text-[10px] ml-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{relTime(r.created_at)}</span>
+                            <div className="text-xs" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{r.content}</div>
                           </div>
                         </div>
                       ))}
@@ -348,10 +370,10 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                   <button
                     onClick={() => pinMessage(msg)}
-                    className="p-1 rounded hover:bg-accent transition-colors"
+                    className="p-1 transition-colors"
                     title={msg.pinned ? "Unpin" : "Pin"}
                   >
-                    <Pin className="h-3 w-3" style={{ color: msg.pinned ? "#F59E0B" : "var(--hs-text-muted)" }} />
+                    <Pin className="h-3 w-3" style={{ color: msg.pinned ? "var(--lcs-accent)" : "var(--lcs-ink-muted)" }} />
                   </button>
                 </div>
               </div>
@@ -363,9 +385,9 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
 
       {/* Add channel dialog */}
       {showAddChannel && (
-        <div className="px-4 py-3" style={{ borderTop: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
+        <div className="px-4 py-3" style={{ borderTop: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
           <div className="flex items-center gap-2">
-            <Hash className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--hs-text-muted)" }} />
+            <Hash className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--lcs-ink-muted)" }} />
             <input
               autoFocus
               value={newChannelName}
@@ -373,17 +395,17 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
               onKeyDown={(e) => { if (e.key === "Enter") addChannel(); if (e.key === "Escape") setShowAddChannel(false); }}
               placeholder="channel-name"
               className="flex-1 text-sm outline-none bg-transparent"
-              style={{ color: "var(--hs-text-primary)" }}
+              style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
             />
-            <button onClick={addChannel} className="text-xs font-medium px-2 py-1 rounded" style={{ background: "var(--gradient-brand)", color: "#fff" }}>Create</button>
-            <button onClick={() => setShowAddChannel(false)}><X className="h-3.5 w-3.5" style={{ color: "var(--hs-text-muted)" }} /></button>
+            <LcsButton variant="primary" onClick={addChannel} className="text-xs px-2 py-1">Create</LcsButton>
+            <button onClick={() => setShowAddChannel(false)}><X className="h-3.5 w-3.5" style={{ color: "var(--lcs-ink-muted)" }} /></button>
           </div>
         </div>
       )}
 
       {/* Send bar */}
-      <div className="px-4 py-3" style={{ borderTop: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
-        <div className="flex items-end gap-2 rounded-lg px-3 py-2" style={{ background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)" }}>
+      <div className="px-4 py-3" style={{ borderTop: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+        <div className="flex items-end gap-2 px-3 py-2" style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}>
           <textarea
             ref={textareaRef}
             data-testid="message-input"
@@ -397,14 +419,14 @@ function ChatSection({ startupId, userId, userName, channels, onChannelCreated }
             placeholder={`Message #${activeChannel?.name ?? "general"}…`}
             rows={1}
             className="flex-1 resize-none bg-transparent text-sm outline-none"
-            style={{ color: "var(--hs-text-primary)", maxHeight: 96, lineHeight: "1.5" }}
+            style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)", maxHeight: 96, lineHeight: "1.5" }}
           />
           <button
             onClick={sendMessage}
             disabled={!draft.trim() || sending}
             data-testid="send-message-btn"
-            className="flex-shrink-0 rounded-lg p-1.5 transition-colors"
-            style={{ background: draft.trim() ? "var(--gradient-brand)" : "var(--accent)", color: draft.trim() ? "#fff" : "var(--faint)" }}
+            className="flex-shrink-0 p-1.5 transition-colors"
+            style={{ background: draft.trim() ? "var(--lcs-accent)" : "var(--lcs-surface)", color: draft.trim() ? "var(--lcs-white)" : "var(--lcs-ink-muted)" }}
           >
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
@@ -428,19 +450,19 @@ function TaskCard({ task, onDragStart, onClick }: {
       draggable
       onDragStart={onDragStart}
       onClick={onClick}
-      className="rounded-none p-3 cursor-grab active:cursor-grabbing transition-colors hover:border-border"
-      style={{ background: "var(--hs-bg-secondary)", border: "1px solid var(--hs-border)" }}
+      className="p-3 cursor-grab active:cursor-grabbing transition-colors"
+      style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}
     >
-      <div className="text-sm font-medium mb-2" style={{ color: "var(--hs-text-primary)" }}>{task.title}</div>
+      <div className="text-sm font-medium mb-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{task.title}</div>
       <div className="flex items-center gap-1.5 flex-wrap">
-        <span style={{ background: p.bg, color: p.text, borderRadius: 99, padding: "1px 8px", fontSize: 10, fontWeight: 600 }}>{p.label}</span>
+        <span style={{ background: p.bg, color: p.text, padding: "1px 8px", fontSize: 10, fontWeight: 600, fontFamily: "var(--font-lcs-ui)" }}>{p.label}</span>
         {task.assignee_name && (
-          <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--hs-text-muted)" }}>
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
             <Avatar name={task.assignee_name} userId={task.assignee_id ?? "x"} size={14} />
           </span>
         )}
         {task.due_date && (
-          <span className="text-[10px] flex items-center gap-0.5" style={{ color: isOverdue ? "#EF4444" : isDueToday ? "#F59E0B" : "var(--hs-text-muted)" }}>
+          <span className="text-[10px] flex items-center gap-0.5" style={{ color: isOverdue ? "var(--lcs-attention)" : isDueToday ? "var(--lcs-accent)" : "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
             <Calendar className="h-2.5 w-2.5" />
             {format(new Date(task.due_date + "T00:00:00"), "d MMM")}
           </span>
@@ -500,83 +522,55 @@ function TaskSlideOver({ startupId, userId, task, teamMembers, dealRooms, onClos
     onSaved(); onClose();
   };
 
-  const inp = "w-full rounded-lg px-3 py-2 text-sm outline-none";
-  const inpStyle = { background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)", color: "var(--hs-text-primary)" };
-
   return (
-    <div className="fixed inset-0 z-50 flex">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative ml-auto h-full w-full max-w-[440px] flex flex-col" style={{ background: "var(--hs-bg-secondary)", borderLeft: "1px solid var(--hs-border)" }} data-testid="task-slideover">
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--hs-border)" }}>
-          <div className="font-semibold" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>{isEdit ? "Edit task" : "New task"}</div>
-          <button onClick={onClose}><X className="h-4 w-4" style={{ color: "var(--hs-text-muted)" }} /></button>
+    <div data-testid="task-slideover">
+      <LcsModal
+        title={isEdit ? "Edit task" : "New task"}
+        variant="slide-over"
+        onClose={onClose}
+        footer={
+          <>
+            <LcsButton variant="secondary" onClick={onClose}>Cancel</LcsButton>
+            <LcsButton variant="primary" onClick={handleSave} disabled={saving} data-testid="save-task-btn">
+              {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {saving ? "Saving…" : isEdit ? "Update" : "Create task"}
+            </LcsButton>
+          </>
+        }
+      >
+        <LcsTextField label="Title *" value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Task title" data-testid="task-title-input" />
+        <LcsTextareaField label="Description" value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="What needs to be done…" rows={3} />
+        <div className="grid grid-cols-2 gap-3">
+          <LcsSelectField label="Status" value={form.status} onChange={(e) => set("status", e.target.value)}>
+            <option value="todo">Todo</option>
+            <option value="in_progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </LcsSelectField>
+          <LcsSelectField label="Priority" value={form.priority} onChange={(e) => set("priority", e.target.value)} data-testid="task-priority-select">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </LcsSelectField>
         </div>
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
-          <div>
-            <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Title *</label>
-            <input className={inp} style={inpStyle} value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Task title" data-testid="task-title-input" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Description</label>
-            <textarea className={inp} style={{ ...inpStyle, minHeight: 72, resize: "vertical" }} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="What needs to be done…" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Status</label>
-              <select className={inp} style={{ ...inpStyle, cursor: "pointer" }} value={form.status} onChange={(e) => set("status", e.target.value)}>
-                <option value="todo">Todo</option>
-                <option value="in_progress">In Progress</option>
-                <option value="review">Review</option>
-                <option value="done">Done</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Priority</label>
-              <select className={inp} style={{ ...inpStyle, cursor: "pointer" }} value={form.priority} onChange={(e) => set("priority", e.target.value)} data-testid="task-priority-select">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Assignee</label>
-              <select className={inp} style={{ ...inpStyle, cursor: "pointer" }} value={form.assignee_id} onChange={(e) => set("assignee_id", e.target.value)}>
-                <option value="">Unassigned</option>
-                {teamMembers.map((m) => (
-                  <option key={m.user_id} value={m.user_id}>{m.display_name ?? m.user_id.slice(0, 8)}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Due date</label>
-              <input type="date" className={inp} style={inpStyle} value={form.due_date} onChange={(e) => set("due_date", e.target.value)} />
-            </div>
-          </div>
-          {dealRooms.length > 0 && (
-            <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Deal room (optional)</label>
-              <select className={inp} style={{ ...inpStyle, cursor: "pointer" }} value={form.deal_room_id} onChange={(e) => set("deal_room_id", e.target.value)}>
-                <option value="">None</option>
-                {dealRooms.map((d) => <option key={d.id} value={d.id}>{d.company_name}</option>)}
-              </select>
-            </div>
-          )}
-          <div>
-            <label className="block text-xs font-medium mb-1" style={{ color: "var(--hs-text-secondary)" }}>Tags (comma separated)</label>
-            <input className={inp} style={inpStyle} value={form.tags} onChange={(e) => set("tags", e.target.value)} placeholder="fundraising, q2, urgent" />
-          </div>
+        <div className="grid grid-cols-2 gap-3">
+          <LcsSelectField label="Assignee" value={form.assignee_id} onChange={(e) => set("assignee_id", e.target.value)}>
+            <option value="">Unassigned</option>
+            {teamMembers.map((m) => (
+              <option key={m.user_id} value={m.user_id}>{m.display_name ?? m.user_id.slice(0, 8)}</option>
+            ))}
+          </LcsSelectField>
+          <LcsTextField label="Due date" type="date" value={form.due_date} onChange={(e) => set("due_date", e.target.value)} />
         </div>
-        <div className="px-5 py-4 flex gap-3" style={{ borderTop: "1px solid var(--hs-border)" }}>
-          <button onClick={onClose} className="flex-1 rounded-lg py-2 text-sm font-medium" style={{ background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)", color: "var(--hs-text-secondary)" }}>Cancel</button>
-          <button onClick={handleSave} disabled={saving} className="flex-1 rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2" style={{ background: "var(--gradient-brand)", color: "#fff" }} data-testid="save-task-btn">
-            {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            {saving ? "Saving…" : isEdit ? "Update" : "Create task"}
-          </button>
-        </div>
-      </div>
+        {dealRooms.length > 0 && (
+          <LcsSelectField label="Deal room (optional)" value={form.deal_room_id} onChange={(e) => set("deal_room_id", e.target.value)}>
+            <option value="">None</option>
+            {dealRooms.map((d) => <option key={d.id} value={d.id}>{d.company_name}</option>)}
+          </LcsSelectField>
+        )}
+        <LcsTextField label="Tags (comma separated)" value={form.tags} onChange={(e) => set("tags", e.target.value)} placeholder="fundraising, q2, urgent" />
+      </LcsModal>
     </div>
   );
 }
@@ -638,34 +632,33 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
+      <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
         <div className="flex items-center gap-2">
-          <CheckSquare className="h-4 w-4" style={{ color: "var(--hs-text-muted)" }} />
-          <span className="font-semibold text-sm" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Tasks</span>
-          <span className="text-xs rounded-full px-2 py-0.5 font-medium" style={{ background: "var(--accent)", color: "var(--hs-text-muted)" }}>{tasks.length}</span>
+          <CheckSquare className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
+          <span className="font-semibold text-sm" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>Tasks</span>
+          <span className="text-xs px-2 py-0.5 font-medium" style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{tasks.length}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid var(--hs-border)" }}>
-            <button onClick={() => setView("kanban")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "kanban" ? "var(--gradient-brand)" : "var(--hs-bg-primary)", color: view === "kanban" ? "#fff" : "var(--hs-text-muted)" }}>
+          <div className="flex overflow-hidden" style={{ border: "1px solid var(--lcs-line)" }}>
+            <button onClick={() => setView("kanban")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "kanban" ? "var(--lcs-accent)" : "var(--lcs-white)", color: view === "kanban" ? "var(--lcs-white)" : "var(--lcs-ink-muted)" }}>
               <Columns3 className="h-3.5 w-3.5" />
             </button>
-            <button onClick={() => setView("list")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "list" ? "var(--gradient-brand)" : "var(--hs-bg-primary)", color: view === "list" ? "#fff" : "var(--hs-text-muted)", borderLeft: "1px solid var(--hs-border)" }}>
+            <button onClick={() => setView("list")} className="px-2.5 py-1.5 text-xs" style={{ background: view === "list" ? "var(--lcs-accent)" : "var(--lcs-white)", color: view === "list" ? "var(--lcs-white)" : "var(--lcs-ink-muted)", borderLeft: "1px solid var(--lcs-line)" }}>
               <LayoutList className="h-3.5 w-3.5" />
             </button>
           </div>
-          <button
+          <LcsButton
+            variant="primary"
             onClick={() => { setEditingTask(null); setShowSlideOver(true); }}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium"
-            style={{ background: "var(--gradient-brand)", color: "#fff" }}
             data-testid="add-task-btn"
           >
             <Plus className="h-3.5 w-3.5" /> Add task
-          </button>
+          </LcsButton>
         </div>
       </div>
 
       {view === "kanban" ? (
-        <div className="flex gap-4 p-4 overflow-x-auto flex-1" style={{ background: "var(--hs-bg-primary)" }} data-testid="kanban-board">
+        <div className="flex gap-4 p-4 overflow-x-auto flex-1" style={{ background: "var(--lcs-white)" }} data-testid="kanban-board">
           {STATUS_COLS.map((col) => {
             const colTasks = tasks.filter((t) => t.status === col.key);
             return (
@@ -679,8 +672,8 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
               >
                 <div className="flex items-center gap-2 mb-3">
                   <Circle className="h-2 w-2" style={{ fill: col.color, color: col.color }} />
-                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: col.color }}>{col.label}</span>
-                  <span className="text-[10px] rounded-full px-1.5 py-0.5 ml-auto font-medium" style={{ background: "var(--accent)", color: "var(--hs-text-muted)" }}>{colTasks.length}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: col.color, fontFamily: "var(--font-lcs-ui)" }}>{col.label}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 ml-auto font-medium" style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{colTasks.length}</span>
                 </div>
                 <div className="space-y-2 flex-1">
                   {colTasks.map((t) => (
@@ -692,8 +685,8 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
                     />
                   ))}
                   {colTasks.length === 0 && (
-                    <div className="rounded-none py-6 text-center" style={{ border: "1px dashed var(--border)" }}>
-                      <p className="text-xs" style={{ color: "var(--hs-text-muted)" }}>No tasks</p>
+                    <div className="py-6 text-center" style={{ border: "1px dashed var(--lcs-line)" }}>
+                      <p className="text-xs" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>No tasks</p>
                     </div>
                   )}
                 </div>
@@ -702,12 +695,12 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
           })}
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto" style={{ background: "var(--hs-bg-primary)" }}>
+        <div className="flex-1 overflow-y-auto" style={{ background: "var(--lcs-white)" }}>
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
+              <tr style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
                 {["Title", "Status", "Priority", "Assignee", "Due date", ""].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider font-semibold" style={{ color: "var(--hs-text-muted)" }}>{h}</th>
+                  <th key={h} className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider font-semibold" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -717,37 +710,37 @@ function TasksSection({ startupId, userId, teamMembers }: { startupId: string; u
                 const col = STATUS_COLS.find((c) => c.key === t.status);
                 const isOverdue = t.due_date && new Date(t.due_date) < new Date() && t.status !== "done";
                 return (
-                  <tr key={t.id} className="hover:bg-accent transition-colors" style={{ borderBottom: "1px solid var(--hs-border)" }}>
-                    <td className="px-4 py-2.5 font-medium" style={{ color: "var(--hs-text-primary)" }}>{t.title}</td>
+                  <tr key={t.id} className="transition-colors" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
+                    <td className="px-4 py-2.5 font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{t.title}</td>
                     <td className="px-4 py-2.5">
-                      <span style={{ color: col?.color ?? "var(--hs-text-muted)", fontSize: 11, fontWeight: 600 }}>{col?.label ?? t.status}</span>
+                      <span style={{ color: col?.color ?? "var(--lcs-ink-muted)", fontSize: 11, fontWeight: 600, fontFamily: "var(--font-lcs-ui)" }}>{col?.label ?? t.status}</span>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span style={{ background: p.bg, color: p.text, borderRadius: 99, padding: "2px 8px", fontSize: 10, fontWeight: 600 }}>{p.label}</span>
+                      <span style={{ background: p.bg, color: p.text, padding: "2px 8px", fontSize: 10, fontWeight: 600, fontFamily: "var(--font-lcs-ui)" }}>{p.label}</span>
                     </td>
                     <td className="px-4 py-2.5">
                       {t.assignee_name ? (
                         <div className="flex items-center gap-1.5">
                           <Avatar name={t.assignee_name} userId={t.assignee_id ?? "x"} size={18} />
-                          <span className="text-xs" style={{ color: "var(--hs-text-secondary)" }}>{t.assignee_name}</span>
+                          <span className="text-xs" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{t.assignee_name}</span>
                         </div>
-                      ) : <span className="text-xs" style={{ color: "var(--hs-text-muted)" }}>—</span>}
+                      ) : <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>—</span>}
                     </td>
                     <td className="px-4 py-2.5">
-                      {t.due_date ? <span className="text-xs" style={{ color: isOverdue ? "#EF4444" : "var(--hs-text-secondary)" }}>{format(new Date(t.due_date + "T00:00:00"), "d MMM yyyy")}</span> : <span className="text-xs" style={{ color: "var(--hs-text-muted)" }}>—</span>}
+                      {t.due_date ? <span className="text-xs" style={{ color: isOverdue ? "var(--lcs-attention)" : "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{format(new Date(t.due_date + "T00:00:00"), "d MMM yyyy")}</span> : <span className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>—</span>}
                     </td>
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-2 justify-end">
-                        <button onClick={() => { setEditingTask(t); setShowSlideOver(true); }} className="text-xs hover:text-brand transition-colors" style={{ color: "var(--hs-text-muted)" }}>Edit</button>
-                        {t.status !== "done" && <button onClick={() => markDone(t.id)} className="text-xs" style={{ color: "#10B981" }}>Done</button>}
-                        <button onClick={() => deleteTask(t.id)} className="text-xs" style={{ color: "#EF4444" }}>Delete</button>
+                        <button onClick={() => { setEditingTask(t); setShowSlideOver(true); }} className="text-xs transition-colors" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Edit</button>
+                        {t.status !== "done" && <button onClick={() => markDone(t.id)} className="text-xs" style={{ color: "var(--lcs-satisfied)", fontFamily: "var(--font-lcs-ui)" }}>Done</button>}
+                        <button onClick={() => deleteTask(t.id)} className="text-xs" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}>Delete</button>
                       </div>
                     </td>
                   </tr>
                 );
               })}
               {tasks.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--hs-text-muted)" }}>No tasks</td></tr>
+                <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>No tasks</td></tr>
               )}
             </tbody>
           </table>
@@ -846,14 +839,14 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
   return (
     <div className="flex h-full" data-testid="notes-section">
       {/* Notes list */}
-      <div className="flex flex-col" style={{ width: 260, flexShrink: 0, borderRight: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
-        <div className="px-3 py-3" style={{ borderBottom: "1px solid var(--hs-border)" }}>
+      <div className="flex flex-col" style={{ width: 260, flexShrink: 0, borderRight: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+        <div className="px-3 py-3" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search notes…"
-            className="w-full rounded-lg px-3 py-1.5 text-xs outline-none"
-            style={{ background: "var(--hs-bg-primary)", border: "1px solid var(--hs-border)", color: "var(--hs-text-primary)" }}
+            className="w-full px-3 py-1.5 text-xs outline-none"
+            style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
           />
         </div>
         <div className="flex-1 overflow-y-auto">
@@ -861,55 +854,50 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
             <button
               key={n.id}
               onClick={() => setActiveNoteId(n.id)}
-              className="w-full text-left px-3 py-3 transition-colors hover:bg-accent"
-              style={{ borderBottom: "1px solid var(--hs-border)", background: activeNoteId === n.id ? "rgba(124,58,237,0.08)" : "transparent" }}
+              className="w-full text-left px-3 py-3 transition-colors"
+              style={{ borderBottom: "1px solid var(--lcs-line)", background: activeNoteId === n.id ? "var(--lcs-progress-wash)" : "transparent" }}
             >
               <div className="flex items-center gap-1.5 mb-0.5">
-                {n.pinned && <Pin className="h-2.5 w-2.5 flex-shrink-0" style={{ color: "#F59E0B" }} />}
-                <span className="text-xs font-semibold truncate" style={{ color: "var(--hs-text-primary)" }}>{n.title}</span>
+                {n.pinned && <Pin className="h-2.5 w-2.5 flex-shrink-0" style={{ color: "var(--lcs-accent)" }} />}
+                <span className="text-xs font-semibold truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{n.title}</span>
               </div>
-              <div className="text-[10px] flex items-center justify-between">
-                <span style={{ color: "var(--hs-text-muted)" }}>{n.author_name ?? "You"}</span>
-                <span style={{ color: "var(--hs-text-muted)" }}>{formatDistanceToNow(new Date(n.updated_at), { addSuffix: true })}</span>
+              <div className="text-[10px] flex items-center justify-between" style={{ fontFamily: "var(--font-lcs-data)" }}>
+                <span style={{ color: "var(--lcs-ink-muted)" }}>{n.author_name ?? "You"}</span>
+                <span style={{ color: "var(--lcs-ink-muted)" }}>{formatDistanceToNow(new Date(n.updated_at), { addSuffix: true })}</span>
               </div>
             </button>
           ))}
           {filteredNotes.length === 0 && (
-            <div className="px-4 py-8 text-center text-xs" style={{ color: "var(--hs-text-muted)" }}>No notes</div>
+            <div className="px-4 py-8 text-center text-xs" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>No notes</div>
           )}
         </div>
-        <div className="px-3 py-3" style={{ borderTop: "1px solid var(--hs-border)" }}>
-          <button
-            onClick={newNote}
-            className="w-full flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium"
-            style={{ background: "var(--gradient-brand)", color: "#fff" }}
-            data-testid="new-note-btn"
-          >
+        <div className="px-3 py-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
+          <LcsButton variant="primary" onClick={newNote} className="w-full justify-center" data-testid="new-note-btn">
             <Plus className="h-3 w-3" /> New note
-          </button>
+          </LcsButton>
         </div>
       </div>
 
       {/* Note editor */}
-      <div className="flex-1 flex flex-col" style={{ background: "var(--hs-bg-primary)" }}>
+      <div className="flex-1 flex flex-col" style={{ background: "var(--lcs-white)" }}>
         {activeNote ? (
           <>
-            <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--hs-border)" }}>
+            <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
               <input
                 value={editTitle}
                 onChange={(e) => { setEditTitle(e.target.value); scheduleAutoSave(activeNote.id, e.target.value, editContent); }}
                 className="text-base font-semibold bg-transparent outline-none flex-1 mr-4"
-                style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}
+                style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}
                 placeholder="Note title"
                 data-testid="note-title-input"
               />
               <div className="flex items-center gap-2">
-                {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" style={{ color: "var(--hs-text-muted)" }} />}
+                {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" style={{ color: "var(--lcs-ink-muted)" }} />}
                 <button onClick={() => togglePin(activeNote)} title={activeNote.pinned ? "Unpin" : "Pin"}>
-                  <Pin className="h-4 w-4" style={{ color: activeNote.pinned ? "#F59E0B" : "var(--hs-text-muted)" }} />
+                  <Pin className="h-4 w-4" style={{ color: activeNote.pinned ? "var(--lcs-accent)" : "var(--lcs-ink-muted)" }} />
                 </button>
                 <button onClick={() => deleteNote(activeNote.id)}>
-                  <Trash2 className="h-4 w-4" style={{ color: "#EF4444" }} />
+                  <Trash2 className="h-4 w-4" style={{ color: "var(--lcs-attention)" }} />
                 </button>
               </div>
             </div>
@@ -917,26 +905,21 @@ function NotesSection({ startupId, userId, userName }: { startupId: string; user
               value={editContent}
               onChange={(e) => { setEditContent(e.target.value); scheduleAutoSave(activeNote.id, editTitle, e.target.value); }}
               className="flex-1 p-5 text-sm bg-transparent outline-none resize-none"
-              style={{ color: "var(--hs-text-secondary)" }}
+              style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}
               placeholder="Start writing…"
               data-testid="note-content-input"
             />
-            <div className="px-5 py-2 text-[10px]" style={{ color: "var(--hs-text-muted)", borderTop: "1px solid var(--hs-border)" }}>
+            <div className="px-5 py-2 text-[10px]" style={{ color: "var(--lcs-ink-muted)", borderTop: "1px solid var(--lcs-line)", fontFamily: "var(--font-lcs-data)" }}>
               Last updated {formatDistanceToNow(new Date(activeNote.updated_at), { addSuffix: true })}
             </div>
           </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-3">
-            <FileText className="h-8 w-8" style={{ color: "var(--hs-text-muted)" }} />
-            <div className="text-sm" style={{ color: "var(--hs-text-secondary)" }}>Select a note or create a new one</div>
-            <button
-              onClick={newNote}
-              data-testid="empty-state-new-note-btn"
-              className="text-sm font-medium flex items-center gap-1.5 rounded px-4 py-2"
-              style={{ background: "#7C3AED", color: "#fff" }}
-            >
+            <FileText className="h-8 w-8" style={{ color: "var(--lcs-ink-muted)" }} />
+            <div className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Select a note or create a new one</div>
+            <LcsButton variant="primary" onClick={newNote} data-testid="empty-state-new-note-btn">
               <Plus className="h-3.5 w-3.5" /> New note
-            </button>
+            </LcsButton>
           </div>
         )}
       </div>
@@ -970,16 +953,18 @@ function ActivitySection({ startupId, userId, isInvestor }: { startupId: string;
   const grouped = groupByDate(entries);
 
   return (
-    <div className="flex-1 overflow-y-auto p-5" style={{ background: "var(--hs-bg-primary)" }} data-testid="activity-feed">
+    <div className="flex-1 overflow-y-auto p-5" style={{ background: "var(--lcs-white)" }} data-testid="activity-feed">
       {isLoading ? (
-        <EmptyState kind="loading" title="Loading" />
+        <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : entries.length === 0 ? (
-        <EmptyState kind="empty" title="No activity" />
+        <LcsEmptyState title="No activity" text="Actions taken across your workspace will appear here." />
       ) : (
         <div className="space-y-6">
           {Array.from(grouped.entries()).map(([dateLabel, items]) => (
             <div key={dateLabel}>
-              <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--hs-text-muted)" }}>{dateLabel}</div>
+              <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{dateLabel}</div>
               <div className="space-y-3">
                 {items.map((entry) => {
                   const dot = actionColor(entry.action_type);
@@ -987,15 +972,15 @@ function ActivitySection({ startupId, userId, isInvestor }: { startupId: string;
                     <div key={entry.id} className="flex items-start gap-3">
                       <div className="mt-1.5 flex-shrink-0 h-2 w-2 rounded-full" style={{ background: dot }} />
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-medium" style={{ color: "var(--hs-text-primary)" }}>{entry.actor_name ?? "Someone"}</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{entry.actor_name ?? "Someone"}</span>
                         {" "}
-                        <span className="text-sm" style={{ color: "var(--hs-text-secondary)" }}>
+                        <span className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                           {entry.action_type.replace(/_/g, " ")}
                           {entry.target_label ? ` — ${entry.target_label}` : ""}
                         </span>
-                        {entry.detail && <div className="text-xs mt-0.5" style={{ color: "var(--hs-text-muted)" }}>{entry.detail}</div>}
+                        {entry.detail && <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{entry.detail}</div>}
                       </div>
-                      <div className="text-[10px] flex-shrink-0 mt-1" style={{ color: "var(--hs-text-muted)" }}>
+                      <div className="text-[10px] flex-shrink-0 mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
                         {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
                       </div>
                     </div>
@@ -1016,9 +1001,9 @@ function InvestorWorkspaceContent({ userId, section }: { userId: string; section
   if (section === "activity") {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
-          <Activity className="h-4 w-4" style={{ color: "var(--hs-text-muted)" }} />
-          <span className="font-semibold text-sm" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Activity</span>
+        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+          <Activity className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
+          <span className="font-semibold text-sm" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>Activity</span>
         </div>
         <ActivitySection startupId="" userId={userId} isInvestor />
       </div>
@@ -1039,28 +1024,21 @@ function InvestorWorkspaceContent({ userId, section }: { userId: string; section
     activity: "Activity timeline",
   };
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-5 p-8" style={{ background: "var(--hs-bg-primary)" }}>
-      <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(124,58,237,0.1)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(124,58,237,0.15)" }}>
-        <Icon className="h-6 w-6" style={{ color: "#A855F7" }} />
+    <div className="flex flex-col items-center justify-center h-full gap-5 p-8" style={{ background: "var(--lcs-white)" }}>
+      <div style={{ width: 52, height: 52, background: "var(--lcs-progress-wash)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--lcs-line)" }}>
+        <Icon className="h-6 w-6" style={{ color: "var(--lcs-accent)" }} />
       </div>
       <div className="text-center max-w-xs">
-        <div className="text-sm font-semibold mb-1.5" style={{ color: "var(--hs-text-primary)", fontFamily: "Syne, sans-serif" }}>{labels[section]}</div>
-        <div className="text-xs leading-relaxed" style={{ color: "var(--hs-text-muted)" }}>
+        <div className="text-sm font-semibold mb-1.5" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{labels[section]}</div>
+        <div className="text-xs leading-relaxed" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
           {descriptions[section]}
         </div>
       </div>
-      <a
-        href="/app/investor/team"
-        style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          padding: "8px 18px", borderRadius: 8,
-          background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.3)",
-          color: "#A855F7", fontSize: 13, fontWeight: 500, textDecoration: "none",
-          transition: "background 0.15s",
-        }}
-      >
-        <Users className="h-3.5 w-3.5" />
-        Manage team
+      <a href="/app/investor/team" className="inline-block">
+        <LcsButton variant="secondary">
+          <Users className="h-3.5 w-3.5" />
+          Manage team
+        </LcsButton>
       </a>
     </div>
   );
@@ -1132,22 +1110,28 @@ export function WorkspacePage() {
   if (!isInvestor && startupLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--hs-text-muted)" }} />
+        <Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--lcs-ink-muted)" }} />
       </div>
     );
   }
 
   return (
-    <div className="flex h-full" style={{ background: "var(--hs-bg-primary)" }}>
+    <div className="flex h-full" style={{ background: "var(--lcs-white)" }}>
       {/* ── Channel / Section list ──────────────────────────────────────── */}
-      <div className="flex flex-col" style={{ width: 220, flexShrink: 0, background: "var(--hs-bg-secondary)", borderRight: "1px solid var(--hs-border)" }}>
+      {/* This 220px internal nav rail is the same structural-fit case as
+          subsystem 2's L2/L3 nav and app.settings.tsx's settings tab rail —
+          a page with its own internally-navigated sub-sections, which LCS's
+          10 primitives have no dedicated pattern for (see PRIMITIVES.md's
+          "Nested nav" section). Restyle-only per that precedent — no logic
+          change, no new primitive invented. */}
+      <div className="flex flex-col" style={{ width: 220, flexShrink: 0, background: "var(--lcs-surface)", borderRight: "1px solid var(--lcs-line)" }}>
         {/* Header */}
-        <div className="px-4 py-4" style={{ borderBottom: "1px solid var(--hs-border)" }}>
-          <div className="font-bold text-sm" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Workspace</div>
+        <div className="px-4 py-4" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
+          <div className="font-bold text-sm" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>Workspace</div>
           {!isInvestor && (
             <div className="flex items-center gap-1 mt-0.5">
-              <Users className="h-3 w-3" style={{ color: "var(--hs-text-muted)" }} />
-              <span className="text-[11px]" style={{ color: "var(--hs-text-muted)" }}>
+              <Users className="h-3 w-3" style={{ color: "var(--lcs-ink-muted)" }} />
+              <span className="text-[11px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                 {teamMembers.length + 1} member{teamMembers.length !== 0 ? "s" : ""}
               </span>
             </div>
@@ -1159,15 +1143,16 @@ export function WorkspacePage() {
           {/* CHANNELS — only for founders with workspace */}
           {!isInvestor && channels.length > 0 && (
             <div className="mb-4">
-              <div className="px-4 py-1 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--hs-text-muted)" }}>Channels</div>
+              <div className="px-4 py-1 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Channels</div>
               {channels.map((ch) => (
                 <button
                   key={ch.id}
                   onClick={() => setSection("chat")}
                   className="w-full flex items-center gap-2 px-4 py-1.5 text-sm transition-colors"
                   style={{
-                    background: section === "chat" ? "rgba(124,58,237,0.12)" : "transparent",
-                    color: section === "chat" ? "#A855F7" : "var(--hs-text-secondary)",
+                    background: section === "chat" ? "var(--lcs-progress-wash)" : "transparent",
+                    color: section === "chat" ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                    fontFamily: "var(--font-lcs-ui)",
                   }}
                   data-testid={`channel-${ch.name}`}
                 >
@@ -1179,15 +1164,16 @@ export function WorkspacePage() {
           )}
 
           {/* Sections */}
-          <div className="px-4 py-1 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--hs-text-muted)" }}>Sections</div>
+          <div className="px-4 py-1 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Sections</div>
           {NAV.filter((n) => n.key !== "chat" || isInvestor).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setSection(key)}
               className="w-full flex items-center gap-2 px-4 py-1.5 text-sm transition-colors"
               style={{
-                background: section === key ? "rgba(124,58,237,0.12)" : "transparent",
-                color: section === key ? "#A855F7" : "var(--hs-text-secondary)",
+                background: section === key ? "var(--lcs-progress-wash)" : "transparent",
+                color: section === key ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                fontFamily: "var(--font-lcs-ui)",
               }}
               data-testid={`nav-${key}`}
             >
@@ -1201,8 +1187,9 @@ export function WorkspacePage() {
               onClick={() => setSection("chat")}
               className="w-full flex items-center gap-2 px-4 py-1.5 text-sm transition-colors"
               style={{
-                background: section === "chat" ? "rgba(124,58,237,0.12)" : "transparent",
-                color: section === "chat" ? "#A855F7" : "var(--hs-text-secondary)",
+                background: section === "chat" ? "var(--lcs-progress-wash)" : "transparent",
+                color: section === "chat" ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                fontFamily: "var(--font-lcs-ui)",
               }}
               data-testid="nav-chat"
             >
@@ -1219,7 +1206,7 @@ export function WorkspacePage() {
           <InvestorWorkspaceContent userId={user?.id ?? ""} section={section} />
         ) : !startupId ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-sm" style={{ color: "var(--hs-text-muted)" }}>No startup found. Complete your profile to access the workspace.</div>
+            <div className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>No startup found. Complete your profile to access the workspace.</div>
           </div>
         ) : section === "chat" ? (
           <ChatSection
@@ -1243,9 +1230,9 @@ export function WorkspacePage() {
           />
         ) : (
           <div className="flex flex-col h-full">
-            <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--hs-border)", background: "var(--hs-bg-secondary)" }}>
-              <Activity className="h-4 w-4" style={{ color: "var(--hs-text-muted)" }} />
-              <span className="font-semibold text-sm" style={{ fontFamily: "Syne, sans-serif", color: "var(--hs-text-primary)" }}>Activity</span>
+            <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+              <Activity className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
+              <span className="font-semibold text-sm" style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)" }}>Activity</span>
             </div>
             <ActivitySection startupId={startupId} userId={user?.id ?? ""} isInvestor={false} />
           </div>

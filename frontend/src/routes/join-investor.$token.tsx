@@ -133,7 +133,7 @@ function JoinViaInviteLinkPage() {
       {/* Logo */}
       <div style={{ marginBottom: 32, textAlign: "center" }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: "var(--foreground)", fontFamily: "Syne, sans-serif", letterSpacing: "-0.5px" }}>
-          Hocky<span style={{ color: "var(--brand)" }}>stick</span>
+          Len<span style={{ color: "var(--brand)" }}>gdon</span>
         </div>
         <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 4 }}>Where deals get done</div>
       </div>

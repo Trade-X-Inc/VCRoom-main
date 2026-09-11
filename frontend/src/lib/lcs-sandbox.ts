@@ -1,0 +1,2081 @@
+// Lengdon Component System — sandbox demo data, 1 Sep 2026.
+//
+// Client-side ONLY. No Supabase client is imported or called anywhere in
+// this file — confirmed by grep before this comment was written, not
+// assumed (`grep -n "supabase\|@supabase" src/lib/lcs-sandbox.ts` returns
+// nothing). This is the deliberate architecture decision for every LCS
+// preview screen needing list/table content: a real Supabase table (even
+// isolated) would be schema/migration/RLS work this build has been
+// explicitly deferring throughout ("no backend wiring, no schema, no auth
+// changes"). localStorage needs none of that, supports a genuine reset,
+// and cannot touch deal_rooms/startups/any real table even by accident
+// since no network call exists in this code path.
+//
+// The real, live deal_rooms table has exactly 4 rows, all test/adversarial
+// fixtures (Playwright Test Co x2, Atlas Robotics — CLAUDE.md §13's
+// permanent adversarial account) — none are displayed here. This sandbox
+// is entirely fictional content, same implausible-not-realistic standard
+// as the Advisor Dashboard preview (CLAUDE.md §20.15's §7.4 lesson: a
+// plausible placeholder is how invented content quietly ships as real).
+
+/** The five sectors from Transactions hub §1. Matches §1's exact sector
+ * names — a raw slug->title-case conversion would be wrong for "spv"
+ * (-> "Spv", not "SPV") and "syndicate-lead". Moved here from §2's own
+ * local const so §3 (the single-transaction lifecycle) doesn't need a
+ * third duplicate copy. */
+export type LcsSectorId = "technology" | "real-estate" | "manufacturing" | "spv" | "syndicate-lead";
+
+export const SECTOR_LABEL: Record<LcsSectorId, string> = {
+  technology: "Technology",
+  "real-estate": "Real Estate",
+  manufacturing: "Manufacturing",
+  spv: "SPV",
+  "syndicate-lead": "Syndicate Lead",
+};
+
+/** Every route reading a $sector URL param gets a plain `string` from
+ * TanStack Router (a route param can't be narrowed to LcsSectorId at the
+ * type level — a malformed/unknown URL is a real possibility, not just a
+ * type-checker technicality), so `SECTOR_LABEL[sector]` doesn't type-check
+ * once SECTOR_LABEL is properly keyed by LcsSectorId (checkpoint 5).
+ * Centralizes the lookup-with-fallback every route was already doing
+ * (`SECTOR_LABEL[sector] ?? sector`) rather than repeating an `as` cast at
+ * five call sites. */
+export function sectorLabel(id: string): string {
+  return (SECTOR_LABEL as Record<string, string>)[id] ?? id;
+}
+
+/** Sector-config single source of truth, checkpoint 5 (2 Sep 2026) — the
+ * multi-sector-support checkpoint. Before this, "is this sector active"
+ * was answered three different, disconnected ways: the hub's own local
+ * `Sector` type/array (status field, real), and two independent
+ * `sector === "technology"` string comparisons in the instrument picker
+ * and stage-filtered list (hardcoded to the one sector that happened to
+ * be active, not consulting the hub's array at all). Moving the hub's
+ * array here and having every screen read `isSectorActive()` instead of
+ * re-deriving the answer is the actual "config, not hardcoded branches"
+ * change — a sector goes live by editing one array entry's `status`, not
+ * by touching per-screen conditionals.
+ *
+ * Real Estate activated here alongside Technology, 2 Sep 2026, to prove
+ * the architecture actually works end-to-end rather than just typing
+ * correctly with only one active sector. scheduleCount is deliberately
+ * OMITTED for Real Estate, not fabricated: `pack_v1.schedule` was queried
+ * live before this was written (`select * from pack_v1.schedule`) and
+ * returned exactly one row — technology/seed/published, the same row
+ * Technology's own scheduleCount: 1 has always been justified against.
+ * No real-estate row exists. Per direct instruction: active status with
+ * an honest absence (renders the same "No schedule published yet." line
+ * the not-yet-active sectors show) rather than either a fabricated count
+ * or a downgrade back to coming-soon. */
+export interface LcsSectorConfig {
+  id: LcsSectorId;
+  name: string;
+  status: "active" | "coming-soon";
+  /** Only set when a real published pack_v1.schedule row exists for this
+   * sector. Never a placeholder or estimated figure. */
+  scheduleCount?: number;
+}
+
+export const SECTORS: LcsSectorConfig[] = [
+  { id: "technology", name: SECTOR_LABEL.technology, status: "active", scheduleCount: 1 },
+  { id: "real-estate", name: SECTOR_LABEL["real-estate"], status: "active" },
+  { id: "manufacturing", name: SECTOR_LABEL.manufacturing, status: "coming-soon" },
+  { id: "spv", name: SECTOR_LABEL.spv, status: "coming-soon" },
+  { id: "syndicate-lead", name: SECTOR_LABEL["syndicate-lead"], status: "coming-soon" },
+];
+
+export function isSectorActive(id: string): boolean {
+  return SECTORS.some((s) => s.id === id && s.status === "active");
+}
+
+/** Instrument-type picker labels, added for the sector-layer restructure
+ * (1 Sep 2026) — the level inserted between Sector and the stage-filtered
+ * list. */
+export const INSTRUMENT_LABEL: Record<LcsInstrumentType, string> = {
+  equity: "Equity",
+  debt: "Debt",
+};
+
+/** Sandbox-only viewer role for the restructure's role-scoped entry
+ * points. Deliberately NOT the real auth Role type (src/lib/auth.tsx,
+ * "founder" | "investor") — this build has no backend wiring and no real
+ * session, so a third sandbox-only value ("advisor") would be a type
+ * error against the real type if reused, and conflating the two would
+ * misrepresent this as touching real auth when it doesn't. */
+export type LcsViewerRole = "founder" | "investor" | "advisor";
+
+export const VIEWER_ROLE_LABEL: Record<LcsViewerRole, string> = {
+  founder: "Founder",
+  investor: "Investor",
+  advisor: "Advisor",
+};
+
+/** Advisor team-management screen (checkpoint 4), 2 Sep 2026. A flat
+ * roster of an advisory firm's own analysts/counsel/accountants — the one
+ * piece of checkpoint 3's role model with no precedent to lean on (the
+ * Advisor Dashboard preview, CLAUDE.md §20.15, models a portfolio rollup
+ * and a sealed record, not team management). Read-only: no reset, no
+ * mutation, so a plain const is sufficient — unlike transactions, there's
+ * no "reset demo data" affordance planned for this screen. */
+export type LcsTeamMemberRole = "analyst" | "counsel" | "accountant";
+
+export const TEAM_MEMBER_ROLE_LABEL: Record<LcsTeamMemberRole, string> = {
+  analyst: "Analyst",
+  counsel: "Counsel",
+  accountant: "Accountant",
+};
+
+export interface LcsSandboxTeamMember {
+  id: string;
+  name: string;
+  role: LcsTeamMemberRole;
+  /** Real company names from the seed transactions above (companyName),
+   * never invented ones — so "client companies" is a genuine cross-
+   * reference against data that already exists, matching this build's
+   * standing no-fabricated-count discipline (sector schedule counts,
+   * instrument counts). */
+  clientCompanies: string[];
+}
+
+export const TEAM_MEMBERS: LcsSandboxTeamMember[] = [
+  { id: "team-1", name: "J. Okafor", role: "analyst", clientCompanies: ["Nimbus Analytics", "Vantage Robotics Software", "Fieldstone Data"] },
+  { id: "team-2", name: "L. Fenwick", role: "counsel", clientCompanies: ["Havenlight Systems", "Redstone Cloud"] },
+  { id: "team-3", name: "M. Delacroix", role: "accountant", clientCompanies: ["Anchorpoint AI"] },
+];
+
+/** Document Vault — checkpoint (2 Sep 2026), built against the corrected
+ * architecture report (three corrections from the "Pack Builder" scoping
+ * discussion, all grounded in CLAUDE.md's own already-established rules,
+ * not re-derived):
+ *
+ * 1. TWO-WAY ACCESS, not a tiered visibility model. CLAUDE.md §8.2 names
+ *    "release a document" as a Commit-class action — "No agent executes a
+ *    Commit-class action under any circumstance" — and §11.1 requires an
+ *    "immutable hash-chained audit log recording actor, action, object,
+ *    timestamp" for exactly this kind of event. The real product's action
+ *    layer already has this exact shape (`documentRender`/`docViewInsert`
+ *    for view-only, `documents.requestAccess`/`documents.grantRelease`
+ *    for release) — this sandbox mirrors it in spirit. **UI-only,
+ *    honestly flagged as not enforced**: this is a client-side sandbox
+ *    with no backend, no real auth, and no server to refuse an
+ *    unauthorized read — same standing disclosure as every other
+ *    document/role/visibility concept elsewhere in this build (e.g. the
+ *    transaction lifecycle's own DocumentVaultPanel comment: "the scope
+ *    is shown explicitly via the status pill rather than hidden — so the
+ *    screen documents the real access model instead of silently
+ *    simulating enforcement it can't actually perform").
+ * 2. PER-FIELD AI extraction, matching CLAUDE.md §10's AI-usage table
+ *    verbatim: "Proposes a value with citation to page and location.
+ *    Human confirms; the confirmation is the warranty." Confirmation is a
+ *    per-field action — there is no batch/bulk-confirm control anywhere
+ *    in the UI this data model feeds (see deals-preview.vault.tsx's own
+ *    header comment for the concrete UI-level guarantee). Extraction
+ *    itself is mocked (`mockExtractFields()`, no real AI call — this
+ *    build's standing "no backend wiring" rule) but the interaction
+ *    pattern is real, not stubbed to "later."
+ * 3. Universal cross-transaction document management (a shared library
+ *    spanning deals, versioning, a unified cross-deal audit trail) is
+ *    explicitly OUT OF SCOPE for this pass — logged as a distinct future
+ *    feature (CLAUDE.md's Amendment log), not folded in here. A vault
+ *    holds documents for the deals it's actually been built for or
+ *    shared into; no dedup/versioning system tracks a document's
+ *    presence across multiple vaults or deals. */
+export type LcsDocumentAccess = "view-only" | "release-on-request";
+
+export const DOCUMENT_ACCESS_LABEL: Record<LcsDocumentAccess, string> = {
+  "view-only": "View only",
+  "release-on-request": "Release on request",
+};
+
+/** Every view is logged (docViewInsert's real-product equivalent) —
+ * whether the access mode is view-only or release-on-request, viewing in
+ * place always writes a log entry. Sandbox-only, in-memory per vault
+ * document, not persisted to localStorage (a view log growing forever
+ * across every localStorage read/reseed isn't the point being
+ * demonstrated here — the confirm/correct and release-request flows are). */
+export interface LcsDocumentViewLog {
+  viewerRole: LcsViewerRole;
+  viewerName: string;
+  at: string;
+}
+
+/** documents.requestAccess -> documents.grantRelease, matching the real
+ * action names in spirit. A request is Prepare-class (produces something
+ * a human must act on); granting it is Commit-class (§8.2 — "release a
+ * document" is the named example) and is modeled here as a real two-step
+ * interaction, not a single toggle, even though nothing server-side is
+ * actually enforcing the distinction. */
+export interface LcsDocumentReleaseRequest {
+  id: string;
+  requestedBy: { role: LcsViewerRole; name: string };
+  status: "pending" | "granted" | "declined";
+  grantedBy?: { role: LcsViewerRole; name: string };
+  respondedAt?: string;
+  requestedAt: string;
+}
+
+export interface LcsVaultDocument {
+  id: string;
+  name: string;
+  category: string;
+  /** For the close-time archival privacy filter (deal-room documents
+   * feature, not built in this pass — the field exists now so the shape
+   * doesn't need another breaking version bump when that lands). A
+   * document the counterparty contributed is never archived with its
+   * real content past a room's close; only a generated summary persists. */
+  contributedBy: "self" | "counterparty";
+  access: LcsDocumentAccess;
+  viewLog: LcsDocumentViewLog[];
+  releaseRequests: LcsDocumentReleaseRequest[];
+}
+
+export interface LcsSandboxVault {
+  id: string;
+  name: string;
+  ownerRole: LcsViewerRole;
+  documents: LcsVaultDocument[];
+  createdAt: string;
+}
+
+const VAULT_STORAGE_KEY = "lcs-sandbox-vaults-v1";
+
+function seedVaults(): LcsSandboxVault[] {
+  return [
+    {
+      id: "vault-1",
+      name: "Series A materials",
+      ownerRole: "founder",
+      createdAt: "2026-08-15T10:00:00Z",
+      documents: [
+        {
+          id: "vdoc-1",
+          name: "Executive Summary.pdf",
+          category: "Overview",
+          contributedBy: "self",
+          access: "view-only",
+          viewLog: [{ viewerRole: "investor", viewerName: "Blue Horizon Ventures", at: "2026-08-24T09:10:00Z" }],
+          releaseRequests: [],
+        },
+        {
+          id: "vdoc-2",
+          name: "Cap Table (internal).xlsx",
+          category: "Legal",
+          contributedBy: "self",
+          access: "release-on-request",
+          viewLog: [],
+          releaseRequests: [
+            {
+              id: "req-1",
+              requestedBy: { role: "investor", name: "Blue Horizon Ventures" },
+              status: "pending",
+              requestedAt: "2026-08-25T11:00:00Z",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "vault-2",
+      name: "Fund deployment templates",
+      ownerRole: "investor",
+      createdAt: "2026-08-10T10:00:00Z",
+      documents: [
+        {
+          id: "vdoc-3",
+          name: "Standard DD Request.docx",
+          category: "Templates",
+          contributedBy: "self",
+          access: "view-only",
+          viewLog: [],
+          releaseRequests: [],
+        },
+      ],
+    },
+  ];
+}
+
+function looksLikeVaultShape(value: unknown): value is LcsSandboxVault[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (v) =>
+        v &&
+        typeof v.name === "string" &&
+        typeof v.ownerRole === "string" &&
+        Array.isArray(v.documents) &&
+        v.documents.every((d: unknown) => d && typeof (d as { access?: unknown }).access === "string")
+    )
+  );
+}
+
+function readAllVaults(): LcsSandboxVault[] {
+  if (typeof window === "undefined") return seedVaults();
+  try {
+    const raw = window.localStorage.getItem(VAULT_STORAGE_KEY);
+    if (!raw) {
+      const seeded = seedVaults();
+      window.localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    const parsed = JSON.parse(raw);
+    if (!looksLikeVaultShape(parsed)) {
+      const seeded = seedVaults();
+      window.localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    return parsed;
+  } catch {
+    return seedVaults();
+  }
+}
+
+function writeAllVaults(vaults: LcsSandboxVault[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vaults));
+  } catch {
+    /* private window / storage blocked — nothing to persist this session */
+  }
+}
+
+export function getSandboxVaults(): LcsSandboxVault[] {
+  return readAllVaults();
+}
+
+/** Creates a vault. Defaults name to "New Vault" when the caller doesn't
+ * supply one — the auto-create-on-move behavior described for Pack
+ * Builder's "move to vault without picking one first" path, even though
+ * Pack Builder itself isn't built in this pass. */
+export function createSandboxVault(ownerRole: LcsViewerRole, name?: string): LcsSandboxVault {
+  const vaults = readAllVaults();
+  const vault: LcsSandboxVault = {
+    id: `vault-${Date.now()}`,
+    name: name?.trim() || "New Vault",
+    ownerRole,
+    documents: [],
+    createdAt: new Date().toISOString(),
+  };
+  writeAllVaults([...vaults, vault]);
+  return vault;
+}
+
+export function renameSandboxVault(vaultId: string, name: string): void {
+  const vaults = readAllVaults();
+  writeAllVaults(vaults.map((v) => (v.id === vaultId ? { ...v, name: name.trim() || v.name } : v)));
+}
+
+export function addDocumentToVault(vaultId: string, doc: Omit<LcsVaultDocument, "id" | "viewLog" | "releaseRequests">): void {
+  const vaults = readAllVaults();
+  const newDoc: LcsVaultDocument = { ...doc, id: `vdoc-${Date.now()}`, viewLog: [], releaseRequests: [] };
+  writeAllVaults(vaults.map((v) => (v.id === vaultId ? { ...v, documents: [...v.documents, newDoc] } : v)));
+}
+
+export function removeDocumentFromVault(vaultId: string, documentId: string): void {
+  const vaults = readAllVaults();
+  writeAllVaults(
+    vaults.map((v) => (v.id === vaultId ? { ...v, documents: v.documents.filter((d) => d.id !== documentId) } : v))
+  );
+}
+
+/** Logs a view — called every time a document is opened in place,
+ * regardless of access mode (view-only or release-on-request both log
+ * views; release-on-request additionally gates a download/full-release
+ * behind a request, which viewing in place doesn't need). */
+export function logDocumentView(vaultId: string, documentId: string, viewer: LcsDocumentViewLog): void {
+  const vaults = readAllVaults();
+  writeAllVaults(
+    vaults.map((v) =>
+      v.id === vaultId
+        ? {
+            ...v,
+            documents: v.documents.map((d) =>
+              d.id === documentId ? { ...d, viewLog: [...d.viewLog, viewer] } : d
+            ),
+          }
+        : v
+    )
+  );
+}
+
+export function requestDocumentRelease(vaultId: string, documentId: string, requestedBy: { role: LcsViewerRole; name: string }): void {
+  const vaults = readAllVaults();
+  const request: LcsDocumentReleaseRequest = {
+    id: `req-${Date.now()}`,
+    requestedBy,
+    status: "pending",
+    requestedAt: new Date().toISOString(),
+  };
+  writeAllVaults(
+    vaults.map((v) =>
+      v.id === vaultId
+        ? {
+            ...v,
+            documents: v.documents.map((d) =>
+              d.id === documentId ? { ...d, releaseRequests: [...d.releaseRequests, request] } : d
+            ),
+          }
+        : v
+    )
+  );
+}
+
+/** Commit-class per CLAUDE.md §8.2 ("release a document" is the named
+ * example — no agent may ever perform this). A human decision, modeled
+ * here as an explicit grant/decline action, never automatic. */
+export function respondToReleaseRequest(
+  vaultId: string,
+  documentId: string,
+  requestId: string,
+  decision: "granted" | "declined",
+  grantedBy: { role: LcsViewerRole; name: string }
+): void {
+  const vaults = readAllVaults();
+  writeAllVaults(
+    vaults.map((v) =>
+      v.id === vaultId
+        ? {
+            ...v,
+            documents: v.documents.map((d) =>
+              d.id === documentId
+                ? {
+                    ...d,
+                    releaseRequests: d.releaseRequests.map((r) =>
+                      r.id === requestId
+                        ? { ...r, status: decision, grantedBy, respondedAt: new Date().toISOString() }
+                        : r
+                    ),
+                  }
+                : d
+            ),
+          }
+        : v
+    )
+  );
+}
+
+/** Extraction — mock computation only, no real AI call (this build's
+ * standing "no backend wiring" rule). The interaction pattern this feeds
+ * (per-field confirm/correct, only confirmed values enter a pack) is
+ * real; only the proposal computation is fictional, same
+ * implausible-not-realistic discipline as every other sandbox value
+ * (CLAUDE.md §7.4's standing lesson on plausible fabrication). */
+export interface LcsExtractedField {
+  id: string;
+  label: string;
+  proposedValue: string;
+  citation: { documentName: string; page: number; location: string };
+  status: "proposed" | "confirmed" | "corrected";
+  confirmedValue?: string;
+}
+
+export function mockExtractFields(documentName: string): LcsExtractedField[] {
+  return [
+    {
+      id: `ex-${Date.now()}-1`,
+      label: "Company legal name",
+      proposedValue: "Example Holdings Ltd.",
+      citation: { documentName, page: 1, location: "Header block" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-2`,
+      label: "Fiscal year revenue",
+      proposedValue: "$—,———,———",
+      citation: { documentName, page: 4, location: "Table 2, row 3" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-3`,
+      label: "Requested closing date",
+      proposedValue: "TBD",
+      citation: { documentName, page: 2, location: "Section 3.1" },
+      status: "proposed",
+    },
+  ];
+}
+
+export type LcsTransactionStage =
+  | "initiation"
+  | "nda_gate"
+  | "company_profile"
+  | "document_vault"
+  | "due_diligence"
+  | "negotiation"
+  | "closing";
+
+/** Order matters — drives the stage tab bar / progress indicator on the
+ * single-transaction lifecycle screen (Transactions hub §3). */
+export const STAGE_ORDER: LcsTransactionStage[] = [
+  "initiation",
+  "nda_gate",
+  "company_profile",
+  "document_vault",
+  "due_diligence",
+  "negotiation",
+  "closing",
+];
+
+export const STAGE_LABEL: Record<LcsTransactionStage, string> = {
+  initiation: "Initiation",
+  nda_gate: "NDA gate",
+  company_profile: "Company profile",
+  document_vault: "Document vault",
+  due_diligence: "Due diligence",
+  negotiation: "Negotiation",
+  closing: "Closing",
+};
+
+/** The six closing gates, per the real product vocabulary already
+ * established this session (public-site rebuild, CLAUDE.md §8.4) —
+ * reused verbatim rather than inventing internal-app-specific names, per
+ * direct instruction. Gate 1 (Counsel) does double duty as the "counsel/
+ * accountant onboarding" moment named in the original §3 instruction:
+ * "either party may bring counsel in, or both agree to proceed without"
+ * — not a separate stage or an earlier touchpoint. */
+export type LcsClosingGate = "counsel" | "agreement" | "conditions" | "signing" | "payment" | "close";
+
+export const CLOSING_GATE_ORDER: LcsClosingGate[] = [
+  "counsel",
+  "agreement",
+  "conditions",
+  "signing",
+  "payment",
+  "close",
+];
+
+export const CLOSING_GATE_LABEL: Record<LcsClosingGate, string> = {
+  counsel: "Counsel",
+  agreement: "Agreement",
+  conditions: "Conditions",
+  signing: "Signing",
+  payment: "Payment",
+  close: "Close",
+};
+
+export type LcsTransactionListStatus = "active" | "closed" | "in-progress" | "pending-action";
+
+/** Sector → Instrument type → Stage hierarchy, added 1 Sep 2026 per direct
+ * instruction. Debt has zero seeded transactions — every transaction this
+ * sandbox already has represents a priced equity round (liquidation
+ * preference terms, board seats, valuation), so all 6 get "equity" rather
+ * than fabricating debt data to populate the other branch. The debt
+ * instrument's own list view renders correctly with zero items via the
+ * same empty-state pattern already used everywhere else in this build. */
+export type LcsInstrumentType = "debt" | "equity";
+
+export interface LcsSandboxTransaction {
+  id: string;
+  ref: string;
+  companyName: string;
+  /** Widened from the literal "technology" to LcsSectorId, checkpoint 5
+   * (2 Sep 2026) — the sandbox previously couldn't represent a
+   * transaction in any other sector without a type change first. */
+  sector: LcsSectorId;
+  instrumentType: LcsInstrumentType;
+  owner: string;
+  /** The investor/counterparty in this transaction — real column added
+   * 1 Sep 2026 after the Transactions hub §2 review found the table
+   * wasn't using its available width; per instruction, filled with real
+   * columns already in the workflow spec rather than widening cells or
+   * adding decoration. */
+  counterparty: string;
+  stage: LcsTransactionStage;
+  listStatus: LcsTransactionListStatus;
+  createdAt: string;
+  /** When the transaction entered its CURRENT stage — distinct from
+   * createdAt. "Days in stage" is computed from this at render time, not
+   * stored as a stale number, so it stays correct as real time passes. */
+  stageEnteredAt: string;
+  /** Most recent activity description + timestamp, same shape as the
+   * PDF's own "Recent Transaction Log" example content. */
+  lastActivity: { text: string; at: string };
+
+  // ── Transactions hub §3 fields — single-transaction lifecycle ────────
+  /** NDA gate. `null` = not yet signed by that party. */
+  nda: { founderSignedAt: string | null; investorSignedAt: string | null };
+  /** Company profile — the minimal shareable-brief-level fields per the
+   * workflow spec's Step 3, not the full disclosure pack (that's Pack
+   * Builder, §4/§5 of the build order — deliberately not duplicated here). */
+  profile: { summary: string; sector: string; stage: string; askAmount: string };
+  /** Document vault — per-document permission scope, matching the real
+   * product's per-document (not per-gate, not per-role-only) model per
+   * CLAUDE.md's own audit of the live deal-room-documents action layer. */
+  documents: { id: string; name: string; category: string; visibleTo: "both" | "founder-only" }[];
+  /** Due diligence checklist — owner + satisfied, matching the real
+   * product's dd_categories/dd_checklist_items shape in spirit (a named
+   * item with an owner and a completion state), not a generic list. */
+  diligenceItems: { id: string; label: string; owner: string; satisfied: boolean }[];
+  /** Negotiation — per-term state, matching the real product's two-sided
+   * ratchet (unset/proposed/countered/accepted) CLAUDE.md §20.12 already
+   * documents as a genuinely well-built, unproblematic part of the
+   * fragmented stage-vocabulary landscape. */
+  terms: { id: string; label: string; value: string; status: "proposed" | "countered" | "accepted" }[];
+  /** Closing — one status per gate, in CLOSING_GATE_ORDER. Gate 1
+   * (Counsel) carries the counsel/accountant onboarding content. */
+  closingGates: Record<LcsClosingGate, "not-started" | "in-progress" | "done">;
+}
+
+// Real bug found live, 1 Sep 2026: this module has no schema-version
+// check, so widening LcsSandboxTransaction's shape (adding counterparty/
+// stageEnteredAt/lastActivity for the §2 review's column additions) left
+// already-persisted localStorage from the OLD shape in place — reading it
+// back and rendering `d.lastActivity.text` crashed the whole route
+// (undefined.text) rather than degrading gracefully. The storage key
+// itself is bumped whenever the shape changes; an old key's data is
+// simply invisible to the new code and gets reseeded, rather than
+// partially deserializing into an incompatible shape.
+// v3 (1 Sep 2026): added nda/profile/documents/diligenceItems/terms/
+// closingGates for Transactions hub §3 (single-transaction lifecycle).
+//
+// "Deals" renamed to "Transactions" as UI-facing terminology, 1 Sep 2026
+// — see deals-preview.index.tsx's header comment for the full scope
+// note. Storage key NOT bumped for this rename alone: the on-disk shape
+// (field names, JSON structure) is unchanged, only TypeScript-level
+// type/function names changed, which localStorage never sees.
+//
+// v4 (1 Sep 2026): added instrumentType for the sector-layer restructure
+// (Sector → Instrument → Stage). This DOES change the on-disk shape, so
+// the key bumps — old v3 data is simply invisible to the new code and
+// gets reseeded, same as every prior version bump.
+//
+// v5 (2 Sep 2026): checkpoint 5, multi-sector support. `sector` widened
+// from the literal "technology" to LcsSectorId (a real shape/type change,
+// not just new seed rows), plus two new Real Estate seed transactions
+// (sbx-7, sbx-8). Old v4 localStorage would still deserialize structurally
+// (no field added/removed), but its 6 rows would all still read
+// sector: "technology" — bumping the key ensures every existing session
+// picks up the two new Real Estate rows on next load rather than being
+// stuck on a stale 6-row seed indefinitely.
+const STORAGE_KEY = "lcs-sandbox-v5";
+
+const NO_GATES_STARTED: Record<LcsClosingGate, "not-started" | "in-progress" | "done"> = {
+  counsel: "not-started",
+  agreement: "not-started",
+  conditions: "not-started",
+  signing: "not-started",
+  payment: "not-started",
+  close: "not-started",
+};
+
+function seedTransactions(): LcsSandboxTransaction[] {
+  return [
+    {
+      id: "sbx-1", ref: "TX-3001", companyName: "Nimbus Analytics", sector: "technology", instrumentType: "equity", owner: "R. Mehta",
+      counterparty: "Blue Horizon Ventures", stage: "negotiation", listStatus: "active",
+      createdAt: "2026-08-05T10:00:00Z", stageEnteredAt: "2026-08-20T10:00:00Z",
+      lastActivity: { text: "Term sheet counter-proposed", at: "2026-08-24T14:32:00Z" },
+      nda: { founderSignedAt: "2026-08-06T09:00:00Z", investorSignedAt: "2026-08-06T15:20:00Z" },
+      profile: { summary: "Developer analytics platform for distributed systems.", sector: "Technology", stage: "Series A", askAmount: "$8,000,000" },
+      documents: [
+        { id: "doc-1", name: "Executive Summary.pdf", category: "Overview", visibleTo: "both" },
+        { id: "doc-2", name: "Financial Model.xlsx", category: "Financials", visibleTo: "both" },
+        { id: "doc-3", name: "Cap Table (internal).xlsx", category: "Legal", visibleTo: "founder-only" },
+      ],
+      diligenceItems: [
+        { id: "dd-1", label: "Financial statements (last 3 years)", owner: "R. Mehta", satisfied: true },
+        { id: "dd-2", label: "Cap table and option pool", owner: "R. Mehta", satisfied: true },
+        { id: "dd-3", label: "Customer reference calls", owner: "Blue Horizon Ventures", satisfied: false },
+      ],
+      terms: [
+        { id: "term-1", label: "Valuation", value: "$40,000,000 pre-money", status: "countered" },
+        { id: "term-2", label: "Board seat", value: "One observer seat", status: "proposed" },
+        { id: "term-3", label: "Liquidation preference", value: "1x non-participating", status: "accepted" },
+      ],
+      closingGates: NO_GATES_STARTED,
+    },
+    {
+      id: "sbx-2", ref: "TX-3002", companyName: "Havenlight Systems", sector: "technology", instrumentType: "equity", owner: "S. Cole",
+      counterparty: "Apex Meridian Capital", stage: "due_diligence", listStatus: "in-progress",
+      createdAt: "2026-07-28T10:00:00Z", stageEnteredAt: "2026-08-18T10:00:00Z",
+      lastActivity: { text: "Data room access extended", at: "2026-08-23T09:15:00Z" },
+      nda: { founderSignedAt: "2026-07-29T11:00:00Z", investorSignedAt: "2026-07-29T16:40:00Z" },
+      profile: { summary: "Infrastructure monitoring for regulated industries.", sector: "Technology", stage: "Seed", askAmount: "$3,500,000" },
+      documents: [
+        { id: "doc-4", name: "Pitch Deck.pdf", category: "Overview", visibleTo: "both" },
+        { id: "doc-5", name: "SOC 2 Report.pdf", category: "Compliance", visibleTo: "both" },
+      ],
+      diligenceItems: [
+        { id: "dd-4", label: "Technical architecture review", owner: "Apex Meridian Capital", satisfied: false },
+        { id: "dd-5", label: "Customer contracts sample", owner: "S. Cole", satisfied: true },
+        { id: "dd-6", label: "IP assignment confirmation", owner: "S. Cole", satisfied: false },
+      ],
+      terms: [],
+      closingGates: NO_GATES_STARTED,
+    },
+    {
+      id: "sbx-3", ref: "TX-3003", companyName: "Redstone Cloud", sector: "technology", instrumentType: "equity", owner: "S. Cole",
+      counterparty: "Starlight Holdings", stage: "document_vault", listStatus: "pending-action",
+      createdAt: "2026-07-20T10:00:00Z", stageEnteredAt: "2026-08-15T10:00:00Z",
+      lastActivity: { text: "Cap table upload requested", at: "2026-08-21T11:05:00Z" },
+      nda: { founderSignedAt: "2026-07-21T09:30:00Z", investorSignedAt: "2026-07-21T14:00:00Z" },
+      profile: { summary: "Managed cloud cost optimization for mid-market SaaS.", sector: "Technology", stage: "Seed", askAmount: "$2,200,000" },
+      documents: [
+        { id: "doc-6", name: "Executive Summary.pdf", category: "Overview", visibleTo: "both" },
+      ],
+      diligenceItems: [],
+      terms: [],
+      closingGates: NO_GATES_STARTED,
+    },
+    {
+      id: "sbx-4", ref: "TX-3004", companyName: "Vantage Robotics Software", sector: "technology", instrumentType: "equity", owner: "R. Mehta",
+      counterparty: "Vanguard Technologies", stage: "closing", listStatus: "closed",
+      createdAt: "2026-06-10T10:00:00Z", stageEnteredAt: "2026-07-30T10:00:00Z",
+      lastActivity: { text: "Close confirmed by both parties", at: "2026-07-31T16:00:00Z" },
+      nda: { founderSignedAt: "2026-06-11T09:00:00Z", investorSignedAt: "2026-06-11T10:15:00Z" },
+      profile: { summary: "Fleet software for warehouse robotics operators.", sector: "Technology", stage: "Series A", askAmount: "$12,000,000" },
+      documents: [
+        { id: "doc-7", name: "Executive Summary.pdf", category: "Overview", visibleTo: "both" },
+        { id: "doc-8", name: "Signed Term Sheet.pdf", category: "Legal", visibleTo: "both" },
+        { id: "doc-9", name: "Closing Certificate.pdf", category: "Legal", visibleTo: "both" },
+      ],
+      diligenceItems: [
+        { id: "dd-7", label: "Financial statements (last 3 years)", owner: "R. Mehta", satisfied: true },
+        { id: "dd-8", label: "Customer reference calls", owner: "Vanguard Technologies", satisfied: true },
+      ],
+      terms: [
+        { id: "term-4", label: "Valuation", value: "$60,000,000 pre-money", status: "accepted" },
+        { id: "term-5", label: "Liquidation preference", value: "1x non-participating", status: "accepted" },
+      ],
+      closingGates: { counsel: "done", agreement: "done", conditions: "done", signing: "done", payment: "done", close: "done" },
+    },
+    {
+      id: "sbx-5", ref: "TX-3005", companyName: "Fieldstone Data", sector: "technology", instrumentType: "equity", owner: "R. Mehta",
+      counterparty: "Corvex Special Situations", stage: "company_profile", listStatus: "pending-action",
+      createdAt: "2026-08-22T10:00:00Z", stageEnteredAt: "2026-08-22T10:00:00Z",
+      lastActivity: { text: "Profile submitted for review", at: "2026-08-22T10:05:00Z" },
+      nda: { founderSignedAt: "2026-08-22T09:00:00Z", investorSignedAt: null },
+      profile: { summary: "Data pipeline tooling for analytics teams.", sector: "Technology", stage: "Pre-seed", askAmount: "$1,200,000" },
+      documents: [],
+      diligenceItems: [],
+      terms: [],
+      closingGates: NO_GATES_STARTED,
+    },
+    {
+      id: "sbx-6", ref: "TX-3006", companyName: "Anchorpoint AI", sector: "technology", instrumentType: "equity", owner: "S. Cole",
+      counterparty: "Northbridge Capital Fund IV", stage: "nda_gate", listStatus: "active",
+      createdAt: "2026-08-25T10:00:00Z", stageEnteredAt: "2026-08-25T10:00:00Z",
+      lastActivity: { text: "NDA sent for signature", at: "2026-08-25T10:10:00Z" },
+      nda: { founderSignedAt: null, investorSignedAt: null },
+      profile: { summary: "", sector: "Technology", stage: "", askAmount: "" },
+      documents: [],
+      diligenceItems: [],
+      terms: [],
+      closingGates: NO_GATES_STARTED,
+    },
+    // Real Estate seeds, checkpoint 5 (2 Sep 2026) — the second sector
+    // activated to prove the sector-config architecture end-to-end, not
+    // just typed correctly. Deliberately new company names and terms, not
+    // the tech seed data relabeled — same "no fabricated realism cheaply
+    // reused" standard as everything else in this sandbox.
+    {
+      id: "sbx-7", ref: "TX-3007", companyName: "Meridian Row Holdings", sector: "real-estate", instrumentType: "equity", owner: "R. Mehta",
+      counterparty: "Cascade Property Partners", stage: "due_diligence", listStatus: "in-progress",
+      createdAt: "2026-08-10T10:00:00Z", stageEnteredAt: "2026-08-24T10:00:00Z",
+      lastActivity: { text: "Appraisal report requested", at: "2026-08-27T13:20:00Z" },
+      nda: { founderSignedAt: "2026-08-11T09:00:00Z", investorSignedAt: "2026-08-11T12:45:00Z" },
+      profile: { summary: "Mixed-use residential redevelopment, 42-unit portfolio.", sector: "Real Estate", stage: "Acquisition", askAmount: "$9,500,000" },
+      documents: [
+        { id: "doc-10", name: "Property Appraisal.pdf", category: "Overview", visibleTo: "both" },
+        { id: "doc-11", name: "Title Report.pdf", category: "Legal", visibleTo: "both" },
+      ],
+      diligenceItems: [
+        { id: "dd-9", label: "Title and lien search", owner: "Cascade Property Partners", satisfied: true },
+        { id: "dd-10", label: "Environmental survey", owner: "R. Mehta", satisfied: false },
+      ],
+      terms: [
+        { id: "term-6", label: "Purchase price", value: "$9,500,000", status: "proposed" },
+      ],
+      closingGates: NO_GATES_STARTED,
+    },
+    {
+      id: "sbx-8", ref: "TX-3008", companyName: "Harborview Logistics Park", sector: "real-estate", instrumentType: "equity", owner: "S. Cole",
+      counterparty: "Sentinel Capital Advisors", stage: "negotiation", listStatus: "active",
+      createdAt: "2026-08-01T10:00:00Z", stageEnteredAt: "2026-08-19T10:00:00Z",
+      lastActivity: { text: "Cap rate counter-proposed", at: "2026-08-26T11:40:00Z" },
+      nda: { founderSignedAt: "2026-08-02T09:15:00Z", investorSignedAt: "2026-08-02T14:00:00Z" },
+      profile: { summary: "Industrial warehouse acquisition, three-tenant lease.", sector: "Real Estate", stage: "Acquisition", askAmount: "$14,200,000" },
+      documents: [
+        { id: "doc-12", name: "Lease Abstracts.pdf", category: "Financials", visibleTo: "both" },
+      ],
+      diligenceItems: [
+        { id: "dd-11", label: "Tenant lease review", owner: "S. Cole", satisfied: true },
+        { id: "dd-12", label: "Zoning compliance check", owner: "Sentinel Capital Advisors", satisfied: true },
+      ],
+      terms: [
+        { id: "term-7", label: "Purchase price", value: "$14,200,000", status: "countered" },
+        { id: "term-8", label: "Cap rate", value: "6.25%", status: "proposed" },
+      ],
+      closingGates: NO_GATES_STARTED,
+    },
+  ];
+}
+
+/** Defense-in-depth against the exact bug the schema-version bump above
+ * fixed: even with a version-bumped key, a stored value could still be
+ * shaped wrong (a manual edit, a future shape change that forgets to bump
+ * the key again). Checks the fields the crash actually depended on rather
+ * than a full shape validator, since this is a sandbox, not production
+ * data needing strict validation. */
+function looksLikeCurrentShape(value: unknown): value is LcsSandboxTransaction[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (d) =>
+        d &&
+        typeof d.counterparty === "string" &&
+        typeof d.stageEnteredAt === "string" &&
+        d.lastActivity &&
+        typeof d.lastActivity.text === "string" &&
+        d.nda &&
+        d.profile &&
+        Array.isArray(d.documents) &&
+        Array.isArray(d.diligenceItems) &&
+        Array.isArray(d.terms) &&
+        d.closingGates &&
+        typeof d.closingGates.counsel === "string" &&
+        typeof d.instrumentType === "string"
+    )
+  );
+}
+
+function readAll(): LcsSandboxTransaction[] {
+  if (typeof window === "undefined") return seedTransactions();
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      const seeded = seedTransactions();
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    const parsed = JSON.parse(raw);
+    if (!looksLikeCurrentShape(parsed)) {
+      const seeded = seedTransactions();
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    return parsed;
+  } catch {
+    // Private window, storage blocked, or corrupt JSON — fall back to a
+    // fresh in-memory seed rather than throwing.
+    return seedTransactions();
+  }
+}
+
+export function getSandboxTransactions(): LcsSandboxTransaction[] {
+  return readAll();
+}
+
+export function getSandboxTransaction(id: string): LcsSandboxTransaction | undefined {
+  return readAll().find((d) => d.id === id);
+}
+
+/** Creates a new transaction — the sandbox equivalent of
+ * approveConnectionRequest's real deal_rooms INSERT (lib/connection-
+ * request-fn.ts). Starts at "nda_gate", matching the real room's start
+ * state (workflow_stage: "information_vault", i.e. pre-NDA) — this
+ * sandbox's closest real analog to "just created, NDA not yet signed by
+ * either party". Reference number is a simple incrementing TX-30XX,
+ * matching this sandbox's existing seed-data numbering (TX-3001..3008)
+ * rather than the real product's real ISO-7064-checked reference format
+ * (CLAUDE.md §8.4) — that scheme sits on no user-facing table in the
+ * real product either (§20.6), so there's nothing real to port here. */
+export function createSandboxTransaction(fields: { companyName: string; sector: LcsSectorId; instrumentType: LcsInstrumentType; owner: string; counterparty: string }): LcsSandboxTransaction {
+  const all = readAll();
+  const nextNum = 3000 + all.length + 1;
+  const now = new Date().toISOString();
+  const transaction: LcsSandboxTransaction = {
+    id: `sbx-${Date.now()}`,
+    ref: `TX-${nextNum}`,
+    companyName: fields.companyName,
+    sector: fields.sector,
+    instrumentType: fields.instrumentType,
+    owner: fields.owner,
+    counterparty: fields.counterparty,
+    stage: "nda_gate",
+    listStatus: "active",
+    createdAt: now,
+    stageEnteredAt: now,
+    lastActivity: { text: "Deal room created", at: now },
+    nda: { founderSignedAt: null, investorSignedAt: null },
+    profile: { summary: "", sector: SECTOR_LABEL[fields.sector], stage: "", askAmount: "" },
+    documents: [],
+    diligenceItems: [],
+    terms: [],
+    closingGates: NO_GATES_STARTED,
+  };
+  const next = [...all, transaction];
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked — nothing to persist this session */
+    }
+  }
+  return transaction;
+}
+
+/** NDA flow — real screen extraction (2 Sep 2026). Source:
+ * app.deal-rooms.$id.nda.tsx's buildPreviewNdaText(), ported verbatim —
+ * every clause, every DIFC/DIAC arbitration sub-clause, the watermarking/
+ * monitoring clause, word for word. Confirmed clean by the research pass
+ * (no discovery-layer residue in the real file). This sandbox's `nda:
+ * {founderSignedAt, investorSignedAt}` model on LcsSandboxTransaction
+ * (checkpoint 1) is a real, deliberate simplification of the real
+ * product's per-signer nda_acceptances table — this sandbox has no
+ * multi-role/lawyer concept flowing through the transaction lifecycle
+ * screen, so a founder/investor pair is the honest equivalent rather
+ * than an arbitrary array of signers. */
+export function buildSandboxNdaText(companyName: string, founderName: string, signerName: string, date: string): string {
+  return `MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into as of ${date} by and between:
+
+${founderName}, on behalf of ${companyName} (the "Company"), a venture seeking investment consideration; and
+
+${signerName} (the "Recipient"), a party evaluating a potential relationship with the Company.
+
+1. PURPOSE
+
+The parties wish to explore a potential investment relationship between the Company and the Recipient. In connection with this evaluation, each party may disclose certain non-public, confidential, or proprietary information to the other.
+
+2. DEFINITION OF CONFIDENTIAL INFORMATION
+
+"Confidential Information" means any non-public information relating to the actual or anticipated business, research, or development of the disclosing party, including but not limited to: financial data and projections, business plans, customer lists, intellectual property, technical specifications, product roadmaps, pricing strategies, personnel information, and any documents shared within this deal room.
+
+3. OBLIGATIONS OF RECEIVING PARTY
+
+The Recipient agrees to:
+(a) Hold all Confidential Information in strict confidence;
+(b) Not disclose any Confidential Information to third parties without prior written consent from the Company;
+(c) Use the Confidential Information solely for the purpose of evaluating the Transaction;
+(d) Protect the Confidential Information using at least the same degree of care applied to its own confidential information, but in no event less than reasonable care, and in any event no less than the standard of care that a prudent person would exercise to protect their own trade secrets.
+
+4. EXCEPTIONS
+
+These obligations do not apply to information that:
+(a) Is or becomes publicly known through no breach of this Agreement;
+(b) Was rightfully known to the Recipient prior to disclosure;
+(c) Is independently developed by the Recipient without use of Confidential Information;
+(d) Is required to be disclosed by applicable law or valid court order, provided the Recipient gives prompt notice where permitted by law, and provide reasonable prior notice to the disclosing party where legally permitted to allow them to seek a protective order.
+
+5. MONITORING AND WATERMARKING
+
+All materials accessed via the Lengdon deal room are electronically watermarked and access-logged. Activity within the deal room is monitored. Any breach of this Agreement may result in immediate revocation of access and legal action.
+
+6. TERM
+
+This Agreement remains in effect for three (3) years from the date of first execution by each respective party. All confidentiality obligations survive termination.
+
+7. RETURN OR DESTRUCTION OF INFORMATION
+
+Upon written request, the Recipient shall promptly return or destroy all Confidential Information and certify such action in writing.
+
+8. NO LICENSE
+
+Nothing herein grants the Recipient any rights in or to the Confidential Information except as expressly set forth.
+
+9. GOVERNING LAW AND DISPUTE RESOLUTION
+
+9.1 Governing Law
+This Agreement and any disputes arising out of or in connection with it shall be governed by and construed in accordance with the laws of the Dubai International Financial Centre (DIFC), United Arab Emirates, without regard to its conflict of laws provisions.
+
+9.2 Dispute Resolution — Negotiation
+The parties shall first attempt to resolve any dispute, controversy, or claim arising out of or relating to this Agreement through good-faith negotiation for a period of thirty (30) days following written notice of the dispute.
+
+9.3 Arbitration
+If the dispute is not resolved through negotiation, it shall be finally settled by binding arbitration under the Rules of the Dubai International Arbitration Centre (DIAC), which rules are deemed incorporated by reference into this clause. The number of arbitrators shall be one (1) for claims below USD 500,000 and three (3) for claims of USD 500,000 or above. The seat of arbitration shall be Dubai, UAE. The language of arbitration shall be English.
+
+9.4 Emergency Relief
+Notwithstanding the foregoing, either party may seek interim or emergency injunctive relief from any court of competent jurisdiction to prevent irreparable harm pending the constitution of the arbitral tribunal. Seeking such relief shall not be deemed a waiver of the right to arbitrate.
+
+9.5 International Parties
+The parties expressly agree that the United Nations Convention on Contracts for the International Sale of Goods (CISG) shall not apply to this Agreement. For parties domiciled outside the UAE, this Agreement shall be enforceable in their home jurisdiction to the maximum extent permitted by applicable local law, and the parties waive any objection to the arbitral seat on grounds of inconvenience.
+
+9.6 Recognition and Enforcement
+The parties agree that any arbitral award rendered under this clause shall be final and binding, and may be entered as a judgment in any court of competent jurisdiction. Enforcement of awards shall be subject to the New York Convention on the Recognition and Enforcement of Foreign Arbitral Awards (1958), to which the UAE is a signatory.
+
+10. ENTIRE AGREEMENT
+
+This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior agreements, whether oral or written.
+
+— — —
+
+Company: ${companyName}
+Representative: ${founderName}
+Accepting Party: ${signerName}
+Date of Acceptance: ${date}
+
+This agreement is executed electronically via Lengdon. By checking the acknowledgement box and clicking "Accept & Enter Deal Room", you agree to be legally bound by the terms above.`;
+}
+
+/** Writes a real signature into the transaction's nda field — this
+ * sandbox's equivalent of the real product's nda_acceptances INSERT.
+ * Signing party is derived from the caller's role (founder or investor),
+ * matching the real page's own role-gated signerCompany resolution. */
+export function signSandboxNda(transactionId: string, signAs: "founder" | "investor"): LcsSandboxTransaction | undefined {
+  const all = readAll();
+  const now = new Date().toISOString();
+  const next = all.map((t) =>
+    t.id === transactionId
+      ? { ...t, nda: { ...t.nda, [signAs === "founder" ? "founderSignedAt" : "investorSignedAt"]: now } }
+      : t
+  );
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked — nothing to persist this session */
+    }
+  }
+  return next.find((t) => t.id === transactionId);
+}
+
+/** Days elapsed since a transaction entered its current stage, computed
+ * from the real stored timestamp against a caller-supplied "now" — never
+ * Date.now() called internally. This function runs during SSR (this route
+ * is server-rendered), and Date.now() differs between the server render
+ * and the client hydration render by however many milliseconds elapsed
+ * between them — the exact same class of hydration-mismatch bug already
+ * found and fixed once this session (deals-preview.$sector.tsx's
+ * sandbox-loading state, and this session's earlier /status fix). Callers
+ * must compute `now` once, client-side only, after mount — see
+ * deals-preview.$sector.tsx for the pattern. */
+export function daysInStage(transaction: LcsSandboxTransaction, now: number): number {
+  const ms = now - new Date(transaction.stageEnteredAt).getTime();
+  return Math.max(0, Math.floor(ms / 86_400_000));
+}
+
+/** Company entity — Profile Builder (2 Sep 2026), extracted against the
+ * REAL product's app.profile-builder.tsx field set (read directly, not
+ * guessed at — its FIELD_LABELS constant names company_name, tagline,
+ * sector, stage, problem, solution, business_model, market_size,
+ * traction, team, funding_target, use_of_funds, competitive_advantage,
+ * plus a v3 set). Not every real field is carried into this sandbox —
+ * only the ones load-bearing for the screens this build actually has
+ * (the profile view, and eventually deal-room company-profile stage
+ * content) — but every field that IS here is a real field name from the
+ * real form, not invented.
+ *
+ * Confirmed before building: sector is not a variable Pack Builder
+ * branches its own behavior on (checkpoint 5's SECTORS/isSectorActive
+ * config still governs reachability everywhere else, unchanged) — it's a
+ * field the founder fills in HERE, and that's the actual mechanism by
+ * which a company's sector gets determined at all. The real product's
+ * own `sector` field is free text with no closed list; this sandbox
+ * deliberately constrains it to LcsSectorId (a select, not a text field)
+ * to stay consistent with checkpoint 5's own closed sector set — a
+ * deliberate divergence from the live product's current looseness, not
+ * an oversight.
+ *
+ * A founder MAY select any of the 5 sectors, including the 3 still
+ * coming-soon (Manufacturing, SPV, Syndicate Lead), confirmed directly:
+ * "founders can build the profile and from any sector startups. once we
+ * open our deal rooms for that particular sectors, can able to close
+ * deal, otherwise they remain as first waiting list for that sector
+ * (this is more a marketing technique than an infrastructure)." A
+ * coming-soon-sector profile is a legitimate pre-registration/waiting-
+ * list state, not a broken or blocked one — see WAITING_LIST_COPY below
+ * for the honest framing this uses instead of a generic "not active"
+ * error tone. */
+export type LcsCompanyStage =
+  | "Pre-idea"
+  | "Pre-revenue"
+  | "Pre-seed"
+  | "Seed"
+  | "Series A"
+  | "Series B"
+  | "Growth"
+  | "Profitable";
+
+export const COMPANY_STAGES: LcsCompanyStage[] = [
+  "Pre-idea",
+  "Pre-revenue",
+  "Pre-seed",
+  "Seed",
+  "Series A",
+  "Series B",
+  "Growth",
+  "Profitable",
+];
+
+/** Widened 2 Sep 2026 (real-screen extraction pass) from the original
+ * 9-field sketch to match the REAL `StartupRow`/`FormState` shape in
+ * app.profile.tsx exactly — same field names (camelCased to match this
+ * file's own convention), same grouping into Company identity /
+ * Fundraising / Traction / Vision / Market / Business model /
+ * Cap & relationships / Media / Social links / Contact, per that file's
+ * own FormSection order. NOT extracted: `publiclyDiscoverable` (the real
+ * product's directory-visibility flag) — dropped per direct instruction,
+ * discovery-layer residue. `published`/`publishedAt` are kept verbatim;
+ * they gate go-live, not directory listing. */
+export interface LcsSandboxCompany {
+  id: string;
+  // Company identity
+  founderName: string;
+  name: string;
+  legalEntityName: string;
+  registrationNumber: string;
+  tagline: string;
+  website: string;
+  foundedYear: string;
+  country: string;
+  teamSize: string;
+  sector: LcsSectorId;
+  stage: LcsCompanyStage;
+  description: string;
+  // Fundraising
+  fundingTarget: string;
+  valuation: string;
+  previousFunding: string;
+  currentInvestors: string;
+  useOfFunds: string;
+  // Traction & metrics
+  revenue: string;
+  growthRate: string;
+  customerCount: string;
+  keyMetric: string;
+  traction: string;
+  // Vision & strategy
+  problem: string;
+  solution: string;
+  businessModel: string;
+  marketSize: string;
+  whyUs: string;
+  whyNow: string;
+  // Market & opportunity
+  tam: string;
+  sam: string;
+  targetCustomer: string;
+  // Business model details
+  revenueModel: string;
+  pricing: string;
+  unitEconomics: string;
+  burnRate: string;
+  runwayMonths: string;
+  // Cap & relationships
+  moat: string;
+  competitors: string;
+  milestones: string;
+  advisors: string;
+  // Media
+  introVideoUrl: string;
+  productVideoUrl: string;
+  // Social links
+  socialLinks: { platform: string; url: string }[];
+  // Contact
+  founderEmail: string;
+  founderLinkedin: string;
+  cofounderName: string;
+  cofounderLinkedin: string;
+  // Section visibility — real 8-section model, see DEFAULT_SECTION_VISIBILITY
+  sectionVisibility: Record<string, LcsSectionVisibility>;
+  // Publishing — real gate, not directory visibility
+  published: boolean;
+  publishedAt: string | null;
+  /** Fictional, local-only counter — never presented as real platform
+   * data (this build's standing no-fabricated-metric discipline). A
+   * sandbox-side view count, incremented client-side, not a claim about
+   * real traffic. */
+  viewCount: number;
+}
+
+/** The REAL 14-key publish-gate formula, ported verbatim from
+ * lib/profileCompleteness.ts's getFounderProfileCompleteness — same
+ * required-field list, same percent formula, same ≥80% threshold. Two
+ * of the real 14 keys (`one_liner`, `investor_narrative`) don't exist in
+ * this sandbox's field set (v3 additions the agent's map flagged as not
+ * carried in); the other 12 map directly. Kept as 12 rather than padding
+ * to 14 with fields that don't exist — the percent is still a real
+ * completeness measure over real required fields, just a slightly
+ * different denominator than the live product's exact current list. */
+const COMPANY_REQUIRED_KEYS: (keyof LcsSandboxCompany)[] = [
+  "name", "tagline", "sector", "stage", "country", "fundingTarget",
+  "businessModel", "problem", "solution", "traction",
+  "useOfFunds", "founderName",
+];
+
+export function companyCompleteness(company: LcsSandboxCompany | null): { percent: number; missing: string[] } {
+  if (!company) return { percent: 0, missing: [] };
+  const missing = COMPANY_REQUIRED_KEYS.filter((k) => !String(company[k] ?? "").trim());
+  const percent = Math.round(((COMPANY_REQUIRED_KEYS.length - missing.length) / COMPANY_REQUIRED_KEYS.length) * 100);
+  return { percent, missing };
+}
+
+export const COMPANY_PUBLISH_THRESHOLD = 80;
+
+export const CAP_TABLE_ROLES = ["Founder", "Co-Founder", "Angel Investor", "VC", "Employee (ESOP)", "Advisor", "Other"];
+
+export interface LcsCapTableRow {
+  id: string;
+  shareholderName: string;
+  shareholderRole: string;
+  ownershipPercent: number;
+  linkedinUrl: string;
+}
+
+const CAP_TABLE_STORAGE_KEY = "lcs-sandbox-cap-table-v1";
+
+export function getSandboxCapTable(): LcsCapTableRow[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CAP_TABLE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveSandboxCapTableRow(row: Omit<LcsCapTableRow, "id">, editId?: string): LcsCapTableRow[] {
+  const rows = getSandboxCapTable();
+  const next = editId
+    ? rows.map((r) => (r.id === editId ? { ...row, id: editId } : r))
+    : [...rows, { ...row, id: `cap-${Date.now()}` }];
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(CAP_TABLE_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked */
+    }
+  }
+  return next;
+}
+
+export function removeSandboxCapTableRow(id: string): LcsCapTableRow[] {
+  const next = getSandboxCapTable().filter((r) => r.id !== id);
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(CAP_TABLE_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* private window / storage blocked */
+    }
+  }
+  return next;
+}
+
+/** Real 8-section model, ported verbatim from app.profile.tsx's
+ * defaultSectionVisibility + PrivacyTab — same section keys, same three
+ * states, same default (public). Shared here rather than duplicated in
+ * the future Privacy Settings screen, per this session's own standing
+ * practice (checkpoint 4's TEAM_MEMBERS cross-reference precedent). */
+export type LcsSectionVisibility = "public" | "on_request" | "deal_room";
+
+export const SECTION_VISIBILITY_LABEL: Record<LcsSectionVisibility, string> = {
+  public: "Public",
+  on_request: "On request",
+  deal_room: "Deal room only",
+};
+
+export const DEFAULT_SECTION_VISIBILITY: Record<string, LcsSectionVisibility> = {
+  problem_solution: "public",
+  market: "public",
+  traction: "public",
+  business_model: "public",
+  team: "public",
+  competition: "public",
+  fundraising: "public",
+  media: "public",
+};
+
+export const SECTION_VISIBILITY_LABELS: [string, string][] = [
+  ["problem_solution", "Problem & solution"],
+  ["market", "Market"],
+  ["traction", "Traction"],
+  ["business_model", "Business model"],
+  ["team", "Team"],
+  ["competition", "Competition"],
+  ["fundraising", "Fundraising"],
+  ["media", "Media"],
+];
+
+// v2 (2 Sep 2026, real-screen extraction pass): widened from 9 invented
+// fields to the real ~45-field StartupRow shape. Bumped so pre-existing
+// v1 sandbox data (the wrong shape) is simply invisible to the new code
+// and reseeds fresh, same reseed-not-migrate pattern as every other
+// version bump in this file.
+const COMPANY_STORAGE_KEY = "lcs-sandbox-company-v2";
+
+/** Corrected 2 Sep 2026, before this checkpoint's push — the original
+ * wording ("you're first in line once it opens") asserted an individual
+ * queue position that nothing in this codebase tracks: no ordering
+ * field, no per-founder position, no notification mechanism of any
+ * kind. Literally true for at most one founder per sector. The real,
+ * confirmed operational commitment is narrower and now logged as such in
+ * CLAUDE.md's Amendment log, not just carried as UI copy: profiles
+ * submitted for a coming-soon sector are retained and the founder will
+ * be contacted in real submission order once that sector activates — a
+ * promise the product owes, not a position it displays. */
+export const WAITING_LIST_COPY =
+  "This sector doesn't have open deal rooms yet. Your profile is saved — you'll be notified when it opens.";
+
+function looksLikeCompanyShape(value: unknown): value is LcsSandboxCompany {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof (value as { name?: unknown }).name === "string" &&
+    typeof (value as { sector?: unknown }).sector === "string" &&
+    typeof (value as { published?: unknown }).published === "boolean"
+  );
+}
+
+function readCompany(): LcsSandboxCompany | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(COMPANY_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return looksLikeCompanyShape(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCompany(company: LcsSandboxCompany): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(company));
+  } catch {
+    /* private window / storage blocked — nothing to persist this session */
+  }
+}
+
+export function getSandboxCompany(): LcsSandboxCompany | null {
+  return readCompany();
+}
+
+/** Creates or overwrites the one sandbox company — there is exactly one
+ * founder identity in this sandbox (R. Mehta, per checkpoint 3's
+ * hardcoded-founder decision), so there is exactly one company, not a
+ * list. */
+export function saveSandboxCompany(fields: Omit<LcsSandboxCompany, "id" | "published" | "publishedAt" | "viewCount">): LcsSandboxCompany {
+  const existing = readCompany();
+  const company: LcsSandboxCompany = {
+    id: existing?.id ?? `company-${Date.now()}`,
+    ...fields,
+    published: existing?.published ?? false,
+    publishedAt: existing?.publishedAt ?? null,
+    viewCount: existing?.viewCount ?? 0,
+  };
+  writeCompany(company);
+  return company;
+}
+
+export function publishSandboxCompany(): LcsSandboxCompany | null {
+  const existing = readCompany();
+  if (!existing) return null;
+  const company: LcsSandboxCompany = { ...existing, published: true, publishedAt: new Date().toISOString() };
+  writeCompany(company);
+  return company;
+}
+
+export function updateSandboxCompanySectionVisibility(section: string, visibility: LcsSectionVisibility): LcsSandboxCompany | null {
+  const existing = readCompany();
+  if (!existing) return null;
+  const company: LcsSandboxCompany = {
+    ...existing,
+    sectionVisibility: { ...existing.sectionVisibility, [section]: visibility },
+  };
+  writeCompany(company);
+  return company;
+}
+
+/** Mock pitch-deck extraction — matches the real product's RightCol
+ * "Upload pitch deck... AI will extract and pre-fill your profile"
+ * feature (app.profile.tsx), itself a legitimate CLAUDE.md §10 extraction
+ * use ("proposes a value with citation"), not the discovery-layer
+ * AIFeedback score/signal/recommendations the real Document Vault screen
+ * was correctly flagged for and will need stripped when that screen is
+ * reskinned. No real AI call — mocked computation only, per this build's
+ * standing no-backend-wiring rule; the per-field confirm/correct pattern
+ * this feeds is the same one already proven in Document Vault's "Add
+ * document" flow. */
+export function mockExtractCompanyFields(deckName: string): LcsExtractedField[] {
+  return [
+    {
+      id: `ex-${Date.now()}-1`,
+      label: "Company name",
+      proposedValue: "Meridian Robotics",
+      citation: { documentName: deckName, page: 1, location: "Title slide" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-2`,
+      label: "Tagline",
+      proposedValue: "Autonomous manufacturing robotics for mid-market factories.",
+      citation: { documentName: deckName, page: 1, location: "Title slide subtitle" },
+      status: "proposed",
+    },
+    {
+      id: `ex-${Date.now()}-3`,
+      label: "Funding target",
+      proposedValue: "$3,500,000",
+      citation: { documentName: deckName, page: 9, location: "The Ask slide" },
+      status: "proposed",
+    },
+  ];
+}
+
+/** Clears and reseeds the sandbox. Returns the fresh seed set. */
+export function resetSandboxTransactions(): LcsSandboxTransaction[] {
+  const seeded = seedTransactions();
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+    } catch {
+      /* private window / storage blocked — nothing to persist, seed still
+         returned for in-memory use this session */
+    }
+  }
+  return seeded;
+}
+
+// ── Profile Builder — Team Cards, real fields per app.profile.tsx's
+// TeamMembersSection (full_name, role, tag, key_person, bio, highlights[],
+// social_links[]). Named LcsProfileTeamMember, distinct from the existing
+// LcsSandboxTeamMember (checkpoint 4's advisor client roster) — same
+// "team member" concept in the real product, but two unrelated entities:
+// one is the founder's own company team, the other is an advisor's
+// analyst/counsel/accountant roster. Real MEMBER_TAGS/MEMBER_SOCIAL_
+// PLATFORMS lists, ported verbatim.
+
+export const PROFILE_MEMBER_TAGS = ["Founder", "Co-Founder", "Advisor", "Employee", "Board Member"] as const;
+export type LcsProfileMemberTag = (typeof PROFILE_MEMBER_TAGS)[number];
+export const PROFILE_MEMBER_SOCIAL_PLATFORMS = ["LinkedIn", "X / Twitter", "Website", "AngelList", "Crunchbase", "Other"];
+
+export interface LcsProfileTeamMember {
+  id: string;
+  fullName: string;
+  role: string;
+  tag: LcsProfileMemberTag;
+  keyPerson: boolean;
+  bio: string;
+  highlights: string[];
+  socialLinks: { platform: string; url: string }[];
+}
+
+const PROFILE_TEAM_STORAGE_KEY = "lcs-sandbox-profile-team-v1";
+
+export function getProfileTeamMembers(): LcsProfileTeamMember[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PROFILE_TEAM_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeProfileTeamMembers(members: LcsProfileTeamMember[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PROFILE_TEAM_STORAGE_KEY, JSON.stringify(members));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+export function saveProfileTeamMember(fields: Omit<LcsProfileTeamMember, "id">, editId?: string): LcsProfileTeamMember[] {
+  const members = getProfileTeamMembers();
+  const next = editId
+    ? members.map((m) => (m.id === editId ? { ...fields, id: editId } : m))
+    : [...members, { ...fields, id: `member-${Date.now()}` }];
+  writeProfileTeamMembers(next);
+  return next;
+}
+
+export function removeProfileTeamMember(id: string): LcsProfileTeamMember[] {
+  const next = getProfileTeamMembers().filter((m) => m.id !== id);
+  writeProfileTeamMembers(next);
+  return next;
+}
+
+// ── Profile Builder — Achievements, real fields per app.prepare.profile-
+// builder.achievements.tsx: title, description, scope (individual/team/
+// company), date, plus a per-section visibility cycle (private ->
+// deal_room -> public). Ported verbatim, including the real emoji-suffixed
+// visibility labels ("Private 🔒" etc.) — this is the one place in the
+// real founder-facing UI that uses decorative emoji in a label, and it's
+// being carried through faithfully as part of the real screen, not
+// invented; CLAUDE.md §13's emoji ban governs THIS sandbox's own new
+// primitives, not a verbatim reskin of real product copy.
+
+export const ACHIEVEMENT_SCOPES = ["individual", "team", "company"] as const;
+export type LcsAchievementScope = (typeof ACHIEVEMENT_SCOPES)[number];
+
+export interface LcsAchievement {
+  id: string;
+  title: string;
+  description: string;
+  scope: LcsAchievementScope;
+  date: string;
+}
+
+export const ACHIEVEMENT_VISIBILITY_CYCLE: Record<LcsSectionVisibility | "private", "private" | "deal_room" | "public"> = {
+  private: "deal_room",
+  deal_room: "public",
+  public: "private",
+  on_request: "private",
+};
+
+export const ACHIEVEMENT_VISIBILITY_LABEL: Record<"private" | "deal_room" | "public", string> = {
+  private: "Private 🔒",
+  deal_room: "Deal Room 🔐",
+  public: "Public 🌐",
+};
+
+const ACHIEVEMENTS_STORAGE_KEY = "lcs-sandbox-achievements-v1";
+const ACHIEVEMENTS_VISIBILITY_KEY = "lcs-sandbox-achievements-visibility-v1";
+
+export function getAchievements(): LcsAchievement[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeAchievements(items: LcsAchievement[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+export function saveAchievements(items: LcsAchievement[]): void {
+  writeAchievements(items);
+}
+
+export function getAchievementsVisibility(): "private" | "deal_room" | "public" {
+  if (typeof window === "undefined") return "private";
+  try {
+    const raw = window.localStorage.getItem(ACHIEVEMENTS_VISIBILITY_KEY);
+    return raw === "deal_room" || raw === "public" ? raw : "private";
+  } catch {
+    return "private";
+  }
+}
+
+export function cycleAchievementsVisibility(): "private" | "deal_room" | "public" {
+  const current = getAchievementsVisibility();
+  const next = ACHIEVEMENT_VISIBILITY_CYCLE[current];
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(ACHIEVEMENTS_VISIBILITY_KEY, next);
+    } catch {
+      /* private window / storage blocked */
+    }
+  }
+  return next;
+}
+
+// ── Profile Builder — Fundraising Thesis, real fields per
+// lib/founder-thesis-fn.ts's FounderThesis type, ported verbatim:
+// preferred_check_size_min/max, preferred_investor_type, board_preference,
+// sector_expertise_wanted, geography_preference, exclusions,
+// what_good_fit_looks_like, status. Excluded per the confirmed residue:
+// the section header copy "This helps us match you with investors who
+// are actually right for you" (app.profile.tsx:1798) — matching-layer
+// framing. The 7 real fields themselves are kept; this sandbox instead
+// frames the section around what it actually is — a stated preference a
+// founder records for their own reference and to show approved
+// investors, not a matching input.
+
+export const INVESTOR_TYPE_OPTIONS = ["Capital only", "Capital + sector expertise", "Capital + network access"];
+export const BOARD_PREFERENCE_OPTIONS = [
+  { value: "Hands-on (board seat, regular check-ins)", short: "Hands-on" },
+  { value: "Collaborative (available but not directive)", short: "Collaborative" },
+  { value: "Hands-off (capital only, minimal involvement)", short: "Hands-off" },
+];
+
+export interface LcsFounderThesis {
+  preferredCheckSizeMin: string;
+  preferredCheckSizeMax: string;
+  preferredInvestorType: string;
+  boardPreference: string;
+  sectorExpertiseWanted: string;
+  geographyPreference: string;
+  exclusions: string;
+  whatGoodFitLooksLike: string;
+  status: "draft" | "complete";
+}
+
+const THESIS_EMPTY: LcsFounderThesis = {
+  preferredCheckSizeMin: "",
+  preferredCheckSizeMax: "",
+  preferredInvestorType: "",
+  boardPreference: "",
+  sectorExpertiseWanted: "",
+  geographyPreference: "",
+  exclusions: "",
+  whatGoodFitLooksLike: "",
+  status: "draft",
+};
+
+const THESIS_STORAGE_KEY = "lcs-sandbox-founder-thesis-v1";
+
+export function getFounderThesisSandbox(): LcsFounderThesis {
+  if (typeof window === "undefined") return THESIS_EMPTY;
+  try {
+    const raw = window.localStorage.getItem(THESIS_STORAGE_KEY);
+    return raw ? { ...THESIS_EMPTY, ...JSON.parse(raw) } : THESIS_EMPTY;
+  } catch {
+    return THESIS_EMPTY;
+  }
+}
+
+export function saveFounderThesisSandbox(thesis: LcsFounderThesis): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(THESIS_STORAGE_KEY, JSON.stringify(thesis));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+// ── Connection Requests — real screen extraction (2 Sep 2026). Source:
+// app.connections.tsx (founder-facing incoming requests) + lib/
+// connection-request-fn.ts (sendConnectionRequest/approveConnectionRequest/
+// declineConnectionRequest). Confirmed clean by the research pass — no
+// discovery-layer residue anywhere in either file. Real fields ported
+// verbatim: investor name, fund name, a thesis one-liner (sectors ·
+// stages · check-size range), a free-text message, relative age
+// ("today"/"N days ago"), status. Real mechanics: approve is
+// CONFIRM-FIRST (a confirmation card with the real product's own copy,
+// not a bare click), decline is immediate. Approving creates a real
+// transaction (see createSandboxTransaction above) — this sandbox's
+// equivalent of the real approveConnectionRequest's deal_rooms INSERT —
+// and marks the request "deal_room_created"; declining marks it
+// "declined" with the real product's own deliberately-generic investor-
+// facing message ("not accepting connections at this time" — the file's
+// own header comment: "the founder's reason is never shared").
+//
+// "Two founders never share a room" (confirmed product rule): not
+// applicable to this screen's own logic — a connection request is
+// always investor -> one founder's company, enforced by construction
+// here (requestedBy is always "investor" shaped data), same as the real
+// schema's own founder_id/investor_id column split.
+
+export type LcsConnectionRequestStatus = "pending" | "deal_room_created" | "declined";
+
+export interface LcsConnectionRequest {
+  id: string;
+  investorName: string;
+  fundName: string;
+  sectors: string;
+  stages: string;
+  checkSizeMin: string;
+  checkSizeMax: string;
+  message: string;
+  createdAt: string;
+  status: LcsConnectionRequestStatus;
+  dealRoomId?: string;
+}
+
+const CONNECTION_REQUESTS_STORAGE_KEY = "lcs-sandbox-connection-requests-v1";
+
+function seedConnectionRequests(): LcsConnectionRequest[] {
+  const now = Date.now();
+  return [
+    {
+      id: "conn-1",
+      investorName: "Priya Shah",
+      fundName: "Blue Horizon Ventures",
+      sectors: "B2B SaaS, Robotics",
+      stages: "Seed, Series A",
+      checkSizeMin: "250,000",
+      checkSizeMax: "2,000,000",
+      message: "We'd love to learn more about Nimbus Dynamics — met your co-founder at a demo day last month.",
+      createdAt: new Date(now - 2 * 86_400_000).toISOString(),
+      status: "pending",
+    },
+    {
+      id: "conn-2",
+      investorName: "Marcus Webb",
+      fundName: "Corvex Special Situations",
+      sectors: "Manufacturing, Deep tech",
+      stages: "Pre-seed, Seed",
+      checkSizeMin: "100,000",
+      checkSizeMax: "750,000",
+      message: "",
+      createdAt: new Date(now - 5 * 3_600_000).toISOString(),
+      status: "pending",
+    },
+  ];
+}
+
+function readConnectionRequests(): LcsConnectionRequest[] {
+  if (typeof window === "undefined") return seedConnectionRequests();
+  try {
+    const raw = window.localStorage.getItem(CONNECTION_REQUESTS_STORAGE_KEY);
+    if (!raw) {
+      const seeded = seedConnectionRequests();
+      window.localStorage.setItem(CONNECTION_REQUESTS_STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+    return JSON.parse(raw);
+  } catch {
+    return seedConnectionRequests();
+  }
+}
+
+function writeConnectionRequests(requests: LcsConnectionRequest[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(CONNECTION_REQUESTS_STORAGE_KEY, JSON.stringify(requests));
+  } catch {
+    /* private window / storage blocked */
+  }
+}
+
+export function getConnectionRequests(): LcsConnectionRequest[] {
+  return readConnectionRequests();
+}
+
+/** CONFIRM-FIRST in the real product — this function itself performs the
+ * write unconditionally; the confirm-first UX (a confirmation card the
+ * founder must acknowledge before this is ever called) lives in the
+ * route component, matching where the real product enforces it too
+ * (app.connections.tsx's own confirmId state, not inside
+ * approveConnectionRequest itself). */
+export function approveConnectionRequestSandbox(requestId: string): { ok: true; dealRoomId: string; sector: LcsSectorId; instrumentType: LcsInstrumentType } | { ok: false } {
+  const requests = readConnectionRequests();
+  const request = requests.find((r) => r.id === requestId);
+  const company = readCompany();
+  if (!request || !company) return { ok: false };
+  const transaction = createSandboxTransaction({
+    companyName: company.name || "Untitled company",
+    sector: company.sector,
+    instrumentType: "equity",
+    owner: company.founderName,
+    counterparty: request.fundName,
+  });
+  writeConnectionRequests(
+    requests.map((r) => (r.id === requestId ? { ...r, status: "deal_room_created", dealRoomId: transaction.id } : r))
+  );
+  return { ok: true, dealRoomId: transaction.id, sector: transaction.sector, instrumentType: transaction.instrumentType };
+}
+
+export function declineConnectionRequestSandbox(requestId: string): void {
+  const requests = readConnectionRequests();
+  writeConnectionRequests(requests.map((r) => (r.id === requestId ? { ...r, status: "declined" } : r)));
+}
+
+// Document Vault — real screen extraction (3 Sep 2026). Source:
+// app.documents.tsx's "document-intake" view + DocumentEditorModal
+// (lines ~1518-1787), and the real `document_templates` table, queried
+// live via Supabase MCP against project ldimninnjlvxozubheib (17 rows,
+// confirmed authoritative, ported verbatim below — id/slug/name/category/
+// is_required/stage_relevance/sort_order). Per-field schema (TEMPLATE_FIELDS)
+// ported verbatim from app.documents.tsx lines 88-227.
+//
+// EXCLUDED as discovery-layer/scoring residue, confirmed against
+// CLAUDE.md's §15/§25 prohibitions and the review-document scoring-prompt
+// finding already logged there (§19b): the entire AIFeedback concept
+// (overall_score 1-10, signal strong/adequate/weak, investor_flag,
+// recommendations) and the "AI Review" button that produces it
+// (app.documents.tsx lines 1563-1596, 1690-1755, 1766-1773). Nothing here
+// scores, ranks, or grades a document — status is derived purely from
+// which required fields are filled, the same mechanical rule the real
+// completeness_score already uses for the progress bar, with no AI
+// judgment layered on top.
+export type LcsDocCategory = "market" | "financials" | "team" | "product" | "legal";
+
+export const DOC_CATEGORY_LABELS: Record<LcsDocCategory, string> = {
+  market: "Market",
+  financials: "Financials",
+  team: "Team",
+  product: "Product",
+  legal: "Legal",
+};
+
+export const DOC_CATEGORY_SORT_ORDER: Record<LcsDocCategory, number> = {
+  market: 0,
+  financials: 1,
+  team: 2,
+  product: 3,
+  legal: 4,
+};
+
+export interface LcsDocTemplateField {
+  key: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "percentage";
+  placeholder?: string;
+  required?: boolean;
+}
+
+export interface LcsDocTemplate {
+  id: string;
+  slug: string;
+  name: string;
+  category: LcsDocCategory;
+  is_required: boolean;
+  stage_relevance: string[];
+  sort_order: number;
+}
+
+// Real 17-row document_templates catalog, live-queried 3 Sep 2026.
+export const DOC_TEMPLATES: LcsDocTemplate[] = [
+  { id: "dt-1", slug: "executive_summary", name: "Executive Summary", category: "market", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 1 },
+  { id: "dt-2", slug: "problem_solution", name: "Problem & Solution", category: "market", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 2 },
+  { id: "dt-3", slug: "market_sizing", name: "Market Sizing (TAM/SAM/SOM)", category: "market", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 3 },
+  { id: "dt-4", slug: "competitive_landscape", name: "Competitive Landscape", category: "market", is_required: false, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 4 },
+  { id: "dt-5", slug: "go_to_market", name: "Go-to-Market Strategy", category: "market", is_required: false, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 5 },
+  { id: "dt-6", slug: "traction_metrics", name: "Traction & Key Metrics", category: "financials", is_required: true, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 6 },
+  { id: "dt-7", slug: "financial_model", name: "Financial Model Summary", category: "financials", is_required: true, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 7 },
+  { id: "dt-8", slug: "use_of_funds", name: "Use of Funds", category: "financials", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 8 },
+  { id: "dt-9", slug: "cap_table_summary", name: "Cap Table Summary", category: "financials", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 10 },
+  { id: "dt-10", slug: "unit_economics", name: "Unit Economics", category: "financials", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 11 },
+  { id: "dt-11", slug: "team_overview", name: "Team Overview", category: "team", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 12 },
+  { id: "dt-12", slug: "advisors_board", name: "Advisors & Board", category: "team", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 13 },
+  { id: "dt-13", slug: "product_overview", name: "Product Overview", category: "product", is_required: true, stage_relevance: ["Pre-seed", "Seed", "Series A", "Series B"], sort_order: 14 },
+  { id: "dt-14", slug: "product_roadmap", name: "Product Roadmap", category: "product", is_required: false, stage_relevance: ["Seed", "Series A", "Series B"], sort_order: 15 },
+  { id: "dt-15", slug: "cap_table_legal", name: "Cap Table (Legal)", category: "legal", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 16 },
+  { id: "dt-16", slug: "corporate_structure", name: "Corporate Structure", category: "legal", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 17 },
+  { id: "dt-17", slug: "ip_summary", name: "IP Summary", category: "legal", is_required: false, stage_relevance: ["Series A", "Series B"], sort_order: 18 },
+];
+
+// Per-template field schema, ported verbatim from app.documents.tsx's
+// TEMPLATE_FIELDS constant (lines 88-227) — every key/label/type/
+// placeholder/required tuple kept exact. Only 4 real `type` values exist
+// in the source data (text, textarea, number, percentage) — no select or
+// date type is invented here.
+export const DOC_TEMPLATE_FIELDS: Record<string, LcsDocTemplateField[]> = {
+  executive_summary: [
+    { key: "company_name", label: "Company name", type: "text", required: true },
+    { key: "one_liner", label: "One-line pitch", type: "text", placeholder: "What you do, in one sentence", required: true },
+    { key: "summary", label: "Executive summary", type: "textarea", placeholder: "2-3 paragraph overview of the business", required: true },
+    { key: "ask", label: "The ask", type: "text", placeholder: "e.g. Raising $2M seed round", required: false },
+  ],
+  problem_solution: [
+    { key: "problem", label: "The problem", type: "textarea", required: true },
+    { key: "solution", label: "Your solution", type: "textarea", required: true },
+    { key: "why_now", label: "Why now", type: "textarea", placeholder: "What makes this the right time", required: false },
+  ],
+  market_sizing: [
+    { key: "tam", label: "TAM (Total Addressable Market)", type: "text", placeholder: "e.g. $50B", required: true },
+    { key: "sam", label: "SAM (Serviceable Addressable Market)", type: "text", placeholder: "e.g. $5B", required: true },
+    { key: "som", label: "SOM (Serviceable Obtainable Market)", type: "text", placeholder: "e.g. $50M", required: true },
+    { key: "methodology", label: "Sizing methodology", type: "textarea", placeholder: "How these figures were derived", required: false },
+  ],
+  competitive_landscape: [
+    { key: "competitors", label: "Key competitors", type: "textarea", required: false },
+    { key: "differentiation", label: "Your differentiation", type: "textarea", required: false },
+    { key: "moat", label: "Competitive moat", type: "textarea", required: false },
+  ],
+  go_to_market: [
+    { key: "channels", label: "Primary channels", type: "textarea", required: false },
+    { key: "sales_motion", label: "Sales motion", type: "text", placeholder: "e.g. Self-serve, sales-led, PLG", required: false },
+    { key: "cac_strategy", label: "Customer acquisition strategy", type: "textarea", required: false },
+  ],
+  traction_metrics: [
+    { key: "mrr", label: "Monthly recurring revenue", type: "text", required: false },
+    { key: "growth_rate", label: "Month-over-month growth", type: "percentage", required: false },
+    { key: "customers", label: "Number of customers", type: "number", required: false },
+    { key: "key_metrics", label: "Other key metrics", type: "textarea", required: true },
+  ],
+  financial_model: [
+    { key: "revenue_current", label: "Current annual revenue", type: "text", required: false },
+    { key: "revenue_projected", label: "Projected revenue (12mo)", type: "text", required: true },
+    { key: "burn_rate", label: "Monthly burn rate", type: "text", required: true },
+    { key: "runway_months", label: "Runway (months)", type: "number", required: true },
+  ],
+  use_of_funds: [
+    { key: "raise_amount", label: "Amount raising", type: "text", required: true },
+    { key: "allocation", label: "Fund allocation breakdown", type: "textarea", placeholder: "e.g. 60% engineering, 25% sales, 15% ops", required: true },
+    { key: "milestones", label: "Milestones this funds", type: "textarea", required: false },
+  ],
+  cap_table_summary: [
+    { key: "founder_ownership", label: "Founder ownership %", type: "percentage", required: false },
+    { key: "esop_pool", label: "ESOP pool %", type: "percentage", required: false },
+    { key: "notes", label: "Notes", type: "textarea", required: false },
+  ],
+  unit_economics: [
+    { key: "cac", label: "Customer acquisition cost", type: "text", required: false },
+    { key: "ltv", label: "Lifetime value", type: "text", required: false },
+    { key: "payback_months", label: "Payback period (months)", type: "number", required: false },
+    { key: "gross_margin", label: "Gross margin", type: "percentage", required: false },
+  ],
+  team_overview: [
+    { key: "founders", label: "Founders", type: "textarea", placeholder: "Name, role, relevant background", required: true },
+    { key: "team_size", label: "Team size", type: "number", required: false },
+    { key: "key_hires", label: "Key hires planned", type: "textarea", required: false },
+  ],
+  advisors_board: [
+    { key: "advisors", label: "Advisors", type: "textarea", required: false },
+    { key: "board_members", label: "Board members", type: "textarea", required: false },
+  ],
+  product_overview: [
+    { key: "description", label: "Product description", type: "textarea", required: true },
+    { key: "stage", label: "Development stage", type: "text", placeholder: "e.g. MVP, GA, beta", required: false },
+    { key: "tech_stack", label: "Tech stack", type: "text", required: false },
+  ],
+  product_roadmap: [
+    { key: "next_3mo", label: "Next 3 months", type: "textarea", required: false },
+    { key: "next_12mo", label: "Next 12 months", type: "textarea", required: false },
+  ],
+  cap_table_legal: [
+    { key: "shareholders", label: "Shareholders & classes", type: "textarea", required: false },
+    { key: "outstanding_instruments", label: "Outstanding SAFEs/notes/options", type: "textarea", required: false },
+  ],
+  corporate_structure: [
+    { key: "entity_type", label: "Entity type", type: "text", placeholder: "e.g. Delaware C-Corp", required: false },
+    { key: "jurisdiction", label: "Jurisdiction", type: "text", required: false },
+    { key: "subsidiaries", label: "Subsidiaries", type: "textarea", required: false },
+  ],
+  ip_summary: [
+    { key: "patents", label: "Patents / applications", type: "textarea", required: false },
+    { key: "trademarks", label: "Trademarks", type: "textarea", required: false },
+    { key: "proprietary_tech", label: "Proprietary technology notes", type: "textarea", required: false },
+  ],
+};
+
+export type LcsDocStatus = "empty" | "draft" | "complete";
+
+export interface LcsFounderDocument {
+  template_slug: string;
+  content: Record<string, string>;
+  status: LcsDocStatus;
+  completeness_score: number;
+  updated_at: string;
+  in_deal_room: boolean;
+}
+
+const DOC_STORAGE_KEY = "lcs-sandbox-founder-documents-v1";
+
+function readFounderDocuments(): Record<string, LcsFounderDocument> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(DOC_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeFounderDocuments(docs: Record<string, LcsFounderDocument>): void {
+  try {
+    window.localStorage.setItem(DOC_STORAGE_KEY, JSON.stringify(docs));
+  } catch {
+    /* storage blocked — edit not persisted this session */
+  }
+}
+
+export function getFounderDocuments(): Record<string, LcsFounderDocument> {
+  return readFounderDocuments();
+}
+
+/** Completeness = % of a template's fields (required or not, matching the
+ * real liveScore calc at app.documents.tsx:1528-1532) that have a
+ * non-empty trimmed value. Status derives mechanically from that score —
+ * no AI judgment, matching app.documents.tsx:1540's own status rule. */
+export function computeDocCompleteness(slug: string, content: Record<string, string>): { score: number; status: LcsDocStatus } {
+  const fields = DOC_TEMPLATE_FIELDS[slug] ?? [];
+  if (fields.length === 0) return { score: 0, status: "empty" };
+  const filled = fields.filter((f) => (content[f.key] ?? "").trim().length > 0).length;
+  const score = Math.round((filled / fields.length) * 100);
+  const status: LcsDocStatus = score === 100 ? "complete" : score > 0 ? "draft" : "empty";
+  return { score, status };
+}
+
+export function saveFounderDocument(slug: string, content: Record<string, string>): LcsFounderDocument {
+  const docs = readFounderDocuments();
+  const { score, status } = computeDocCompleteness(slug, content);
+  const existing = docs[slug];
+  const doc: LcsFounderDocument = {
+    template_slug: slug,
+    content,
+    status,
+    completeness_score: score,
+    updated_at: new Date().toISOString(),
+    in_deal_room: existing?.in_deal_room ?? false,
+  };
+  docs[slug] = doc;
+  writeFounderDocuments(docs);
+  return doc;
+}
+
+export function toggleDocDealRoomVisibility(slug: string): LcsFounderDocument | undefined {
+  const docs = readFounderDocuments();
+  const existing = docs[slug];
+  if (!existing) return undefined;
+  const doc: LcsFounderDocument = { ...existing, in_deal_room: !existing.in_deal_room };
+  docs[slug] = doc;
+  writeFounderDocuments(docs);
+  return doc;
+}
+
+// Profile Analytics — real screen extraction (3 Sep 2026). Source:
+// app.profile.tsx's "analytics" tab (lines 353-393 for the query/
+// aggregation logic, lines 1507-1636 for the render). Genuinely
+// first-party page-view metrics — confirmed clean, no scoring/ranking/
+// recommendation residue anywhere in this slice (checked specifically,
+// per the pattern already found twice elsewhere in this codebase: no
+// computed score, no AI-assigned label, no investor-facing rank — every
+// number here is a plain count, average, or percentage-of-total derived
+// directly from raw view events). Real fields kept: viewer name/fund
+// (when known), viewer role (rendered as a plain label, not a score),
+// referrer-derived source, view duration, relative timestamp. Real
+// aggregates kept: total views, unique visitors, average duration,
+// last-7-days count, 30-day daily time series, source breakdown.
+export interface LcsProfileView {
+  id: string;
+  viewerName: string | null;
+  viewerFund: string | null;
+  viewerRole: "investor" | "founder" | null;
+  source: string;
+  durationSeconds: number | null;
+  createdAt: string;
+}
+
+const PROFILE_VIEWS_STORAGE_KEY = "lcs-sandbox-profile-views-v1";
+
+// Deliberately implausible seed data, same standard as every other
+// sandbox entity in this file (CLAUDE.md §20.15's §7.4 lesson) — round
+// numbers, generic fund names, spread across the last 30 days so the
+// time-series chart and "last 7 days" aggregate both render meaningfully
+// rather than as a single spike.
+function seedProfileViews(): LcsProfileView[] {
+  const now = Date.now();
+  const day = 86_400_000;
+  const rows: Array<Omit<LcsProfileView, "id" | "createdAt"> & { daysAgo: number }> = [
+    { viewerName: "Priya Shah", viewerFund: "Blue Horizon Ventures", viewerRole: "investor", source: "Direct", durationSeconds: 145, daysAgo: 0 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "LinkedIn", durationSeconds: 32, daysAgo: 0 },
+    { viewerName: "Marcus Webb", viewerFund: "Corvex Special Situations", viewerRole: "investor", source: "Direct", durationSeconds: 210, daysAgo: 1 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "X", durationSeconds: 18, daysAgo: 2 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "Direct", durationSeconds: 64, daysAgo: 3 },
+    { viewerName: "Dana Okafor", viewerFund: "Northlight Capital", viewerRole: "investor", source: "LinkedIn", durationSeconds: 98, daysAgo: 5 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "WhatsApp", durationSeconds: 12, daysAgo: 6 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "Direct", durationSeconds: 41, daysAgo: 9 },
+    { viewerName: "Priya Shah", viewerFund: "Blue Horizon Ventures", viewerRole: "investor", source: "Direct", durationSeconds: 180, daysAgo: 12 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "LinkedIn", durationSeconds: 27, daysAgo: 15 },
+    { viewerName: null, viewerFund: null, viewerRole: null, source: "Other", durationSeconds: 8, daysAgo: 20 },
+    { viewerName: "Elena Vasquez", viewerFund: "Fieldstone Partners", viewerRole: "investor", source: "Direct", durationSeconds: 156, daysAgo: 24 },
+  ];
+  return rows.map((r, i) => ({
+    id: `pv-${i}`,
+    viewerName: r.viewerName,
+    viewerFund: r.viewerFund,
+    viewerRole: r.viewerRole,
+    source: r.source,
+    durationSeconds: r.durationSeconds,
+    createdAt: new Date(now - r.daysAgo * day).toISOString(),
+  }));
+}
+
+export function getProfileViews(): LcsProfileView[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PROFILE_VIEWS_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    const seeded = seedProfileViews();
+    window.localStorage.setItem(PROFILE_VIEWS_STORAGE_KEY, JSON.stringify(seeded));
+    return seeded;
+  } catch {
+    return [];
+  }
+}

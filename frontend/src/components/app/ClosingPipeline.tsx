@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Loader2, Lock, Check, Upload, Download, AlertTriangle, FileText, DollarSign, PenLine, ShieldCheck, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { calculateFee, formatUsd, feeBasisLabel } from "@/lib/fee-schedule";
+import { StatusLabel } from "@/components/v2";
 import {
   setFee, confirmFeePayment, recordSignedAgreement,
   uploadPaymentProof, reviewPaymentProof, confirmDeliverable, downloadAgreement,
@@ -14,9 +15,31 @@ import {
 // /close route. Principals only (founder/investor) — LawyerRoomView never renders
 // this and RLS gives the lawyer 0 rows. Once the room is closed it is a read-only
 // archive (isClosed short-circuits every action).
+//
+// Restyled to v2 tokens per CLAUDE.md §0a against Figma frames 35:9378
+// ("Signing (Gate 4)"), 35:9560 ("Payment (Gate 5)"), 35:9172 ("Final
+// Close (Gate 6)") — the same "Closing Sequence" frame family as
+// close.tsx/LawyerGate.tsx. Real gate count/order/content stayed
+// authoritative (4 real gates: fee, sign, payment, close — not the
+// frames' own 6-gate numbering, which includes counsel and agreement,
+// already covered elsewhere in this route). Extracted only the
+// transferable visual grammar: the solid/dashed status-badge pair
+// (35:9378's "Signed"/"Pending" pill treatment, now StatusLabel),
+// the dashed-border upload-slot pattern (35:9560), the checkbox +
+// monospace-amount confirmation copy (35:9560's founder-confirms-funds
+// block), and the red "Irreversible Action" panel with a Principal A/B
+// pending-pair for the mutual-close step (35:9172). NOT ported: any of
+// the three frames' own page chrome (SideNavBar, "Capital
+// Flow"/"Capital Systems"/"Worklist" nav, search bar, LND-8492 ticket
+// IDs, PDF viewer canvas, prerequisite-checklist table) — none of it
+// exists as a concept in this component, and none of it is this
+// component's job (it renders inside the real AppShell). "Reference
+// ID"/timestamp-audit-row styling from 35:9172's checklist was also not
+// ported — no per-gate reference number exists yet (CLAUDE.md §20.6:
+// reference numbering lands on deal_rooms, not sub-gates).
 
-const BORDER = "#E4E4E7", INK = "#0A0A0B", INK2 = "#52525B", INK3 = "#71717A", BRAND = "#7C3AED";
-const GREEN = "#166534", AMBER = "#92400E";
+const BORDER = "var(--v2-rule)", INK = "var(--v2-ink)", INK2 = "var(--v2-ink-secondary)", INK3 = "var(--v2-ink-muted)", BRAND = "var(--v2-accent)";
+const GREEN = "var(--v2-satisfied)", AMBER = "var(--v2-attention)";
 
 async function token() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -171,19 +194,19 @@ export function ClosingPipeline({
 
   if (!agreement) {
     return (
-      <div className="border bg-white px-5 py-6 text-sm" style={{ borderColor: BORDER, borderRadius: 0, color: INK2 }}>
+      <div className="border bg-v2-panel px-5 py-6 text-sm" style={{ borderColor: BORDER, borderRadius: "var(--v2-radius)", color: INK2 }}>
         The closing pipeline unlocks once the agreement is finalized (both parties accepted it in the Term Sheet stage).
       </div>
     );
   }
 
   const step = (n: number, title: string, done: boolean, active: boolean, children: React.ReactNode, icon: React.ReactNode) => (
-    <div className="border bg-white" style={{ borderColor: done ? GREEN : BORDER, borderRadius: 0 }}>
-      <div className="flex items-center gap-2.5 border-b px-5 py-3.5" style={{ borderColor: done ? "#DCFCE7" : BORDER }}>
-        <div className="grid h-6 w-6 place-items-center text-[11px] font-semibold text-white" style={{ background: done ? GREEN : active ? BRAND : INK3, borderRadius: 2 }}>
+    <div className="border bg-v2-panel" style={{ borderColor: done ? GREEN : BORDER, borderRadius: "var(--v2-radius)" }}>
+      <div className="flex items-center gap-2.5 border-b px-5 py-3.5" style={{ borderColor: done ? "var(--v2-satisfied-wash)" : BORDER }}>
+        <div className="grid h-6 w-6 place-items-center text-[11px] font-semibold text-white" style={{ background: done ? GREEN : active ? BRAND : INK3, borderRadius: "var(--v2-radius)" }}>
           {done ? <Check className="h-3.5 w-3.5" /> : n}
         </div>
-        <span className="text-sm font-semibold" style={{ color: INK, fontFamily: "Syne, sans-serif" }}>{title}</span>
+        <span className="font-v2-ui text-sm font-semibold" style={{ color: INK }}>{title}</span>
         <span className="ml-auto">{icon}</span>
       </div>
       <div className="px-5 py-4">{children}</div>
@@ -193,7 +216,7 @@ export function ClosingPipeline({
   return (
     <div className="space-y-6">
       {isClosed && (
-        <div className="flex items-center gap-3 border p-4" style={{ borderColor: GREEN, background: "#F0FDF4", borderRadius: 0 }}>
+        <div className="flex items-center gap-3 border p-4" style={{ borderColor: GREEN, background: "var(--v2-satisfied-wash)", borderRadius: "var(--v2-radius)" }}>
           <Lock className="h-5 w-5 shrink-0" style={{ color: GREEN }} />
           <div>
             <div className="text-sm font-semibold" style={{ color: GREEN }}>Deal closed — {closedAt ? new Date(closedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}</div>
@@ -213,7 +236,7 @@ export function ClosingPipeline({
                   <div>
                     <label className="block text-[12px] font-medium" style={{ color: INK2 }}>Deal amount (USD)</label>
                     <input value={amountInput} onChange={(e) => setAmountInput(e.target.value)} placeholder="e.g. 500000"
-                      className="mt-1 w-48 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: 2 }} />
+                      className="mt-1 w-48 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 36, borderRadius: "var(--v2-radius)" }} />
                     {prefillAmount && <div className="mt-1 text-[11px]" style={{ color: INK3 }}>Pre-filled from locked terms — confirm or edit.</div>}
                   </div>
                   <div>
@@ -226,14 +249,14 @@ export function ClosingPipeline({
                   <div className="mt-1.5 flex gap-2">
                     {(["founder", "investor"] as const).map((p) => (
                       <button key={p} onClick={() => setFeePayer(p)}
-                        className="border px-3 text-xs font-medium capitalize" style={{ borderColor: feePayer === p ? BRAND : BORDER, color: feePayer === p ? BRAND : INK2, background: feePayer === p ? "#F5F3FF" : "#FFF", height: 32, borderRadius: 2 }}>
+                        className="border px-3 text-xs font-medium capitalize" style={{ borderColor: feePayer === p ? BRAND : BORDER, color: feePayer === p ? BRAND : INK2, background: feePayer === p ? "var(--v2-accent-wash)" : "var(--v2-panel)", height: 32, borderRadius: "var(--v2-radius)" }}>
                         {p} pays
                       </button>
                     ))}
                   </div>
                 </div>
                 <button onClick={doSetFee} disabled={busy === "setfee" || isClosed}
-                  className="inline-flex items-center gap-1.5 px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>
+                  className="inline-flex items-center gap-1.5 px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: "var(--v2-radius)" }}>
                   {busy === "setfee" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <DollarSign className="h-3.5 w-3.5" />} Confirm fee & who pays
                 </button>
               </>
@@ -247,18 +270,18 @@ export function ClosingPipeline({
                 <Row label="Status" value={feeConfirmed ? "Confirmed (beta)" : "Awaiting payment"} />
               </div>
               {!feeConfirmed && role === fee.fee_payer && (
-                <div className="border p-4" style={{ borderColor: BORDER, background: "#FAFAFA", borderRadius: 0 }}>
+                <div className="border p-4" style={{ borderColor: BORDER, background: "var(--v2-surface)", borderRadius: "var(--v2-radius)" }}>
                   <div className="text-[13px] font-medium" style={{ color: INK }}>Confirm payment of the {formatUsd(Number(fee.calculated_fee))} platform fee</div>
                   {/* TODO(stripe): placeholder — no real charge in beta. */}
                   <p className="mt-1 text-[12px]" style={{ color: INK2 }}>Payment processing coming soon — confirming records the fee so the closing can proceed. Your deal closing is recorded and your agreement is preserved.</p>
                   <button onClick={doConfirmPayment} disabled={busy === "payfee" || isClosed}
-                    className="mt-3 inline-flex items-center gap-1.5 px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: "var(--v2-radius)" }}>
                     {busy === "payfee" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Confirm payment (beta)
                   </button>
                 </div>
               )}
               {!feeConfirmed && role !== fee.fee_payer && (
-                <div className="border p-3 text-[13px]" style={{ borderColor: "#F59E0B", background: "#FFFBEB", borderRadius: 0, color: AMBER }}>
+                <div className="border p-3 text-[13px]" style={{ borderColor: "var(--v2-attention)", background: "var(--v2-attention-wash)", borderRadius: "var(--v2-radius)", color: AMBER }}>
                   You are the designated payer of the platform fee ({formatUsd(Number(fee.calculated_fee))}). — This shows for the payer. Awaiting {fee.fee_payer} to confirm.
                 </div>
               )}
@@ -280,7 +303,7 @@ export function ClosingPipeline({
                   if (r.ok && r.url) window.open(r.url, "_blank");
                   else toast.error(r.error === "fee_not_confirmed" ? "Confirm the platform fee first" : "Could not download");
                 }}
-                  className="inline-flex items-center gap-1.5 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+                  className="inline-flex items-center gap-1.5 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 32, borderRadius: "var(--v2-radius)" }}>
                   <Download className="h-3.5 w-3.5" /> Download agreement
                 </button>
                 <span className="text-[12px]" style={{ color: INK3 }}>Sign externally, then upload your signed copy.</span>
@@ -305,7 +328,7 @@ export function ClosingPipeline({
             <>
               <p className="text-[13px]" style={{ color: INK2 }}>The investor processes the deal payment externally (wire, etc.) and uploads proof. The founder confirms receipt.</p>
               {role === "investor" && !paymentConfirmed && !isClosed && (
-                <label className="inline-flex cursor-pointer items-center gap-1.5 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 32, borderRadius: 2 }}>
+                <label className="inline-flex cursor-pointer items-center gap-1.5 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 32, borderRadius: "var(--v2-radius)" }}>
                   {busy === "proof" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                   Upload payment proof{(proofs as any[]).length ? " (new version)" : ""}
                   <input type="file" className="sr-only" accept=".pdf,.png,.jpg,.jpeg" disabled={busy === "proof"} onChange={(e) => { const f = e.target.files?.[0]; if (f) doUploadProof(f); e.target.value = ""; }} />
@@ -315,22 +338,24 @@ export function ClosingPipeline({
                 <div key={p.id} className="border-b last:border-b-0 py-2" style={{ borderColor: BORDER }}>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[13px] font-medium" style={{ color: INK }}>v{p.version} · {p.file_name}</span>
-                    <StatusChip status={p.founder_status} />
+                    <StatusLabel tone={p.founder_status === "confirmed" ? "satisfied" : p.founder_status === "discrepancy" ? "adverse" : "attention"}>
+                      {p.founder_status === "confirmed" ? "Confirmed" : p.founder_status === "discrepancy" ? "Discrepancy" : "Awaiting review"}
+                    </StatusLabel>
                     <button onClick={() => download(p.storage_path)} className="text-[12px] underline" style={{ color: INK3 }}>download</button>
                     <span className="ml-auto text-[12px]" style={{ color: INK3 }}>{formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}</span>
                   </div>
                   {p.discrepancy_comment && <div className="mt-1 text-[12px]" style={{ color: AMBER }}>Founder flagged: {p.discrepancy_comment}</div>}
                   {role === "founder" && p.id === latestProof?.id && p.founder_status !== "confirmed" && !isClosed && (
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <button onClick={() => doReviewProof(p.id, true)} disabled={busy === "review"} className="inline-flex items-center gap-1 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 30, borderRadius: 2 }}>Confirm receipt</button>
-                      <button onClick={() => setDiscOpen(true)} className="border px-3 text-xs font-medium" style={{ borderColor: "#FCD34D", color: AMBER, height: 30, borderRadius: 2 }}>Flag discrepancy</button>
+                      <button onClick={() => doReviewProof(p.id, true)} disabled={busy === "review"} className="inline-flex items-center gap-1 px-3 text-xs font-medium text-white" style={{ background: BRAND, height: 30, borderRadius: "var(--v2-radius)" }}>Confirm receipt</button>
+                      <button onClick={() => setDiscOpen(true)} className="border px-3 text-xs font-medium" style={{ borderColor: "var(--v2-attention)", color: AMBER, height: 30, borderRadius: "var(--v2-radius)" }}>Flag discrepancy</button>
                     </div>
                   )}
                   {discOpen && role === "founder" && p.id === latestProof?.id && (
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <input value={discText} onChange={(e) => setDiscText(e.target.value)} placeholder="What's wrong with the payment?" className="min-w-[240px] flex-1 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 34, borderRadius: 2 }} />
-                      <button onClick={() => doReviewProof(p.id, false)} disabled={busy === "review"} className="px-3 text-xs font-medium text-white" style={{ background: "#D97706", height: 34, borderRadius: 2 }}>Send flag</button>
-                      <button onClick={() => { setDiscOpen(false); setDiscText(""); }} className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 34, borderRadius: 2 }}>Cancel</button>
+                      <input value={discText} onChange={(e) => setDiscText(e.target.value)} placeholder="What's wrong with the payment?" className="min-w-[240px] flex-1 border px-3 text-sm outline-none" style={{ borderColor: BORDER, color: INK, height: 34, borderRadius: "var(--v2-radius)" }} />
+                      <button onClick={() => doReviewProof(p.id, false)} disabled={busy === "review"} className="px-3 text-xs font-medium text-white" style={{ background: "var(--v2-attention)", height: 34, borderRadius: "var(--v2-radius)" }}>Send flag</button>
+                      <button onClick={() => { setDiscOpen(false); setDiscText(""); }} className="border px-3 text-xs" style={{ borderColor: BORDER, color: INK2, height: 34, borderRadius: "var(--v2-radius)" }}>Cancel</button>
                     </div>
                   )}
                 </div>
@@ -364,12 +389,12 @@ export function ClosingPipeline({
               <p className="text-[13px]" style={{ color: INK2 }}>
                 {role === "investor" ? "Confirm you received the equity certificate / debt agreement / share transfer per the agreed instrument." : "Confirm you delivered the agreed instrument to the investor."}
               </p>
-              <div className="flex items-center gap-3 text-[12px]" style={{ color: INK3 }}>
-                <span>{close?.founder_confirmed ? "✓ Founder confirmed" : "○ Founder pending"}</span>
-                <span>{close?.investor_confirmed ? "✓ Investor confirmed" : "○ Investor pending"}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusLabel tone={close?.founder_confirmed ? "satisfied" : "attention"}>Founder {close?.founder_confirmed ? "confirmed" : "pending"}</StatusLabel>
+                <StatusLabel tone={close?.investor_confirmed ? "satisfied" : "attention"}>Investor {close?.investor_confirmed ? "confirmed" : "pending"}</StatusLabel>
               </div>
               {!myClose ? (
-                <button onClick={doConfirmClose} disabled={busy === "close"} className="inline-flex items-center gap-1.5 px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: 2 }}>
+                <button onClick={doConfirmClose} disabled={busy === "close"} className="inline-flex items-center gap-1.5 px-4 text-xs font-medium text-white disabled:opacity-50" style={{ background: BRAND, height: 36, borderRadius: "var(--v2-radius)" }}>
                   {busy === "close" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {role === "investor" ? "Confirm receipt" : "Confirm delivery"}
                 </button>
               ) : (
@@ -393,18 +418,9 @@ function Row({ label, value, brand, cap }: { label: string; value: string; brand
     </div>
   );
 }
-function StatusChip({ status }: { status: string }) {
-  const m: Record<string, { bg: string; fg: string; label: string }> = {
-    pending: { bg: "#EDE9FE", fg: "#6D28D9", label: "Awaiting review" },
-    confirmed: { bg: "#DCFCE7", fg: GREEN, label: "Confirmed" },
-    discrepancy: { bg: "#FEF3C7", fg: AMBER, label: "Discrepancy" },
-  };
-  const c = m[status] ?? m.pending;
-  return <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium" style={{ background: c.bg, color: c.fg, borderRadius: 2 }}>{c.label}</span>;
-}
 function SignSlot({ label, done, name, canUpload, onUpload, onDownload, busy }: { label: string; done: boolean; name?: string; canUpload: boolean; onUpload: (f: File) => void; onDownload: () => void; busy: boolean }) {
   return (
-    <div className="border p-3" style={{ borderColor: done ? GREEN : BORDER, borderRadius: 0 }}>
+    <div className="border p-3" style={{ borderColor: done ? GREEN : BORDER, borderRadius: "var(--v2-radius)" }}>
       <div className="flex items-center gap-2">
         {done ? <Check className="h-4 w-4" style={{ color: GREEN }} /> : <div className="h-4 w-4 rounded-full border-2" style={{ borderColor: INK3 }} />}
         <span className="text-[13px] font-medium" style={{ color: INK }}>{label}</span>
@@ -412,8 +428,12 @@ function SignSlot({ label, done, name, canUpload, onUpload, onDownload, busy }: 
       {done ? (
         <div className="mt-1.5 flex items-center gap-2 text-[12px]"><span style={{ color: INK2 }}>{name}</span><button onClick={onDownload} className="underline" style={{ color: INK3 }}>download</button></div>
       ) : canUpload ? (
-        <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1.5 border px-3 text-xs font-medium" style={{ borderColor: BORDER, color: INK2, height: 30, borderRadius: 2 }}>
-          {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />} Upload signed copy
+        <label
+          className="mt-1.5 flex cursor-pointer flex-col items-center justify-center gap-1 border-2 border-dashed px-3 py-3 text-xs font-medium"
+          style={{ borderColor: "var(--v2-rule)", color: INK2, borderRadius: "var(--v2-radius)" }}
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          <span>Upload signed copy</span>
           <input type="file" className="sr-only" accept=".pdf" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }} />
         </label>
       ) : (

@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, X, Loader2, ExternalLink, Save } from "lucide-react";
+import { Plus, X, Loader2, ExternalLink, Save, User } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { LcsButton } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/member-profile")({
   component: MemberProfilePage,
@@ -330,7 +331,7 @@ function MemberProfilePage() {
     return (
       <div style={{ padding: 32, maxWidth: 700, margin: "0 auto" }}>
         {[1, 2, 3].map((i) => (
-          <div key={i} style={{ height: 120, background: "var(--accent)", borderRadius: 12, marginBottom: 16 }} />
+          <div key={i} style={{ height: 120, background: "var(--lcs-surface)", marginBottom: 16 }} />
         ))}
       </div>
     );
@@ -338,10 +339,10 @@ function MemberProfilePage() {
 
   return (
     <div style={{ padding: "32px 32px 120px", maxWidth: 700, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--foreground)", letterSpacing: "-0.03em", marginBottom: 4 }}>
+      <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--lcs-ink)", letterSpacing: "-0.03em", marginBottom: 4, fontFamily: "var(--font-lcs-ui)" }}>
         My Profile
       </h1>
-      <p style={{ fontSize: 13, color: "var(--muted-foreground)", marginBottom: 32 }}>
+      <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)", marginBottom: 32, fontFamily: "var(--font-lcs-ui)" }}>
         Build your professional CV. Use the Save button below when done.
       </p>
 
@@ -353,23 +354,23 @@ function MemberProfilePage() {
             onClick={() => fileInputRef.current?.click()}
             style={{
               width: 96, height: 96, borderRadius: "50%", flexShrink: 0,
-              background: "rgba(124,58,237,0.2)", border: "2px solid rgba(124,58,237,0.3)",
+              background: "var(--lcs-surface)", border: "2px solid var(--lcs-line)",
               cursor: "pointer", overflow: "hidden", position: "relative",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
           >
             {avatarUploading
-              ? <Loader2 size={22} style={{ color: "var(--brand)", animation: "spin 1s linear infinite" }} />
+              ? <Loader2 size={22} style={{ color: "var(--lcs-accent)", animation: "spin 1s linear infinite" }} />
               : avatarUrl
               ? <img src={avatarUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : <span style={{ fontSize: 32, fontWeight: 800, color: "var(--brand)", fontFamily: "Syne, sans-serif" }}>
+              : <span style={{ fontSize: 32, fontWeight: 800, color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}>
                   {initials(firstName, lastName)}
                 </span>
             }
             <div
               style={{
                 position: "absolute", inset: 0,
-                background: "rgba(0,0,0,0.55)",
+                background: "color-mix(in srgb, var(--lcs-ink) 55%, transparent)",
                 display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center",
                 opacity: 0, transition: "opacity 0.2s",
@@ -377,8 +378,8 @@ function MemberProfilePage() {
               onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "1"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "0"; }}
             >
-              <span style={{ fontSize: 20 }}>📷</span>
-              <span style={{ fontSize: 10, color: "var(--foreground)", fontWeight: 600, marginTop: 4 }}>Upload</span>
+              <User size={20} style={{ color: "var(--lcs-white)" }} />
+              <span style={{ fontSize: 10, color: "var(--lcs-white)", fontWeight: 600, marginTop: 4, fontFamily: "var(--font-lcs-ui)" }}>Upload</span>
             </div>
           </div>
           <input
@@ -393,8 +394,8 @@ function MemberProfilePage() {
             }}
           />
           <div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", marginBottom: 2 }}>Profile photo</div>
-            <div style={{ fontSize: 11, color: "var(--faint)" }}>Max 2MB · Cropped to 400×400 square</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--lcs-ink)", marginBottom: 2, fontFamily: "var(--font-lcs-ui)" }}>Profile photo</div>
+            <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Max 2MB · Cropped to 400×400 square</div>
           </div>
         </div>
 
@@ -433,10 +434,10 @@ function MemberProfilePage() {
         />
 
         {/* Share toggle */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: "1px solid var(--border)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: "1px solid var(--lcs-line)" }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", marginBottom: 2 }}>Public CV</div>
-            <div style={{ fontSize: 11, color: "var(--faint)" }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--lcs-ink)", marginBottom: 2, fontFamily: "var(--font-lcs-ui)" }}>Public CV</div>
+            <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
               Make your profile publicly shareable at a unique URL.
             </div>
           </div>
@@ -451,21 +452,21 @@ function MemberProfilePage() {
             }}
             style={{
               width: 36, height: 20, borderRadius: 10, border: "none", flexShrink: 0,
-              background: isPublic ? "var(--gradient-brand)" : "var(--accent)",
+              background: isPublic ? "var(--lcs-accent)" : "var(--lcs-line)",
               cursor: "pointer", position: "relative", transition: "background 0.2s",
             }}
           >
             <span style={{
               position: "absolute", top: 2, left: isPublic ? 18 : 2,
-              width: 16, height: 16, borderRadius: "50%", background: "#fff",
+              width: 16, height: 16, borderRadius: "50%", background: "var(--lcs-white)",
               transition: "left 0.2s",
             }} />
           </button>
         </div>
         {isPublic && shareUrl && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, padding: "10px 12px", background: "rgba(124,58,237,0.08)", borderRadius: 8, border: "1px solid rgba(124,58,237,0.2)" }}>
-            <span style={{ fontSize: 12, color: "var(--muted-foreground)", flex: 1, wordBreak: "break-all" }}>{shareUrl}</span>
-            <a href={shareUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brand)", display: "flex" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, padding: "10px 12px", background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)" }}>
+            <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)", flex: 1, wordBreak: "break-all", fontFamily: "var(--font-lcs-ui)" }}>{shareUrl}</span>
+            <a href={shareUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--lcs-accent)", display: "flex" }}>
               <ExternalLink size={14} />
             </a>
           </div>
@@ -482,7 +483,7 @@ function MemberProfilePage() {
             rows={4}
             style={{ ...textareaStyle, resize: "none" }}
           />
-          <div style={{ fontSize: 11, color: "var(--faint)", textAlign: "right", marginTop: 4 }}>
+          <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", textAlign: "right", marginTop: 4 }}>
             {bio.length}/400
           </div>
         </div>
@@ -530,8 +531,8 @@ function MemberProfilePage() {
           {skills.map((s) => (
             <span key={s} style={{
               display: "inline-flex", alignItems: "center", gap: 6,
-              background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.2)",
-              borderRadius: 99, padding: "4px 12px", fontSize: 12, color: "#c4b5fd",
+              background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)",
+              padding: "4px 12px", fontSize: 12, color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)",
             }}>
               {s}
               <button onClick={() => removeSkill(s)} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 0, display: "flex" }}>
@@ -540,7 +541,7 @@ function MemberProfilePage() {
             </span>
           ))}
           {skills.length < 20 && (
-            <span style={{ fontSize: 11, color: "var(--faint)", display: "flex", alignItems: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--lcs-ink-muted)", display: "flex", alignItems: "center", fontFamily: "var(--font-lcs-ui)" }}>
               {skills.length}/20
             </span>
           )}
@@ -553,37 +554,27 @@ function MemberProfilePage() {
             placeholder="Type a skill and press Enter"
             style={{ ...inputStyle, flex: 1 }}
           />
-          <button onClick={addSkill} style={{ background: "var(--gradient-brand)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 12, cursor: "pointer" }}>
+          <LcsButton variant="primary" onClick={addSkill} className="text-xs px-3.5 py-2">
             Add
-          </button>
+          </LcsButton>
         </div>
       </Card>
 
       {/* Sticky save bar */}
       <div style={{
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 40,
-        background: "rgba(10,10,11,0.95)", backdropFilter: "blur(8px)",
-        borderTop: "1px solid var(--border)",
+        background: "var(--lcs-white)", backdropFilter: "blur(8px)",
+        borderTop: "1px solid var(--lcs-line)",
         padding: "16px 24px",
         display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 16,
       }}>
-        <span style={{ fontSize: 13, color: saved ? "#10B981" : "var(--faint)" }}>
-          {saved ? "✓ Saved" : "Unsaved changes"}
+        <span style={{ fontSize: 13, color: saved ? "var(--lcs-satisfied)" : "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+          {saved ? "Saved" : "Unsaved changes"}
         </span>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{
-            background: "var(--gradient-brand)", color: "#fff", border: "none",
-            borderRadius: 8, padding: "10px 24px", fontSize: 14,
-            fontWeight: 600, cursor: saving ? "not-allowed" : "pointer",
-            opacity: saving ? 0.7 : 1,
-            display: "inline-flex", alignItems: "center", gap: 6,
-          }}
-        >
+        <LcsButton variant="primary" onClick={handleSave} disabled={saving} className="text-sm px-6 py-2.5 inline-flex items-center gap-1.5">
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           Save profile
-        </button>
+        </LcsButton>
       </div>
     </div>
   );
@@ -593,9 +584,9 @@ function MemberProfilePage() {
 
 function Card({ title, children, style, action }: { title: string; children: React.ReactNode; style?: React.CSSProperties; action?: React.ReactNode }) {
   return (
-    <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)", overflow: "hidden", ...style }}>
-      <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>{title}</span>
+    <div style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", overflow: "hidden", ...style }}>
+      <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--lcs-line)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{title}</span>
         {action}
       </div>
       <div style={{ padding: "20px" }}>{children}</div>
@@ -605,19 +596,14 @@ function Card({ title, children, style, action }: { title: string; children: Rea
 
 function AddBtn({ onClick, label }: { onClick: () => void; label: string }) {
   return (
-    <button onClick={onClick} style={{
-      display: "inline-flex", alignItems: "center", gap: 4,
-      background: "transparent", border: "1px solid var(--border)",
-      borderRadius: 6, padding: "5px 10px", fontSize: 11,
-      color: "var(--muted-foreground)", cursor: "pointer",
-    }}>
+    <LcsButton variant="secondary" onClick={onClick} className="text-[11px] px-2.5 py-1 inline-flex items-center gap-1">
       <Plus size={11} /> {label}
-    </button>
+    </LcsButton>
   );
 }
 
 function EmptyHint({ text }: { text: string }) {
-  return <div style={{ fontSize: 12, color: "var(--faint)", padding: "8px 0" }}>{text}</div>;
+  return <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", padding: "8px 0", fontFamily: "var(--font-lcs-ui)" }}>{text}</div>;
 }
 
 function LabeledInput({
@@ -640,9 +626,9 @@ function LabeledInput({
 
 function ExpCard({ exp, onChange, onRemove }: { exp: ExperienceEntry; onChange: (p: Partial<ExperienceEntry>) => void; onRemove: () => void }) {
   return (
-    <div style={{ background: "var(--accent)", borderRadius: 10, border: "1px solid var(--border)", padding: 16, marginBottom: 12 }}>
+    <div style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", padding: 16, marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)" }}>
+        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lcs-ink-muted)" }}>
           <X size={14} />
         </button>
       </div>
@@ -664,7 +650,7 @@ function ExpCard({ exp, onChange, onRemove }: { exp: ExperienceEntry; onChange: 
           <input value={exp.end_date} onChange={(e) => onChange({ end_date: e.target.value })} placeholder="Dec 2023" disabled={exp.is_current} style={{ ...inputStyle, opacity: exp.is_current ? 0.4 : 1 }} />
         </div>
       </div>
-      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--muted-foreground)", cursor: "pointer", marginBottom: 12 }}>
+      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--lcs-ink-muted)", cursor: "pointer", marginBottom: 12 }}>
         <input type="checkbox" checked={exp.is_current} onChange={(e) => onChange({ is_current: e.target.checked, end_date: "" })} />
         Current role
       </label>
@@ -676,7 +662,7 @@ function ExpCard({ exp, onChange, onRemove }: { exp: ExperienceEntry; onChange: 
           rows={2}
           style={{ ...textareaStyle, resize: "none" }}
         />
-        <div style={{ fontSize: 10, color: "var(--faint)", textAlign: "right" }}>{exp.description.length}/300</div>
+        <div style={{ fontSize: 10, color: "var(--lcs-ink-muted)", textAlign: "right" }}>{exp.description.length}/300</div>
       </div>
     </div>
   );
@@ -684,9 +670,9 @@ function ExpCard({ exp, onChange, onRemove }: { exp: ExperienceEntry; onChange: 
 
 function EduCard({ edu, onChange, onRemove }: { edu: EducationEntry; onChange: (p: Partial<EducationEntry>) => void; onRemove: () => void }) {
   return (
-    <div style={{ background: "var(--accent)", borderRadius: 10, border: "1px solid var(--border)", padding: 16, marginBottom: 12 }}>
+    <div style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", padding: 16, marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)" }}>
+        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lcs-ink-muted)" }}>
           <X size={14} />
         </button>
       </div>
@@ -718,7 +704,7 @@ function EduCard({ edu, onChange, onRemove }: { edu: EducationEntry; onChange: (
           <input value={edu.end_year} onChange={(e) => onChange({ end_year: e.target.value })} placeholder="2022" disabled={edu.is_ongoing} style={{ ...inputStyle, opacity: edu.is_ongoing ? 0.4 : 1 }} />
         </div>
       </div>
-      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--muted-foreground)", cursor: "pointer" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--lcs-ink-muted)", cursor: "pointer" }}>
         <input type="checkbox" checked={edu.is_ongoing} onChange={(e) => onChange({ is_ongoing: e.target.checked, end_year: "" })} />
         Ongoing
       </label>
@@ -728,9 +714,9 @@ function EduCard({ edu, onChange, onRemove }: { edu: EducationEntry; onChange: (
 
 function AchCard({ ach, onChange, onRemove }: { ach: AchievementEntry; onChange: (p: Partial<AchievementEntry>) => void; onRemove: () => void }) {
   return (
-    <div style={{ background: "var(--accent)", borderRadius: 10, border: "1px solid var(--border)", padding: 16, marginBottom: 12 }}>
+    <div style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)", padding: 16, marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 10 }}>
-        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--faint)" }}>
+        <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--lcs-ink-muted)" }}>
           <X size={14} />
         </button>
       </div>
@@ -752,7 +738,7 @@ function AchCard({ ach, onChange, onRemove }: { ach: AchievementEntry; onChange:
           rows={2}
           style={{ ...textareaStyle, resize: "none" }}
         />
-        <div style={{ fontSize: 10, color: "var(--faint)", textAlign: "right" }}>{ach.description.length}/200</div>
+        <div style={{ fontSize: 10, color: "var(--lcs-ink-muted)", textAlign: "right" }}>{ach.description.length}/200</div>
       </div>
     </div>
   );
@@ -761,21 +747,21 @@ function AchCard({ ach, onChange, onRemove }: { ach: AchievementEntry; onChange:
 // ── Shared styles ──────────────────────────────────────────────────
 
 const labelStyle: React.CSSProperties = {
-  fontSize: 10, fontWeight: 600, color: "var(--faint)",
+  fontSize: 10, fontWeight: 600, color: "var(--lcs-ink-muted)",
   textTransform: "uppercase", letterSpacing: "0.08em",
-  display: "block", marginBottom: 5,
+  display: "block", marginBottom: 5, fontFamily: "var(--font-lcs-ui)",
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "var(--accent)",
-  border: "1px solid var(--border)", borderRadius: 8,
-  padding: "9px 12px", fontSize: 13, color: "var(--foreground)",
-  outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lcs-white)",
+  border: "1px solid var(--lcs-line)", borderRadius: 0,
+  padding: "0 10px", height: 32, fontSize: 14, color: "var(--lcs-ink)",
+  outline: "none", boxSizing: "border-box", fontFamily: "var(--font-lcs-ui)",
 };
 
 const textareaStyle: React.CSSProperties = {
-  width: "100%", background: "var(--accent)",
-  border: "1px solid var(--border)", borderRadius: 8,
-  padding: "9px 12px", fontSize: 13, color: "var(--foreground)",
-  outline: "none", boxSizing: "border-box",
+  width: "100%", background: "var(--lcs-white)",
+  border: "1px solid var(--lcs-line)", borderRadius: 0,
+  padding: "8px 10px", fontSize: 14, color: "var(--lcs-ink)",
+  outline: "none", boxSizing: "border-box", fontFamily: "var(--font-lcs-ui)",
 };

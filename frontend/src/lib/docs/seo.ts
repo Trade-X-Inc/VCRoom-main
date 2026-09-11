@@ -56,7 +56,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
   "": [
     {
       q: "What is Lengdon?",
-      a: "Lengdon is a global fundraising platform for founders and investors. Founders build a structured profile, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors get thesis-matched deal flow, an AI due-diligence engine that cross-examines documents against claims, and a decision pipeline. It is headquartered at DIFC, Dubai.",
+      a: "Lengdon is a global fundraising platform for founders and investors. Founders build a structured profile, run NDA-gated deal rooms with a six-stage workflow, and receive recorded investment decisions. Investors build an investment thesis and profile, review deal flow inside NDA-gated deal rooms, and use an AI due-diligence engine that cross-examines documents against claims. It is headquartered at DIFC, Dubai.",
     },
     {
       q: "How does founder verification work?",
@@ -68,7 +68,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
     },
     {
       q: "What countries does Lengdon support?",
-      a: "Lengdon is a global platform: founders and investors from any jurisdiction can use it, wherever they are based. Registry verification covers 140+ jurisdictions including the UAE, Saudi Arabia, Qatar, Bahrain, the UK, and the US.",
+      a: "Lengdon is a global platform: founders and investors from any jurisdiction can use it, wherever they are based, including the UAE, Saudi Arabia, Qatar, Bahrain, the UK, and the US.",
     },
     {
       q: "How does the success fee work?",

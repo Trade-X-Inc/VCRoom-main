@@ -1,6 +1,6 @@
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { FOUNDER_PERMISSIONS, INVESTOR_PERMISSIONS, ROLE_LABELS } from "@/lib/roles";
-import { EmptyState } from "@/components/system/EmptyState";
+import { LcsEmptyState } from "@/components/lcs";
 
 /**
  * Route-layer RBAC enforcement (R12 step 2b). Wrap a page's component with
@@ -35,10 +35,9 @@ export function PermissionGate({
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8">
-      <EmptyState
-        kind="error"
+      <LcsEmptyState
         title={`Your role (${roleLabel}) does not include access to this page.`}
-        description="Contact your workspace admin."
+        text="Contact your workspace admin."
       />
     </div>
   );

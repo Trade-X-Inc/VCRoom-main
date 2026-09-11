@@ -46,8 +46,9 @@ export const PRICING_PAGES: Record<string, DocPage> = {
           ]}
         />
         <P>
-          All founder plans include verification — the trust layer is never paywalled. Pro and
-          Scale add full AI access; Scale includes a free Founder Roast seat.
+          Every founder plan includes the full deal room and record infrastructure — nothing about
+          how a deal closes is paywalled. Pro and Scale add full AI access; Scale includes a free
+          Founder Roast seat.
         </P>
 
         <H2 id="investor-plans">Investor plans</H2>

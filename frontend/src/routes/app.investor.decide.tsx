@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
-import { PageFrame } from "@/components/system";
+import { ArrowRight, ChevronRight } from "lucide-react";
+import { LcsPageHeader } from "@/components/lcs";
 import { useDealFlowProgress } from "@/hooks/useDealFlowProgress";
 
 // ④ Decide — the decision board and the book. Decisions has a canonical
@@ -37,10 +37,16 @@ function SectionLinkRow({
 function DecidePage() {
   const { data: p } = useDealFlowProgress();
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Deal flow" }, { label: "Decide" }]}
-      title="Decide"
-    >
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Deal flow</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Decide</span>
+      </div>
+      <LcsPageHeader title="Decide" />
       <Link
         to={"/app/investor/decisions" as any}
         className="block bg-card border border-border/60 rounded-none p-6 mb-6 hover:bg-accent/40 transition-colors"
@@ -65,6 +71,6 @@ function DecidePage() {
           summary={p ? `${p.portfolioCount} invested` : undefined}
         />
       </div>
-    </PageFrame>
+    </div>
   );
 }

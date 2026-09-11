@@ -10,6 +10,9 @@ import { useAuth } from "@/lib/auth";
  */
 export interface DealFlowProgress {
   thesisSet: boolean;
+  orgDetailsSet: boolean;
+  teamMembersCount: number;
+  notificationPrefsSet: boolean;
   watchlistCount: number;
   activeRooms: number;
   pendingDecisions: number;
@@ -34,19 +37,29 @@ export function useDealFlowProgress() {
       // stays undefined, consumers already null-guard `p`), not silently
       // degrade to [] — a caught failure that renders a plausible "0
       // rooms" state is worse than an uncaught one (CLAUDE.md §7.4).
-      const [profile, watchlist, roomsResult] = await Promise.all([
+      const [profile, watchlist, team, userRow, roomsResult] = await Promise.all([
         supabase
           .from("investor_profiles")
-          .select("thesis, sectors, stages")
+          .select("thesis_statement, sectors, stages, fund_name, geography")
           .eq("user_id", user!.id)
           .maybeSingle(),
         supabase
           .from("investor_watchlist")
           .select("id, status", { count: "exact" })
           .eq("investor_id", user!.id),
+        supabase
+          .from("startup_team_accounts")
+          .select("id", { count: "exact", head: true })
+          .eq("investor_profile_id", user!.id)
+          .eq("status", "active"),
+        supabase
+          .from("users")
+          .select("notification_prefs")
+          .eq("id", user!.id)
+          .maybeSingle(),
         callAction<{ rooms: any[] }>(roomListProgressInvestor, user!.id, {}),
       ]);
-      for (const r of [profile, watchlist]) {
+      for (const r of [profile, watchlist, team, userRow]) {
         if (r.error) console.error("[deal-flow] fetch failed:", r.error);
       }
 
@@ -61,13 +74,17 @@ export function useDealFlowProgress() {
           !r.investor_decision,
       ).length;
 
-      const thesisSet = !!profile.data?.thesis?.trim();
+      const thesisSet = !!profile.data?.thesis_statement?.trim();
+      const orgDetailsSet = !!profile.data?.fund_name?.trim() || !!profile.data?.geography?.trim();
       const portfolioCount = (watchlist.data ?? []).filter(
         (w) => w.status === "Invested",
       ).length;
 
       return {
         thesisSet,
+        orgDetailsSet,
+        teamMembersCount: team.count ?? 0,
+        notificationPrefsSet: userRow.data?.notification_prefs != null,
         watchlistCount: watchlist.count ?? 0,
         activeRooms,
         pendingDecisions,

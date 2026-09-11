@@ -9,3 +9,10 @@ test-results/
 
 # Local wrangler pages dev state.
 .wrangler/
+
+# Disposable design-reference clone (public site rebuild, 31 Aug 2026) —
+# pixel-exact source for the LENGDONPUBLIC-NEW port. Its own git repo,
+# not part of this codebase. Same treatment as lengdon-public-site/ and
+# DesignCopy-main-2/ per CLAUDE.md §12/§4a — delete once the rebuild is
+# confirmed matching, don't merge it in.
+lengdon-public-new/

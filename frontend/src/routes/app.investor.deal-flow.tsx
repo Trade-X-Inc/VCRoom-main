@@ -8,8 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow, format } from "date-fns";
 import type { AgentDealBrief } from "@/lib/deal-brief-fn";
-import { EmptyState } from "@/components/system";
-import { color, table as tableTokens } from "@/lib/design-tokens";
+import { LcsEmptyState, LcsButton } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/investor/deal-flow")({
   // R9 relocation: this URL's content moved — see nav-structure.ts.
@@ -342,25 +341,34 @@ export function DealFlowPage() {
 
       <div className="mt-5">
         {isLoading ? (
-          <EmptyState kind="loading" title="Loading" />
+          <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </div>
         ) : isError ? (
-          <EmptyState
-            kind="error"
+          <LcsEmptyState
             title="Something went wrong"
-            action={{ label: "Try again", onClick: () => window.location.reload() }}
+            text="Deal flow could not load."
+            action={
+              <LcsButton variant="secondary" onClick={() => window.location.reload()}>
+                Try again
+              </LcsButton>
+            }
           />
         ) : filtered.length === 0 ? (
-          <EmptyState kind={q ? "no-results" : "empty"} title={q ? "No matches" : "No deals"} />
+          <LcsEmptyState
+            title={q ? "No matches" : "No deals"}
+            text={q ? "No deals match your search." : "Deals you track appear here."}
+          />
         ) : viewMode === "table" ? (
-          <div style={{ overflowX: "auto", border: `1px solid ${color.border}` }}>
+          <div style={{ overflowX: "auto", border: `1px solid var(--lcs-line)` }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ borderBottom: `1px solid ${color.border}` }}>
-                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Company</th>
-                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Sector</th>
-                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Stage</th>
-                  <th style={{ padding: "0 16px", height: 36, textAlign: "right", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Target</th>
-                  <th style={{ padding: "0 16px", height: 36, textAlign: "right", fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Updated</th>
+                <tr style={{ borderBottom: `1px solid var(--lcs-line)` }}>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Company</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Sector</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "left", fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Stage</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "right", fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Target</th>
+                  <th style={{ padding: "0 16px", height: 36, textAlign: "right", fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Updated</th>
                   <th style={{ padding: "0 16px", height: 36 }} />
                 </tr>
               </thead>
@@ -369,14 +377,14 @@ export function DealFlowPage() {
                   <tr
                     key={room.id}
                     onClick={() => navigate({ to: "/app/deal-rooms/$id", params: { id: room.id } })}
-                    style={{ height: tableTokens.rowHeight, borderBottom: tableTokens.rowBorder, cursor: "pointer" }}
+                    style={{ height: 44, borderBottom: "1px solid var(--lcs-line)", cursor: "pointer" }}
                     className="hover:bg-accent/30 transition-colors"
                   >
-                    <td style={{ padding: "0 16px", fontSize: 13, fontWeight: 600, color: color.ink }}>{room.company}</td>
-                    <td style={{ padding: "0 16px", fontSize: 13, color: color.inkTertiary }}>{room.sector || "—"}</td>
-                    <td style={{ padding: "0 16px", fontSize: 13, color: color.inkTertiary }}>{room.stage || "—"}</td>
-                    <td style={{ padding: "0 16px", fontSize: 13, color: color.ink, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{room.fundingTarget || "—"}</td>
-                    <td style={{ padding: "0 16px", fontSize: 13, color: color.inkTertiary, textAlign: "right", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "0 16px", fontSize: 13, fontWeight: 600, color: "var(--lcs-ink)" }}>{room.company}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: "var(--lcs-ink-muted)" }}>{room.sector || "—"}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: "var(--lcs-ink-muted)" }}>{room.stage || "—"}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: "var(--lcs-ink)", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{room.fundingTarget || "—"}</td>
+                    <td style={{ padding: "0 16px", fontSize: 13, color: "var(--lcs-ink-muted)", textAlign: "right", whiteSpace: "nowrap" }}>
                       {room.updatedAt ? formatDistanceToNow(new Date(room.updatedAt), { addSuffix: true }) : "—"}
                     </td>
                     <td style={{ padding: "0 16px", textAlign: "right" }}>

@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { StickyNote, Plus, Pin, Trash2, Loader2, Sparkles } from "lucide-react";
+import { StickyNote, Plus, Pin, Trash2, Loader2, Sparkles, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { PageFrame, EmptyState } from "@/components/system";
+import { LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
 import { cn } from "@/lib/utils";
 
 // R9 (c) — Deal Rooms › Deal Prep Notes. Team-authored notes for tracking
@@ -189,27 +189,48 @@ export function PrepNotesBase({
   };
 
   return (
-    <PageFrame
-      breadcrumb={breadcrumb}
-      title="Deal Prep Notes"
-      description="Your own notes for tracking multiple deals — visible to your team, separate from any single deal room."
-      actions={
-        ownerId ? (
-          <button
-            onClick={newNote}
-            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-3 py-2 text-sm font-medium"
-          >
-            <Plus className="h-4 w-4" /> New note
-          </button>
-        ) : undefined
-      }
-    >
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        {breadcrumb.map((c, i) => (
+          <span key={i} className="flex items-center gap-1.5">
+            {i > 0 && <ChevronRight style={{ width: 12, height: 12 }} />}
+            <span>{c.label}</span>
+          </span>
+        ))}
+      </div>
+      <LcsPageHeader
+        title="Deal Prep Notes"
+        description="Your own notes for tracking multiple deals — visible to your team, separate from any single deal room."
+        action={
+          ownerId ? (
+            <button
+              onClick={newNote}
+              className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-3 py-2 text-sm font-medium"
+            >
+              <Plus className="h-4 w-4" /> New note
+            </button>
+          ) : undefined
+        }
+      />
       {isLoading ? (
-        <EmptyState kind="loading" title="Loading" />
+        <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
       ) : !ownerId ? (
-        <EmptyState kind="empty" title="Set up your profile first" />
+        <LcsEmptyState title="Set up your profile first" text="Add your company profile before writing prep notes." />
       ) : notes.length === 0 ? (
-        <EmptyState kind="empty" title="No notes yet" action={{ label: "New note", onClick: newNote }} />
+        <LcsEmptyState
+          title="No notes yet"
+          text="Notes you write appear here."
+          action={
+            <LcsButton variant="secondary" onClick={newNote}>
+              New note
+            </LcsButton>
+          }
+        />
       ) : (
         <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
           <div className="rounded-none border border-border/60 bg-card divide-y divide-border/60 overflow-hidden">
@@ -278,6 +299,6 @@ export function PrepNotesBase({
           </div>
         </div>
       )}
-    </PageFrame>
+    </div>
   );
 }

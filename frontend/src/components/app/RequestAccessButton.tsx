@@ -2,7 +2,6 @@ import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { color, font, radius, brand } from "@/lib/design-tokens";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { INVESTOR_PERMISSIONS } from "@/lib/roles";
 
@@ -49,7 +48,7 @@ export function RequestAccessButton({
 
   if (existingStatus === "pending") {
     return (
-      <span style={{ fontSize: 12, color: color.inkTertiary, whiteSpace: "nowrap" }}>Request pending</span>
+      <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)", whiteSpace: "nowrap" }}>Request pending</span>
     );
   }
   if (existingStatus === "approved" || existingStatus === "deal_room_created") {
@@ -62,7 +61,7 @@ export function RequestAccessButton({
     return (
       <span
         title={disabled ? disabledReason : "Your role does not include requesting access"}
-        style={{ fontSize: 12, color: color.inkTertiary, cursor: "not-allowed" }}
+        style={{ fontSize: 12, color: "var(--lcs-ink-muted)", cursor: "not-allowed" }}
       >
         Request access
       </span>
@@ -108,8 +107,8 @@ export function RequestAccessButton({
         style={{
           display: "inline-flex", alignItems: "center", gap: 4,
           height: 28, padding: "0 10px", fontSize: 12, fontWeight: 500,
-          background: color.white, color: brand.flat,
-          border: `1px solid ${color.border}`, borderRadius: radius.control,
+          background: "var(--lcs-white)", color: "var(--lcs-accent)",
+          border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)",
           cursor: "pointer", whiteSpace: "nowrap",
         }}
       >
@@ -122,27 +121,27 @@ export function RequestAccessButton({
           onClick={() => !sending && setOpen(false)}
         >
           <div
-            style={{ width: "100%", maxWidth: 420, background: color.white, border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 24 }}
+            style={{ width: "100%", maxWidth: 420, background: "var(--lcs-white)", border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 24 }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
               <div>
-                <div style={{ fontFamily: font.display, fontSize: 16, fontWeight: 700, color: color.ink }}>
+                <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 16, fontWeight: 700, color: "var(--lcs-ink)" }}>
                   Request access — {companyName}
                 </div>
-                <p style={{ marginTop: 6, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>
+                <p style={{ marginTop: 6, fontSize: 12, color: "var(--lcs-ink-muted)", lineHeight: 1.5 }}>
                   The founder reviews every request. If approved, a deal room opens for both of you.
                 </p>
               </div>
               <button
                 onClick={() => !sending && setOpen(false)}
-                style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer", padding: 4, flexShrink: 0 }}
+                style={{ background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer", padding: 4, flexShrink: 0 }}
               >
                 <X style={{ width: 16, height: 16 }} />
               </button>
             </div>
 
-            <label style={{ display: "block", marginTop: 16, fontSize: 11, fontWeight: 500, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+            <label style={{ display: "block", marginTop: 16, fontSize: 11, fontWeight: 500, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               Message (optional)
             </label>
             <textarea
@@ -152,19 +151,19 @@ export function RequestAccessButton({
               maxLength={200}
               placeholder="Thesis fit, why now…"
               style={{
-                marginTop: 6, width: "100%", border: `1px solid ${color.border}`, borderRadius: radius.control,
-                padding: "8px 10px", fontSize: 13, fontFamily: font.body, resize: "none", outline: "none",
+                marginTop: 6, width: "100%", border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)",
+                padding: "8px 10px", fontSize: 13, fontFamily: "var(--font-lcs-ui)", resize: "none", outline: "none",
               }}
             />
-            <div style={{ marginTop: 4, textAlign: "right", fontSize: 11, color: color.inkTertiary }}>{message.length}/200</div>
+            <div style={{ marginTop: 4, textAlign: "right", fontSize: 11, color: "var(--lcs-ink-muted)" }}>{message.length}/200</div>
 
             <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
               <button
                 onClick={() => !sending && setOpen(false)}
                 disabled={sending}
                 style={{
-                  flex: 1, height: 36, background: color.white, color: color.ink,
-                  border: `1px solid ${color.border}`, borderRadius: radius.control, fontSize: 13, fontWeight: 500, cursor: "pointer",
+                  flex: 1, height: 36, background: "var(--lcs-white)", color: "var(--lcs-ink)",
+                  border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", fontSize: 13, fontWeight: 500, cursor: "pointer",
                 }}
               >
                 Cancel
@@ -173,8 +172,8 @@ export function RequestAccessButton({
                 onClick={handleSend}
                 disabled={sending}
                 style={{
-                  flex: 1, height: 36, background: brand.flat, color: "#fff",
-                  border: "none", borderRadius: radius.control, fontSize: 13, fontWeight: 500,
+                  flex: 1, height: 36, background: "var(--lcs-accent)", color: "#fff",
+                  border: "none", borderRadius: "var(--radius-lcs-control)", fontSize: 13, fontWeight: 500,
                   cursor: sending ? "not-allowed" : "pointer", opacity: sending ? 0.7 : 1,
                   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
                 }}

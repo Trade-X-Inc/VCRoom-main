@@ -6,13 +6,13 @@ import { LazyChart } from "@/components/shared/LazyChart";
 import {
   ChevronDown, ChevronUp, X, CheckCircle2, ArrowRight, ArrowUpRight,
   MessageSquareWarning, Clock3,
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
-import { PageFrame, EmptyState } from "@/components/system";
-import { color, font, radius, space } from "@/lib/design-tokens";
+import { LcsPageHeader, LcsEmptyState } from "@/components/lcs";
 import { stageRank, STAGE_KEY_TO_PATH, type DealRoomStageKey } from "@/lib/deal-room-stages";
 
 export const Route = createFileRoute("/app/overview")({
@@ -54,24 +54,24 @@ function StatCard({
   empty?: string;
 }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary }}>{label}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 12, color: "var(--lcs-ink-muted)" }}>{label}</div>
       {empty ? (
-        <div style={{ marginTop: 10, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>{empty}</div>
+        <div style={{ marginTop: 10, fontSize: 12, color: "var(--lcs-ink-muted)", lineHeight: 1.5 }}>{empty}</div>
       ) : (
         <>
           <div style={{ marginTop: 6, display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontFamily: font.display, fontSize: 26, fontWeight: 700, color: color.ink, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+            <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 26, fontWeight: 700, color: "var(--lcs-ink)", fontVariantNumeric: "tabular-nums" }}>{value}</span>
             {trend && (
               <span style={{
                 fontSize: 12, display: "inline-flex", alignItems: "center", gap: 2,
-                color: trend.direction === "up" ? "#059669" : trend.direction === "down" ? "#DC2626" : color.inkTertiary,
+                color: trend.direction === "up" ? "#059669" : trend.direction === "down" ? "#DC2626" : "var(--lcs-ink-muted)",
               }}>
                 {trend.direction === "up" ? "↑" : trend.direction === "down" ? "↓" : "→"} {trend.label}
               </span>
             )}
           </div>
-          {sub && <div style={{ marginTop: 2, fontSize: 12, color: color.inkTertiary }}>{sub}</div>}
+          {sub && <div style={{ marginTop: 2, fontSize: 12, color: "var(--lcs-ink-muted)" }}>{sub}</div>}
         </>
       )}
     </div>
@@ -105,16 +105,16 @@ function OnboardingChecklist({
   const pct = Math.round((completed / steps.length) * 100);
 
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: collapsed ? "none" : `1px solid ${color.border}` }}>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: collapsed ? "none" : `1px solid var(--lcs-line)` }}>
         <button onClick={() => setCollapsed((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 8, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>
-          {collapsed ? <ChevronDown style={{ width: 14, height: 14, color: color.inkTertiary }} /> : <ChevronUp style={{ width: 14, height: 14, color: color.inkTertiary }} />}
-          <span style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Get started</span>
-          <span style={{ fontSize: 12, color: color.inkTertiary }}>{completed} of {steps.length} complete</span>
+          {collapsed ? <ChevronDown style={{ width: 14, height: 14, color: "var(--lcs-ink-muted)" }} /> : <ChevronUp style={{ width: 14, height: 14, color: "var(--lcs-ink-muted)" }} />}
+          <span style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Get started</span>
+          <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>{completed} of {steps.length} complete</span>
         </button>
         <button
           onClick={() => markStep("checklist_dismissed", true)}
-          style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}
+          style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: "var(--radius-lcs-control)", background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer" }}
           title="Skip"
         >
           <X style={{ width: 14, height: 14 }} />
@@ -122,7 +122,7 @@ function OnboardingChecklist({
       </div>
       {!collapsed && (
         <div style={{ padding: 20 }}>
-          <div style={{ height: 4, background: color.canvas, borderRadius: 2, overflow: "hidden", marginBottom: 16 }}>
+          <div style={{ height: 4, background: "var(--lcs-surface)", borderRadius: 2, overflow: "hidden", marginBottom: 16 }}>
             <div style={{ height: 4, width: `${pct}%`, background: "#7C3AED" }} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
@@ -132,14 +132,14 @@ function OnboardingChecklist({
                 to={s.href as any}
                 style={{
                   display: "flex", alignItems: "flex-start", gap: 8, padding: "10px 12px",
-                  border: `1px solid ${color.border}`, textDecoration: "none",
+                  border: `1px solid var(--lcs-line)`, textDecoration: "none",
                   opacity: s.done ? 0.6 : 1,
                 }}
               >
                 {s.done
                   ? <CheckCircle2 style={{ width: 14, height: 14, color: "#059669", marginTop: 1, flexShrink: 0 }} />
-                  : <div style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid ${color.border}`, marginTop: 1, flexShrink: 0 }} />}
-                <span style={{ fontSize: 12, color: s.done ? color.inkTertiary : color.ink, textDecoration: s.done ? "line-through" : "none" }}>{s.label}</span>
+                  : <div style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid var(--lcs-line)`, marginTop: 1, flexShrink: 0 }} />}
+                <span style={{ fontSize: 12, color: s.done ? "var(--lcs-ink-muted)" : "var(--lcs-ink)", textDecoration: s.done ? "line-through" : "none" }}>{s.label}</span>
               </Link>
             ))}
           </div>
@@ -161,12 +161,12 @@ interface AttentionRow {
 
 function NeedsAttentionTable({ rows }: { rows: AttentionRow[] }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-      <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-        <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Needs your attention</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+      <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+        <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Needs your attention</div>
       </div>
       {rows.length === 0 ? (
-        <EmptyState kind="empty" title="Nothing needs attention right now" />
+        <LcsEmptyState title="Nothing needs attention right now" text="Items needing your attention appear here." />
       ) : (
         <div>
           {rows.map((r) => {
@@ -177,15 +177,15 @@ function NeedsAttentionTable({ rows }: { rows: AttentionRow[] }) {
                 to={r.href as any}
                 style={{
                   display: "flex", alignItems: "center", gap: 12, padding: "0 20px",
-                  height: 44, borderBottom: `1px solid ${color.border}`, textDecoration: "none",
+                  height: 44, borderBottom: `1px solid var(--lcs-line)`, textDecoration: "none",
                 }}
               >
                 <Icon style={{ width: 14, height: 14, color: "#DC2626", flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 8 }}>
-                  <span style={{ fontSize: 13, color: color.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</span>
-                  <span style={{ fontSize: 12, color: color.inkTertiary, whiteSpace: "nowrap" }}>{r.sub}</span>
+                  <span style={{ fontSize: 13, color: "var(--lcs-ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</span>
+                  <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)", whiteSpace: "nowrap" }}>{r.sub}</span>
                 </div>
-                <ArrowRight style={{ width: 12, height: 12, color: color.inkTertiary, flexShrink: 0 }} />
+                <ArrowRight style={{ width: 12, height: 12, color: "var(--lcs-ink-muted)", flexShrink: 0 }} />
               </Link>
             );
           })}
@@ -199,10 +199,10 @@ function NeedsAttentionTable({ rows }: { rows: AttentionRow[] }) {
 
 function ChartCard({ title, children, empty }: { title: string; children?: React.ReactNode; empty?: string }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, padding: 20 }}>
-      <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink, marginBottom: 16 }}>{title}</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", padding: 20 }}>
+      <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)", marginBottom: 16 }}>{title}</div>
       {empty ? (
-        <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: color.inkTertiary, textAlign: "center", padding: "0 24px" }}>
+        <div style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "var(--lcs-ink-muted)", textAlign: "center", padding: "0 24px" }}>
           {empty}
         </div>
       ) : (
@@ -216,18 +216,18 @@ function ChartCard({ title, children, empty }: { title: string; children?: React
 
 function ActivityRail({ items }: { items: { id: string; label: string; sub: string; time: string }[] }) {
   return (
-    <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, background: color.white, overflow: "hidden" }}>
-      <div style={{ padding: "14px 20px", borderBottom: `1px solid ${color.border}` }}>
-        <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>Recent activity</div>
+    <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, background: "var(--lcs-white)", overflow: "hidden" }}>
+      <div style={{ padding: "14px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+        <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>Recent activity</div>
       </div>
       {items.length === 0 ? (
-        <EmptyState kind="empty" title="No activity yet" />
+        <LcsEmptyState title="No activity yet" text="Activity on your raise appears here." />
       ) : (
         <div>
           {items.map((a) => (
-            <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid ${color.border}` }}>
-              <div style={{ fontSize: 13, color: color.ink }}>{a.label}</div>
-              <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{a.sub} · {a.time}</div>
+            <div key={a.id} style={{ padding: "12px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+              <div style={{ fontSize: 13, color: "var(--lcs-ink)" }}>{a.label}</div>
+              <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 2 }}>{a.sub} · {a.time}</div>
             </div>
           ))}
         </div>
@@ -443,24 +443,30 @@ function Overview() {
   });
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Overview" }]}
-      title="Overview"
-      description="Your raise at a glance — activity and what needs attention."
-      actions={
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Overview</span>
+      </div>
+      <LcsPageHeader
+        title="Overview"
+        description="Your raise at a glance — activity and what needs attention."
+        action={
         <Link
           to="/app/deal-rooms"
           style={{
             display: "inline-flex", alignItems: "center", gap: 6, height: 36,
-            background: "#7C3AED", color: "#fff", border: "none", borderRadius: radius.control,
-            padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: font.body, textDecoration: "none",
+            background: "#7C3AED", color: "#fff", border: "none", borderRadius: "var(--radius-lcs-control)",
+            padding: "0 16px", fontSize: 13, fontWeight: 500, fontFamily: "var(--font-lcs-ui)", textDecoration: "none",
           }}
         >
           Deal rooms <ArrowUpRight style={{ width: 14, height: 14 }} />
         </Link>
-      }
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: space.block }}>
+        }
+      />
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
         {startupId && (
           <OnboardingChecklist startup={startup} docs={docs} dealRooms={dealRooms} investorMembers={investorMembers} />
@@ -497,10 +503,10 @@ function Overview() {
             <LazyChart render={(R) => (
             <R.ResponsiveContainer width="100%" height="100%">
               <R.AreaChart data={viewsSeries} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <R.CartesianGrid stroke={color.border} vertical={false} />
-                <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-                <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+                <R.CartesianGrid stroke={"var(--lcs-line)"} vertical={false} />
+                <R.XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={{ stroke: "var(--lcs-line)" }} tickLine={false} />
+                <R.YAxis tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid var(--lcs-line)`, borderRadius: 0 }} />
                 <R.Area type="monotone" dataKey="views" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.08} strokeWidth={2} />
               </R.AreaChart>
             </R.ResponsiveContainer>
@@ -510,10 +516,10 @@ function Overview() {
             <LazyChart render={(R) => (
             <R.ResponsiveContainer width="100%" height="100%">
               <R.BarChart data={engagementByRoom} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <R.CartesianGrid stroke={color.border} vertical={false} />
-                <R.XAxis dataKey="name" tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={{ stroke: color.border }} tickLine={false} />
-                <R.YAxis tick={{ fontSize: 11, fill: color.inkTertiary }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid ${color.border}`, borderRadius: 0 }} />
+                <R.CartesianGrid stroke={"var(--lcs-line)"} vertical={false} />
+                <R.XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={{ stroke: "var(--lcs-line)" }} tickLine={false} />
+                <R.YAxis tick={{ fontSize: 11, fill: "var(--lcs-ink-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <R.Tooltip contentStyle={{ fontSize: 12, border: `1px solid var(--lcs-line)`, borderRadius: 0 }} />
                 <R.Bar dataKey="views" fill="#7C3AED" />
               </R.BarChart>
             </R.ResponsiveContainer>
@@ -524,6 +530,6 @@ function Overview() {
         {/* Right rail: activity feed (full width below graphs on this layout) */}
         <ActivityRail items={activityItems} />
       </div>
-    </PageFrame>
+    </div>
   );
 }

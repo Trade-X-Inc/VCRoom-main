@@ -49,7 +49,7 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
         <DocTable
           head={["Stage", "Purpose", "Docs"]}
           rows={[
-            ["Overview", "Company summary, metrics, NDA status, deal brief", <A href="/docs/deal-rooms/overview">Overview</A>],
+            ["Overview", "Company summary, metrics, NDA status", <A href="/docs/deal-rooms/overview">Overview</A>],
             ["Information Vault", "The document repository, NDA-gated", <A href="/docs/deal-rooms/information-vault">Vault</A>],
             ["Q&A", "Structured questions, 10 per room", <A href="/docs/deal-rooms/qa">Q&A</A>],
             ["Due Diligence", "Shared DD workstation", <A href="/docs/deal-rooms/due-diligence">DD</A>],
@@ -62,8 +62,9 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
         <Rules
           items={[
             <><strong>Activity timeline</strong> — every material event (uploads, views, signatures, stage changes, notes) in one chronological feed.</>,
-            <><strong>Notes</strong> — with three visibility levels: private to you, shared with your team, or visible to the whole room.</>,
+            <><strong>Notes</strong> — private to you, or shared with the whole room.</>,
             <><strong>Participants</strong> — invite by email or link; team members join with the role and assignment their account carries.</>,
+            <><strong>Interviews</strong> — schedule stage-linked meetings, video or in-person, alongside the Information Vault stage.</>,
             <><strong>Ask AI</strong> — a room-scoped AI assistant that answers against this room's context.</>,
           ]}
         />
@@ -146,7 +147,7 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
       slug: "deal-rooms/overview",
       title: "Overview panel",
       description:
-        "The deal room's landing view: company summary, traction metrics, NDA status, deal brief, and recent activity.",
+        "The deal room's landing view: company summary, traction metrics, NDA status, and recent activity.",
       updated: UPDATED,
       toc: [
         { id: "overview", label: "What it shows" },
@@ -165,9 +166,8 @@ export const DEAL_ROOM_PAGES: Record<string, DocPage> = {
         <DocTable
           head={["Section", "Contents"]}
           rows={[
-            ["Company header", "Name, stage, sector, days open, workflow stage, match score"],
+            ["Company header", "Name, stage, sector, days open, workflow stage"],
             ["Traction metrics", "Revenue, burn rate, runway, team size — from the founder's profile"],
-            ["Deal brief", "AI-generated brief, cached per room; generate on demand"],
             ["NDA & confidentiality", "Signature status for both parties, with signer names and dates"],
             ["Team", "Participants on each side"],
             ["Recent activity", "The latest events from the room's timeline"],

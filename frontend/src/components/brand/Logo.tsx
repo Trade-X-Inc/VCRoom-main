@@ -1,11 +1,13 @@
-// Icon: the reference-line monogram (PUBLIC-REGISTER.md §10 item 1,
-// resolved 17 Aug 2026; mark refreshed 25 Aug 2026 with a founder-provided
-// asset, rendered from /Lengdon-Favicon.png — same geometry, no vector
-// source available so the raster PNG is now the single source of truth
-// for the mark, used here and for the generated favicon set). Wordmark:
-// Archivo Bold, tight tracking, ledger navy — Direction A paired with
-// Direction B, since a wordmark alone has no icon-sized form. Both
-// directions, one mark.
+// Icon: the reference-line monogram, refreshed 9 Sep 2026 with new
+// professionally-designed assets (full logo + icon-only mark + OG image,
+// all sourced from public/). Rendered from /lengdon-logo-icon.png — a
+// transparent-background PNG, correct for this use (composited over
+// whatever surface the shell renders behind it); the opaque-background
+// counterpart used for the browser-tab favicon set is a separate file
+// (public/favicon.ico + favicon-*.png, generated from the designer's
+// Favicon.png). No vector source available, so the raster PNG remains
+// the single source of truth for the mark. Wordmark: Archivo Bold,
+// tight tracking, ledger navy.
 export function Logo({
   withWordmark = true,
   size = "default",
@@ -18,7 +20,7 @@ export function Logo({
   return (
     <div className="flex items-center gap-2">
       <img
-        src="/Lengdon-Favicon.png"
+        src="/lengdon-logo-icon.png"
         alt="Lengdon"
         width={dim}
         height={dim}

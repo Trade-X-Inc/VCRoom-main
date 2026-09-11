@@ -35,8 +35,8 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           items={[
             <>All traffic is encrypted in transit with TLS; data is encrypted at rest with AES-256.</>,
             <>
-              Row Level Security is enabled on all 107 database tables — every query is scoped to
-              the requesting user. Verified against the production database on 8 July 2026.
+              Row Level Security is enabled on all 137 database tables — every query is scoped to
+              the requesting user. Verified against the production database on 8 September 2026.
             </>,
             <>
               No deal document is visible to a counterparty before a mutual NDA is signed inside the
@@ -69,7 +69,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
 
         <H2 id="access-control">Access control</H2>
         <P>
-          Authorization is enforced in the database, not just the application. Every one of the 107
+          Authorization is enforced in the database, not just the application. Every one of the 137
           tables in the production schema has PostgreSQL Row Level Security enabled, which means a
           query can only return rows the authenticated user is entitled to see — even if
           application code has a bug, the database refuses to serve another user's data. Details and
@@ -96,8 +96,8 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           Text extraction from uploaded files (PDF, DOCX, PPTX, XLSX, CSV) happens client-side, in
           your browser. Nothing is sent to an AI provider as a side effect of uploading. Document
           content is transmitted to a third-party AI model only when you take an explicit action
-          that requires it — generating a summary, a deal brief, or running verification
-          classification. The full policy is on <A href="/docs/ai/data-handling">AI data handling</A>.
+          that requires it — generating a summary, an investment memo, or requesting a document
+          review. The full policy is on <A href="/docs/ai/data-handling">AI data handling</A>.
         </P>
 
         <H2 id="infrastructure">Infrastructure</H2>
@@ -187,8 +187,8 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           attestation — the SOC 2 Type II compliance referenced in these docs belongs to Supabase,
           our infrastructure provider. Uploaded documents are encrypted at rest but not end-to-end
           encrypted: the platform can technically read stored files, which is what allows AI
-          summaries and verification to work. If your threat model requires zero platform access to
-          file contents, do not upload those files.
+          summaries and document review to work. If your threat model requires zero platform access
+          to file contents, do not upload those files.
         </P>
       </>
     ),
@@ -275,7 +275,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
       updated: UPDATED,
       toc: [
         { id: "what", label: "What RLS gives you" },
-        { id: "coverage", label: "Coverage: 107 of 107" },
+        { id: "coverage", label: "Coverage: 137 of 137" },
         { id: "patterns", label: "Policy patterns" },
         { id: "verification", label: "How we verify it" },
       ],
@@ -298,12 +298,13 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
           skipped by client code.
         </P>
 
-        <H2 id="coverage">Coverage: 107 of 107</H2>
+        <H2 id="coverage">Coverage: 137 of 137</H2>
         <P>
-          As of 8 July 2026, the production database contains 107 tables in the public schema, and
-          all 107 have RLS enabled — zero exceptions. Coverage is verified automatically against the
-          live database on every deploy, not inferred from migration files, so a new table cannot go
-          live unprotected without the check catching it.
+          As of 8 September 2026, the production database contains 137 tables in the public schema,
+          and all 137 have RLS enabled — zero exceptions. This count grows as the product does; what
+          stays constant is that RLS coverage is verified automatically against the live database on
+          every deploy, not inferred from migration files, so a new table cannot go live unprotected
+          without the check catching it.
         </P>
 
         <H2 id="patterns">Policy patterns</H2>
@@ -323,7 +324,7 @@ export const SECURITY_PAGES: Record<string, DocPage> = {
               updates are validated with the same rigor as reads.
             </>,
             <>
-              <strong>Public pages</strong> (published profiles, verification reports) read through
+              <strong>Public pages</strong> (published founder and investor profiles) read through
               policies that require an explicit published flag — unpublished data is invisible even
               to a direct API call.
             </>,

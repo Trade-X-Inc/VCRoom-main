@@ -9,81 +9,72 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VirtualDataRoomRouteImport } from './routes/virtual-data-room'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SubProcessorsRouteImport } from './routes/sub-processors'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as SchedulesRouteImport } from './routes/schedules'
 import { Route as RegistryRouteImport } from './routes/registry'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as LegalRouteImport } from './routes/legal'
+import { Route as LcsPreviewRouteImport } from './routes/lcs-preview'
 import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as InviteRouteImport } from './routes/invite'
-import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as ForInvestorsRouteImport } from './routes/for-investors'
-import { Route as ForFoundersRouteImport } from './routes/for-founders'
 import { Route as FeedbackRouteImport } from './routes/feedback'
-import { Route as DueDiligenceChecklistRouteImport } from './routes/due-diligence-checklist'
-import { Route as DpaRouteImport } from './routes/dpa'
+import { Route as DocsV2RouteImport } from './routes/docs-v2'
 import { Route as DocsRouteImport } from './routes/docs'
-import { Route as DealManagementSoftwareRouteImport } from './routes/deal-management-software'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CareersRouteImport } from './routes/careers'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AppRouteImport } from './routes/app'
-import { Route as AcceptableUseRouteImport } from './routes/acceptable-use'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ToolsIndexRouteImport } from './routes/tools/index'
+import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
+import { Route as LegalIndexRouteImport } from './routes/legal.index'
 import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
-import { Route as DocsIndexRouteImport } from './routes/docs.index'
-import { Route as CompareIndexRouteImport } from './routes/compare.index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as DocsV2IndexRouteImport } from './routes/docs-v2.index'
+import { Route as DealsPreviewIndexRouteImport } from './routes/deals-preview.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as ToolsValuationRouteImport } from './routes/tools/valuation'
-import { Route as ToolsSafeNoteRouteImport } from './routes/tools/safe-note'
-import { Route as ToolsRunwayRouteImport } from './routes/tools/runway'
-import { Route as ToolsDilutionRouteImport } from './routes/tools/dilution'
-import { Route as ToolsCogsRouteImport } from './routes/tools/cogs'
-import { Route as ToolsCapTableRouteImport } from './routes/tools/cap-table'
-import { Route as ToolsBurnRateRouteImport } from './routes/tools/burn-rate'
-import { Route as SolutionsVentureCapitalRouteImport } from './routes/solutions.venture-capital'
-import { Route as SolutionsSyndicatesRouteImport } from './routes/solutions.syndicates'
-import { Route as SolutionsSpvsRouteImport } from './routes/solutions.spvs'
-import { Route as SolutionsPrivateEquityRouteImport } from './routes/solutions.private-equity'
-import { Route as SolutionsLimitedPartnersRouteImport } from './routes/solutions.limited-partners'
-import { Route as SolutionsFamilyOfficesRouteImport } from './routes/solutions.family-offices'
-import { Route as SolutionsAngelsRouteImport } from './routes/solutions.angels'
-import { Route as SolutionsAdvisorsRouteImport } from './routes/solutions.advisors'
-import { Route as SectorsPropertyRouteImport } from './routes/sectors.property'
-import { Route as SectorsManufacturingRouteImport } from './routes/sectors.manufacturing'
-import { Route as SectorsHealthcareRouteImport } from './routes/sectors.healthcare'
-import { Route as SectorsEnergyRouteImport } from './routes/sectors.energy'
-import { Route as SectorsBrandsRetailRouteImport } from './routes/sectors.brands-retail'
+import { Route as ToolsValuationCalculatorRouteImport } from './routes/tools.valuation-calculator'
+import { Route as ToolsSafeNoteRouteImport } from './routes/tools.safe-note'
+import { Route as ToolsRunwayRouteImport } from './routes/tools.runway'
+import { Route as ToolsDilutionRouteImport } from './routes/tools.dilution'
+import { Route as ToolsCogsRouteImport } from './routes/tools.cogs'
+import { Route as ToolsCapTableRouteImport } from './routes/tools.cap-table'
+import { Route as ToolsBurnRateRouteImport } from './routes/tools.burn-rate'
 import { Route as RoastIdRouteImport } from './routes/roast.$id'
-import { Route as ResourcesScheduleRouteImport } from './routes/resources.schedule'
+import { Route as ResourcesChangelogRouteImport } from './routes/resources.changelog'
+import { Route as ProductSecurityRouteImport } from './routes/product.security'
+import { Route as ProductPricingRouteImport } from './routes/product.pricing'
+import { Route as ProductHowItWorksRouteImport } from './routes/product.how-it-works'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
+import { Route as LegalSubProcessorsRouteImport } from './routes/legal.sub-processors'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as LegalDpaRouteImport } from './routes/legal.dpa'
+import { Route as LegalAcceptableUseRouteImport } from './routes/legal.acceptable-use'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
-import { Route as GlossaryTermRouteImport } from './routes/glossary.$term'
-import { Route as DocsSplatRouteImport } from './routes/docs.$'
+import { Route as ForVentureCapitalRouteImport } from './routes/for.venture-capital'
+import { Route as ForSyndicatesRouteImport } from './routes/for.syndicates'
+import { Route as ForSpvsRouteImport } from './routes/for.spvs'
+import { Route as ForPrivateEquityRouteImport } from './routes/for.private-equity'
+import { Route as ForLimitedPartnersRouteImport } from './routes/for.limited-partners'
+import { Route as ForInvestorsRouteImport } from './routes/for.investors'
+import { Route as ForFoundersRouteImport } from './routes/for.founders'
+import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
+import { Route as ForAngelsRouteImport } from './routes/for.angels'
+import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
+import { Route as DocsV2SplatRouteImport } from './routes/docs-v2.$'
+import { Route as DealsPreviewVaultRouteImport } from './routes/deals-preview.vault'
+import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
+import { Route as DealsPreviewRequestsRouteImport } from './routes/deals-preview.requests'
+import { Route as DealsPreviewProfileRouteImport } from './routes/deals-preview.profile'
+import { Route as DealsPreviewAnalyticsRouteImport } from './routes/deals-preview.analytics'
 import { Route as CvSlugRouteImport } from './routes/cv.$slug'
-import { Route as CompareIdealsRouteImport } from './routes/compare.ideals'
-import { Route as CompareFirmexRouteImport } from './routes/compare.firmex'
-import { Route as CompareDocsendRouteImport } from './routes/compare.docsend'
-import { Route as CompareDealroomRouteImport } from './routes/compare.dealroom'
-import { Route as CompareDatasiteRouteImport } from './routes/compare.datasite'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as CompanyContactRouteImport } from './routes/company.contact'
+import { Route as CompanyCareersRouteImport } from './routes/company.careers'
+import { Route as CompanyAboutRouteImport } from './routes/company.about'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppUsersRouteImport } from './routes/app.users'
 import { Route as AppTeamChatRouteImport } from './routes/app.team-chat'
+import { Route as AppSupportRouteImport } from './routes/app.support'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
@@ -93,7 +84,6 @@ import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMemberProfileRouteImport } from './routes/app.member-profile'
 import { Route as AppInvestorRouteImport } from './routes/app.investor'
 import { Route as AppHomeRouteImport } from './routes/app.home'
-import { Route as AppFeedbackRouteImport } from './routes/app.feedback'
 import { Route as AppDocumentsRouteImport } from './routes/app.documents'
 import { Route as AppConnectionsRouteImport } from './routes/app.connections'
 import { Route as AppCloseRouteImport } from './routes/app.close'
@@ -106,16 +96,31 @@ import { Route as ApiEmailtestRouteImport } from './routes/api.emailtest'
 import { Route as ApiEmailTestRouteImport } from './routes/api.email-test'
 import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
 import { Route as ApiAdminRouteImport } from './routes/api.admin'
+import { Route as ResourcesBlogIndexRouteImport } from './routes/resources.blog.index'
+import { Route as ProductCompareIndexRouteImport } from './routes/product.compare.index'
+import { Route as DealsPreviewSectorIndexRouteImport } from './routes/deals-preview.$sector.index'
 import { Route as AppRoastIndexRouteImport } from './routes/app.roast.index'
 import { Route as AppPrepareIndexRouteImport } from './routes/app.prepare.index'
 import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
 import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
 import { Route as AppGoLiveIndexRouteImport } from './routes/app.go-live.index'
 import { Route as AppDealRoomsIndexRouteImport } from './routes/app.deal-rooms.index'
+import { Route as AppAdvisorPreviewIndexRouteImport } from './routes/app.advisor-preview.index'
+import { Route as ResourcesBlogSlugRouteImport } from './routes/resources.blog.$slug'
+import { Route as ProductCompareIdealsRouteImport } from './routes/product.compare.ideals'
+import { Route as ProductCompareFirmexRouteImport } from './routes/product.compare.firmex'
+import { Route as ProductCompareDocsendRouteImport } from './routes/product.compare.docsend'
+import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
+import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
 import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
+import { Route as DealsPreviewProfileThesisRouteImport } from './routes/deals-preview.profile_.thesis'
+import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-preview.profile_.team'
+import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
+import { Route as DealsPreviewProfileAchievementsRouteImport } from './routes/deals-preview.profile_.achievements'
+import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
+import { Route as AppSupportFeedbackRouteImport } from './routes/app.support_.feedback'
 import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
-import { Route as AppSettingsDomainRouteImport } from './routes/app.settings.domain'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppSettingsActivityRouteImport } from './routes/app.settings.activity'
 import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
@@ -139,11 +144,14 @@ import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-
 import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
 import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
 import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
+import { Route as AppAdvisorPreviewRecordRouteImport } from './routes/app.advisor-preview.record'
+import { Route as AppAdvisorPreviewCompanyRouteImport } from './routes/app.advisor-preview.company'
 import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
 import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
 import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
 import { Route as AppInvestorDiscoverIndexRouteImport } from './routes/app.investor.discover.index'
 import { Route as AppInvestorDealRoomsIndexRouteImport } from './routes/app.investor.deal-rooms.index'
+import { Route as DealsPreviewSectorInstrumentDealIdRouteImport } from './routes/deals-preview.$sector_.$instrument.$dealId'
 import { Route as AppRoastIdLiveRouteImport } from './routes/app.roast.$id.live'
 import { Route as AppRoastIdAnswersRouteImport } from './routes/app.roast.$id.answers'
 import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/app.prepare.profile-builder.team-cards'
@@ -188,21 +196,6 @@ import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } fr
 import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
 
-const VirtualDataRoomRoute = VirtualDataRoomRouteImport.update({
-  id: '/virtual-data-room',
-  path: '/virtual-data-room',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SubProcessorsRoute = SubProcessorsRouteImport.update({
-  id: '/sub-processors',
-  path: '/sub-processors',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
@@ -218,29 +211,14 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SchedulesRoute = SchedulesRouteImport.update({
-  id: '/schedules',
-  path: '/schedules',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RegistryRoute = RegistryRouteImport.update({
   id: '/registry',
   path: '/registry',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalRoute = LegalRouteImport.update({
-  id: '/legal',
-  path: '/legal',
+const LcsPreviewRoute = LcsPreviewRouteImport.update({
+  id: '/lcs-preview',
+  path: '/lcs-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoomRoute = JoinRoomRouteImport.update({
@@ -258,24 +236,9 @@ const InviteRoute = InviteRouteImport.update({
   path: '/invite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HowItWorksRoute = HowItWorksRouteImport.update({
-  id: '/how-it-works',
-  path: '/how-it-works',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForInvestorsRoute = ForInvestorsRouteImport.update({
-  id: '/for-investors',
-  path: '/for-investors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForFoundersRoute = ForFoundersRouteImport.update({
-  id: '/for-founders',
-  path: '/for-founders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedbackRoute = FeedbackRouteImport.update({
@@ -283,14 +246,9 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DueDiligenceChecklistRoute = DueDiligenceChecklistRouteImport.update({
-  id: '/due-diligence-checklist',
-  path: '/due-diligence-checklist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DpaRoute = DpaRouteImport.update({
-  id: '/dpa',
-  path: '/dpa',
+const DocsV2Route = DocsV2RouteImport.update({
+  id: '/docs-v2',
+  path: '/docs-v2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsRoute = DocsRouteImport.update({
@@ -298,39 +256,9 @@ const DocsRoute = DocsRouteImport.update({
   path: '/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DealManagementSoftwareRoute = DealManagementSoftwareRouteImport.update({
-  id: '/deal-management-software',
-  path: '/deal-management-software',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AcceptableUseRoute = AcceptableUseRouteImport.update({
-  id: '/acceptable-use',
-  path: '/acceptable-use',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -353,36 +281,37 @@ const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
   path: '/resources/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalIndexRoute = LegalIndexRouteImport.update({
+  id: '/legal/',
+  path: '/legal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GlossaryIndexRoute = GlossaryIndexRouteImport.update({
   id: '/glossary/',
   path: '/glossary/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsIndexRoute = DocsIndexRouteImport.update({
+const DocsV2IndexRoute = DocsV2IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DocsRoute,
+  getParentRoute: () => DocsV2Route,
 } as any)
-const CompareIndexRoute = CompareIndexRouteImport.update({
-  id: '/compare/',
-  path: '/compare/',
+const DealsPreviewIndexRoute = DealsPreviewIndexRouteImport.update({
+  id: '/deals-preview/',
+  path: '/deals-preview/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => BlogRoute,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const ToolsValuationRoute = ToolsValuationRouteImport.update({
-  id: '/tools/valuation',
-  path: '/tools/valuation',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ToolsValuationCalculatorRoute =
+  ToolsValuationCalculatorRouteImport.update({
+    id: '/tools/valuation-calculator',
+    path: '/tools/valuation-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsSafeNoteRoute = ToolsSafeNoteRouteImport.update({
   id: '/tools/safe-note',
   path: '/tools/safe-note',
@@ -413,85 +342,59 @@ const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
   path: '/tools/burn-rate',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SolutionsVentureCapitalRoute = SolutionsVentureCapitalRouteImport.update({
-  id: '/solutions/venture-capital',
-  path: '/solutions/venture-capital',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsSyndicatesRoute = SolutionsSyndicatesRouteImport.update({
-  id: '/solutions/syndicates',
-  path: '/solutions/syndicates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsSpvsRoute = SolutionsSpvsRouteImport.update({
-  id: '/solutions/spvs',
-  path: '/solutions/spvs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsPrivateEquityRoute = SolutionsPrivateEquityRouteImport.update({
-  id: '/solutions/private-equity',
-  path: '/solutions/private-equity',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsLimitedPartnersRoute =
-  SolutionsLimitedPartnersRouteImport.update({
-    id: '/solutions/limited-partners',
-    path: '/solutions/limited-partners',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SolutionsFamilyOfficesRoute = SolutionsFamilyOfficesRouteImport.update({
-  id: '/solutions/family-offices',
-  path: '/solutions/family-offices',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsAngelsRoute = SolutionsAngelsRouteImport.update({
-  id: '/solutions/angels',
-  path: '/solutions/angels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SolutionsAdvisorsRoute = SolutionsAdvisorsRouteImport.update({
-  id: '/solutions/advisors',
-  path: '/solutions/advisors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SectorsPropertyRoute = SectorsPropertyRouteImport.update({
-  id: '/sectors/property',
-  path: '/sectors/property',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SectorsManufacturingRoute = SectorsManufacturingRouteImport.update({
-  id: '/sectors/manufacturing',
-  path: '/sectors/manufacturing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SectorsHealthcareRoute = SectorsHealthcareRouteImport.update({
-  id: '/sectors/healthcare',
-  path: '/sectors/healthcare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SectorsEnergyRoute = SectorsEnergyRouteImport.update({
-  id: '/sectors/energy',
-  path: '/sectors/energy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SectorsBrandsRetailRoute = SectorsBrandsRetailRouteImport.update({
-  id: '/sectors/brands-retail',
-  path: '/sectors/brands-retail',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RoastIdRoute = RoastIdRouteImport.update({
   id: '/roast/$id',
   path: '/roast/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResourcesScheduleRoute = ResourcesScheduleRouteImport.update({
-  id: '/resources/schedule',
-  path: '/resources/schedule',
+const ResourcesChangelogRoute = ResourcesChangelogRouteImport.update({
+  id: '/resources/changelog',
+  path: '/resources/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductSecurityRoute = ProductSecurityRouteImport.update({
+  id: '/product/security',
+  path: '/product/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductPricingRoute = ProductPricingRouteImport.update({
+  id: '/product/pricing',
+  path: '/product/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductHowItWorksRoute = ProductHowItWorksRouteImport.update({
+  id: '/product/how-it-works',
+  path: '/product/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PSlugRoute = PSlugRouteImport.update({
   id: '/p/$slug',
   path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalSubProcessorsRoute = LegalSubProcessorsRouteImport.update({
+  id: '/legal/sub-processors',
+  path: '/legal/sub-processors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDpaRoute = LegalDpaRouteImport.update({
+  id: '/legal/dpa',
+  path: '/legal/dpa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalAcceptableUseRoute = LegalAcceptableUseRouteImport.update({
+  id: '/legal/acceptable-use',
+  path: '/legal/acceptable-use',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinInvestorTokenRoute = JoinInvestorTokenRouteImport.update({
@@ -504,50 +407,105 @@ const ISlugRoute = ISlugRouteImport.update({
   path: '/i/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GlossaryTermRoute = GlossaryTermRouteImport.update({
-  id: '/glossary/$term',
-  path: '/glossary/$term',
+const ForVentureCapitalRoute = ForVentureCapitalRouteImport.update({
+  id: '/for/venture-capital',
+  path: '/for/venture-capital',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsSplatRoute = DocsSplatRouteImport.update({
+const ForSyndicatesRoute = ForSyndicatesRouteImport.update({
+  id: '/for/syndicates',
+  path: '/for/syndicates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForSpvsRoute = ForSpvsRouteImport.update({
+  id: '/for/spvs',
+  path: '/for/spvs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForPrivateEquityRoute = ForPrivateEquityRouteImport.update({
+  id: '/for/private-equity',
+  path: '/for/private-equity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForLimitedPartnersRoute = ForLimitedPartnersRouteImport.update({
+  id: '/for/limited-partners',
+  path: '/for/limited-partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForInvestorsRoute = ForInvestorsRouteImport.update({
+  id: '/for/investors',
+  path: '/for/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFoundersRoute = ForFoundersRouteImport.update({
+  id: '/for/founders',
+  path: '/for/founders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFamilyOfficesRoute = ForFamilyOfficesRouteImport.update({
+  id: '/for/family-offices',
+  path: '/for/family-offices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForAngelsRoute = ForAngelsRouteImport.update({
+  id: '/for/angels',
+  path: '/for/angels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
+  id: '/for/advisors',
+  path: '/for/advisors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsV2SplatRoute = DocsV2SplatRouteImport.update({
   id: '/$',
   path: '/$',
-  getParentRoute: () => DocsRoute,
+  getParentRoute: () => DocsV2Route,
+} as any)
+const DealsPreviewVaultRoute = DealsPreviewVaultRouteImport.update({
+  id: '/deals-preview/vault',
+  path: '/deals-preview/vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewTeamRoute = DealsPreviewTeamRouteImport.update({
+  id: '/deals-preview/team',
+  path: '/deals-preview/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewRequestsRoute = DealsPreviewRequestsRouteImport.update({
+  id: '/deals-preview/requests',
+  path: '/deals-preview/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileRoute = DealsPreviewProfileRouteImport.update({
+  id: '/deals-preview/profile',
+  path: '/deals-preview/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewAnalyticsRoute = DealsPreviewAnalyticsRouteImport.update({
+  id: '/deals-preview/analytics',
+  path: '/deals-preview/analytics',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CvSlugRoute = CvSlugRouteImport.update({
   id: '/cv/$slug',
   path: '/cv/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompareIdealsRoute = CompareIdealsRouteImport.update({
-  id: '/compare/ideals',
-  path: '/compare/ideals',
+const CompanyContactRoute = CompanyContactRouteImport.update({
+  id: '/company/contact',
+  path: '/company/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompareFirmexRoute = CompareFirmexRouteImport.update({
-  id: '/compare/firmex',
-  path: '/compare/firmex',
+const CompanyCareersRoute = CompanyCareersRouteImport.update({
+  id: '/company/careers',
+  path: '/company/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompareDocsendRoute = CompareDocsendRouteImport.update({
-  id: '/compare/docsend',
-  path: '/compare/docsend',
+const CompanyAboutRoute = CompanyAboutRouteImport.update({
+  id: '/company/about',
+  path: '/company/about',
   getParentRoute: () => rootRouteImport,
-} as any)
-const CompareDealroomRoute = CompareDealroomRouteImport.update({
-  id: '/compare/dealroom',
-  path: '/compare/dealroom',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompareDatasiteRoute = CompareDatasiteRouteImport.update({
-  id: '/compare/datasite',
-  path: '/compare/datasite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
@@ -562,6 +520,11 @@ const AppUsersRoute = AppUsersRouteImport.update({
 const AppTeamChatRoute = AppTeamChatRouteImport.update({
   id: '/team-chat',
   path: '/team-chat',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSupportRoute = AppSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -607,11 +570,6 @@ const AppInvestorRoute = AppInvestorRouteImport.update({
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppFeedbackRoute = AppFeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDocumentsRoute = AppDocumentsRouteImport.update({
@@ -674,6 +632,21 @@ const ApiAdminRoute = ApiAdminRouteImport.update({
   path: '/api/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResourcesBlogIndexRoute = ResourcesBlogIndexRouteImport.update({
+  id: '/resources/blog/',
+  path: '/resources/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareIndexRoute = ProductCompareIndexRouteImport.update({
+  id: '/product/compare/',
+  path: '/product/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewSectorIndexRoute = DealsPreviewSectorIndexRouteImport.update({
+  id: '/deals-preview/$sector/',
+  path: '/deals-preview/$sector/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoastIndexRoute = AppRoastIndexRouteImport.update({
   id: '/roast/',
   path: '/roast/',
@@ -704,10 +677,78 @@ const AppDealRoomsIndexRoute = AppDealRoomsIndexRouteImport.update({
   path: '/deal-rooms/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdvisorPreviewIndexRoute = AppAdvisorPreviewIndexRouteImport.update({
+  id: '/advisor-preview/',
+  path: '/advisor-preview/',
+  getParentRoute: () => AppRoute,
+} as any)
+const ResourcesBlogSlugRoute = ResourcesBlogSlugRouteImport.update({
+  id: '/resources/blog/$slug',
+  path: '/resources/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareIdealsRoute = ProductCompareIdealsRouteImport.update({
+  id: '/product/compare/ideals',
+  path: '/product/compare/ideals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareFirmexRoute = ProductCompareFirmexRouteImport.update({
+  id: '/product/compare/firmex',
+  path: '/product/compare/firmex',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareDocsendRoute = ProductCompareDocsendRouteImport.update({
+  id: '/product/compare/docsend',
+  path: '/product/compare/docsend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareDealroomRoute = ProductCompareDealroomRouteImport.update({
+  id: '/product/compare/dealroom',
+  path: '/product/compare/dealroom',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareDatasiteRoute = ProductCompareDatasiteRouteImport.update({
+  id: '/product/compare/datasite',
+  path: '/product/compare/datasite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
   id: '/team/$token',
   path: '/team/$token',
   getParentRoute: () => JoinRoute,
+} as any)
+const DealsPreviewProfileThesisRoute =
+  DealsPreviewProfileThesisRouteImport.update({
+    id: '/deals-preview/profile_/thesis',
+    path: '/deals-preview/profile/thesis',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DealsPreviewProfileTeamRoute = DealsPreviewProfileTeamRouteImport.update({
+  id: '/deals-preview/profile_/team',
+  path: '/deals-preview/profile/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileFullRoute = DealsPreviewProfileFullRouteImport.update({
+  id: '/deals-preview/profile_/full',
+  path: '/deals-preview/profile/full',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileAchievementsRoute =
+  DealsPreviewProfileAchievementsRouteImport.update({
+    id: '/deals-preview/profile_/achievements',
+    path: '/deals-preview/profile/achievements',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DealsPreviewSectorInstrumentRoute =
+  DealsPreviewSectorInstrumentRouteImport.update({
+    id: '/deals-preview/$sector/$instrument',
+    path: '/deals-preview/$sector/$instrument',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppSupportFeedbackRoute = AppSupportFeedbackRouteImport.update({
+  id: '/support_/feedback',
+  path: '/support/feedback',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
   id: '/security',
@@ -720,11 +761,6 @@ const AppSettingsNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AppSettingsRoute,
   } as any)
-const AppSettingsDomainRoute = AppSettingsDomainRouteImport.update({
-  id: '/domain',
-  path: '/domain',
-  getParentRoute: () => AppSettingsRoute,
-} as any)
 const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -844,6 +880,17 @@ const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
   path: '/deal-rooms/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdvisorPreviewRecordRoute = AppAdvisorPreviewRecordRouteImport.update({
+  id: '/advisor-preview/record',
+  path: '/advisor-preview/record',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdvisorPreviewCompanyRoute =
+  AppAdvisorPreviewCompanyRouteImport.update({
+    id: '/advisor-preview/company',
+    path: '/advisor-preview/company',
+    getParentRoute: () => AppRoute,
+  } as any)
 const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
   id: '/api/internal/email-test',
   path: '/api/internal/email-test',
@@ -870,6 +917,12 @@ const AppInvestorDealRoomsIndexRoute =
     id: '/deal-rooms/',
     path: '/deal-rooms/',
     getParentRoute: () => AppInvestorRoute,
+  } as any)
+const DealsPreviewSectorInstrumentDealIdRoute =
+  DealsPreviewSectorInstrumentDealIdRouteImport.update({
+    id: '/deals-preview/$sector_/$instrument/$dealId',
+    path: '/deals-preview/$sector/$instrument/$dealId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AppRoastIdLiveRoute = AppRoastIdLiveRouteImport.update({
   id: '/roast/$id/live',
@@ -1122,35 +1175,19 @@ const AppInvestorDiscoverPublicProfilePrivacySettingsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/acceptable-use': typeof AcceptableUseRoute
   '/app': typeof AppRouteWithChildren
-  '/blog': typeof BlogRouteWithChildren
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/deal-management-software': typeof DealManagementSoftwareRoute
-  '/docs': typeof DocsRouteWithChildren
-  '/dpa': typeof DpaRoute
-  '/due-diligence-checklist': typeof DueDiligenceChecklistRoute
+  '/docs': typeof DocsRoute
+  '/docs-v2': typeof DocsV2RouteWithChildren
   '/feedback': typeof FeedbackRoute
-  '/for-founders': typeof ForFoundersRoute
-  '/for-investors': typeof ForInvestorsRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
-  '/legal': typeof LegalRoute
-  '/pricing': typeof PricingRoute
-  '/privacy': typeof PrivacyRoute
+  '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
-  '/schedules': typeof SchedulesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
-  '/sub-processors': typeof SubProcessorsRoute
-  '/terms': typeof TermsRoute
-  '/virtual-data-room': typeof VirtualDataRoomRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1163,7 +1200,6 @@ export interface FileRoutesByFullPath {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/member-profile': typeof AppMemberProfileRoute
@@ -1173,53 +1209,62 @@ export interface FileRoutesByFullPath {
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
+  '/app/support': typeof AppSupportRoute
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/compare/datasite': typeof CompareDatasiteRoute
-  '/compare/dealroom': typeof CompareDealroomRoute
-  '/compare/docsend': typeof CompareDocsendRoute
-  '/compare/firmex': typeof CompareFirmexRoute
-  '/compare/ideals': typeof CompareIdealsRoute
+  '/company/about': typeof CompanyAboutRoute
+  '/company/careers': typeof CompanyCareersRoute
+  '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/glossary/$term': typeof GlossaryTermRoute
+  '/deals-preview/analytics': typeof DealsPreviewAnalyticsRoute
+  '/deals-preview/profile': typeof DealsPreviewProfileRoute
+  '/deals-preview/requests': typeof DealsPreviewRequestsRoute
+  '/deals-preview/team': typeof DealsPreviewTeamRoute
+  '/deals-preview/vault': typeof DealsPreviewVaultRoute
+  '/docs-v2/$': typeof DocsV2SplatRoute
+  '/for/advisors': typeof ForAdvisorsRoute
+  '/for/angels': typeof ForAngelsRoute
+  '/for/family-offices': typeof ForFamilyOfficesRoute
+  '/for/founders': typeof ForFoundersRoute
+  '/for/investors': typeof ForInvestorsRoute
+  '/for/limited-partners': typeof ForLimitedPartnersRoute
+  '/for/private-equity': typeof ForPrivateEquityRoute
+  '/for/spvs': typeof ForSpvsRoute
+  '/for/syndicates': typeof ForSyndicatesRoute
+  '/for/venture-capital': typeof ForVentureCapitalRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
+  '/legal/acceptable-use': typeof LegalAcceptableUseRoute
+  '/legal/dpa': typeof LegalDpaRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/sub-processors': typeof LegalSubProcessorsRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
-  '/resources/schedule': typeof ResourcesScheduleRoute
+  '/product/how-it-works': typeof ProductHowItWorksRoute
+  '/product/pricing': typeof ProductPricingRoute
+  '/product/security': typeof ProductSecurityRoute
+  '/resources/changelog': typeof ResourcesChangelogRoute
   '/roast/$id': typeof RoastIdRoute
-  '/sectors/brands-retail': typeof SectorsBrandsRetailRoute
-  '/sectors/energy': typeof SectorsEnergyRoute
-  '/sectors/healthcare': typeof SectorsHealthcareRoute
-  '/sectors/manufacturing': typeof SectorsManufacturingRoute
-  '/sectors/property': typeof SectorsPropertyRoute
-  '/solutions/advisors': typeof SolutionsAdvisorsRoute
-  '/solutions/angels': typeof SolutionsAngelsRoute
-  '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
-  '/solutions/limited-partners': typeof SolutionsLimitedPartnersRoute
-  '/solutions/private-equity': typeof SolutionsPrivateEquityRoute
-  '/solutions/spvs': typeof SolutionsSpvsRoute
-  '/solutions/syndicates': typeof SolutionsSyndicatesRoute
-  '/solutions/venture-capital': typeof SolutionsVentureCapitalRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
   '/tools/dilution': typeof ToolsDilutionRoute
   '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
-  '/tools/valuation': typeof ToolsValuationRoute
+  '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app/': typeof AppIndexRoute
-  '/blog/': typeof BlogIndexRoute
-  '/compare/': typeof CompareIndexRoute
-  '/docs/': typeof DocsIndexRoute
+  '/deals-preview/': typeof DealsPreviewIndexRoute
+  '/docs-v2/': typeof DocsV2IndexRoute
   '/glossary/': typeof GlossaryIndexRoute
+  '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/advisor-preview/company': typeof AppAdvisorPreviewCompanyRoute
+  '/app/advisor-preview/record': typeof AppAdvisorPreviewRecordRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
@@ -1243,16 +1288,31 @@ export interface FileRoutesByFullPath {
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
-  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/app/support/feedback': typeof AppSupportFeedbackRoute
+  '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
+  '/deals-preview/profile/achievements': typeof DealsPreviewProfileAchievementsRoute
+  '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
+  '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
+  '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
+  '/product/compare/datasite': typeof ProductCompareDatasiteRoute
+  '/product/compare/dealroom': typeof ProductCompareDealroomRoute
+  '/product/compare/docsend': typeof ProductCompareDocsendRoute
+  '/product/compare/firmex': typeof ProductCompareFirmexRoute
+  '/product/compare/ideals': typeof ProductCompareIdealsRoute
+  '/resources/blog/$slug': typeof ResourcesBlogSlugRoute
+  '/app/advisor-preview/': typeof AppAdvisorPreviewIndexRoute
   '/app/deal-rooms/': typeof AppDealRoomsIndexRoute
   '/app/go-live/': typeof AppGoLiveIndexRoute
   '/app/investor/': typeof AppInvestorIndexRoute
   '/app/member/': typeof AppMemberIndexRoute
   '/app/prepare/': typeof AppPrepareIndexRoute
   '/app/roast/': typeof AppRoastIndexRoute
+  '/deals-preview/$sector/': typeof DealsPreviewSectorIndexRoute
+  '/product/compare/': typeof ProductCompareIndexRoute
+  '/resources/blog/': typeof ResourcesBlogIndexRoute
   '/app/deal-rooms/$id/activity': typeof AppDealRoomsIdActivityRoute
   '/app/deal-rooms/$id/close': typeof AppDealRoomsIdCloseRoute
   '/app/deal-rooms/$id/diligence': typeof AppDealRoomsIdDiligenceRoute
@@ -1286,6 +1346,7 @@ export interface FileRoutesByFullPath {
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
+  '/deals-preview/$sector/$instrument/$dealId': typeof DealsPreviewSectorInstrumentDealIdRoute
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
@@ -1302,32 +1363,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/acceptable-use': typeof AcceptableUseRoute
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/deal-management-software': typeof DealManagementSoftwareRoute
-  '/dpa': typeof DpaRoute
-  '/due-diligence-checklist': typeof DueDiligenceChecklistRoute
+  '/docs': typeof DocsRoute
   '/feedback': typeof FeedbackRoute
-  '/for-founders': typeof ForFoundersRoute
-  '/for-investors': typeof ForInvestorsRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
-  '/legal': typeof LegalRoute
-  '/pricing': typeof PricingRoute
-  '/privacy': typeof PrivacyRoute
+  '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
-  '/schedules': typeof SchedulesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
-  '/sub-processors': typeof SubProcessorsRoute
-  '/terms': typeof TermsRoute
-  '/virtual-data-room': typeof VirtualDataRoomRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1340,7 +1386,6 @@ export interface FileRoutesByTo {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/member-profile': typeof AppMemberProfileRoute
   '/app/messages': typeof AppMessagesRoute
@@ -1349,53 +1394,62 @@ export interface FileRoutesByTo {
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
+  '/app/support': typeof AppSupportRoute
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/compare/datasite': typeof CompareDatasiteRoute
-  '/compare/dealroom': typeof CompareDealroomRoute
-  '/compare/docsend': typeof CompareDocsendRoute
-  '/compare/firmex': typeof CompareFirmexRoute
-  '/compare/ideals': typeof CompareIdealsRoute
+  '/company/about': typeof CompanyAboutRoute
+  '/company/careers': typeof CompanyCareersRoute
+  '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/glossary/$term': typeof GlossaryTermRoute
+  '/deals-preview/analytics': typeof DealsPreviewAnalyticsRoute
+  '/deals-preview/profile': typeof DealsPreviewProfileRoute
+  '/deals-preview/requests': typeof DealsPreviewRequestsRoute
+  '/deals-preview/team': typeof DealsPreviewTeamRoute
+  '/deals-preview/vault': typeof DealsPreviewVaultRoute
+  '/docs-v2/$': typeof DocsV2SplatRoute
+  '/for/advisors': typeof ForAdvisorsRoute
+  '/for/angels': typeof ForAngelsRoute
+  '/for/family-offices': typeof ForFamilyOfficesRoute
+  '/for/founders': typeof ForFoundersRoute
+  '/for/investors': typeof ForInvestorsRoute
+  '/for/limited-partners': typeof ForLimitedPartnersRoute
+  '/for/private-equity': typeof ForPrivateEquityRoute
+  '/for/spvs': typeof ForSpvsRoute
+  '/for/syndicates': typeof ForSyndicatesRoute
+  '/for/venture-capital': typeof ForVentureCapitalRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
+  '/legal/acceptable-use': typeof LegalAcceptableUseRoute
+  '/legal/dpa': typeof LegalDpaRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/sub-processors': typeof LegalSubProcessorsRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
-  '/resources/schedule': typeof ResourcesScheduleRoute
+  '/product/how-it-works': typeof ProductHowItWorksRoute
+  '/product/pricing': typeof ProductPricingRoute
+  '/product/security': typeof ProductSecurityRoute
+  '/resources/changelog': typeof ResourcesChangelogRoute
   '/roast/$id': typeof RoastIdRoute
-  '/sectors/brands-retail': typeof SectorsBrandsRetailRoute
-  '/sectors/energy': typeof SectorsEnergyRoute
-  '/sectors/healthcare': typeof SectorsHealthcareRoute
-  '/sectors/manufacturing': typeof SectorsManufacturingRoute
-  '/sectors/property': typeof SectorsPropertyRoute
-  '/solutions/advisors': typeof SolutionsAdvisorsRoute
-  '/solutions/angels': typeof SolutionsAngelsRoute
-  '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
-  '/solutions/limited-partners': typeof SolutionsLimitedPartnersRoute
-  '/solutions/private-equity': typeof SolutionsPrivateEquityRoute
-  '/solutions/spvs': typeof SolutionsSpvsRoute
-  '/solutions/syndicates': typeof SolutionsSyndicatesRoute
-  '/solutions/venture-capital': typeof SolutionsVentureCapitalRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
   '/tools/dilution': typeof ToolsDilutionRoute
   '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
-  '/tools/valuation': typeof ToolsValuationRoute
+  '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app': typeof AppIndexRoute
-  '/blog': typeof BlogIndexRoute
-  '/compare': typeof CompareIndexRoute
-  '/docs': typeof DocsIndexRoute
+  '/deals-preview': typeof DealsPreviewIndexRoute
+  '/docs-v2': typeof DocsV2IndexRoute
   '/glossary': typeof GlossaryIndexRoute
+  '/legal': typeof LegalIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/sectors': typeof SectorsIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/advisor-preview/company': typeof AppAdvisorPreviewCompanyRoute
+  '/app/advisor-preview/record': typeof AppAdvisorPreviewRecordRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
@@ -1419,16 +1473,31 @@ export interface FileRoutesByTo {
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
-  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/app/support/feedback': typeof AppSupportFeedbackRoute
+  '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
+  '/deals-preview/profile/achievements': typeof DealsPreviewProfileAchievementsRoute
+  '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
+  '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
+  '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
+  '/product/compare/datasite': typeof ProductCompareDatasiteRoute
+  '/product/compare/dealroom': typeof ProductCompareDealroomRoute
+  '/product/compare/docsend': typeof ProductCompareDocsendRoute
+  '/product/compare/firmex': typeof ProductCompareFirmexRoute
+  '/product/compare/ideals': typeof ProductCompareIdealsRoute
+  '/resources/blog/$slug': typeof ResourcesBlogSlugRoute
+  '/app/advisor-preview': typeof AppAdvisorPreviewIndexRoute
   '/app/deal-rooms': typeof AppDealRoomsIndexRoute
   '/app/go-live': typeof AppGoLiveIndexRoute
   '/app/investor': typeof AppInvestorIndexRoute
   '/app/member': typeof AppMemberIndexRoute
   '/app/prepare': typeof AppPrepareIndexRoute
   '/app/roast': typeof AppRoastIndexRoute
+  '/deals-preview/$sector': typeof DealsPreviewSectorIndexRoute
+  '/product/compare': typeof ProductCompareIndexRoute
+  '/resources/blog': typeof ResourcesBlogIndexRoute
   '/app/deal-rooms/$id/activity': typeof AppDealRoomsIdActivityRoute
   '/app/deal-rooms/$id/close': typeof AppDealRoomsIdCloseRoute
   '/app/deal-rooms/$id/diligence': typeof AppDealRoomsIdDiligenceRoute
@@ -1462,6 +1531,7 @@ export interface FileRoutesByTo {
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
+  '/deals-preview/$sector/$instrument/$dealId': typeof DealsPreviewSectorInstrumentDealIdRoute
   '/app/investor/deal-rooms': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis': typeof AppInvestorThesisIndexRoute
@@ -1479,35 +1549,19 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/acceptable-use': typeof AcceptableUseRoute
   '/app': typeof AppRouteWithChildren
-  '/blog': typeof BlogRouteWithChildren
-  '/careers': typeof CareersRoute
-  '/contact': typeof ContactRoute
-  '/deal-management-software': typeof DealManagementSoftwareRoute
-  '/docs': typeof DocsRouteWithChildren
-  '/dpa': typeof DpaRoute
-  '/due-diligence-checklist': typeof DueDiligenceChecklistRoute
+  '/docs': typeof DocsRoute
+  '/docs-v2': typeof DocsV2RouteWithChildren
   '/feedback': typeof FeedbackRoute
-  '/for-founders': typeof ForFoundersRoute
-  '/for-investors': typeof ForInvestorsRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/how-it-works': typeof HowItWorksRoute
   '/invite': typeof InviteRoute
   '/join': typeof JoinRouteWithChildren
   '/join-room': typeof JoinRoomRoute
-  '/legal': typeof LegalRoute
-  '/pricing': typeof PricingRoute
-  '/privacy': typeof PrivacyRoute
+  '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
-  '/schedules': typeof SchedulesRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
-  '/sub-processors': typeof SubProcessorsRoute
-  '/terms': typeof TermsRoute
-  '/virtual-data-room': typeof VirtualDataRoomRoute
   '/api/admin': typeof ApiAdminRoute
   '/api/admin-data': typeof ApiAdminDataRoute
   '/api/email-test': typeof ApiEmailTestRoute
@@ -1520,7 +1574,6 @@ export interface FileRoutesById {
   '/app/close': typeof AppCloseRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/documents': typeof AppDocumentsRoute
-  '/app/feedback': typeof AppFeedbackRoute
   '/app/home': typeof AppHomeRoute
   '/app/investor': typeof AppInvestorRouteWithChildren
   '/app/member-profile': typeof AppMemberProfileRoute
@@ -1530,53 +1583,62 @@ export interface FileRoutesById {
   '/app/profile': typeof AppProfileRoute
   '/app/profile-builder': typeof AppProfileBuilderRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
+  '/app/support': typeof AppSupportRoute
   '/app/team-chat': typeof AppTeamChatRoute
   '/app/users': typeof AppUsersRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/compare/datasite': typeof CompareDatasiteRoute
-  '/compare/dealroom': typeof CompareDealroomRoute
-  '/compare/docsend': typeof CompareDocsendRoute
-  '/compare/firmex': typeof CompareFirmexRoute
-  '/compare/ideals': typeof CompareIdealsRoute
+  '/company/about': typeof CompanyAboutRoute
+  '/company/careers': typeof CompanyCareersRoute
+  '/company/contact': typeof CompanyContactRoute
   '/cv/$slug': typeof CvSlugRoute
-  '/docs/$': typeof DocsSplatRoute
-  '/glossary/$term': typeof GlossaryTermRoute
+  '/deals-preview/analytics': typeof DealsPreviewAnalyticsRoute
+  '/deals-preview/profile': typeof DealsPreviewProfileRoute
+  '/deals-preview/requests': typeof DealsPreviewRequestsRoute
+  '/deals-preview/team': typeof DealsPreviewTeamRoute
+  '/deals-preview/vault': typeof DealsPreviewVaultRoute
+  '/docs-v2/$': typeof DocsV2SplatRoute
+  '/for/advisors': typeof ForAdvisorsRoute
+  '/for/angels': typeof ForAngelsRoute
+  '/for/family-offices': typeof ForFamilyOfficesRoute
+  '/for/founders': typeof ForFoundersRoute
+  '/for/investors': typeof ForInvestorsRoute
+  '/for/limited-partners': typeof ForLimitedPartnersRoute
+  '/for/private-equity': typeof ForPrivateEquityRoute
+  '/for/spvs': typeof ForSpvsRoute
+  '/for/syndicates': typeof ForSyndicatesRoute
+  '/for/venture-capital': typeof ForVentureCapitalRoute
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
+  '/legal/acceptable-use': typeof LegalAcceptableUseRoute
+  '/legal/dpa': typeof LegalDpaRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/sub-processors': typeof LegalSubProcessorsRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
-  '/resources/schedule': typeof ResourcesScheduleRoute
+  '/product/how-it-works': typeof ProductHowItWorksRoute
+  '/product/pricing': typeof ProductPricingRoute
+  '/product/security': typeof ProductSecurityRoute
+  '/resources/changelog': typeof ResourcesChangelogRoute
   '/roast/$id': typeof RoastIdRoute
-  '/sectors/brands-retail': typeof SectorsBrandsRetailRoute
-  '/sectors/energy': typeof SectorsEnergyRoute
-  '/sectors/healthcare': typeof SectorsHealthcareRoute
-  '/sectors/manufacturing': typeof SectorsManufacturingRoute
-  '/sectors/property': typeof SectorsPropertyRoute
-  '/solutions/advisors': typeof SolutionsAdvisorsRoute
-  '/solutions/angels': typeof SolutionsAngelsRoute
-  '/solutions/family-offices': typeof SolutionsFamilyOfficesRoute
-  '/solutions/limited-partners': typeof SolutionsLimitedPartnersRoute
-  '/solutions/private-equity': typeof SolutionsPrivateEquityRoute
-  '/solutions/spvs': typeof SolutionsSpvsRoute
-  '/solutions/syndicates': typeof SolutionsSyndicatesRoute
-  '/solutions/venture-capital': typeof SolutionsVentureCapitalRoute
   '/tools/burn-rate': typeof ToolsBurnRateRoute
   '/tools/cap-table': typeof ToolsCapTableRoute
   '/tools/cogs': typeof ToolsCogsRoute
   '/tools/dilution': typeof ToolsDilutionRoute
   '/tools/runway': typeof ToolsRunwayRoute
   '/tools/safe-note': typeof ToolsSafeNoteRoute
-  '/tools/valuation': typeof ToolsValuationRoute
+  '/tools/valuation-calculator': typeof ToolsValuationCalculatorRoute
   '/app/': typeof AppIndexRoute
-  '/blog/': typeof BlogIndexRoute
-  '/compare/': typeof CompareIndexRoute
-  '/docs/': typeof DocsIndexRoute
+  '/deals-preview/': typeof DealsPreviewIndexRoute
+  '/docs-v2/': typeof DocsV2IndexRoute
   '/glossary/': typeof GlossaryIndexRoute
+  '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
+  '/app/advisor-preview/company': typeof AppAdvisorPreviewCompanyRoute
+  '/app/advisor-preview/record': typeof AppAdvisorPreviewRecordRoute
   '/app/deal-rooms/$id': typeof AppDealRoomsIdRouteWithChildren
   '/app/deal-rooms/meetings-calendar': typeof AppDealRoomsMeetingsCalendarRoute
   '/app/deal-rooms/prep-notes': typeof AppDealRoomsPrepNotesRoute
@@ -1600,16 +1662,31 @@ export interface FileRoutesById {
   '/app/investor/team': typeof AppInvestorTeamRoute
   '/app/settings/activity': typeof AppSettingsActivityRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
-  '/app/settings/domain': typeof AppSettingsDomainRoute
   '/app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/app/settings/security': typeof AppSettingsSecurityRoute
+  '/app/support_/feedback': typeof AppSupportFeedbackRoute
+  '/deals-preview/$sector/$instrument': typeof DealsPreviewSectorInstrumentRoute
+  '/deals-preview/profile_/achievements': typeof DealsPreviewProfileAchievementsRoute
+  '/deals-preview/profile_/full': typeof DealsPreviewProfileFullRoute
+  '/deals-preview/profile_/team': typeof DealsPreviewProfileTeamRoute
+  '/deals-preview/profile_/thesis': typeof DealsPreviewProfileThesisRoute
   '/join/team/$token': typeof JoinTeamTokenRoute
+  '/product/compare/datasite': typeof ProductCompareDatasiteRoute
+  '/product/compare/dealroom': typeof ProductCompareDealroomRoute
+  '/product/compare/docsend': typeof ProductCompareDocsendRoute
+  '/product/compare/firmex': typeof ProductCompareFirmexRoute
+  '/product/compare/ideals': typeof ProductCompareIdealsRoute
+  '/resources/blog/$slug': typeof ResourcesBlogSlugRoute
+  '/app/advisor-preview/': typeof AppAdvisorPreviewIndexRoute
   '/app/deal-rooms/': typeof AppDealRoomsIndexRoute
   '/app/go-live/': typeof AppGoLiveIndexRoute
   '/app/investor/': typeof AppInvestorIndexRoute
   '/app/member/': typeof AppMemberIndexRoute
   '/app/prepare/': typeof AppPrepareIndexRoute
   '/app/roast/': typeof AppRoastIndexRoute
+  '/deals-preview/$sector/': typeof DealsPreviewSectorIndexRoute
+  '/product/compare/': typeof ProductCompareIndexRoute
+  '/resources/blog/': typeof ResourcesBlogIndexRoute
   '/app/deal-rooms/$id/activity': typeof AppDealRoomsIdActivityRoute
   '/app/deal-rooms/$id/close': typeof AppDealRoomsIdCloseRoute
   '/app/deal-rooms/$id/diligence': typeof AppDealRoomsIdDiligenceRoute
@@ -1643,6 +1720,7 @@ export interface FileRoutesById {
   '/app/prepare/profile-builder/team-cards': typeof AppPrepareProfileBuilderTeamCardsRoute
   '/app/roast/$id/answers': typeof AppRoastIdAnswersRoute
   '/app/roast/$id/live': typeof AppRoastIdLiveRoute
+  '/deals-preview/$sector_/$instrument/$dealId': typeof DealsPreviewSectorInstrumentDealIdRoute
   '/app/investor/deal-rooms/': typeof AppInvestorDealRoomsIndexRoute
   '/app/investor/discover/': typeof AppInvestorDiscoverIndexRoute
   '/app/investor/thesis/': typeof AppInvestorThesisIndexRoute
@@ -1661,35 +1739,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
-    | '/acceptable-use'
     | '/app'
-    | '/blog'
-    | '/careers'
-    | '/contact'
-    | '/deal-management-software'
     | '/docs'
-    | '/dpa'
-    | '/due-diligence-checklist'
+    | '/docs-v2'
     | '/feedback'
-    | '/for-founders'
-    | '/for-investors'
     | '/forgot-password'
-    | '/how-it-works'
     | '/invite'
     | '/join'
     | '/join-room'
-    | '/legal'
-    | '/pricing'
-    | '/privacy'
+    | '/lcs-preview'
     | '/registry'
-    | '/schedules'
     | '/sign-in'
     | '/sign-up'
     | '/status'
-    | '/sub-processors'
-    | '/terms'
-    | '/virtual-data-room'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1702,7 +1764,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/documents'
-    | '/app/feedback'
     | '/app/home'
     | '/app/investor'
     | '/app/member-profile'
@@ -1712,53 +1773,62 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/settings'
+    | '/app/support'
     | '/app/team-chat'
     | '/app/users'
     | '/auth/callback'
-    | '/blog/$slug'
-    | '/compare/datasite'
-    | '/compare/dealroom'
-    | '/compare/docsend'
-    | '/compare/firmex'
-    | '/compare/ideals'
+    | '/company/about'
+    | '/company/careers'
+    | '/company/contact'
     | '/cv/$slug'
-    | '/docs/$'
-    | '/glossary/$term'
+    | '/deals-preview/analytics'
+    | '/deals-preview/profile'
+    | '/deals-preview/requests'
+    | '/deals-preview/team'
+    | '/deals-preview/vault'
+    | '/docs-v2/$'
+    | '/for/advisors'
+    | '/for/angels'
+    | '/for/family-offices'
+    | '/for/founders'
+    | '/for/investors'
+    | '/for/limited-partners'
+    | '/for/private-equity'
+    | '/for/spvs'
+    | '/for/syndicates'
+    | '/for/venture-capital'
     | '/i/$slug'
     | '/join-investor/$token'
+    | '/legal/acceptable-use'
+    | '/legal/dpa'
+    | '/legal/privacy'
+    | '/legal/sub-processors'
+    | '/legal/terms'
     | '/p/$slug'
-    | '/resources/schedule'
+    | '/product/how-it-works'
+    | '/product/pricing'
+    | '/product/security'
+    | '/resources/changelog'
     | '/roast/$id'
-    | '/sectors/brands-retail'
-    | '/sectors/energy'
-    | '/sectors/healthcare'
-    | '/sectors/manufacturing'
-    | '/sectors/property'
-    | '/solutions/advisors'
-    | '/solutions/angels'
-    | '/solutions/family-offices'
-    | '/solutions/limited-partners'
-    | '/solutions/private-equity'
-    | '/solutions/spvs'
-    | '/solutions/syndicates'
-    | '/solutions/venture-capital'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
     | '/tools/dilution'
     | '/tools/runway'
     | '/tools/safe-note'
-    | '/tools/valuation'
+    | '/tools/valuation-calculator'
     | '/app/'
-    | '/blog/'
-    | '/compare/'
-    | '/docs/'
+    | '/deals-preview/'
+    | '/docs-v2/'
     | '/glossary/'
+    | '/legal/'
     | '/resources/'
     | '/sectors/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/advisor-preview/company'
+    | '/app/advisor-preview/record'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
@@ -1782,16 +1852,31 @@ export interface FileRouteTypes {
     | '/app/investor/team'
     | '/app/settings/activity'
     | '/app/settings/billing'
-    | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/app/support/feedback'
+    | '/deals-preview/$sector/$instrument'
+    | '/deals-preview/profile/achievements'
+    | '/deals-preview/profile/full'
+    | '/deals-preview/profile/team'
+    | '/deals-preview/profile/thesis'
     | '/join/team/$token'
+    | '/product/compare/datasite'
+    | '/product/compare/dealroom'
+    | '/product/compare/docsend'
+    | '/product/compare/firmex'
+    | '/product/compare/ideals'
+    | '/resources/blog/$slug'
+    | '/app/advisor-preview/'
     | '/app/deal-rooms/'
     | '/app/go-live/'
     | '/app/investor/'
     | '/app/member/'
     | '/app/prepare/'
     | '/app/roast/'
+    | '/deals-preview/$sector/'
+    | '/product/compare/'
+    | '/resources/blog/'
     | '/app/deal-rooms/$id/activity'
     | '/app/deal-rooms/$id/close'
     | '/app/deal-rooms/$id/diligence'
@@ -1825,6 +1910,7 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/team-cards'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
+    | '/deals-preview/$sector/$instrument/$dealId'
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
@@ -1841,32 +1927,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
-    | '/acceptable-use'
-    | '/careers'
-    | '/contact'
-    | '/deal-management-software'
-    | '/dpa'
-    | '/due-diligence-checklist'
+    | '/docs'
     | '/feedback'
-    | '/for-founders'
-    | '/for-investors'
     | '/forgot-password'
-    | '/how-it-works'
     | '/invite'
     | '/join'
     | '/join-room'
-    | '/legal'
-    | '/pricing'
-    | '/privacy'
+    | '/lcs-preview'
     | '/registry'
-    | '/schedules'
     | '/sign-in'
     | '/sign-up'
     | '/status'
-    | '/sub-processors'
-    | '/terms'
-    | '/virtual-data-room'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -1879,7 +1950,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/documents'
-    | '/app/feedback'
     | '/app/home'
     | '/app/member-profile'
     | '/app/messages'
@@ -1888,53 +1958,62 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/settings'
+    | '/app/support'
     | '/app/team-chat'
     | '/app/users'
     | '/auth/callback'
-    | '/blog/$slug'
-    | '/compare/datasite'
-    | '/compare/dealroom'
-    | '/compare/docsend'
-    | '/compare/firmex'
-    | '/compare/ideals'
+    | '/company/about'
+    | '/company/careers'
+    | '/company/contact'
     | '/cv/$slug'
-    | '/docs/$'
-    | '/glossary/$term'
+    | '/deals-preview/analytics'
+    | '/deals-preview/profile'
+    | '/deals-preview/requests'
+    | '/deals-preview/team'
+    | '/deals-preview/vault'
+    | '/docs-v2/$'
+    | '/for/advisors'
+    | '/for/angels'
+    | '/for/family-offices'
+    | '/for/founders'
+    | '/for/investors'
+    | '/for/limited-partners'
+    | '/for/private-equity'
+    | '/for/spvs'
+    | '/for/syndicates'
+    | '/for/venture-capital'
     | '/i/$slug'
     | '/join-investor/$token'
+    | '/legal/acceptable-use'
+    | '/legal/dpa'
+    | '/legal/privacy'
+    | '/legal/sub-processors'
+    | '/legal/terms'
     | '/p/$slug'
-    | '/resources/schedule'
+    | '/product/how-it-works'
+    | '/product/pricing'
+    | '/product/security'
+    | '/resources/changelog'
     | '/roast/$id'
-    | '/sectors/brands-retail'
-    | '/sectors/energy'
-    | '/sectors/healthcare'
-    | '/sectors/manufacturing'
-    | '/sectors/property'
-    | '/solutions/advisors'
-    | '/solutions/angels'
-    | '/solutions/family-offices'
-    | '/solutions/limited-partners'
-    | '/solutions/private-equity'
-    | '/solutions/spvs'
-    | '/solutions/syndicates'
-    | '/solutions/venture-capital'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
     | '/tools/dilution'
     | '/tools/runway'
     | '/tools/safe-note'
-    | '/tools/valuation'
+    | '/tools/valuation-calculator'
     | '/app'
-    | '/blog'
-    | '/compare'
-    | '/docs'
+    | '/deals-preview'
+    | '/docs-v2'
     | '/glossary'
+    | '/legal'
     | '/resources'
     | '/sectors'
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/advisor-preview/company'
+    | '/app/advisor-preview/record'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
@@ -1958,16 +2037,31 @@ export interface FileRouteTypes {
     | '/app/investor/team'
     | '/app/settings/activity'
     | '/app/settings/billing'
-    | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/app/support/feedback'
+    | '/deals-preview/$sector/$instrument'
+    | '/deals-preview/profile/achievements'
+    | '/deals-preview/profile/full'
+    | '/deals-preview/profile/team'
+    | '/deals-preview/profile/thesis'
     | '/join/team/$token'
+    | '/product/compare/datasite'
+    | '/product/compare/dealroom'
+    | '/product/compare/docsend'
+    | '/product/compare/firmex'
+    | '/product/compare/ideals'
+    | '/resources/blog/$slug'
+    | '/app/advisor-preview'
     | '/app/deal-rooms'
     | '/app/go-live'
     | '/app/investor'
     | '/app/member'
     | '/app/prepare'
     | '/app/roast'
+    | '/deals-preview/$sector'
+    | '/product/compare'
+    | '/resources/blog'
     | '/app/deal-rooms/$id/activity'
     | '/app/deal-rooms/$id/close'
     | '/app/deal-rooms/$id/diligence'
@@ -2001,6 +2095,7 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/team-cards'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
+    | '/deals-preview/$sector/$instrument/$dealId'
     | '/app/investor/deal-rooms'
     | '/app/investor/discover'
     | '/app/investor/thesis'
@@ -2017,35 +2112,19 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/about'
-    | '/acceptable-use'
     | '/app'
-    | '/blog'
-    | '/careers'
-    | '/contact'
-    | '/deal-management-software'
     | '/docs'
-    | '/dpa'
-    | '/due-diligence-checklist'
+    | '/docs-v2'
     | '/feedback'
-    | '/for-founders'
-    | '/for-investors'
     | '/forgot-password'
-    | '/how-it-works'
     | '/invite'
     | '/join'
     | '/join-room'
-    | '/legal'
-    | '/pricing'
-    | '/privacy'
+    | '/lcs-preview'
     | '/registry'
-    | '/schedules'
     | '/sign-in'
     | '/sign-up'
     | '/status'
-    | '/sub-processors'
-    | '/terms'
-    | '/virtual-data-room'
     | '/api/admin'
     | '/api/admin-data'
     | '/api/email-test'
@@ -2058,7 +2137,6 @@ export interface FileRouteTypes {
     | '/app/close'
     | '/app/connections'
     | '/app/documents'
-    | '/app/feedback'
     | '/app/home'
     | '/app/investor'
     | '/app/member-profile'
@@ -2068,53 +2146,62 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/profile-builder'
     | '/app/settings'
+    | '/app/support'
     | '/app/team-chat'
     | '/app/users'
     | '/auth/callback'
-    | '/blog/$slug'
-    | '/compare/datasite'
-    | '/compare/dealroom'
-    | '/compare/docsend'
-    | '/compare/firmex'
-    | '/compare/ideals'
+    | '/company/about'
+    | '/company/careers'
+    | '/company/contact'
     | '/cv/$slug'
-    | '/docs/$'
-    | '/glossary/$term'
+    | '/deals-preview/analytics'
+    | '/deals-preview/profile'
+    | '/deals-preview/requests'
+    | '/deals-preview/team'
+    | '/deals-preview/vault'
+    | '/docs-v2/$'
+    | '/for/advisors'
+    | '/for/angels'
+    | '/for/family-offices'
+    | '/for/founders'
+    | '/for/investors'
+    | '/for/limited-partners'
+    | '/for/private-equity'
+    | '/for/spvs'
+    | '/for/syndicates'
+    | '/for/venture-capital'
     | '/i/$slug'
     | '/join-investor/$token'
+    | '/legal/acceptable-use'
+    | '/legal/dpa'
+    | '/legal/privacy'
+    | '/legal/sub-processors'
+    | '/legal/terms'
     | '/p/$slug'
-    | '/resources/schedule'
+    | '/product/how-it-works'
+    | '/product/pricing'
+    | '/product/security'
+    | '/resources/changelog'
     | '/roast/$id'
-    | '/sectors/brands-retail'
-    | '/sectors/energy'
-    | '/sectors/healthcare'
-    | '/sectors/manufacturing'
-    | '/sectors/property'
-    | '/solutions/advisors'
-    | '/solutions/angels'
-    | '/solutions/family-offices'
-    | '/solutions/limited-partners'
-    | '/solutions/private-equity'
-    | '/solutions/spvs'
-    | '/solutions/syndicates'
-    | '/solutions/venture-capital'
     | '/tools/burn-rate'
     | '/tools/cap-table'
     | '/tools/cogs'
     | '/tools/dilution'
     | '/tools/runway'
     | '/tools/safe-note'
-    | '/tools/valuation'
+    | '/tools/valuation-calculator'
     | '/app/'
-    | '/blog/'
-    | '/compare/'
-    | '/docs/'
+    | '/deals-preview/'
+    | '/docs-v2/'
     | '/glossary/'
+    | '/legal/'
     | '/resources/'
     | '/sectors/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
+    | '/app/advisor-preview/company'
+    | '/app/advisor-preview/record'
     | '/app/deal-rooms/$id'
     | '/app/deal-rooms/meetings-calendar'
     | '/app/deal-rooms/prep-notes'
@@ -2138,16 +2225,31 @@ export interface FileRouteTypes {
     | '/app/investor/team'
     | '/app/settings/activity'
     | '/app/settings/billing'
-    | '/app/settings/domain'
     | '/app/settings/notifications'
     | '/app/settings/security'
+    | '/app/support_/feedback'
+    | '/deals-preview/$sector/$instrument'
+    | '/deals-preview/profile_/achievements'
+    | '/deals-preview/profile_/full'
+    | '/deals-preview/profile_/team'
+    | '/deals-preview/profile_/thesis'
     | '/join/team/$token'
+    | '/product/compare/datasite'
+    | '/product/compare/dealroom'
+    | '/product/compare/docsend'
+    | '/product/compare/firmex'
+    | '/product/compare/ideals'
+    | '/resources/blog/$slug'
+    | '/app/advisor-preview/'
     | '/app/deal-rooms/'
     | '/app/go-live/'
     | '/app/investor/'
     | '/app/member/'
     | '/app/prepare/'
     | '/app/roast/'
+    | '/deals-preview/$sector/'
+    | '/product/compare/'
+    | '/resources/blog/'
     | '/app/deal-rooms/$id/activity'
     | '/app/deal-rooms/$id/close'
     | '/app/deal-rooms/$id/diligence'
@@ -2181,6 +2283,7 @@ export interface FileRouteTypes {
     | '/app/prepare/profile-builder/team-cards'
     | '/app/roast/$id/answers'
     | '/app/roast/$id/live'
+    | '/deals-preview/$sector_/$instrument/$dealId'
     | '/app/investor/deal-rooms/'
     | '/app/investor/discover/'
     | '/app/investor/thesis/'
@@ -2198,35 +2301,19 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  AcceptableUseRoute: typeof AcceptableUseRoute
   AppRoute: typeof AppRouteWithChildren
-  BlogRoute: typeof BlogRouteWithChildren
-  CareersRoute: typeof CareersRoute
-  ContactRoute: typeof ContactRoute
-  DealManagementSoftwareRoute: typeof DealManagementSoftwareRoute
-  DocsRoute: typeof DocsRouteWithChildren
-  DpaRoute: typeof DpaRoute
-  DueDiligenceChecklistRoute: typeof DueDiligenceChecklistRoute
+  DocsRoute: typeof DocsRoute
+  DocsV2Route: typeof DocsV2RouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
-  ForFoundersRoute: typeof ForFoundersRoute
-  ForInvestorsRoute: typeof ForInvestorsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
-  HowItWorksRoute: typeof HowItWorksRoute
   InviteRoute: typeof InviteRoute
   JoinRoute: typeof JoinRouteWithChildren
   JoinRoomRoute: typeof JoinRoomRoute
-  LegalRoute: typeof LegalRoute
-  PricingRoute: typeof PricingRoute
-  PrivacyRoute: typeof PrivacyRoute
+  LcsPreviewRoute: typeof LcsPreviewRoute
   RegistryRoute: typeof RegistryRoute
-  SchedulesRoute: typeof SchedulesRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   StatusRoute: typeof StatusRoute
-  SubProcessorsRoute: typeof SubProcessorsRoute
-  TermsRoute: typeof TermsRoute
-  VirtualDataRoomRoute: typeof VirtualDataRoomRoute
   ApiAdminRoute: typeof ApiAdminRoute
   ApiAdminDataRoute: typeof ApiAdminDataRoute
   ApiEmailTestRoute: typeof ApiEmailTestRoute
@@ -2235,70 +2322,72 @@ export interface RootRouteChildren {
   ApiHubspotSyncRoute: typeof ApiHubspotSyncRoute
   ApiTestAiRoute: typeof ApiTestAiRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
-  CompareDatasiteRoute: typeof CompareDatasiteRoute
-  CompareDealroomRoute: typeof CompareDealroomRoute
-  CompareDocsendRoute: typeof CompareDocsendRoute
-  CompareFirmexRoute: typeof CompareFirmexRoute
-  CompareIdealsRoute: typeof CompareIdealsRoute
+  CompanyAboutRoute: typeof CompanyAboutRoute
+  CompanyCareersRoute: typeof CompanyCareersRoute
+  CompanyContactRoute: typeof CompanyContactRoute
   CvSlugRoute: typeof CvSlugRoute
-  GlossaryTermRoute: typeof GlossaryTermRoute
+  DealsPreviewAnalyticsRoute: typeof DealsPreviewAnalyticsRoute
+  DealsPreviewProfileRoute: typeof DealsPreviewProfileRoute
+  DealsPreviewRequestsRoute: typeof DealsPreviewRequestsRoute
+  DealsPreviewTeamRoute: typeof DealsPreviewTeamRoute
+  DealsPreviewVaultRoute: typeof DealsPreviewVaultRoute
+  ForAdvisorsRoute: typeof ForAdvisorsRoute
+  ForAngelsRoute: typeof ForAngelsRoute
+  ForFamilyOfficesRoute: typeof ForFamilyOfficesRoute
+  ForFoundersRoute: typeof ForFoundersRoute
+  ForInvestorsRoute: typeof ForInvestorsRoute
+  ForLimitedPartnersRoute: typeof ForLimitedPartnersRoute
+  ForPrivateEquityRoute: typeof ForPrivateEquityRoute
+  ForSpvsRoute: typeof ForSpvsRoute
+  ForSyndicatesRoute: typeof ForSyndicatesRoute
+  ForVentureCapitalRoute: typeof ForVentureCapitalRoute
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
+  LegalAcceptableUseRoute: typeof LegalAcceptableUseRoute
+  LegalDpaRoute: typeof LegalDpaRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalSubProcessorsRoute: typeof LegalSubProcessorsRoute
+  LegalTermsRoute: typeof LegalTermsRoute
   PSlugRoute: typeof PSlugRoute
-  ResourcesScheduleRoute: typeof ResourcesScheduleRoute
+  ProductHowItWorksRoute: typeof ProductHowItWorksRoute
+  ProductPricingRoute: typeof ProductPricingRoute
+  ProductSecurityRoute: typeof ProductSecurityRoute
+  ResourcesChangelogRoute: typeof ResourcesChangelogRoute
   RoastIdRoute: typeof RoastIdRoute
-  SectorsBrandsRetailRoute: typeof SectorsBrandsRetailRoute
-  SectorsEnergyRoute: typeof SectorsEnergyRoute
-  SectorsHealthcareRoute: typeof SectorsHealthcareRoute
-  SectorsManufacturingRoute: typeof SectorsManufacturingRoute
-  SectorsPropertyRoute: typeof SectorsPropertyRoute
-  SolutionsAdvisorsRoute: typeof SolutionsAdvisorsRoute
-  SolutionsAngelsRoute: typeof SolutionsAngelsRoute
-  SolutionsFamilyOfficesRoute: typeof SolutionsFamilyOfficesRoute
-  SolutionsLimitedPartnersRoute: typeof SolutionsLimitedPartnersRoute
-  SolutionsPrivateEquityRoute: typeof SolutionsPrivateEquityRoute
-  SolutionsSpvsRoute: typeof SolutionsSpvsRoute
-  SolutionsSyndicatesRoute: typeof SolutionsSyndicatesRoute
-  SolutionsVentureCapitalRoute: typeof SolutionsVentureCapitalRoute
   ToolsBurnRateRoute: typeof ToolsBurnRateRoute
   ToolsCapTableRoute: typeof ToolsCapTableRoute
   ToolsCogsRoute: typeof ToolsCogsRoute
   ToolsDilutionRoute: typeof ToolsDilutionRoute
   ToolsRunwayRoute: typeof ToolsRunwayRoute
   ToolsSafeNoteRoute: typeof ToolsSafeNoteRoute
-  ToolsValuationRoute: typeof ToolsValuationRoute
-  CompareIndexRoute: typeof CompareIndexRoute
+  ToolsValuationCalculatorRoute: typeof ToolsValuationCalculatorRoute
+  DealsPreviewIndexRoute: typeof DealsPreviewIndexRoute
   GlossaryIndexRoute: typeof GlossaryIndexRoute
+  LegalIndexRoute: typeof LegalIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   SectorsIndexRoute: typeof SectorsIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
+  DealsPreviewSectorInstrumentRoute: typeof DealsPreviewSectorInstrumentRoute
+  DealsPreviewProfileAchievementsRoute: typeof DealsPreviewProfileAchievementsRoute
+  DealsPreviewProfileFullRoute: typeof DealsPreviewProfileFullRoute
+  DealsPreviewProfileTeamRoute: typeof DealsPreviewProfileTeamRoute
+  DealsPreviewProfileThesisRoute: typeof DealsPreviewProfileThesisRoute
+  ProductCompareDatasiteRoute: typeof ProductCompareDatasiteRoute
+  ProductCompareDealroomRoute: typeof ProductCompareDealroomRoute
+  ProductCompareDocsendRoute: typeof ProductCompareDocsendRoute
+  ProductCompareFirmexRoute: typeof ProductCompareFirmexRoute
+  ProductCompareIdealsRoute: typeof ProductCompareIdealsRoute
+  ResourcesBlogSlugRoute: typeof ResourcesBlogSlugRoute
+  DealsPreviewSectorIndexRoute: typeof DealsPreviewSectorIndexRoute
+  ProductCompareIndexRoute: typeof ProductCompareIndexRoute
+  ResourcesBlogIndexRoute: typeof ResourcesBlogIndexRoute
+  DealsPreviewSectorInstrumentDealIdRoute: typeof DealsPreviewSectorInstrumentDealIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/virtual-data-room': {
-      id: '/virtual-data-room'
-      path: '/virtual-data-room'
-      fullPath: '/virtual-data-room'
-      preLoaderRoute: typeof VirtualDataRoomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sub-processors': {
-      id: '/sub-processors'
-      path: '/sub-processors'
-      fullPath: '/sub-processors'
-      preLoaderRoute: typeof SubProcessorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/status': {
       id: '/status'
       path: '/status'
@@ -2320,13 +2409,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/schedules': {
-      id: '/schedules'
-      path: '/schedules'
-      fullPath: '/schedules'
-      preLoaderRoute: typeof SchedulesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/registry': {
       id: '/registry'
       path: '/registry'
@@ -2334,25 +2416,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegistryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal': {
-      id: '/legal'
-      path: '/legal'
-      fullPath: '/legal'
-      preLoaderRoute: typeof LegalRouteImport
+    '/lcs-preview': {
+      id: '/lcs-preview'
+      path: '/lcs-preview'
+      fullPath: '/lcs-preview'
+      preLoaderRoute: typeof LcsPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join-room': {
@@ -2376,32 +2444,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/how-it-works': {
-      id: '/how-it-works'
-      path: '/how-it-works'
-      fullPath: '/how-it-works'
-      preLoaderRoute: typeof HowItWorksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-investors': {
-      id: '/for-investors'
-      path: '/for-investors'
-      fullPath: '/for-investors'
-      preLoaderRoute: typeof ForInvestorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-founders': {
-      id: '/for-founders'
-      path: '/for-founders'
-      fullPath: '/for-founders'
-      preLoaderRoute: typeof ForFoundersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feedback': {
@@ -2411,18 +2458,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/due-diligence-checklist': {
-      id: '/due-diligence-checklist'
-      path: '/due-diligence-checklist'
-      fullPath: '/due-diligence-checklist'
-      preLoaderRoute: typeof DueDiligenceChecklistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dpa': {
-      id: '/dpa'
-      path: '/dpa'
-      fullPath: '/dpa'
-      preLoaderRoute: typeof DpaRouteImport
+    '/docs-v2': {
+      id: '/docs-v2'
+      path: '/docs-v2'
+      fullPath: '/docs-v2'
+      preLoaderRoute: typeof DocsV2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs': {
@@ -2432,53 +2472,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/deal-management-software': {
-      id: '/deal-management-software'
-      path: '/deal-management-software'
-      fullPath: '/deal-management-software'
-      preLoaderRoute: typeof DealManagementSoftwareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/app': {
       id: '/app'
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/acceptable-use': {
-      id: '/acceptable-use'
-      path: '/acceptable-use'
-      fullPath: '/acceptable-use'
-      preLoaderRoute: typeof AcceptableUseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -2509,6 +2507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/': {
+      id: '/legal/'
+      path: '/legal'
+      fullPath: '/legal/'
+      preLoaderRoute: typeof LegalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/glossary/': {
       id: '/glossary/'
       path: '/glossary'
@@ -2516,26 +2521,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GlossaryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs/': {
-      id: '/docs/'
+    '/docs-v2/': {
+      id: '/docs-v2/'
       path: '/'
-      fullPath: '/docs/'
-      preLoaderRoute: typeof DocsIndexRouteImport
-      parentRoute: typeof DocsRoute
+      fullPath: '/docs-v2/'
+      preLoaderRoute: typeof DocsV2IndexRouteImport
+      parentRoute: typeof DocsV2Route
     }
-    '/compare/': {
-      id: '/compare/'
-      path: '/compare'
-      fullPath: '/compare/'
-      preLoaderRoute: typeof CompareIndexRouteImport
+    '/deals-preview/': {
+      id: '/deals-preview/'
+      path: '/deals-preview'
+      fullPath: '/deals-preview/'
+      preLoaderRoute: typeof DealsPreviewIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof BlogRoute
     }
     '/app/': {
       id: '/app/'
@@ -2544,11 +2542,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/tools/valuation': {
-      id: '/tools/valuation'
-      path: '/tools/valuation'
-      fullPath: '/tools/valuation'
-      preLoaderRoute: typeof ToolsValuationRouteImport
+    '/tools/valuation-calculator': {
+      id: '/tools/valuation-calculator'
+      path: '/tools/valuation-calculator'
+      fullPath: '/tools/valuation-calculator'
+      preLoaderRoute: typeof ToolsValuationCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/safe-note': {
@@ -2593,97 +2591,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBurnRateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/solutions/venture-capital': {
-      id: '/solutions/venture-capital'
-      path: '/solutions/venture-capital'
-      fullPath: '/solutions/venture-capital'
-      preLoaderRoute: typeof SolutionsVentureCapitalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/syndicates': {
-      id: '/solutions/syndicates'
-      path: '/solutions/syndicates'
-      fullPath: '/solutions/syndicates'
-      preLoaderRoute: typeof SolutionsSyndicatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/spvs': {
-      id: '/solutions/spvs'
-      path: '/solutions/spvs'
-      fullPath: '/solutions/spvs'
-      preLoaderRoute: typeof SolutionsSpvsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/private-equity': {
-      id: '/solutions/private-equity'
-      path: '/solutions/private-equity'
-      fullPath: '/solutions/private-equity'
-      preLoaderRoute: typeof SolutionsPrivateEquityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/limited-partners': {
-      id: '/solutions/limited-partners'
-      path: '/solutions/limited-partners'
-      fullPath: '/solutions/limited-partners'
-      preLoaderRoute: typeof SolutionsLimitedPartnersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/family-offices': {
-      id: '/solutions/family-offices'
-      path: '/solutions/family-offices'
-      fullPath: '/solutions/family-offices'
-      preLoaderRoute: typeof SolutionsFamilyOfficesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/angels': {
-      id: '/solutions/angels'
-      path: '/solutions/angels'
-      fullPath: '/solutions/angels'
-      preLoaderRoute: typeof SolutionsAngelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solutions/advisors': {
-      id: '/solutions/advisors'
-      path: '/solutions/advisors'
-      fullPath: '/solutions/advisors'
-      preLoaderRoute: typeof SolutionsAdvisorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sectors/property': {
-      id: '/sectors/property'
-      path: '/sectors/property'
-      fullPath: '/sectors/property'
-      preLoaderRoute: typeof SectorsPropertyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sectors/manufacturing': {
-      id: '/sectors/manufacturing'
-      path: '/sectors/manufacturing'
-      fullPath: '/sectors/manufacturing'
-      preLoaderRoute: typeof SectorsManufacturingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sectors/healthcare': {
-      id: '/sectors/healthcare'
-      path: '/sectors/healthcare'
-      fullPath: '/sectors/healthcare'
-      preLoaderRoute: typeof SectorsHealthcareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sectors/energy': {
-      id: '/sectors/energy'
-      path: '/sectors/energy'
-      fullPath: '/sectors/energy'
-      preLoaderRoute: typeof SectorsEnergyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sectors/brands-retail': {
-      id: '/sectors/brands-retail'
-      path: '/sectors/brands-retail'
-      fullPath: '/sectors/brands-retail'
-      preLoaderRoute: typeof SectorsBrandsRetailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/roast/$id': {
       id: '/roast/$id'
       path: '/roast/$id'
@@ -2691,11 +2598,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoastIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resources/schedule': {
-      id: '/resources/schedule'
-      path: '/resources/schedule'
-      fullPath: '/resources/schedule'
-      preLoaderRoute: typeof ResourcesScheduleRouteImport
+    '/resources/changelog': {
+      id: '/resources/changelog'
+      path: '/resources/changelog'
+      fullPath: '/resources/changelog'
+      preLoaderRoute: typeof ResourcesChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/security': {
+      id: '/product/security'
+      path: '/product/security'
+      fullPath: '/product/security'
+      preLoaderRoute: typeof ProductSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/pricing': {
+      id: '/product/pricing'
+      path: '/product/pricing'
+      fullPath: '/product/pricing'
+      preLoaderRoute: typeof ProductPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/how-it-works': {
+      id: '/product/how-it-works'
+      path: '/product/how-it-works'
+      fullPath: '/product/how-it-works'
+      preLoaderRoute: typeof ProductHowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/p/$slug': {
@@ -2703,6 +2631,41 @@ declare module '@tanstack/react-router' {
       path: '/p/$slug'
       fullPath: '/p/$slug'
       preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/sub-processors': {
+      id: '/legal/sub-processors'
+      path: '/legal/sub-processors'
+      fullPath: '/legal/sub-processors'
+      preLoaderRoute: typeof LegalSubProcessorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/dpa': {
+      id: '/legal/dpa'
+      path: '/legal/dpa'
+      fullPath: '/legal/dpa'
+      preLoaderRoute: typeof LegalDpaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/acceptable-use': {
+      id: '/legal/acceptable-use'
+      path: '/legal/acceptable-use'
+      fullPath: '/legal/acceptable-use'
+      preLoaderRoute: typeof LegalAcceptableUseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join-investor/$token': {
@@ -2719,19 +2682,117 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ISlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/glossary/$term': {
-      id: '/glossary/$term'
-      path: '/glossary/$term'
-      fullPath: '/glossary/$term'
-      preLoaderRoute: typeof GlossaryTermRouteImport
+    '/for/venture-capital': {
+      id: '/for/venture-capital'
+      path: '/for/venture-capital'
+      fullPath: '/for/venture-capital'
+      preLoaderRoute: typeof ForVentureCapitalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs/$': {
-      id: '/docs/$'
+    '/for/syndicates': {
+      id: '/for/syndicates'
+      path: '/for/syndicates'
+      fullPath: '/for/syndicates'
+      preLoaderRoute: typeof ForSyndicatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/spvs': {
+      id: '/for/spvs'
+      path: '/for/spvs'
+      fullPath: '/for/spvs'
+      preLoaderRoute: typeof ForSpvsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/private-equity': {
+      id: '/for/private-equity'
+      path: '/for/private-equity'
+      fullPath: '/for/private-equity'
+      preLoaderRoute: typeof ForPrivateEquityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/limited-partners': {
+      id: '/for/limited-partners'
+      path: '/for/limited-partners'
+      fullPath: '/for/limited-partners'
+      preLoaderRoute: typeof ForLimitedPartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/investors': {
+      id: '/for/investors'
+      path: '/for/investors'
+      fullPath: '/for/investors'
+      preLoaderRoute: typeof ForInvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/founders': {
+      id: '/for/founders'
+      path: '/for/founders'
+      fullPath: '/for/founders'
+      preLoaderRoute: typeof ForFoundersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/family-offices': {
+      id: '/for/family-offices'
+      path: '/for/family-offices'
+      fullPath: '/for/family-offices'
+      preLoaderRoute: typeof ForFamilyOfficesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/angels': {
+      id: '/for/angels'
+      path: '/for/angels'
+      fullPath: '/for/angels'
+      preLoaderRoute: typeof ForAngelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/advisors': {
+      id: '/for/advisors'
+      path: '/for/advisors'
+      fullPath: '/for/advisors'
+      preLoaderRoute: typeof ForAdvisorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs-v2/$': {
+      id: '/docs-v2/$'
       path: '/$'
-      fullPath: '/docs/$'
-      preLoaderRoute: typeof DocsSplatRouteImport
-      parentRoute: typeof DocsRoute
+      fullPath: '/docs-v2/$'
+      preLoaderRoute: typeof DocsV2SplatRouteImport
+      parentRoute: typeof DocsV2Route
+    }
+    '/deals-preview/vault': {
+      id: '/deals-preview/vault'
+      path: '/deals-preview/vault'
+      fullPath: '/deals-preview/vault'
+      preLoaderRoute: typeof DealsPreviewVaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/team': {
+      id: '/deals-preview/team'
+      path: '/deals-preview/team'
+      fullPath: '/deals-preview/team'
+      preLoaderRoute: typeof DealsPreviewTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/requests': {
+      id: '/deals-preview/requests'
+      path: '/deals-preview/requests'
+      fullPath: '/deals-preview/requests'
+      preLoaderRoute: typeof DealsPreviewRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile': {
+      id: '/deals-preview/profile'
+      path: '/deals-preview/profile'
+      fullPath: '/deals-preview/profile'
+      preLoaderRoute: typeof DealsPreviewProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/analytics': {
+      id: '/deals-preview/analytics'
+      path: '/deals-preview/analytics'
+      fullPath: '/deals-preview/analytics'
+      preLoaderRoute: typeof DealsPreviewAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/cv/$slug': {
       id: '/cv/$slug'
@@ -2740,47 +2801,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CvSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compare/ideals': {
-      id: '/compare/ideals'
-      path: '/compare/ideals'
-      fullPath: '/compare/ideals'
-      preLoaderRoute: typeof CompareIdealsRouteImport
+    '/company/contact': {
+      id: '/company/contact'
+      path: '/company/contact'
+      fullPath: '/company/contact'
+      preLoaderRoute: typeof CompanyContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compare/firmex': {
-      id: '/compare/firmex'
-      path: '/compare/firmex'
-      fullPath: '/compare/firmex'
-      preLoaderRoute: typeof CompareFirmexRouteImport
+    '/company/careers': {
+      id: '/company/careers'
+      path: '/company/careers'
+      fullPath: '/company/careers'
+      preLoaderRoute: typeof CompanyCareersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compare/docsend': {
-      id: '/compare/docsend'
-      path: '/compare/docsend'
-      fullPath: '/compare/docsend'
-      preLoaderRoute: typeof CompareDocsendRouteImport
+    '/company/about': {
+      id: '/company/about'
+      path: '/company/about'
+      fullPath: '/company/about'
+      preLoaderRoute: typeof CompanyAboutRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/compare/dealroom': {
-      id: '/compare/dealroom'
-      path: '/compare/dealroom'
-      fullPath: '/compare/dealroom'
-      preLoaderRoute: typeof CompareDealroomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compare/datasite': {
-      id: '/compare/datasite'
-      path: '/compare/datasite'
-      fullPath: '/compare/datasite'
-      preLoaderRoute: typeof CompareDatasiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -2801,6 +2841,13 @@ declare module '@tanstack/react-router' {
       path: '/team-chat'
       fullPath: '/app/team-chat'
       preLoaderRoute: typeof AppTeamChatRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/support': {
+      id: '/app/support'
+      path: '/support'
+      fullPath: '/app/support'
+      preLoaderRoute: typeof AppSupportRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/settings': {
@@ -2864,13 +2911,6 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/app/home'
       preLoaderRoute: typeof AppHomeRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/feedback': {
-      id: '/app/feedback'
-      path: '/feedback'
-      fullPath: '/app/feedback'
-      preLoaderRoute: typeof AppFeedbackRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/documents': {
@@ -2957,6 +2997,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resources/blog/': {
+      id: '/resources/blog/'
+      path: '/resources/blog'
+      fullPath: '/resources/blog/'
+      preLoaderRoute: typeof ResourcesBlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/': {
+      id: '/product/compare/'
+      path: '/product/compare'
+      fullPath: '/product/compare/'
+      preLoaderRoute: typeof ProductCompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/$sector/': {
+      id: '/deals-preview/$sector/'
+      path: '/deals-preview/$sector'
+      fullPath: '/deals-preview/$sector/'
+      preLoaderRoute: typeof DealsPreviewSectorIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/roast/': {
       id: '/app/roast/'
       path: '/roast'
@@ -2999,12 +3060,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/advisor-preview/': {
+      id: '/app/advisor-preview/'
+      path: '/advisor-preview'
+      fullPath: '/app/advisor-preview/'
+      preLoaderRoute: typeof AppAdvisorPreviewIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/resources/blog/$slug': {
+      id: '/resources/blog/$slug'
+      path: '/resources/blog/$slug'
+      fullPath: '/resources/blog/$slug'
+      preLoaderRoute: typeof ResourcesBlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/ideals': {
+      id: '/product/compare/ideals'
+      path: '/product/compare/ideals'
+      fullPath: '/product/compare/ideals'
+      preLoaderRoute: typeof ProductCompareIdealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/firmex': {
+      id: '/product/compare/firmex'
+      path: '/product/compare/firmex'
+      fullPath: '/product/compare/firmex'
+      preLoaderRoute: typeof ProductCompareFirmexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/docsend': {
+      id: '/product/compare/docsend'
+      path: '/product/compare/docsend'
+      fullPath: '/product/compare/docsend'
+      preLoaderRoute: typeof ProductCompareDocsendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/dealroom': {
+      id: '/product/compare/dealroom'
+      path: '/product/compare/dealroom'
+      fullPath: '/product/compare/dealroom'
+      preLoaderRoute: typeof ProductCompareDealroomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/datasite': {
+      id: '/product/compare/datasite'
+      path: '/product/compare/datasite'
+      fullPath: '/product/compare/datasite'
+      preLoaderRoute: typeof ProductCompareDatasiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/join/team/$token': {
       id: '/join/team/$token'
       path: '/team/$token'
       fullPath: '/join/team/$token'
       preLoaderRoute: typeof JoinTeamTokenRouteImport
       parentRoute: typeof JoinRoute
+    }
+    '/deals-preview/profile_/thesis': {
+      id: '/deals-preview/profile_/thesis'
+      path: '/deals-preview/profile/thesis'
+      fullPath: '/deals-preview/profile/thesis'
+      preLoaderRoute: typeof DealsPreviewProfileThesisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/team': {
+      id: '/deals-preview/profile_/team'
+      path: '/deals-preview/profile/team'
+      fullPath: '/deals-preview/profile/team'
+      preLoaderRoute: typeof DealsPreviewProfileTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/full': {
+      id: '/deals-preview/profile_/full'
+      path: '/deals-preview/profile/full'
+      fullPath: '/deals-preview/profile/full'
+      preLoaderRoute: typeof DealsPreviewProfileFullRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/achievements': {
+      id: '/deals-preview/profile_/achievements'
+      path: '/deals-preview/profile/achievements'
+      fullPath: '/deals-preview/profile/achievements'
+      preLoaderRoute: typeof DealsPreviewProfileAchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/$sector/$instrument': {
+      id: '/deals-preview/$sector/$instrument'
+      path: '/deals-preview/$sector/$instrument'
+      fullPath: '/deals-preview/$sector/$instrument'
+      preLoaderRoute: typeof DealsPreviewSectorInstrumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/support_/feedback': {
+      id: '/app/support_/feedback'
+      path: '/support/feedback'
+      fullPath: '/app/support/feedback'
+      preLoaderRoute: typeof AppSupportFeedbackRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/settings/security': {
       id: '/app/settings/security'
@@ -3018,13 +3170,6 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/app/settings/notifications'
       preLoaderRoute: typeof AppSettingsNotificationsRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
-    '/app/settings/domain': {
-      id: '/app/settings/domain'
-      path: '/domain'
-      fullPath: '/app/settings/domain'
-      preLoaderRoute: typeof AppSettingsDomainRouteImport
       parentRoute: typeof AppSettingsRoute
     }
     '/app/settings/billing': {
@@ -3188,6 +3333,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/advisor-preview/record': {
+      id: '/app/advisor-preview/record'
+      path: '/advisor-preview/record'
+      fullPath: '/app/advisor-preview/record'
+      preLoaderRoute: typeof AppAdvisorPreviewRecordRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/advisor-preview/company': {
+      id: '/app/advisor-preview/company'
+      path: '/advisor-preview/company'
+      fullPath: '/app/advisor-preview/company'
+      preLoaderRoute: typeof AppAdvisorPreviewCompanyRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/internal/email-test': {
       id: '/api/internal/email-test'
       path: '/api/internal/email-test'
@@ -3222,6 +3381,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/investor/deal-rooms/'
       preLoaderRoute: typeof AppInvestorDealRoomsIndexRouteImport
       parentRoute: typeof AppInvestorRoute
+    }
+    '/deals-preview/$sector_/$instrument/$dealId': {
+      id: '/deals-preview/$sector_/$instrument/$dealId'
+      path: '/deals-preview/$sector/$instrument/$dealId'
+      fullPath: '/deals-preview/$sector/$instrument/$dealId'
+      preLoaderRoute: typeof DealsPreviewSectorInstrumentDealIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/roast/$id/live': {
       id: '/app/roast/$id/live'
@@ -3627,7 +3793,6 @@ const AppInvestorRouteWithChildren = AppInvestorRoute._addFileChildren(
 interface AppSettingsRouteChildren {
   AppSettingsActivityRoute: typeof AppSettingsActivityRoute
   AppSettingsBillingRoute: typeof AppSettingsBillingRoute
-  AppSettingsDomainRoute: typeof AppSettingsDomainRoute
   AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
   AppSettingsSecurityRoute: typeof AppSettingsSecurityRoute
 }
@@ -3635,7 +3800,6 @@ interface AppSettingsRouteChildren {
 const AppSettingsRouteChildren: AppSettingsRouteChildren = {
   AppSettingsActivityRoute: AppSettingsActivityRoute,
   AppSettingsBillingRoute: AppSettingsBillingRoute,
-  AppSettingsDomainRoute: AppSettingsDomainRoute,
   AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
   AppSettingsSecurityRoute: AppSettingsSecurityRoute,
 }
@@ -3680,7 +3844,6 @@ interface AppRouteChildren {
   AppCloseRoute: typeof AppCloseRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppDocumentsRoute: typeof AppDocumentsRoute
-  AppFeedbackRoute: typeof AppFeedbackRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInvestorRoute: typeof AppInvestorRouteWithChildren
   AppMemberProfileRoute: typeof AppMemberProfileRoute
@@ -3690,15 +3853,20 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppProfileBuilderRoute: typeof AppProfileBuilderRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
+  AppSupportRoute: typeof AppSupportRoute
   AppTeamChatRoute: typeof AppTeamChatRoute
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppAdvisorPreviewCompanyRoute: typeof AppAdvisorPreviewCompanyRoute
+  AppAdvisorPreviewRecordRoute: typeof AppAdvisorPreviewRecordRoute
   AppDealRoomsIdRoute: typeof AppDealRoomsIdRouteWithChildren
   AppDealRoomsMeetingsCalendarRoute: typeof AppDealRoomsMeetingsCalendarRoute
   AppDealRoomsPrepNotesRoute: typeof AppDealRoomsPrepNotesRoute
   AppDealRoomsReportsVaultRoute: typeof AppDealRoomsReportsVaultRoute
   AppDealRoomsTeamAssignmentsRoute: typeof AppDealRoomsTeamAssignmentsRoute
   AppGoLiveProfileAnalyticsRoute: typeof AppGoLiveProfileAnalyticsRoute
+  AppSupportFeedbackRoute: typeof AppSupportFeedbackRoute
+  AppAdvisorPreviewIndexRoute: typeof AppAdvisorPreviewIndexRoute
   AppDealRoomsIndexRoute: typeof AppDealRoomsIndexRoute
   AppGoLiveIndexRoute: typeof AppGoLiveIndexRoute
   AppMemberIndexRoute: typeof AppMemberIndexRoute
@@ -3727,7 +3895,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCloseRoute: AppCloseRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppDocumentsRoute: AppDocumentsRoute,
-  AppFeedbackRoute: AppFeedbackRoute,
   AppHomeRoute: AppHomeRoute,
   AppInvestorRoute: AppInvestorRouteWithChildren,
   AppMemberProfileRoute: AppMemberProfileRoute,
@@ -3737,15 +3904,20 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppProfileBuilderRoute: AppProfileBuilderRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
+  AppSupportRoute: AppSupportRoute,
   AppTeamChatRoute: AppTeamChatRoute,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
+  AppAdvisorPreviewCompanyRoute: AppAdvisorPreviewCompanyRoute,
+  AppAdvisorPreviewRecordRoute: AppAdvisorPreviewRecordRoute,
   AppDealRoomsIdRoute: AppDealRoomsIdRouteWithChildren,
   AppDealRoomsMeetingsCalendarRoute: AppDealRoomsMeetingsCalendarRoute,
   AppDealRoomsPrepNotesRoute: AppDealRoomsPrepNotesRoute,
   AppDealRoomsReportsVaultRoute: AppDealRoomsReportsVaultRoute,
   AppDealRoomsTeamAssignmentsRoute: AppDealRoomsTeamAssignmentsRoute,
   AppGoLiveProfileAnalyticsRoute: AppGoLiveProfileAnalyticsRoute,
+  AppSupportFeedbackRoute: AppSupportFeedbackRoute,
+  AppAdvisorPreviewIndexRoute: AppAdvisorPreviewIndexRoute,
   AppDealRoomsIndexRoute: AppDealRoomsIndexRoute,
   AppGoLiveIndexRoute: AppGoLiveIndexRoute,
   AppMemberIndexRoute: AppMemberIndexRoute,
@@ -3778,29 +3950,18 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-  BlogIndexRoute: typeof BlogIndexRoute
+interface DocsV2RouteChildren {
+  DocsV2SplatRoute: typeof DocsV2SplatRoute
+  DocsV2IndexRoute: typeof DocsV2IndexRoute
 }
 
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-  BlogIndexRoute: BlogIndexRoute,
+const DocsV2RouteChildren: DocsV2RouteChildren = {
+  DocsV2SplatRoute: DocsV2SplatRoute,
+  DocsV2IndexRoute: DocsV2IndexRoute,
 }
 
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
-interface DocsRouteChildren {
-  DocsSplatRoute: typeof DocsSplatRoute
-  DocsIndexRoute: typeof DocsIndexRoute
-}
-
-const DocsRouteChildren: DocsRouteChildren = {
-  DocsSplatRoute: DocsSplatRoute,
-  DocsIndexRoute: DocsIndexRoute,
-}
-
-const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+const DocsV2RouteWithChildren =
+  DocsV2Route._addFileChildren(DocsV2RouteChildren)
 
 interface JoinRouteChildren {
   JoinTeamTokenRoute: typeof JoinTeamTokenRoute
@@ -3814,35 +3975,19 @@ const JoinRouteWithChildren = JoinRoute._addFileChildren(JoinRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  AcceptableUseRoute: AcceptableUseRoute,
   AppRoute: AppRouteWithChildren,
-  BlogRoute: BlogRouteWithChildren,
-  CareersRoute: CareersRoute,
-  ContactRoute: ContactRoute,
-  DealManagementSoftwareRoute: DealManagementSoftwareRoute,
-  DocsRoute: DocsRouteWithChildren,
-  DpaRoute: DpaRoute,
-  DueDiligenceChecklistRoute: DueDiligenceChecklistRoute,
+  DocsRoute: DocsRoute,
+  DocsV2Route: DocsV2RouteWithChildren,
   FeedbackRoute: FeedbackRoute,
-  ForFoundersRoute: ForFoundersRoute,
-  ForInvestorsRoute: ForInvestorsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
-  HowItWorksRoute: HowItWorksRoute,
   InviteRoute: InviteRoute,
   JoinRoute: JoinRouteWithChildren,
   JoinRoomRoute: JoinRoomRoute,
-  LegalRoute: LegalRoute,
-  PricingRoute: PricingRoute,
-  PrivacyRoute: PrivacyRoute,
+  LcsPreviewRoute: LcsPreviewRoute,
   RegistryRoute: RegistryRoute,
-  SchedulesRoute: SchedulesRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   StatusRoute: StatusRoute,
-  SubProcessorsRoute: SubProcessorsRoute,
-  TermsRoute: TermsRoute,
-  VirtualDataRoomRoute: VirtualDataRoomRoute,
   ApiAdminRoute: ApiAdminRoute,
   ApiAdminDataRoute: ApiAdminDataRoute,
   ApiEmailTestRoute: ApiEmailTestRoute,
@@ -3851,45 +3996,69 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHubspotSyncRoute: ApiHubspotSyncRoute,
   ApiTestAiRoute: ApiTestAiRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-  CompareDatasiteRoute: CompareDatasiteRoute,
-  CompareDealroomRoute: CompareDealroomRoute,
-  CompareDocsendRoute: CompareDocsendRoute,
-  CompareFirmexRoute: CompareFirmexRoute,
-  CompareIdealsRoute: CompareIdealsRoute,
+  CompanyAboutRoute: CompanyAboutRoute,
+  CompanyCareersRoute: CompanyCareersRoute,
+  CompanyContactRoute: CompanyContactRoute,
   CvSlugRoute: CvSlugRoute,
-  GlossaryTermRoute: GlossaryTermRoute,
+  DealsPreviewAnalyticsRoute: DealsPreviewAnalyticsRoute,
+  DealsPreviewProfileRoute: DealsPreviewProfileRoute,
+  DealsPreviewRequestsRoute: DealsPreviewRequestsRoute,
+  DealsPreviewTeamRoute: DealsPreviewTeamRoute,
+  DealsPreviewVaultRoute: DealsPreviewVaultRoute,
+  ForAdvisorsRoute: ForAdvisorsRoute,
+  ForAngelsRoute: ForAngelsRoute,
+  ForFamilyOfficesRoute: ForFamilyOfficesRoute,
+  ForFoundersRoute: ForFoundersRoute,
+  ForInvestorsRoute: ForInvestorsRoute,
+  ForLimitedPartnersRoute: ForLimitedPartnersRoute,
+  ForPrivateEquityRoute: ForPrivateEquityRoute,
+  ForSpvsRoute: ForSpvsRoute,
+  ForSyndicatesRoute: ForSyndicatesRoute,
+  ForVentureCapitalRoute: ForVentureCapitalRoute,
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
+  LegalAcceptableUseRoute: LegalAcceptableUseRoute,
+  LegalDpaRoute: LegalDpaRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalSubProcessorsRoute: LegalSubProcessorsRoute,
+  LegalTermsRoute: LegalTermsRoute,
   PSlugRoute: PSlugRoute,
-  ResourcesScheduleRoute: ResourcesScheduleRoute,
+  ProductHowItWorksRoute: ProductHowItWorksRoute,
+  ProductPricingRoute: ProductPricingRoute,
+  ProductSecurityRoute: ProductSecurityRoute,
+  ResourcesChangelogRoute: ResourcesChangelogRoute,
   RoastIdRoute: RoastIdRoute,
-  SectorsBrandsRetailRoute: SectorsBrandsRetailRoute,
-  SectorsEnergyRoute: SectorsEnergyRoute,
-  SectorsHealthcareRoute: SectorsHealthcareRoute,
-  SectorsManufacturingRoute: SectorsManufacturingRoute,
-  SectorsPropertyRoute: SectorsPropertyRoute,
-  SolutionsAdvisorsRoute: SolutionsAdvisorsRoute,
-  SolutionsAngelsRoute: SolutionsAngelsRoute,
-  SolutionsFamilyOfficesRoute: SolutionsFamilyOfficesRoute,
-  SolutionsLimitedPartnersRoute: SolutionsLimitedPartnersRoute,
-  SolutionsPrivateEquityRoute: SolutionsPrivateEquityRoute,
-  SolutionsSpvsRoute: SolutionsSpvsRoute,
-  SolutionsSyndicatesRoute: SolutionsSyndicatesRoute,
-  SolutionsVentureCapitalRoute: SolutionsVentureCapitalRoute,
   ToolsBurnRateRoute: ToolsBurnRateRoute,
   ToolsCapTableRoute: ToolsCapTableRoute,
   ToolsCogsRoute: ToolsCogsRoute,
   ToolsDilutionRoute: ToolsDilutionRoute,
   ToolsRunwayRoute: ToolsRunwayRoute,
   ToolsSafeNoteRoute: ToolsSafeNoteRoute,
-  ToolsValuationRoute: ToolsValuationRoute,
-  CompareIndexRoute: CompareIndexRoute,
+  ToolsValuationCalculatorRoute: ToolsValuationCalculatorRoute,
+  DealsPreviewIndexRoute: DealsPreviewIndexRoute,
   GlossaryIndexRoute: GlossaryIndexRoute,
+  LegalIndexRoute: LegalIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   SectorsIndexRoute: SectorsIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,
+  DealsPreviewSectorInstrumentRoute: DealsPreviewSectorInstrumentRoute,
+  DealsPreviewProfileAchievementsRoute: DealsPreviewProfileAchievementsRoute,
+  DealsPreviewProfileFullRoute: DealsPreviewProfileFullRoute,
+  DealsPreviewProfileTeamRoute: DealsPreviewProfileTeamRoute,
+  DealsPreviewProfileThesisRoute: DealsPreviewProfileThesisRoute,
+  ProductCompareDatasiteRoute: ProductCompareDatasiteRoute,
+  ProductCompareDealroomRoute: ProductCompareDealroomRoute,
+  ProductCompareDocsendRoute: ProductCompareDocsendRoute,
+  ProductCompareFirmexRoute: ProductCompareFirmexRoute,
+  ProductCompareIdealsRoute: ProductCompareIdealsRoute,
+  ResourcesBlogSlugRoute: ResourcesBlogSlugRoute,
+  DealsPreviewSectorIndexRoute: DealsPreviewSectorIndexRoute,
+  ProductCompareIndexRoute: ProductCompareIndexRoute,
+  ResourcesBlogIndexRoute: ResourcesBlogIndexRoute,
+  DealsPreviewSectorInstrumentDealIdRoute:
+    DealsPreviewSectorInstrumentDealIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

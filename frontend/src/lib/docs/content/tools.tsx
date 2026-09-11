@@ -33,7 +33,7 @@ export const TOOLS_PAGES: Record<string, DocPage> = {
           rows={[
             [
               "Valuation",
-              <A href="/tools/valuation">/tools/valuation</A>,
+              <A href="/tools/valuation-calculator">/tools/valuation-calculator</A>,
               "Pre-money valuation range via three methods side by side: VC method, revenue multiples, and Berkus",
             ],
             [
@@ -74,7 +74,7 @@ export const TOOLS_PAGES: Record<string, DocPage> = {
           items={[
             <>All calculation runs in your browser. Inputs are not transmitted or stored — closing the tab discards them.</>,
             <>No sign-up wall. The calculators are public pages.</>,
-            <>Results can be downloaded as a PDF for sharing or record-keeping.</>,
+            <>Results stay on the page for as long as your session — copy or screenshot anything you want to keep.</>,
             <>These are deliberately human-driven pages — there is no AI in the calculators. Formulas are stated, inputs are yours, arithmetic is arithmetic.</>,
           ]}
         />

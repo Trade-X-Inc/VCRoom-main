@@ -141,7 +141,7 @@ test.describe("UI-3A: Layout, width, and theme fixes", () => {
     await injectSession(ctx, founderSession);
     const page = await ctx.newPage();
 
-    await page.goto(`${APP}/app/feedback`, { waitUntil: "networkidle" });
+    await page.goto(`${APP}/app/support/feedback`, { waitUntil: "networkidle" });
     await waitForLoad(page);
 
     console.log("\n── TEST 2 RESULT ──");

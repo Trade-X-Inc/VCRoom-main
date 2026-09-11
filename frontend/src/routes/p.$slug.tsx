@@ -141,12 +141,13 @@ export const Route = createFileRoute("/p/$slug")({
     if (!startup) {
       return { meta: [{ title: "Founder profile not found — Lengdon" }] };
     }
+    const fallbackDescription = [startup.sector, startup.stage].filter(Boolean).join(" · ") || "Founder profile on Lengdon.";
     return {
       meta: [
         { title: `${startup.company_name || "Founder profile"} — Lengdon` },
-        { name: "description", content: startup.tagline || startup.description || "Verified founder profile on Lengdon." },
+        { name: "description", content: startup.tagline || startup.description || fallbackDescription },
         { property: "og:title", content: `${startup.company_name || "Founder profile"} — Lengdon` },
-        { property: "og:description", content: startup.tagline || startup.description || "Verified founder profile on Lengdon." },
+        { property: "og:description", content: startup.tagline || startup.description || fallbackDescription },
       ],
     };
   },
@@ -810,7 +811,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
         {/* Header — always public */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Verified founder profile</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Founder profile</p>
             <h1 className="mt-3 text-4xl font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
               {startup.company_name || "Unnamed startup"}
             </h1>

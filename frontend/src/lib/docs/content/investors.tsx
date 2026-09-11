@@ -10,7 +10,7 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
       slug: "investors",
       title: "Investor features",
       description:
-        "The investor side of Lengdon: watchlist-driven sourcing, AI deal briefs, structured decisions, and NDA-gated deal rooms.",
+        "The investor side of Lengdon: watchlist-driven sourcing, AI-drafted investment memos, structured decisions, and NDA-gated deal rooms.",
       updated: UPDATED,
       toc: [
         { id: "map", label: "Feature map" },
@@ -33,7 +33,7 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
         <DocTable
           head={["Feature", "What it does", "Docs"]}
           rows={[
-            ["Deal flow inbox", "Inbound queue with AI briefs per company", <A href="/docs/investors/deal-flow">Deal flow</A>],
+            ["Deal flow inbox", "Inbound queue for founder packs shared directly with you", <A href="/docs/investors/deal-flow">Deal flow</A>],
             ["Pipeline", "Kanban of active deal rooms by stage", <A href="/docs/investors/pipeline">Pipeline</A>],
             ["Decisions", "Invest / Hold / Pass with recorded reasons", <A href="/docs/investors/decisions">Decisions</A>],
             ["Due diligence", "DD checklist status across every active deal", <A href="/docs/investors/due-diligence">Due diligence</A>],
@@ -45,8 +45,8 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
         <H2 id="watchlist">The watchlist</H2>
         <P>
           The watchlist (<strong>Startups</strong> in the sidebar) is the backbone: a private list
-          of every company you're tracking, whether it came from intake parsing, the deal flow
-          inbox, a CSV import, or manual entry. Each entry carries a status —{" "}
+          of every company you're tracking, whether it came from the deal flow inbox, a CSV
+          import, or manual entry. Each entry carries a status —{" "}
           <em>Sourcing → Reviewing → Diligence → Passed / Invested / Watching</em> — and the
           diligence, analysis, and portfolio pages all read from it. Your watchlist is scoped to
           you at the database level; no other investor can see it.
@@ -55,9 +55,9 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
         <H2 id="flow">The investor flow</H2>
         <Steps
           items={[
-            <>Set your thesis — stage, sectors, geography, check size. Matching and scoring run against it.</>,
-            <>Fill the watchlist: parse pasted lead data, work the deal flow inbox, or import a CSV.</>,
-            <>Generate AI briefs to decide what deserves a first meeting.</>,
+            <>Set your thesis — stage, sectors, geography, check size. It's the criteria you evaluate deals against.</>,
+            <>Fill the watchlist: work the deal flow inbox, or import a CSV.</>,
+            <>Generate an investment memo to decide what deserves a first meeting.</>,
             <>Open a deal room with companies worth diligence. NDA first, then documents.</>,
             <>Record the decision — Invest, Hold, or Pass with a reason the founder actually receives.</>,
           ]}
@@ -102,39 +102,29 @@ export const INVESTOR_PAGES: Record<string, DocPage> = {
       slug: "investors/deal-flow",
       title: "Deal flow inbox",
       description:
-        "The inbound deal queue: thesis-matched companies with cached AI briefs and one-click watchlist routing.",
+        "Where founder packs shared directly with you arrive, with one-click watchlist routing.",
       updated: UPDATED,
       toc: [
         { id: "overview", label: "Overview" },
         { id: "how", label: "How it works" },
-        { id: "briefs", label: "AI briefs" },
       ],
     },
     Body: () => (
       <>
         <Lead>
-          The deal flow inbox is where inbound reaches you: founders whose verified profiles match
-          your thesis. It exists to replace the cold-email pile with a queue that is already
-          filtered by stage, sector, and geography before you see it.
+          The deal flow inbox is where inbound reaches you: a founder shares their brief with you
+          directly. There is no directory to browse and no matching to opt into — access to a
+          founder's pack starts with an invitation from the founder.
         </Lead>
 
         <H2 id="how">How it works</H2>
         <Steps
           items={[
-            <>Companies appear in the inbox when their profile matches your thesis settings.</>,
-            <>Each card shows the verified profile summary — what was checked, and what wasn't.</>,
-            <>Generate an AI brief for anything that looks interesting before committing meeting time.</>,
+            <>A founder shares their brief with you directly — you're notified when it arrives.</>,
+            <>Open the pack and review it against the founder's own stated evidence tiers.</>,
             <>Route each company: add to watchlist to track it, or move on.</>,
           ]}
         />
-
-        <H2 id="briefs">AI briefs</H2>
-        <P>
-          A brief is a structured first-pass read on a company: what it does and its traction
-          signals. Briefs are cached — generating the same company's brief twice costs nothing
-          and stays consistent — and carry a viewed/unviewed state so you can see what's new at
-          a glance.
-        </P>
       </>
     ),
   },

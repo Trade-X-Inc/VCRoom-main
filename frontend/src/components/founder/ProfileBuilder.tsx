@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronUp, GripVertical, Plus, Trash2, Sparkles, Check, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { LcsButton } from "@/components/lcs";
 
 // ── Constants ─────────────────────────────────────────────────────
 
@@ -31,18 +31,18 @@ const VISIBILITY_CYCLE: Record<string, string> = {
 };
 
 const VISIBILITY_LABELS: Record<string, string> = {
-  private: "Private 🔒",
-  deal_room: "Deal Room 🔐",
-  public: "Public 🌐",
-};
-
-const VISIBILITY_CLASSES: Record<string, string> = {
-  private: "bg-gray-100 text-gray-600  ",
-  deal_room: "bg-purple-50 text-purple-700  ",
-  public: "bg-green-50 text-green-700  ",
+  private: "Private",
+  deal_room: "Deal Room",
+  public: "Public",
 };
 
 // ── Input atoms ───────────────────────────────────────────────────
+
+const fieldInputStyle: React.CSSProperties = {
+  width: "100%", height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)",
+  background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px",
+  outline: "none",
+};
 
 function Field({ label, value, onChange, placeholder, type = "text" }: {
   label: string; value: string; onChange: (v: string) => void;
@@ -50,13 +50,13 @@ function Field({ label, value, onChange, placeholder, type = "text" }: {
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+      <label className="block text-[13px] font-medium mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+        style={fieldInputStyle}
       />
     </div>
   );
@@ -68,13 +68,14 @@ function TextArea({ label, value, onChange, placeholder, rows = 3 }: {
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+      <label className="block text-[13px] font-medium mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+        className="resize-none"
+        style={{ ...fieldInputStyle, height: "auto", padding: "8px 10px" }}
       />
     </div>
   );
@@ -106,10 +107,10 @@ function TeamEditor({ content, onChange }: { content: any; onChange: (c: any) =>
   return (
     <div className="space-y-4">
       {members.map((m, idx) => (
-        <div key={idx} className="rounded-lg border border-[rgba(0,0,0,0.08)] p-3 space-y-2">
+        <div key={idx} className="space-y-2 p-3" style={{ border: "1px solid var(--lcs-line)" }}>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500 ">Member {idx + 1}</span>
-            <button onClick={() => remove(idx)} className="text-[#71717A] hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+            <span className="text-[12px] font-medium" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Member {idx + 1}</span>
+            <button onClick={() => remove(idx)} style={{ color: "var(--lcs-ink-muted)" }}><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <Field label="Name" value={m.name ?? ""} onChange={(v) => update(idx, "name", v)} placeholder="Full name" />
@@ -119,12 +120,9 @@ function TeamEditor({ content, onChange }: { content: any; onChange: (c: any) =>
           <TextArea label="Bio" value={m.bio ?? ""} onChange={(v) => update(idx, "bio", v)} placeholder="Brief background" rows={2} />
         </div>
       ))}
-      <button
-        onClick={add}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-brand hover:text-brand"
-      >
+      <LcsButton variant="secondary" onClick={add} className="inline-flex items-center gap-1.5 text-[13px]">
         <Plus className="h-3.5 w-3.5" /> Add team member
-      </button>
+      </LcsButton>
     </div>
   );
 }
@@ -168,11 +166,11 @@ function RevenueModelEditor({ content, onChange }: { content: any; onChange: (c:
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Revenue type</label>
+        <label className="block text-[13px] font-medium mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Revenue type</label>
         <select
           value={content.type ?? "SaaS"}
           onChange={(e) => onChange({ ...content, type: e.target.value })}
-          className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
+          style={{ height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px", outline: "none" }}
         >
           {["SaaS", "Marketplace", "Transactional", "Subscription", "Other"].map((o) => <option key={o}>{o}</option>)}
         </select>
@@ -237,11 +235,11 @@ function ProductEditor({ content, onChange }: { content: any; onChange: (c: any)
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">Stage</label>
+        <label className="block text-[13px] font-medium mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Stage</label>
         <select
           value={content.stage ?? "Idea"}
           onChange={(e) => onChange({ ...content, stage: e.target.value })}
-          className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
+          style={{ height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px", outline: "none" }}
         >
           {["Idea", "Prototype", "MVP", "Beta", "Live", "Scaling"].map((o) => <option key={o}>{o}</option>)}
         </select>
@@ -263,17 +261,17 @@ function CompetitiveLandscapeEditor({ content, onChange }: { content: any; onCha
     <div className="space-y-3">
       <TextArea label="Who are your main competitors and how are you different?" value={content.overview ?? ""} onChange={(v) => onChange({ ...content, overview: v })} rows={3} />
       {competitors.map((c, idx) => (
-        <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg border border-[rgba(0,0,0,0.08)] p-3">
+        <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3" style={{ border: "1px solid var(--lcs-line)" }}>
           <Field label="Competitor name" value={c.name ?? ""} onChange={(v) => updateComp(idx, "name", v)} />
           <div className="relative">
             <Field label="How you're different" value={c.differentiator ?? ""} onChange={(v) => updateComp(idx, "differentiator", v)} />
-            <button onClick={() => removeComp(idx)} className="absolute top-0 right-0 text-[#71717A] hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+            <button onClick={() => removeComp(idx)} className="absolute top-0 right-0" style={{ color: "var(--lcs-ink-muted)" }}><Trash2 className="h-3.5 w-3.5" /></button>
           </div>
         </div>
       ))}
-      <button onClick={addComp} className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-brand hover:text-brand">
+      <LcsButton variant="secondary" onClick={addComp} className="inline-flex items-center gap-1.5 text-[13px]">
         <Plus className="h-3.5 w-3.5" /> Add competitor
-      </button>
+      </LcsButton>
     </div>
   );
 }
@@ -470,39 +468,43 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
   };
 
   return (
-    <div className="mb-6 bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+    <div className="mb-6 overflow-hidden" style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}>
       {/* Header */}
       <button
-        className="w-full flex items-start justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+        className="w-full flex items-start justify-between px-5 py-4 text-left transition-colors"
         onClick={() => setPanelOpen((v) => !v)}
         data-testid="profile-builder-header"
       >
         <div>
-          <div className="text-sm font-bold text-gray-900 " style={{ fontFamily: "Syne, sans-serif" }}>Digital Profile</div>
-          <div className="text-xs text-gray-500 mt-0.5">Build your investor-ready profile</div>
+          <div className="text-[14px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Digital Profile</div>
+          <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Build your investor-ready profile</div>
         </div>
         <div className="flex items-center gap-3 shrink-0 mt-0.5">
           {allSections.length > 0 && (
-            <span className={cn(
-              "rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
-              completedCount === allSections.length
-                ? "bg-green-50 text-green-700  "
-                : "bg-gray-100 text-gray-600  ",
-            )}>
+            <span
+              className="px-2.5 py-0.5 text-[11px] font-medium"
+              style={{
+                fontFamily: "var(--font-lcs-ui)",
+                color: completedCount === allSections.length ? "var(--lcs-satisfied)" : "var(--lcs-ink-muted)",
+                background: completedCount === allSections.length ? "var(--lcs-satisfied-wash)" : "var(--lcs-surface)",
+              }}
+            >
               {completedCount} / {allSections.length} sections complete
             </span>
           )}
-          {panelOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
+          {panelOpen ? <ChevronUp className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />}
         </div>
       </button>
 
       {panelOpen && (
-        <div className="border-t border-[rgba(0,0,0,0.08)] ">
+        <div style={{ borderTop: "1px solid var(--lcs-line)" }}>
           {seeding ? (
-            <div className="px-5 py-8 text-center text-sm text-[#71717A]">Setting up your profile sections…</div>
+            <div className="px-5 py-8 text-center text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+              Setting up your profile sections…
+            </div>
           ) : (
-            <div className="divide-y divide-gray-100 ">
-              {allSections.map((section: any) => {
+            <div>
+              {allSections.map((section: any, sIdx: number) => {
                 const key = section.section_key;
                 const isExpanded = expandedKey === key;
                 const content = localContents[key] ?? section.content ?? {};
@@ -510,16 +512,18 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                 const showVisibilityWarning = visibilityWarning === key;
 
                 return (
-                  <div key={section.id}>
+                  <div key={section.id} style={{ borderTop: sIdx === 0 ? undefined : "1px solid var(--lcs-line)" }}>
                     {/* Section header row */}
-                    <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 ">
-                      <GripVertical className="h-4 w-4 text-[#71717A] shrink-0" />
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <GripVertical className="h-4 w-4 shrink-0" style={{ color: "var(--lcs-ink-muted)" }} />
 
                       <button
                         className="flex-1 text-left min-w-0"
                         onClick={() => setExpandedKey(isExpanded ? null : key)}
                       >
-                        <span className="text-sm font-medium text-gray-900 truncate">{section.section_label}</span>
+                        <span className="text-[13px] font-medium truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
+                          {section.section_label}
+                        </span>
                       </button>
 
                       <div className="flex items-center gap-2 shrink-0">
@@ -528,12 +532,16 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                           <button
                             onClick={() => cycleVisibility(section)}
                             title={NO_PUBLIC_SECTIONS.has(key) ? "Cannot be made public — financial data" : undefined}
-                            className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-medium cursor-pointer hover:opacity-80", VISIBILITY_CLASSES[section.visibility] ?? VISIBILITY_CLASSES.private)}
+                            className="px-2.5 py-0.5 text-[11px] font-medium cursor-pointer"
+                            style={{ fontFamily: "var(--font-lcs-ui)", color: "var(--lcs-ink)", border: "1px solid var(--lcs-line)" }}
                           >
                             {VISIBILITY_LABELS[section.visibility] ?? VISIBILITY_LABELS.private}
                           </button>
                           {showVisibilityWarning && (
-                            <div className="absolute top-full left-0 mt-1 z-10 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700 whitespace-nowrap flex items-center gap-1.5">
+                            <div
+                              className="absolute top-full left-0 mt-1 z-10 px-3 py-2 text-[12px] whitespace-nowrap flex items-center gap-1.5"
+                              style={{ background: "var(--lcs-attention-wash)", border: "1px solid var(--lcs-attention)", color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}
+                            >
                               <AlertTriangle className="h-3 w-3 shrink-0" />
                               Cannot be made public — financial data
                             </div>
@@ -541,19 +549,22 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         </div>
 
                         {/* Content status */}
-                        <span className={cn("text-[10px] font-medium", empty ? "text-[#71717A] " : "text-green-600 ")}>
-                          {empty ? "Empty" : "✓ Complete"}
+                        <span
+                          className="text-[11px] font-medium"
+                          style={{ fontFamily: "var(--font-lcs-ui)", color: empty ? "var(--lcs-ink-muted)" : "var(--lcs-satisfied)" }}
+                        >
+                          {empty ? "Empty" : "Complete"}
                         </span>
 
                         <button onClick={() => setExpandedKey(isExpanded ? null : key)}>
-                          {isExpanded ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
+                          {isExpanded ? <ChevronUp className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />}
                         </button>
                       </div>
                     </div>
 
                     {/* Expanded editor */}
                     {isExpanded && (
-                      <div className="px-5 pb-5 pt-2 bg-gray-50/50 ">
+                      <div className="px-5 pb-5 pt-2" style={{ background: "var(--lcs-surface)" }}>
                         <SectionEditor
                           sectionKey={key}
                           content={content}
@@ -561,30 +572,31 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         />
 
                         <div className="flex items-center gap-2 mt-4">
-                          <button
+                          <LcsButton
+                            variant="primary"
                             onClick={() => saveSection(section)}
                             disabled={savingKey === key}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
-                            style={{ background: "var(--gradient-brand)" }}
+                            className="inline-flex items-center gap-1.5 text-[13px]"
                             data-testid={`save-section-${key}`}
                           >
                             {savedKey === key ? (
-                              <><Check className="h-3.5 w-3.5" /> Saved ✓</>
+                              <><Check className="h-3.5 w-3.5" /> Saved</>
                             ) : savingKey === key ? (
                               "Saving…"
                             ) : (
                               "Save"
                             )}
-                          </button>
+                          </LcsButton>
 
-                          <button
+                          <LcsButton
+                            variant="secondary"
                             onClick={() => console.log(`AI extraction from document — Claude Code will wire to edge function [section: ${key}]`)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-2 text-xs font-medium text-brand hover:bg-accent"
+                            className="inline-flex items-center gap-1.5 text-[12px]"
                             title="Upload a document above and AI will extract relevant data into this section"
                             data-testid={`extract-section-${key}`}
                           >
                             <Sparkles className="h-3.5 w-3.5" /> Extract from document
-                          </button>
+                          </LcsButton>
                         </div>
                       </div>
                     )}
@@ -593,7 +605,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
               })}
 
               {/* Add custom section */}
-              <div className="px-4 py-4">
+              <div className="px-4 py-4" style={{ borderTop: "1px solid var(--lcs-line)" }}>
                 {addSectionOpen ? (
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -601,13 +613,14 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                         value={newSectionName}
                         onChange={(e) => setNewSectionName(e.target.value)}
                         placeholder="Section name"
-                        className="col-span-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-brand"
+                        className="col-span-2"
+                        style={{ height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px", outline: "none" }}
                         onKeyDown={(e) => { if (e.key === "Enter") addCustomSection(); }}
                       />
                       <select
                         value={newSectionVisibility}
                         onChange={(e) => setNewSectionVisibility(e.target.value as any)}
-                        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none"
+                        style={{ height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px", outline: "none" }}
                       >
                         <option value="private">Private</option>
                         <option value="deal_room">Deal Room</option>
@@ -615,22 +628,25 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
                       </select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setAddSectionOpen(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
-                      <button
+                      <LcsButton variant="secondary" onClick={() => setAddSectionOpen(false)} className="text-[12px]">
+                        Cancel
+                      </LcsButton>
+                      <LcsButton
+                        variant="primary"
                         onClick={addCustomSection}
                         disabled={!newSectionName.trim() || addingSec}
-                        className="rounded-lg px-4 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
-                        style={{ background: "var(--gradient-brand)" }}
+                        className="text-[12px]"
                         data-testid="add-custom-section-btn"
                       >
                         {addingSec ? "Adding…" : "Add section"}
-                      </button>
+                      </LcsButton>
                     </div>
                   </div>
                 ) : (
                   <button
                     onClick={() => setAddSectionOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand "
+                    className="inline-flex items-center gap-1.5 text-[13px]"
+                    style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
                     data-testid="add-custom-section-open-btn"
                   >
                     <Plus className="h-4 w-4" /> Add custom section

@@ -7,6 +7,7 @@ import {
   Clock, Sparkles,
   ChevronDown, Link as LinkIcon, Copy, Eye, EyeOff,
   Trophy, Briefcase, Building2, FileText,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,8 +19,7 @@ import { logActivity } from "@/lib/activity-log-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { useTimedAI, AITimeoutError, AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
-import { PageFrame, EmptyState } from "@/components/system";
-import { color, font, space, radius } from "@/lib/design-tokens";
+import { LcsPageHeader, LcsEmptyState } from "@/components/lcs";
 import { useAccountContext } from "@/hooks/useAccountContext";
 
 export const Route = createFileRoute("/app/investor/profile")({
@@ -155,13 +155,13 @@ const EMPTY_FORM: ProfileForm = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  border: `1px solid ${color.border}`,
-  borderRadius: radius.control,
-  background: color.white,
+  border: `1px solid var(--lcs-line)`,
+  borderRadius: "var(--radius-lcs-control)",
+  background: "var(--lcs-white)",
   padding: "8px 12px",
   fontSize: 14,
-  fontFamily: font.body,
-  color: color.ink,
+  fontFamily: "var(--font-lcs-ui)",
+  color: "var(--lcs-ink)",
   outline: "none",
 };
 
@@ -190,9 +190,9 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
   return (
     <div
       style={{
-        border: `1px solid ${color.border}`,
-        borderRadius: radius.structural,
-        background: color.white,
+        border: `1px solid var(--lcs-line)`,
+        borderRadius: 0,
+        background: "var(--lcs-white)",
         ...style,
       }}
     >
@@ -203,11 +203,11 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 
 function SectionHeader({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "16px 20px", borderBottom: `1px solid ${color.border}` }}>
-      <Icon style={{ width: 16, height: 16, color: color.inkTertiary, marginTop: 2, flexShrink: 0 }} />
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "16px 20px", borderBottom: `1px solid var(--lcs-line)` }}>
+      <Icon style={{ width: 16, height: 16, color: "var(--lcs-ink-muted)", marginTop: 2, flexShrink: 0 }} />
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontFamily: font.display, fontSize: 14, fontWeight: 700, color: color.ink }}>{title}</div>
-        <div style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{description}</div>
+        <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 14, fontWeight: 700, color: "var(--lcs-ink)" }}>{title}</div>
+        <div style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 2 }}>{description}</div>
       </div>
     </div>
   );
@@ -217,7 +217,7 @@ function Field({ label, badge, children }: { label: string; badge?: React.ReactN
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-        <label style={{ fontFamily: font.body, fontSize: 12, color: color.inkTertiary }}>{label}</label>
+        <label style={{ fontFamily: "var(--font-lcs-ui)", fontSize: 12, color: "var(--lcs-ink-muted)" }}>{label}</label>
         {badge}
       </div>
       {children}
@@ -308,26 +308,26 @@ function PendingChangesQueue({
   };
 
   return (
-    <Card style={{ marginBottom: space.block, borderColor: "rgba(217,119,6,0.35)" }}>
+    <Card style={{ marginBottom: 24, borderColor: "rgba(217,119,6,0.35)" }}>
       <SectionHeader icon={Clock} title={`Pending changes (${items.length})`} description="Associate edits awaiting your approval before they go live." />
       <div style={{ display: "flex", flexDirection: "column" }}>
         {items.map((item) => (
-          <div key={item.id} style={{ padding: "14px 20px", borderTop: `1px solid ${color.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div key={item.id} style={{ padding: "14px 20px", borderTop: `1px solid var(--lcs-line)`, display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div style={{ fontSize: 12, color: color.inkTertiary }}>
-                <strong style={{ color: color.ink }}>{proposerNames[item.proposed_by] ?? "Team member"}</strong>
+              <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>
+                <strong style={{ color: "var(--lcs-ink)" }}>{proposerNames[item.proposed_by] ?? "Team member"}</strong>
                 {" proposed a change to "}
-                <strong style={{ color: color.ink }}>{PENDING_CHANGE_FIELD_LABELS[item.field_key] ?? item.field_key}</strong>
+                <strong style={{ color: "var(--lcs-ink)" }}>{PENDING_CHANGE_FIELD_LABELS[item.field_key] ?? item.field_key}</strong>
               </div>
-              <div style={{ fontSize: 11, color: color.inkTertiary }}>{new Date(item.created_at).toLocaleDateString()}</div>
+              <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)" }}>{new Date(item.created_at).toLocaleDateString()}</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 12 }}>
               <div>
-                <div style={{ color: color.inkTertiary, marginBottom: 2 }}>Current</div>
-                <div style={{ color: color.ink }}>{formatValue(item.old_value)}</div>
+                <div style={{ color: "var(--lcs-ink-muted)", marginBottom: 2 }}>Current</div>
+                <div style={{ color: "var(--lcs-ink)" }}>{formatValue(item.old_value)}</div>
               </div>
               <div>
-                <div style={{ color: color.inkTertiary, marginBottom: 2 }}>Proposed</div>
+                <div style={{ color: "var(--lcs-ink-muted)", marginBottom: 2 }}>Proposed</div>
                 <div style={{ color: "#7C3AED", fontWeight: 500 }}>{formatValue(item.new_value)}</div>
               </div>
             </div>
@@ -341,22 +341,22 @@ function PendingChangesQueue({
                 />
                 <button type="button" onClick={() => applyDecision(item, "rejected", rejectNote.trim() || undefined)}
                   disabled={decidingId === item.id}
-                  style={{ height: 32, padding: "0 12px", fontSize: 12, fontWeight: 500, color: "#fff", background: "#DC2626", border: "none", borderRadius: radius.control, cursor: "pointer" }}>
+                  style={{ height: 32, padding: "0 12px", fontSize: 12, fontWeight: 500, color: "#fff", background: "#DC2626", border: "none", borderRadius: "var(--radius-lcs-control)", cursor: "pointer" }}>
                   Confirm reject
                 </button>
                 <button type="button" onClick={() => { setRejectingId(null); setRejectNote(""); }}
-                  style={{ height: 32, padding: "0 12px", fontSize: 12, color: color.inkTertiary, background: "transparent", border: `1px solid ${color.border}`, borderRadius: radius.control, cursor: "pointer" }}>
+                  style={{ height: 32, padding: "0 12px", fontSize: 12, color: "var(--lcs-ink-muted)", background: "transparent", border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", cursor: "pointer" }}>
                   Cancel
                 </button>
               </div>
             ) : (
               <div style={{ display: "flex", gap: 8 }}>
                 <button type="button" onClick={() => applyDecision(item, "approved")} disabled={decidingId === item.id}
-                  style={{ height: 32, padding: "0 14px", fontSize: 12, fontWeight: 500, color: "#fff", background: "#7C3AED", border: "none", borderRadius: radius.control, cursor: decidingId === item.id ? "default" : "pointer", opacity: decidingId === item.id ? 0.6 : 1 }}>
+                  style={{ height: 32, padding: "0 14px", fontSize: 12, fontWeight: 500, color: "#fff", background: "#7C3AED", border: "none", borderRadius: "var(--radius-lcs-control)", cursor: decidingId === item.id ? "default" : "pointer", opacity: decidingId === item.id ? 0.6 : 1 }}>
                   Approve
                 </button>
                 <button type="button" onClick={() => setRejectingId(item.id)} disabled={decidingId === item.id}
-                  style={{ height: 32, padding: "0 14px", fontSize: 12, color: color.ink, background: color.white, border: `1px solid ${color.border}`, borderRadius: radius.control, cursor: "pointer" }}>
+                  style={{ height: 32, padding: "0 14px", fontSize: 12, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", cursor: "pointer" }}>
                   Reject
                 </button>
               </div>
@@ -376,16 +376,16 @@ function BulletEditor({ bullets, onChange, placeholder }: { bullets: string[]; o
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {bullets.map((b, i) => (
         <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-          <span style={{ marginTop: 12, width: 4, height: 4, borderRadius: "50%", background: color.inkTertiary, flexShrink: 0 }} />
+          <span style={{ marginTop: 12, width: 4, height: 4, borderRadius: "50%", background: "var(--lcs-ink-muted)", flexShrink: 0 }} />
           <input value={b} onChange={(e) => update(i, e.target.value)} style={{ ...inputStyle, flex: 1 }} placeholder={placeholder} />
           <button type="button" onClick={() => remove(i)}
-            style={{ marginTop: 4, display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
+            style={{ marginTop: 4, display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)", background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
             <X style={{ width: 14, height: 14 }} />
           </button>
         </div>
       ))}
       <button type="button" onClick={add}
-        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: color.inkTertiary, border: `1px dashed ${color.border}`, borderRadius: radius.control, padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
+        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: "var(--lcs-ink-muted)", border: `1px dashed var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
         <Plus style={{ width: 14, height: 14 }} /> Add bullet
       </button>
     </div>
@@ -846,13 +846,14 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
 
   if (isLoading) {
     return (
-      <PageFrame title="Investor profile">
+      <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+        <LcsPageHeader title="Investor profile" />
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {[1, 2, 3].map((n) => (
-            <div key={n} style={{ height: 96, border: `1px solid ${color.border}`, background: color.canvas }} />
+            <div key={n} style={{ height: 96, border: `1px solid var(--lcs-line)`, background: "var(--lcs-surface)" }} />
           ))}
         </div>
-      </PageFrame>
+      </div>
     );
   }
 
@@ -871,24 +872,32 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
     progress.current_step === "thesis";
 
   return (
-    <PageFrame
-      breadcrumb={[{ label: "Investor" }, { label: copy ? copy.title : "Profile" }]}
-      title={copy ? copy.title : "Investor profile"}
-      description={copy ? copy.description : "Your fund's digital profile — shown publicly and inside unlocked deal rooms."}
-      actions={
+    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <span>Investor</span>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>{copy ? copy.title : "Profile"}</span>
+      </div>
+      <LcsPageHeader
+        title={copy ? copy.title : "Investor profile"}
+        description={copy ? copy.description : "Your fund's digital profile — shown publicly and inside unlocked deal rooms."}
+        action={
         <button type="button" onClick={handleSave} disabled={saving}
           style={{
             display: "inline-flex", alignItems: "center", gap: 6, height: 36,
-            background: color.ink === "#0A0A0B" ? "#7C3AED" : "#7C3AED", color: "#fff",
-            border: "none", borderRadius: radius.control, padding: "0 16px",
-            fontSize: 13, fontWeight: 500, fontFamily: font.body, cursor: saving ? "default" : "pointer",
+            background: "#7C3AED", color: "#fff",
+            border: "none", borderRadius: "var(--radius-lcs-control)", padding: "0 16px",
+            fontSize: 13, fontWeight: 500, fontFamily: "var(--font-lcs-ui)", cursor: saving ? "default" : "pointer",
             opacity: saving ? 0.6 : 1,
           }}>
           {saving ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Save style={{ width: 14, height: 14 }} />}
           {saved ? "Saved" : existing ? "Save changes" : "Save & continue"}
         </button>
-      }
-    >
+        }
+      />
       {showThesisSpotlight && (
         <OnboardingTour
           steps={[{
@@ -912,11 +921,11 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
         />
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: hasLeft && hasRail ? "1fr 380px" : "1fr", gap: space.block, alignItems: "flex-start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: hasLeft && hasRail ? "1fr 380px" : "1fr", gap: 24, alignItems: "flex-start" }}>
 
         {/* ── LEFT: form sections ─────────────────────────────────── */}
         {hasLeft && (
-        <div style={{ display: "flex", flexDirection: "column", gap: space.block, minWidth: 0 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24, minWidth: 0 }}>
 
           {/* Identity & Fund */}
           {show("identity") && (
@@ -934,7 +943,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                   </div>
                   <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
                 </label>
-                <div style={{ fontSize: 12, color: color.inkTertiary }}>Photo, max 2MB</div>
+                <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Photo, max 2MB</div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -957,7 +966,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
               </div>
 
               <div>
-                <label style={{ fontSize: 12, color: color.inkTertiary, display: "block", marginBottom: 8 }}>Social links</label>
+                <label style={{ fontSize: 12, color: "var(--lcs-ink-muted)", display: "block", marginBottom: 8 }}>Social links</label>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {form.social_links.map((link, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -983,14 +992,14 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                         placeholder="https://…"
                       />
                       <button type="button" onClick={() => set("social_links", form.social_links.filter((_, idx) => idx !== i))}
-                        style={{ display: "grid", placeItems: "center", height: 32, width: 32, borderRadius: radius.control, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                        style={{ display: "grid", placeItems: "center", height: 32, width: 32, borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)", background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
                         <X style={{ width: 14, height: 14 }} />
                       </button>
                     </div>
                   ))}
                   <button type="button"
                     onClick={() => set("social_links", [...form.social_links, { platform: "LinkedIn", url: "" }])}
-                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: color.inkTertiary, border: `1px dashed ${color.border}`, borderRadius: radius.control, padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
+                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: "var(--lcs-ink-muted)", border: `1px dashed var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
                     <Plus style={{ width: 14, height: 14 }} /> Add link
                   </button>
                 </div>
@@ -1005,11 +1014,11 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
             <SectionHeader icon={Sparkles} title="Upload fund deck" description="AI drafts your profile from a deck — you confirm before anything is applied" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
               {!deckDraft ? (
-                <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: `1px dashed ${color.border}`, borderRadius: radius.structural, padding: "28px 16px", cursor: deckExtracting ? "default" : "pointer", gap: 8 }}>
+                <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", border: `1px dashed var(--lcs-line)`, borderRadius: 0, padding: "28px 16px", cursor: deckExtracting ? "default" : "pointer", gap: 8 }}>
                   {deckExtracting
-                    ? <Loader2 style={{ width: 18, height: 18, color: color.inkTertiary }} className="animate-spin" />
-                    : <Upload style={{ width: 18, height: 18, color: color.inkTertiary }} />}
-                  <span style={{ fontSize: 12, color: color.inkTertiary, textAlign: "center" }}>
+                    ? <Loader2 style={{ width: 18, height: 18, color: "var(--lcs-ink-muted)" }} className="animate-spin" />
+                    : <Upload style={{ width: 18, height: 18, color: "var(--lcs-ink-muted)" }} />}
+                  <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)", textAlign: "center" }}>
                     {deckExtracting
                       ? (aiStillWorking ? "Still working — this may take a moment." : "Reading document…")
                       : "Click to select PDF, DOCX, or PPTX"}
@@ -1018,9 +1027,9 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                     onChange={(e) => e.target.files?.[0] && handleDeckUpload(e.target.files[0])} />
                 </label>
               ) : (
-                <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: color.ink }}>Draft extracted — review before applying</div>
-                  <div style={{ fontSize: 12, color: color.inkSecondary, lineHeight: 1.6 }}>
+                <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: "var(--lcs-ink)" }}>Draft extracted — review before applying</div>
+                  <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", lineHeight: 1.6 }}>
                     {["fund_name", "your_name", "thesis_statement", "sectors", "geography"].map((k) => {
                       const v = deckDraft[k];
                       if (!v) return null;
@@ -1031,21 +1040,21 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                     )}
                   </div>
                   {deckMissing.length > 0 && (
-                    <div style={{ fontSize: 11, color: color.inkTertiary }}>Not found: {deckMissing.join(", ")}</div>
+                    <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)" }}>Not found: {deckMissing.join(", ")}</div>
                   )}
                   <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                     <button type="button" onClick={discardDeckDraft}
-                      style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", color: color.inkSecondary, cursor: "pointer" }}>
+                      style={{ border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "6px 12px", fontSize: 12, background: "transparent", color: "var(--lcs-ink-muted)", cursor: "pointer" }}>
                       Discard
                     </button>
                     <button type="button" onClick={applyDeckDraft}
-                      style={{ border: "none", borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "#7C3AED", color: "#fff", cursor: "pointer" }}>
+                      style={{ border: "none", borderRadius: "var(--radius-lcs-control)", padding: "6px 12px", fontSize: 12, background: "#7C3AED", color: "#fff", cursor: "pointer" }}>
                       Apply to form
                     </button>
                   </div>
                 </div>
               )}
-              <p style={{ fontSize: 11, color: color.inkTertiary, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 11, color: "var(--lcs-ink-muted)", lineHeight: 1.5 }}>
                 Extracted values are draft only — nothing is saved or published until you review and click Save changes. Track-record items always start Unverified until you attach evidence.
               </p>
             </div>
@@ -1057,12 +1066,12 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           <Card data-tour="thesis-accordion">
             <SectionHeader icon={Sparkles} title="Thesis summary" description="Your one-sentence thesis, bullet points, sectors, stages, and cheque size" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ fontSize: 12, fontWeight: 500, color: "#7C3AED" }}>Thesis statement</div>
                   {pendingByField.has("thesis_statement") && <PendingApprovalBadge pendingValue={pendingByField.get("thesis_statement")!.new_value} />}
                 </div>
-                <p style={{ fontSize: 11, color: color.inkTertiary, lineHeight: 1.5, margin: 0 }}>
+                <p style={{ fontSize: 11, color: "var(--lcs-ink-muted)", lineHeight: 1.5, margin: 0 }}>
                   One sentence formula: <em>[Fund] is a [$ size] [stage] fund in [geography] backing [sector] companies with [edge].</em>
                 </p>
                 <textarea value={form.thesis_statement} onChange={(e) => set("thesis_statement", e.target.value)}
@@ -1090,10 +1099,10 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                     return (
                       <button key={s} type="button" onClick={() => toggleStage(s)}
                         style={{
-                          padding: "6px 12px", borderRadius: radius.control, fontSize: 12,
-                          border: active ? "1px solid #7C3AED" : `1px solid ${color.border}`,
-                          background: active ? "#7C3AED" : color.white,
-                          color: active ? "#fff" : color.ink,
+                          padding: "6px 12px", borderRadius: "var(--radius-lcs-control)", fontSize: 12,
+                          border: active ? "1px solid #7C3AED" : `1px solid var(--lcs-line)`,
+                          background: active ? "#7C3AED" : "var(--lcs-white)",
+                          color: active ? "#fff" : "var(--lcs-ink)",
                           cursor: "pointer",
                         }}>
                         {s}
@@ -1128,16 +1137,16 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
             <SectionHeader icon={Trophy} title="Track record" description="Named investments and outcomes" />
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
               {form.track_record.length === 0 && (
-                <p style={{ fontSize: 13, color: color.inkTertiary }}>No track record items yet.</p>
+                <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)" }}>No track record items yet.</p>
               )}
               {form.track_record.map((item, i) => {
                 return (
-                  <div key={i} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div key={i} style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ display: "flex", gap: 8 }}>
                       <input value={item.label} onChange={(e) => updateTrackRecordItem(i, { label: e.target.value })}
                         style={{ ...inputStyle, flex: 1 }} placeholder="Company or exit name" />
                       <button type="button" onClick={() => removeTrackRecordItem(i)}
-                        style={{ display: "grid", placeItems: "center", height: 36, width: 36, borderRadius: radius.control, color: color.inkTertiary, background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                        style={{ display: "grid", placeItems: "center", height: 36, width: 36, borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)", background: "transparent", border: "none", cursor: "pointer", flexShrink: 0 }}>
                         <X style={{ width: 14, height: 14 }} />
                       </button>
                     </div>
@@ -1147,7 +1156,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                 );
               })}
               <button type="button" onClick={addTrackRecordItem}
-                style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: color.inkTertiary, border: `1px dashed ${color.border}`, borderRadius: radius.control, padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
+                style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 12, color: "var(--lcs-ink-muted)", border: `1px dashed var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "8px 12px", background: "transparent", cursor: "pointer" }}>
                 <Plus style={{ width: 14, height: 14 }} /> Add track record item
               </button>
             </div>
@@ -1178,7 +1187,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                   fundName={form.fund_name}
                 />
               ) : (
-                <p style={{ fontSize: 13, color: color.inkTertiary, textAlign: "center", padding: "16px 0" }}>Save your profile first to add team members.</p>
+                <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)", textAlign: "center", padding: "16px 0" }}>Save your profile first to add team members.</p>
               )}
             </div>
           </Card>
@@ -1194,7 +1203,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
                   <PortfolioSection profileId={existing.id} />
                 </SectionErrorBoundary>
               ) : (
-                <p style={{ fontSize: 13, color: color.inkTertiary, textAlign: "center", padding: "16px 0" }}>Save your profile first to add portfolio companies.</p>
+                <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)", textAlign: "center", padding: "16px 0" }}>Save your profile first to add portfolio companies.</p>
               )}
             </div>
           </Card>
@@ -1230,10 +1239,10 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           {show("completeness") && (
           <Card style={{ padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Profile completeness</div>
+              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "var(--font-lcs-ui)" }}>Profile completeness</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#7C3AED" }}>{completeness}%</div>
             </div>
-            <div style={{ height: 4, background: color.canvas, borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ height: 4, background: "var(--lcs-surface)", borderRadius: 2, overflow: "hidden" }}>
               <div style={{ height: 4, width: `${completeness}%`, background: "#7C3AED" }} />
             </div>
           </Card>
@@ -1242,38 +1251,38 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           {/* Preview tabs */}
           {show("preview") && (
           <Card>
-            <div style={{ display: "flex", borderBottom: `1px solid ${color.border}` }}>
+            <div style={{ display: "flex", borderBottom: `1px solid var(--lcs-line)` }}>
               {(["public", "dealroom"] as const).map((tab) => (
                 <button key={tab} type="button" onClick={() => setPreviewTab(tab)}
                   style={{
                     flex: 1, padding: "10px 0", fontSize: 12, fontWeight: 500, cursor: "pointer",
                     background: "transparent", border: "none",
-                    color: previewTab === tab ? color.ink : color.inkTertiary,
+                    color: previewTab === tab ? "var(--lcs-ink)" : "var(--lcs-ink-muted)",
                     borderBottom: previewTab === tab ? "2px solid #7C3AED" : "2px solid transparent",
                   }}>
                   {tab === "public" ? "Public view" : "Deal room view"}
                 </button>
               ))}
             </div>
-            <div style={{ padding: 16, fontSize: 12, color: color.inkSecondary, lineHeight: 1.6 }}>
+            <div style={{ padding: 16, fontSize: 12, color: "var(--lcs-ink-muted)", lineHeight: 1.6 }}>
               {previewTab === "public" ? (
                 <>
-                  <div style={{ fontWeight: 600, color: color.ink }}>{form.your_name || "Your name"}</div>
+                  <div style={{ fontWeight: 600, color: "var(--lcs-ink)" }}>{form.your_name || "Your name"}</div>
                   <div>{form.role} {form.fund_name && `· ${form.fund_name}`}</div>
                   {form.public_fields.includes("thesis_statement") && form.thesis_statement && (
                     <p style={{ marginTop: 8 }}>{form.thesis_statement.slice(0, 140)}</p>
                   )}
-                  <div style={{ marginTop: 8, fontSize: 11, color: color.inkTertiary }}>
+                  <div style={{ marginTop: 8, fontSize: 11, color: "var(--lcs-ink-muted)" }}>
                     {form.public_fields.length} of {PUBLIC_FIELD_OPTIONS.length} fields visible
                   </div>
                 </>
               ) : (
                 <>
-                  <div style={{ fontWeight: 600, color: color.ink }}>{form.your_name || "Your name"}</div>
+                  <div style={{ fontWeight: 600, color: "var(--lcs-ink)" }}>{form.your_name || "Your name"}</div>
                   <div>{form.role} {form.fund_name && `· ${form.fund_name}`}</div>
                   <p style={{ marginTop: 8 }}>Cheque: {form.check_size_min || "—"} – {form.check_size_max || "—"}</p>
                   <p>Track record: {form.track_record.length} item(s)</p>
-                  <div style={{ marginTop: 8, fontSize: 11, color: color.inkTertiary }}>
+                  <div style={{ marginTop: 8, fontSize: 11, color: "var(--lcs-ink-muted)" }}>
                     Full profile — visible only once a deal room reaches the Information stage.
                   </div>
                 </>
@@ -1287,19 +1296,19 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
           <Card style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Globe style={{ width: 14, height: 14, color: "#7C3AED" }} />
-              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: font.display }}>Shareable profile</div>
+              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "var(--font-lcs-ui)" }}>Shareable profile</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{form.profile_published ? "Public" : "Private"}</div>
-                <div style={{ fontSize: 11, color: color.inkTertiary, marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", marginTop: 2 }}>
                   {form.profile_published ? "Anyone with the link can view" : "Only in deal rooms you've unlocked"}
                 </div>
               </div>
               <button type="button" onClick={() => set("profile_published", !form.profile_published)}
                 style={{
                   height: 22, width: 40, borderRadius: 11, position: "relative", flexShrink: 0, border: "none", cursor: "pointer",
-                  background: form.profile_published ? "#7C3AED" : color.border,
+                  background: form.profile_published ? "#7C3AED" : "var(--lcs-line)",
                 }}>
                 <div style={{
                   position: "absolute", top: 2, height: 18, width: 18, borderRadius: "50%", background: "#fff",
@@ -1309,16 +1318,16 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
             </div>
             <Field label="Profile URL slug">
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ fontSize: 12, color: color.inkTertiary, paddingLeft: 4 }}>/i/</span>
+                <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)", paddingLeft: 4 }}>/i/</span>
                 <input value={form.profile_slug} onChange={(e) => set("profile_slug", slugify(e.target.value))} style={{ ...inputStyle, flex: 1 }} placeholder="acme-ventures" />
               </div>
             </Field>
             {form.profile_published && (
-              <div style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
-                <LinkIcon style={{ width: 14, height: 14, color: color.inkTertiary, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, color: color.inkTertiary, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profileUrl}</span>
+              <div style={{ border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                <LinkIcon style={{ width: 14, height: 14, color: "var(--lcs-ink-muted)", flexShrink: 0 }} />
+                <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profileUrl}</span>
                 <button type="button" onClick={() => { navigator.clipboard.writeText(profileUrl); toast.success("Link copied"); }}
-                  style={{ background: "transparent", border: "none", cursor: "pointer", color: color.inkTertiary, flexShrink: 0 }}>
+                  style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--lcs-ink-muted)", flexShrink: 0 }}>
                   <Copy style={{ width: 14, height: 14 }} />
                 </button>
               </div>
@@ -1326,7 +1335,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
             <a href={profileUrl} target="_blank" rel="noopener noreferrer"
               style={{
                 display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
-                borderRadius: radius.control, padding: "8px 12px", fontSize: 12, fontWeight: 500, textDecoration: "none",
+                borderRadius: "var(--radius-lcs-control)", padding: "8px 12px", fontSize: 12, fontWeight: 500, textDecoration: "none",
                 background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.25)", color: "#7C3AED",
               }}>
               <Eye style={{ width: 14, height: 14 }} /> View public profile
@@ -1337,7 +1346,7 @@ export function InvestorProfilePage({ view }: { view?: InvestorProfileView } = {
         </div>
         )}
       </div>
-    </PageFrame>
+    </div>
   );
 }
 
@@ -1402,38 +1411,38 @@ function PortfolioSection({ profileId }: { profileId: string }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <p style={{ fontSize: 12, color: color.inkTertiary }}>Companies you've invested in and want to showcase — separate from your active pipeline in Startups.</p>
+      <p style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Companies you've invested in and want to showcase — separate from your active pipeline in Startups.</p>
 
       {!showForm && (
         <button onClick={() => setShowForm(true)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "8px 12px", fontSize: 12, border: "none", cursor: "pointer", width: "fit-content" }}>
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: "var(--radius-lcs-control)", background: "#7C3AED", color: "#fff", padding: "8px 12px", fontSize: 12, border: "none", cursor: "pointer", width: "fit-content" }}>
           <Plus style={{ width: 14, height: 14 }} /> Add portfolio company
         </button>
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+        <form onSubmit={handleSubmit} style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>{editingId ? "Edit company" : "New company"}</div>
-            <button type="button" onClick={closeForm} style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{editingId ? "Edit company" : "New company"}</div>
+            <button type="button" onClick={closeForm} style={{ background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label style={{ fontSize: 12, color: color.inkTertiary }}>Company name *</label>
+              <label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Company name *</label>
               <input value={pf.company_name} onChange={(e) => setPf((f) => ({ ...f, company_name: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Stripe" />
             </div>
             <div>
-              <label style={{ fontSize: 12, color: color.inkTertiary }}>Website</label>
+              <label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Website</label>
               <input value={pf.website_url} onChange={(e) => setPf((f) => ({ ...f, website_url: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="https://stripe.com" />
             </div>
           </div>
           <div>
-            <label style={{ fontSize: 12, color: color.inkTertiary }}>Description</label>
+            <label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Description</label>
             <textarea value={pf.description} onChange={(e) => setPf((f) => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, marginTop: 4, resize: "none" }} placeholder="Online payments infrastructure. Led seed round, 8x return at IPO." />
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-            <button type="button" onClick={closeForm} style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
-            <button type="submit" disabled={submitting} style={{ display: "inline-flex", alignItems: "center", gap: 4, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "6px 12px", fontSize: 12, border: "none", cursor: "pointer", opacity: submitting ? 0.6 : 1 }}>
+            <button type="button" onClick={closeForm} style={{ border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
+            <button type="submit" disabled={submitting} style={{ display: "inline-flex", alignItems: "center", gap: 4, borderRadius: "var(--radius-lcs-control)", background: "#7C3AED", color: "#fff", padding: "6px 12px", fontSize: 12, border: "none", cursor: "pointer", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <Save style={{ width: 12, height: 12 }} />}
               {editingId ? "Update" : "Add"}
             </button>
@@ -1444,21 +1453,21 @@ function PortfolioSection({ profileId }: { profileId: string }) {
       {isLoading ? (
         <div style={{ textAlign: "center", padding: "24px 0" }}><Loader2 style={{ width: 16, height: 16 }} className="animate-spin mx-auto" /></div>
       ) : isError ? (
-        <div style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", borderRadius: radius.structural, padding: 16, textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: color.inkTertiary }}>Couldn't load portfolio — try refreshing the page.</p>
+        <div style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", borderRadius: 0, padding: 16, textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)" }}>Couldn't load portfolio — try refreshing the page.</p>
         </div>
       ) : entries.length === 0 ? (
-        <EmptyState kind="empty" title="No portfolio companies yet" />
+        <LcsEmptyState title="No portfolio companies yet" text="Companies you invest in appear here." />
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {entries.map((e) => (
-            <div key={e.id} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", alignItems: "flex-start", gap: 12 }}>
-              <div style={{ height: 40, width: 40, borderRadius: radius.control, overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+            <div key={e.id} style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 16, display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{ height: 40, width: 40, borderRadius: "var(--radius-lcs-control)", overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
                 {e.logo_url ? <img src={e.logo_url} alt={e.company_name} style={{ height: "100%", width: "100%", objectFit: "cover" }} /> : <span>{e.company_name.charAt(0).toUpperCase()}</span>}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{e.company_name}</div>
-                {e.description && <div style={{ fontSize: 12, color: color.inkTertiary, marginTop: 2 }}>{e.description}</div>}
+                {e.description && <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", marginTop: 2 }}>{e.description}</div>}
                 {e.website_url && (
                   <a href={e.website_url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", marginTop: 4, textDecoration: "none" }}>
                     <Globe style={{ width: 10, height: 10 }} /> Website
@@ -1467,11 +1476,11 @@ function PortfolioSection({ profileId }: { profileId: string }) {
               </div>
               <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                 <button onClick={() => { setPf({ company_name: e.company_name, description: e.description ?? "", website_url: e.website_url ?? "", logo_url: e.logo_url ?? "" }); setEditingId(e.id); setShowForm(true); }}
-                  style={{ display: "grid", placeItems: "center", height: 24, width: 24, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}>
+                  style={{ display: "grid", placeItems: "center", height: 24, width: 24, borderRadius: "var(--radius-lcs-control)", background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer" }}>
                   <Pencil style={{ width: 12, height: 12 }} />
                 </button>
                 <button onClick={() => handleDelete(e.id)}
-                  style={{ display: "grid", placeItems: "center", height: 24, width: 24, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}>
+                  style={{ display: "grid", placeItems: "center", height: 24, width: 24, borderRadius: "var(--radius-lcs-control)", background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer" }}>
                   <Trash2 style={{ width: 12, height: 12 }} />
                 </button>
               </div>
@@ -1590,16 +1599,16 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {!showForm && (
         <button onClick={() => setShowForm(true)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "8px 12px", fontSize: 12, border: "none", cursor: "pointer", width: "fit-content" }}>
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: "var(--radius-lcs-control)", background: "#7C3AED", color: "#fff", padding: "8px 12px", fontSize: 12, border: "none", cursor: "pointer", width: "fit-content" }}>
           <Plus style={{ width: 14, height: 14 }} /> Add member
         </button>
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} style={{ border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+        <form onSubmit={handleSubmit} style={{ border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: color.inkTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>{editingId ? "Edit member" : "New member"}</div>
-            <button type="button" onClick={closeForm} style={{ background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--lcs-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{editingId ? "Edit member" : "New member"}</div>
+            <button type="button" onClick={closeForm} style={{ background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer" }}><X style={{ width: 16, height: 16 }} /></button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <label style={{ position: "relative", cursor: "pointer", flexShrink: 0 }}>
@@ -1608,41 +1617,41 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
               </div>
               <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
             </label>
-            <div style={{ fontSize: 12, color: color.inkTertiary }}>Photo (optional, max 2MB)</div>
+            <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Photo (optional, max 2MB)</div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Full name *</label><input value={mf.name} onChange={(e) => setMf((f) => ({ ...f, name: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Jane Doe" /></div>
-            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Designation</label><input value={mf.designation} onChange={(e) => setMf((f) => ({ ...f, designation: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="General Partner" /></div>
+            <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Full name *</label><input value={mf.name} onChange={(e) => setMf((f) => ({ ...f, name: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Jane Doe" /></div>
+            <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Designation</label><input value={mf.designation} onChange={(e) => setMf((f) => ({ ...f, designation: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="General Partner" /></div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Role *</label><input value={mf.role} onChange={(e) => setMf((f) => ({ ...f, role: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Partner" /></div>
+            <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Role *</label><input value={mf.role} onChange={(e) => setMf((f) => ({ ...f, role: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Partner" /></div>
             <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 8 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <div style={{ height: 16, width: 32, borderRadius: 8, position: "relative", background: mf.is_admin ? "#7C3AED" : color.border }} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
+                <div style={{ height: 16, width: 32, borderRadius: 8, position: "relative", background: mf.is_admin ? "#7C3AED" : "var(--lcs-line)" }} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
                   <div style={{ position: "absolute", top: 2, height: 12, width: 12, borderRadius: "50%", background: "#fff", transform: mf.is_admin ? "translateX(18px)" : "translateX(2px)", transition: "transform 0.15s" }} />
                 </div>
-                <span style={{ fontSize: 12, color: color.inkTertiary }}>Fund admin</span>
+                <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Fund admin</span>
               </label>
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Contact email</label><input type="email" value={mf.contact_email} onChange={(e) => setMf((f) => ({ ...f, contact_email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>
+            <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Contact email</label><input type="email" value={mf.contact_email} onChange={(e) => setMf((f) => ({ ...f, contact_email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>
             <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 8 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                 <input type="checkbox" checked={mf.key_person} onChange={(e) => setMf((f) => ({ ...f, key_person: e.target.checked }))} style={{ height: 14, width: 14 }} />
-                <span style={{ fontSize: 12, fontWeight: 500, color: color.ink }}>Key person</span>
+                <span style={{ fontSize: 12, fontWeight: 500, color: "var(--lcs-ink)" }}>Key person</span>
               </label>
             </div>
           </div>
-          <div style={{ fontSize: 11, color: color.inkTertiary, marginTop: -4 }}>
+          <div style={{ fontSize: 11, color: "var(--lcs-ink-muted)", marginTop: -4 }}>
             Key people appear as a card in every shared deal room from room entry — name, photo, and designation only,
             until Information stage unlocks the full profile.
           </div>
-          {!editingId && <div><label style={{ fontSize: 12, color: color.inkTertiary, display: "flex", alignItems: "center", gap: 4 }}><Mail style={{ width: 12, height: 12 }} /> Invite email (optional — sends an invite)</label><input type="email" value={mf.email} onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>}
-          <div><label style={{ fontSize: 12, color: color.inkTertiary }}>Short bio</label><textarea value={mf.bio} onChange={(e) => setMf((f) => ({ ...f, bio: e.target.value }))} rows={2} style={{ ...inputStyle, marginTop: 4, resize: "none" }} placeholder="Former operator turned investor." /></div>
+          {!editingId && <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)", display: "flex", alignItems: "center", gap: 4 }}><Mail style={{ width: 12, height: 12 }} /> Invite email (optional — sends an invite)</label><input type="email" value={mf.email} onChange={(e) => setMf((f) => ({ ...f, email: e.target.value }))} style={{ ...inputStyle, marginTop: 4 }} placeholder="partner@fund.com" /></div>}
+          <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Short bio</label><textarea value={mf.bio} onChange={(e) => setMf((f) => ({ ...f, bio: e.target.value }))} rows={2} style={{ ...inputStyle, marginTop: 4, resize: "none" }} placeholder="Former operator turned investor." /></div>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-            <button type="button" onClick={closeForm} style={{ border: `1px solid ${color.border}`, borderRadius: radius.control, padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
-            <button type="submit" disabled={submitting} style={{ display: "inline-flex", alignItems: "center", gap: 4, borderRadius: radius.control, background: "#7C3AED", color: "#fff", padding: "6px 12px", fontSize: 12, border: "none", cursor: "pointer", opacity: submitting ? 0.6 : 1 }}>
+            <button type="button" onClick={closeForm} style={{ border: `1px solid var(--lcs-line)`, borderRadius: "var(--radius-lcs-control)", padding: "6px 12px", fontSize: 12, background: "transparent", cursor: "pointer" }}>Cancel</button>
+            <button type="submit" disabled={submitting} style={{ display: "inline-flex", alignItems: "center", gap: 4, borderRadius: "var(--radius-lcs-control)", background: "#7C3AED", color: "#fff", padding: "6px 12px", fontSize: 12, border: "none", cursor: "pointer", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <Save style={{ width: 12, height: 12 }} />} {editingId ? "Update" : "Add"}
             </button>
           </div>
@@ -1650,11 +1659,11 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
       )}
 
       {isLoading ? <div style={{ textAlign: "center", padding: "24px 0" }}><Loader2 style={{ width: 16, height: 16 }} className="animate-spin mx-auto" /></div>
-       : members.length === 0 && !showForm ? <EmptyState kind="empty" title="No team members yet" />
+       : members.length === 0 && !showForm ? <LcsEmptyState title="No team members yet" text="People you add to your team appear here." />
        : (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {members.map((m) => (
-            <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 12, border: `1px solid ${color.border}`, borderRadius: radius.structural, padding: 12 }}>
+            <div key={m.id} style={{ display: "flex", alignItems: "center", gap: 12, border: `1px solid var(--lcs-line)`, borderRadius: 0, padding: 12 }}>
               <div style={{ height: 36, width: 36, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "grid", placeItems: "center", color: "#fff", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
                 {m.avatar_url ? <img src={m.avatar_url} alt={m.name} style={{ height: "100%", width: "100%", objectFit: "cover" }} /> : <span>{m.name.charAt(0).toUpperCase()}</span>}
               </div>
@@ -1663,13 +1672,13 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
                   <span style={{ fontSize: 13, fontWeight: 500 }}>{m.name}</span>
                   {m.key_person && <span style={{ fontSize: 9, fontWeight: 700, color: "#7C3AED", border: "1px solid rgba(124,58,237,0.3)", borderRadius: 99, padding: "1px 6px" }}>KEY</span>}
                   {m.designation && <span style={{ fontSize: 10, background: "rgba(124,58,237,0.08)", color: "#7C3AED", padding: "2px 6px", borderRadius: 2, fontWeight: 500 }}>{m.designation}</span>}
-                  {m.role && m.role !== m.designation && <span style={{ fontSize: 10, background: color.canvas, color: color.inkTertiary, padding: "2px 6px", borderRadius: 2 }}>{m.role}</span>}
+                  {m.role && m.role !== m.designation && <span style={{ fontSize: 10, background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)", padding: "2px 6px", borderRadius: 2 }}>{m.role}</span>}
                   {m.is_admin && <span style={{ fontSize: 9, background: "rgba(16,185,129,0.1)", color: "#10B981", padding: "2px 6px", borderRadius: 2, fontWeight: 700, textTransform: "uppercase" }}>Admin</span>}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                <button onClick={() => openEdit(m)} style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: "transparent", border: "none", color: color.inkTertiary, cursor: "pointer" }}><Pencil style={{ width: 14, height: 14 }} /></button>
-                <button onClick={() => handleDelete(m.id)} style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: radius.control, background: deletingId === m.id ? "rgba(239,68,68,0.08)" : "transparent", border: "none", color: deletingId === m.id ? "#EF4444" : color.inkTertiary, cursor: "pointer" }}><Trash2 style={{ width: 14, height: 14 }} /></button>
+                <button onClick={() => openEdit(m)} style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: "var(--radius-lcs-control)", background: "transparent", border: "none", color: "var(--lcs-ink-muted)", cursor: "pointer" }}><Pencil style={{ width: 14, height: 14 }} /></button>
+                <button onClick={() => handleDelete(m.id)} style={{ display: "grid", placeItems: "center", height: 28, width: 28, borderRadius: "var(--radius-lcs-control)", background: deletingId === m.id ? "rgba(239,68,68,0.08)" : "transparent", border: "none", color: deletingId === m.id ? "#EF4444" : "var(--lcs-ink-muted)", cursor: "pointer" }}><Trash2 style={{ width: 14, height: 14 }} /></button>
               </div>
             </div>
           ))}
@@ -1688,8 +1697,8 @@ class SectionErrorBoundary extends Component<{ children: ReactNode }, { error: E
   render() {
     if (this.state.error) {
       return (
-        <div style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", borderRadius: radius.structural, padding: 16, textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: color.inkTertiary }}>Couldn't load this section — try refreshing the page.</p>
+        <div style={{ border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", borderRadius: 0, padding: 16, textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)" }}>Couldn't load this section — try refreshing the page.</p>
           <button style={{ marginTop: 8, fontSize: 12, color: "#7C3AED", background: "transparent", border: "none", cursor: "pointer", textDecoration: "underline" }}
             onClick={() => this.setState({ error: null })}>
             Retry

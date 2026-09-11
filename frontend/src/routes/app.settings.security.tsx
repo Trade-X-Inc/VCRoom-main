@@ -4,19 +4,17 @@ import { Shield, AlertTriangle, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { LcsButton, LcsModal, LcsTextField } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/settings/security")({
   component: SecuritySettings,
 });
-
-const inputCls = "w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/10";
 
 function SecuritySettings() {
   const { user, signOut } = useAuth();
   const nav = useNavigate();
 
   // Password change
-  const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -36,7 +34,7 @@ function SecuritySettings() {
       const { error } = await supabase.auth.updateUser({ password: newPw });
       if (error) throw error;
       toast.success("Password updated successfully");
-      setCurrentPw(""); setNewPw(""); setConfirmPw("");
+      setNewPw(""); setConfirmPw("");
     } catch (err: any) {
       toast.error(err.message || "Failed to update password");
     } finally {
@@ -73,145 +71,117 @@ function SecuritySettings() {
     }
   };
 
-  // Detect if user logged in with OAuth (no password to change)
-  const isOAuthUser = user?.email && !user?.email.includes("@") === false &&
-    supabase.auth.getUser !== undefined;
-
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-5">
       {/* Change password */}
-      <section className="rounded-none border border-border/60 bg-card p-5 space-y-4">
+      <section className="border p-5 flex flex-col gap-4" style={{ borderColor: "var(--lcs-line)" }}>
         <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-brand" />
-          <h2 className="text-sm font-semibold">Change password</h2>
+          <Shield className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
+          <h2 className="text-sm font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Change password</h2>
         </div>
 
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">New password</label>
-            <div className="relative">
-              <input
-                type={showPw ? "text" : "password"}
-                className={inputCls + " pr-10"}
-                value={newPw}
-                onChange={(e) => setNewPw(e.target.value)}
-                placeholder="At least 8 characters"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPw((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
+        <div className="flex flex-col gap-3">
+          <div className="relative">
+            <LcsTextField
+              label="New password"
+              type={showPw ? "text" : "password"}
+              value={newPw}
+              onChange={(e) => setNewPw(e.target.value)}
+              placeholder="At least 8 characters"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              className="absolute right-3 top-[30px]"
+              style={{ color: "var(--lcs-ink-muted)" }}
+              aria-label={showPw ? "Hide password" : "Show password"}
+            >
+              {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Confirm new password</label>
-            <input
-              type={showPw ? "text" : "password"}
-              className={inputCls}
-              value={confirmPw}
-              onChange={(e) => setConfirmPw(e.target.value)}
-              placeholder="Repeat new password"
-            />
-          </div>
+          <LcsTextField
+            label="Confirm new password"
+            type={showPw ? "text" : "password"}
+            value={confirmPw}
+            onChange={(e) => setConfirmPw(e.target.value)}
+            placeholder="Repeat new password"
+          />
         </div>
 
         <div className="flex justify-end">
-          <button
-            onClick={handleChangePassword}
-            disabled={savingPw}
-            className="inline-flex items-center gap-1.5 rounded-md hs-gradient text-brand-foreground px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-60 transition-colors"
-          >
+          <LcsButton variant="primary" onClick={handleChangePassword} disabled={savingPw}>
             {savingPw && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Update password
-          </button>
+          </LcsButton>
         </div>
       </section>
 
       {/* Active session */}
-      <section className="rounded-none border border-border/60 bg-card p-5 space-y-3">
-        <h2 className="text-sm font-semibold">Current session</h2>
+      <section className="border p-5 flex flex-col gap-3" style={{ borderColor: "var(--lcs-line)" }}>
+        <h2 className="text-sm font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Current session</h2>
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-medium">
+            <div className="text-sm font-medium flex items-center gap-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
               {user?.email}
-              <span className="ml-2 text-[10px] rounded bg-accent text-brand px-1.5 py-0.5">Active</span>
+              <span
+                className="text-[10px] px-1.5 py-0.5"
+                style={{ background: "var(--lcs-satisfied-wash)", color: "var(--lcs-satisfied)", fontFamily: "var(--font-lcs-ui)" }}
+              >
+                Active
+              </span>
             </div>
-            <div className="text-xs text-muted-foreground mt-0.5">Signed in as {user?.role}</div>
+            <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Signed in as {user?.role}</div>
           </div>
-          <button
-            onClick={handleSignOutAll}
-            className="text-sm text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-3 py-1.5 transition-colors"
-          >
-            Sign out
-          </button>
+          <LcsButton variant="secondary" onClick={handleSignOutAll}>Sign out</LcsButton>
         </div>
       </section>
 
       {/* Danger zone */}
-      <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-5 space-y-3">
-        <div className="flex items-center gap-2 text-destructive">
+      <section className="border p-5 flex flex-col gap-3" style={{ borderColor: "var(--lcs-attention)", background: "var(--lcs-attention-wash)" }}>
+        <div className="flex items-center gap-2" style={{ color: "var(--lcs-attention)" }}>
           <AlertTriangle className="h-4 w-4" />
-          <h2 className="text-sm font-semibold">Danger zone</h2>
+          <h2 className="text-sm font-semibold" style={{ fontFamily: "var(--font-lcs-ui)" }}>Danger zone</h2>
         </div>
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-sm font-medium">Delete account</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
+            <div className="text-sm font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Delete account</div>
+            <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
               Permanently removes your account and all associated data. This cannot be undone.
             </div>
           </div>
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="shrink-0 rounded-md border border-destructive/40 text-destructive px-3 py-2 text-sm hover:bg-destructive/10 transition-colors"
-          >
-            Delete account
-          </button>
+          <LcsButton variant="destructive" onClick={() => setShowDeleteModal(true)}>Delete account</LcsButton>
         </div>
       </section>
 
       {/* Delete confirm modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-          <div className="bg-card border border-border/60 rounded-none p-6 max-w-sm w-full shadow-xl space-y-4">
-            <div className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              <h3 className="font-semibold">Delete your account?</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              This will permanently delete your account, all deal rooms, documents, and data. This action cannot be undone.
-            </p>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Type <strong>DELETE</strong> to confirm</label>
-              <input
-                className="w-full rounded-md border border-destructive/40 bg-background px-3 py-2 text-sm focus:outline-none focus:border-destructive"
-                value={deleteConfirm}
-                onChange={(e) => setDeleteConfirm(e.target.value)}
-                placeholder="DELETE"
-              />
-            </div>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => { setShowDeleteModal(false); setDeleteConfirm(""); }}
-                className="rounded-md border border-border/60 px-4 py-2 text-sm hover:bg-accent transition-colors"
-              >
+        <LcsModal
+          title="Delete your account?"
+          onClose={() => { setShowDeleteModal(false); setDeleteConfirm(""); }}
+          footer={
+            <>
+              <LcsButton variant="secondary" onClick={() => { setShowDeleteModal(false); setDeleteConfirm(""); }} disabled={deleting}>
                 Cancel
-              </button>
-              <button
-                onClick={handleDeleteAccount}
-                disabled={deleting || deleteConfirm !== "DELETE"}
-                className="inline-flex items-center gap-1.5 rounded-md bg-destructive text-destructive-foreground px-4 py-2 text-sm font-medium hover:bg-destructive/90 disabled:opacity-50 transition-colors"
-              >
+              </LcsButton>
+              <LcsButton variant="destructive" onClick={handleDeleteAccount} disabled={deleting || deleteConfirm !== "DELETE"}>
                 {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Delete permanently
-              </button>
-            </div>
-          </div>
-        </div>
+              </LcsButton>
+            </>
+          }
+        >
+          <p className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+            This will permanently delete your account, all deal rooms, documents, and data. This action cannot be undone.
+          </p>
+          <LcsTextField
+            label="Type DELETE to confirm"
+            value={deleteConfirm}
+            onChange={(e) => setDeleteConfirm(e.target.value)}
+            placeholder="DELETE"
+          />
+        </LcsModal>
       )}
     </div>
   );

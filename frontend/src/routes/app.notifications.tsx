@@ -2,14 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Bell, MessageSquare, Briefcase, Sparkles, UserPlus,
-  Settings, CheckCheck, Search, Loader2, ClipboardList,
+  Settings, CheckCheck, Search, ClipboardList,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
-import { cn } from "@/lib/utils";
-import { EmptyState } from "@/components/system";
+import { LcsButton, LcsEmptyState } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/notifications")({
   component: NotificationsPage,
@@ -41,14 +40,17 @@ const iconFor = (kind: string) => {
   return Settings;
 };
 
-const tintFor = (kind: string) => {
-  if (kind === "deal")             return "bg-success/10 text-success";
-  if (kind === "message")          return "bg-accent text-brand";
-  if (kind === "invite")           return "bg-warning/10 text-warning";
-  if (kind === "ai")               return "bg-violet/10 text-violet";
-  if (kind === "document_request") return "bg-accent text-brand";
-  if (kind === "dd_update")        return "bg-success/10 text-success";
-  return "bg-muted text-muted-foreground";
+// Single semantic accent per kind rather than the old mixed decorative
+// palette (success/warning/violet/muted) — matching LCS's "exactly four
+// status colours" discipline. Every notification kind here is either a
+// neutral system event or an accent-worthy one; none of them are
+// error/attention states, so --lcs-accent/--lcs-ink-muted is the
+// complete real vocabulary needed.
+const toneFor = (kind: string) => {
+  if (kind === "deal" || kind === "dd_update" || kind === "document_request" || kind === "message" || kind === "invite" || kind === "ai") {
+    return "var(--lcs-accent)";
+  }
+  return "var(--lcs-ink-muted)";
 };
 
 const filters = [
@@ -127,36 +129,36 @@ function NotificationsPage() {
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-brand" />
-            <h1 className="text-lg font-bold tracking-tight">Notifications</h1>
+            <Bell className="h-5 w-5" style={{ color: "var(--lcs-accent)" }} />
+            <h1 className="text-lg font-bold tracking-tight" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Notifications</h1>
             {unread > 0 && (
-              <span className="text-[10px] rounded-full bg-accent text-brand px-1.5 py-0.5 font-medium">
+              <span
+                className="text-[10px] px-1.5 py-0.5 font-medium"
+                style={{ background: "var(--lcs-progress-wash)", color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}
+              >
                 {unread} unread
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
             Investor activity, document requests, due diligence updates, and more.
           </p>
         </div>
-        <button
-          onClick={markAll}
-          disabled={unread === 0}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-2 text-sm hover:bg-accent disabled:opacity-40"
-        >
+        <LcsButton variant="secondary" onClick={markAll} disabled={unread === 0}>
           <CheckCheck className="h-4 w-4" /> Mark all read
-        </button>
+        </LcsButton>
       </div>
 
       {/* Search + filters */}
       <div className="mt-6 flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--lcs-ink-muted)" }} />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search notifications…"
-            className="w-full rounded-md border border-border/60 bg-background pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-brand/50"
+            className="w-full pl-8 pr-3 py-2 text-sm focus:outline-none"
+            style={{ fontFamily: "var(--font-lcs-ui)", border: "1px solid var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }}
           />
         </div>
         <div className="flex flex-wrap gap-1">
@@ -164,12 +166,13 @@ function NotificationsPage() {
             <button
               key={f.k}
               onClick={() => setFilter(f.k)}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-xs transition-colors",
-                filter === f.k
-                  ? "bg-foreground text-background"
-                  : "border border-border/60 hover:bg-accent",
-              )}
+              className="px-3 py-1.5 text-xs transition-colors"
+              style={{
+                fontFamily: "var(--font-lcs-ui)",
+                background: filter === f.k ? "var(--lcs-accent)" : "transparent",
+                color: filter === f.k ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
+                border: filter === f.k ? "1px solid var(--lcs-accent)" : "1px solid var(--lcs-line)",
+              }}
             >
               {f.l}
             </button>
@@ -178,43 +181,42 @@ function NotificationsPage() {
       </div>
 
       {/* Content */}
-      <div className="mt-5 rounded-none border border-border/60 bg-card shadow-card overflow-hidden">
+      <div className="mt-5 border" style={{ borderColor: "var(--lcs-line)" }}>
         {isLoading ? (
-          <EmptyState kind="loading" title="Loading" />
+          <div className="flex items-center justify-center py-16" style={{ color: "var(--lcs-ink-muted)" }}>Loading…</div>
         ) : list.length === 0 ? (
-          <EmptyState
-            kind={filter === "all" && !q ? "empty" : "no-results"}
+          <LcsEmptyState
             title={filter === "all" && !q ? "No notifications" : "No matches"}
+            text={filter === "all" && !q ? "Investor activity, document requests, and updates will appear here." : "No notifications match the selected filter."}
           />
         ) : (
-          <div className="divide-y divide-border/60">
-            {list.map((n) => {
+          <div className="flex flex-col">
+            {list.map((n, i) => {
               const Icon = iconFor(n.kind);
+              const tone = toneFor(n.kind);
               const row = (
                 <div
                   onClick={() => { if (!n.read) markRead(n.id); }}
-                  className={cn(
-                    "flex gap-4 px-5 py-4 hover:bg-accent/40 transition-colors cursor-pointer",
-                    !n.read ? "hs-gradient/[0.02]" : "",
-                  )}
+                  className="flex gap-4 px-5 py-4 cursor-pointer"
+                  style={{
+                    borderTop: i > 0 ? "1px solid var(--lcs-line)" : undefined,
+                    background: !n.read ? "var(--lcs-progress-wash)" : "transparent",
+                  }}
                 >
-                  <div className={cn(
-                    "grid h-10 w-10 place-items-center rounded-lg shrink-0",
-                    tintFor(n.kind),
-                  )}>
+                  <div className="grid h-10 w-10 place-items-center shrink-0" style={{ background: "var(--lcs-surface)", color: tone }}>
                     <Icon className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="text-sm font-medium">{n.title}</div>
-                        <div className="mt-0.5 text-sm text-muted-foreground">{n.body}</div>
+                        <div className="text-sm font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{n.title}</div>
+                        <div className="mt-0.5 text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{n.body}</div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {!n.read && (
-                          <span className="h-2 w-2 rounded-full hs-gradient" />
+                          <span className="h-2 w-2 rounded-full" style={{ background: "var(--lcs-accent)" }} />
                         )}
-                        <span className="text-xs text-muted-foreground tabular-nums">
+                        <span className="text-xs tabular-nums" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
                           {n.created_at
                             ? formatDistanceToNow(new Date(n.created_at), { addSuffix: true })
                             : "—"}

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useDealRoom } from "@/hooks/useDealRoom";
 import { MutualDisclosure } from "@/components/app/MutualDisclosure";
-import { V2EmptyState } from "@/components/v2";
+import { LcsEmptyState, LcsButton, LcsStatusPill, type LcsStatus } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/deal-rooms/$id/information")({
   component: InformationPage,
@@ -217,39 +217,43 @@ function InformationPage() {
   });
 
   return (
-    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6">
+    <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6" style={{ fontFamily: "var(--font-lcs-ui)" }}>
       <MutualDisclosure />
 
       {roastRecord.length > 0 && (
-        <div className="rounded-none border border-border/60 bg-card p-5">
-          <div className="text-sm font-semibold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
-            🔥 Roast record
+        <div className="border p-5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="text-sm font-semibold mb-2" style={{ color: "var(--lcs-ink)" }}>
+            Roast record
           </div>
           <div className="space-y-2">
-            {roastRecord.map((r: any) => (
-              <a
-                key={r.id}
-                href={`/roast/${r.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm border transition-opacity hover:opacity-80"
-                style={r.status === "completed"
-                  ? { background: "rgba(16,185,129,0.08)", borderColor: "rgba(16,185,129,0.25)" }
-                  : { background: "rgba(239,68,68,0.08)", borderColor: "rgba(239,68,68,0.25)" }}
-              >
-                <span>
-                  {r.status === "completed"
-                    ? `Completed a Level ${r.level} Roast — every public question answered on the record`
-                    : `Level ${r.level} Roast expired incomplete — public questions left unanswered`}
-                </span>
-                <span className="text-xs text-muted-foreground shrink-0">
-                  {new Date(r.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · view →
-                </span>
-              </a>
-            ))}
+            {roastRecord.map((r: any) => {
+              // Genuine 2-state signal (completed = good, expired = bad) —
+              // mapped onto satisfied/attention, no forced adverse tone, per
+              // Group 6 Phase-0 decision 5's palette-collapse rule.
+              const isDone = r.status === "completed";
+              return (
+                <a
+                  key={r.id}
+                  href={`/roast/${r.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between gap-3 px-4 py-3 text-sm border transition-opacity hover:opacity-80"
+                  style={{ borderRadius: "var(--radius-lcs-control)", background: isDone ? "var(--lcs-satisfied-wash)" : "var(--lcs-attention-wash)", borderColor: isDone ? "var(--lcs-satisfied)" : "var(--lcs-attention)" }}
+                >
+                  <span style={{ color: "var(--lcs-ink)" }}>
+                    {isDone
+                      ? `Completed a Level ${r.level} Roast — every public question answered on the record`
+                      : `Level ${r.level} Roast expired incomplete — public questions left unanswered`}
+                  </span>
+                  <span className="text-xs shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>
+                    {new Date(r.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · view →
+                  </span>
+                </a>
+              );
+            })}
           </div>
           {isInvestor && (
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs mt-2" style={{ color: "var(--lcs-ink-muted)" }}>
               The Roast report's credibility flags feed the confrontational DD analysis automatically.
             </p>
           )}
@@ -275,30 +279,25 @@ function InformationPage() {
         const isOpen = qaReportModalOpen === report.id;
 
         return (
-          <div key={report.id} className="rounded-none border border-[rgba(16,185,129,0.3)] bg-white overflow-hidden">
+          <div key={report.id} className="border overflow-hidden" style={{ borderColor: "var(--lcs-satisfied)", background: "var(--lcs-white)" }}>
             <div className="flex items-center justify-between px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] flex items-center justify-center shrink-0">
-                  <MessagesSquare className="h-4 w-4 text-[#10B981]" />
+                <div className="h-9 w-9 flex items-center justify-center shrink-0" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-satisfied-wash)" }}>
+                  <MessagesSquare className="h-4 w-4" style={{ color: "var(--lcs-satisfied)" }} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-900">Q&amp;A Report</span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(16,185,129,0.12)] text-[#10B981] text-[10px] font-semibold px-2 py-0.5">
-                      <CheckCircle2 className="h-3 w-3" /> Complete
-                    </span>
+                    <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Q&amp;A Report</span>
+                    <LcsStatusPill status="satisfied" label="Complete" />
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5">
+                  <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>
                     {reportDate} · {totalQs} questions · {answeredQs} answered
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => setQaReportModalOpen(isOpen ? null : report.id)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
-              >
+              <LcsButton variant="secondary" onClick={() => setQaReportModalOpen(isOpen ? null : report.id)}>
                 <Eye className="h-3.5 w-3.5" /> View report
-              </button>
+              </LcsButton>
             </div>
 
             {isOpen && report.report_text && (
@@ -307,34 +306,29 @@ function InformationPage() {
                 onClick={() => setQaReportModalOpen(null)}
               >
                 <div
-                  className="w-full max-w-2xl max-h-[85vh] rounded-2xl border border-border/60 bg-card shadow-elev flex flex-col"
+                  className="w-full max-w-2xl max-h-[85vh] border flex flex-col"
+                  style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 shrink-0">
+                  <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderColor: "var(--lcs-line)" }}>
                     <div className="flex items-center gap-3">
-                      <MessagesSquare className="h-5 w-5 text-[#10B981]" />
+                      <MessagesSquare className="h-5 w-5" style={{ color: "var(--lcs-satisfied)" }} />
                       <div>
-                        <div className="font-semibold text-sm text-foreground">Q&amp;A Report</div>
-                        <div className="text-xs text-muted-foreground">{reportDate} · {totalQs} questions</div>
+                        <div className="font-semibold text-sm" style={{ color: "var(--lcs-ink)" }}>Q&amp;A Report</div>
+                        <div className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>{reportDate} · {totalQs} questions</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => window.print()}
-                        className="inline-flex items-center gap-1.5 text-xs bg-accent hover:bg-accent text-brand border border-brand/20 rounded-lg px-3 py-1.5 transition-colors qa-report-print-trigger"
-                      >
+                      <LcsButton variant="secondary" onClick={() => window.print()} className="qa-report-print-trigger">
                         <Download className="h-3.5 w-3.5" /> Download PDF
-                      </button>
-                      <button
-                        onClick={() => setQaReportModalOpen(null)}
-                        className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
-                      >
+                      </LcsButton>
+                      <LcsButton variant="text-link" onClick={() => setQaReportModalOpen(null)}>
                         <X className="h-4 w-4" />
-                      </button>
+                      </LcsButton>
                     </div>
                   </div>
                   <div className="flex-1 overflow-y-auto px-6 py-5">
-                    <pre className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap font-sans qa-report-content">
+                    <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans qa-report-content" style={{ color: "var(--lcs-ink-muted)" }}>
                       {report.report_text}
                     </pre>
                   </div>
@@ -348,73 +342,74 @@ function InformationPage() {
         );
       })}
 
-      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
+      <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
         <button
           onClick={() => setProfilesOpen((o) => !o)}
-          className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
+          className="w-full flex items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[var(--lcs-progress-wash)]"
         >
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
-              <Building2 className="h-4 w-4 text-brand" />
+            <div className="h-8 w-8 flex items-center justify-center" style={{ borderRadius: "var(--radius-lcs-control)", background: "var(--lcs-progress-wash)" }}>
+              <Building2 className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">Digital Profiles</div>
+              <div className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Digital Profiles</div>
               {!profilesOpen && (
-                <div className="text-xs text-gray-500 mt-0.5">
+                <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)" }}>
                   {startup?.company_name ?? "—"} {startup?.tagline ? `· ${startup.tagline}` : ""}
                 </div>
               )}
             </div>
           </div>
-          {profilesOpen ? <ChevronUp className="h-4 w-4 text-[#71717A]" /> : <ChevronDown className="h-4 w-4 text-[#71717A]" />}
+          {profilesOpen ? <ChevronUp className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} /> : <ChevronDown className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />}
         </button>
 
         {profilesOpen && (
-          <div className="px-6 pb-6 border-t border-[rgba(0,0,0,0.08)]">
+          <div className="px-6 pb-6 border-t" style={{ borderColor: "var(--lcs-line)" }}>
             {(profileSections as any[]).length === 0 ? (
               <div className="mt-4 space-y-2">
                 {DEFAULT_PROFILE_SECTIONS.map((s) => (
-                  <div key={s.key} className="flex items-center justify-between rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-3">
-                    <span className="text-sm font-medium text-[#71717A]">{s.label}</span>
-                    <span className="text-xs text-[#71717A] italic">Not added</span>
+                  <div key={s.key} className="flex items-center justify-between border px-4 py-3" style={{ borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}>
+                    <span className="text-sm font-medium" style={{ color: "var(--lcs-ink-muted)" }}>{s.label}</span>
+                    <span className="text-xs italic" style={{ color: "var(--lcs-ink-muted)" }}>Not added</span>
                   </div>
                 ))}
                 {isFounder && (
-                  <p className="text-xs text-[#71717A] mt-3">
-                    Add profile sections in your <Link to="/app/documents" className="text-brand hover:underline">Documents page</Link>.
+                  <p className="text-xs mt-3" style={{ color: "var(--lcs-ink-muted)" }}>
+                    Add profile sections in your <Link to="/app/documents" className="hover:underline" style={{ color: "var(--lcs-accent)" }}>Documents page</Link>.
                   </p>
                 )}
               </div>
             ) : (
               <div className="mt-4 space-y-3">
                 {(profileSections as any[]).map((sec: any) => (
-                  <div key={sec.id} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-4 py-3">
+                  <div key={sec.id} className="border px-4 py-3" style={{ borderColor: "var(--lcs-line)", borderRadius: "var(--radius-lcs-control)" }}>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-sm font-semibold text-gray-900">{sec.section_label}</span>
+                      <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{sec.section_label}</span>
                       <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "text-[10px] font-medium rounded-full px-2 py-0.5",
-                          sec.visibility === "public"
-                            ? "bg-green-50 text-green-700"
-                            : "bg-accent text-brand"
-                        )}>
-                          {sec.visibility === "public" ? "Public" : "Deal Room"}
-                        </span>
+                        {/* Genuine 2-state visibility signal, mapped onto
+                            satisfied/in-progress — public is the "done, live"
+                            state, deal-room-only is the narrower in-progress
+                            state, no forced adverse tone. */}
+                        <LcsStatusPill
+                          status={sec.visibility === "public" ? "satisfied" : "in-progress"}
+                          label={sec.visibility === "public" ? "Public" : "Deal Room"}
+                          dot={false}
+                        />
                         {isFounder && (
-                          <button className="grid h-6 w-6 place-items-center rounded text-[#71717A] hover:text-gray-600" onClick={() => console.log("edit section — Claude Code will wire")}>
+                          <button className="grid h-6 w-6 place-items-center" style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }} onClick={() => console.log("edit section — Claude Code will wire")}>
                             <Pencil className="h-3 w-3" />
                           </button>
                         )}
                       </div>
                     </div>
                     {sec.content && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>
                         {typeof sec.content === "object" && sec.content !== null
                           ? (sec.content.text
                             ? <p>{sec.content.text}</p>
                             : Object.entries(sec.content).map(([k, v]) => (
                               <div key={k} className="flex gap-1.5 text-xs">
-                                <span className="font-medium text-gray-500 shrink-0">{k}:</span>
+                                <span className="font-medium shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>{k}:</span>
                                 <span>{String(v)}</span>
                               </div>
                             ))
@@ -431,35 +426,31 @@ function InformationPage() {
         )}
       </div>
 
-      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(0,0,0,0.08)]">
+      <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--lcs-line)" }}>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-900">Document Requests</span>
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Document Requests</span>
             {(docRequests as any[]).length > 0 && (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+              <span className="px-2 py-0.5 text-xs font-medium" style={{ borderRadius: "9999px", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>
                 {(docRequests as any[]).length}
               </span>
             )}
           </div>
           {isInvestor && (
-            <button
-              onClick={() => setShowReqForm((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground"
-              style={{ background: "var(--gradient-brand)" }}
-              data-testid="iv-new-request-btn"
-            >
+            <LcsButton variant="primary" onClick={() => setShowReqForm((v) => !v)} data-testid="iv-new-request-btn">
               <Plus className="h-3.5 w-3.5" /> New request
-            </button>
+            </LcsButton>
           )}
         </div>
 
         {showReqForm && (
-          <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)] bg-gray-50 space-y-3">
+          <div className="px-6 py-4 border-b space-y-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)" }}>
             <input
               value={reqName}
               onChange={(e) => setReqName(e.target.value)}
               placeholder="Document name (e.g. Cap table, Bank statement)"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
+              className="w-full border px-3 py-2.5 text-sm outline-none"
+              style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
               data-testid="iv-req-name"
             />
             <textarea
@@ -467,12 +458,14 @@ function InformationPage() {
               onChange={(e) => setReqDesc(e.target.value)}
               rows={2}
               placeholder="Why you need this document (optional)"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none resize-none focus:border-brand"
+              className="w-full border px-3 py-2.5 text-sm outline-none resize-none"
+              style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
             />
             <select
               value={reqCategory}
               onChange={(e) => setReqCategory(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none"
+              className="w-full border px-3 py-2.5 text-sm outline-none"
+              style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
               data-testid="iv-req-category"
             >
               {["Financial", "Legal", "Team", "Product", "Other"].map((c) => (
@@ -480,32 +473,31 @@ function InformationPage() {
               ))}
             </select>
             <div className="flex items-center justify-end gap-2">
-              <button onClick={() => { setShowReqForm(false); setReqName(""); setReqDesc(""); }} className="rounded-lg px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 border border-[rgba(0,0,0,0.08)]">
+              <LcsButton variant="secondary" onClick={() => { setShowReqForm(false); setReqName(""); setReqDesc(""); }}>
                 Cancel
-              </button>
-              <button
-                onClick={submitDocRequest}
-                disabled={!reqName.trim() || reqCreating}
-                className="inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium text-foreground disabled:opacity-50"
-                style={{ background: "var(--gradient-brand)" }}
-                data-testid="iv-req-submit"
-              >
+              </LcsButton>
+              <LcsButton variant="primary" onClick={submitDocRequest} disabled={!reqName.trim() || reqCreating} data-testid="iv-req-submit">
                 {reqCreating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Submit"}
-              </button>
+              </LcsButton>
             </div>
           </div>
         )}
 
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y" style={{ borderColor: "var(--lcs-line)" }}>
           {(docRequests as any[]).length === 0 ? (
-            <V2EmptyState text="No document requests yet." />
+            <LcsEmptyState text="No document requests yet." />
           ) : (
             (docRequests as any[]).map((req: any) => {
-              const statusMap: Record<string, { label: string; cls: string }> = {
-                pending: { label: "Pending", cls: "bg-amber-50 text-amber-700" },
-                fulfilled: { label: "Fulfilled", cls: "bg-green-50 text-green-700" },
-                provided: { label: "Fulfilled", cls: "bg-green-50 text-green-700" },
-                declined: { label: "Declined", cls: "bg-red-50 text-red-700" },
+              // Genuine 3-state vocabulary (pending/fulfilled/declined) —
+              // direct 1:1 mapping onto pending/satisfied/attention, no
+              // forced adverse tone, per Group 6 Phase-0 decision 5.
+              // "provided" is a legacy synonym for "fulfilled" (same status
+              // family, not a 4th state).
+              const statusMap: Record<string, { label: string; status: LcsStatus }> = {
+                pending: { label: "Pending", status: "pending" },
+                fulfilled: { label: "Fulfilled", status: "satisfied" },
+                provided: { label: "Fulfilled", status: "satisfied" },
+                declined: { label: "Declined", status: "attention" },
               };
               const pill = statusMap[req.status] ?? statusMap.pending;
               const canFounderRespond = isFounder && req.status === "pending" && req.requested_from === userId;
@@ -515,38 +507,33 @@ function InformationPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-900">{req.document_name}</span>
+                        <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>{req.document_name}</span>
                         {req.category && (
-                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">
+                          <span className="px-2 py-0.5 text-[10px] font-medium" style={{ borderRadius: "9999px", background: "var(--lcs-surface)", color: "var(--lcs-ink-muted)" }}>
                             {req.category}
                           </span>
                         )}
                       </div>
                       {req.document_description && (
-                        <p className="mt-0.5 text-xs text-gray-500 line-clamp-1">{req.document_description}</p>
+                        <p className="mt-0.5 text-xs line-clamp-1" style={{ color: "var(--lcs-ink-muted)" }}>{req.document_description}</p>
                       )}
                       {req.decline_reason && (
-                        <p className="mt-1 text-xs text-red-600">Declined: {req.decline_reason}</p>
+                        <p className="mt-1 text-xs" style={{ color: "var(--lcs-attention)" }}>Declined: {req.decline_reason}</p>
                       )}
                     </div>
-                    <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-medium", pill.cls)}>
-                      {pill.label}
-                    </span>
+                    <LcsStatusPill status={pill.status} label={pill.label} />
                   </div>
 
                   {canFounderRespond && declineMode !== req.id && (
                     <div className="mt-3 flex items-center gap-2">
-                      <label className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
+                      <label className="inline-flex items-center gap-1.5 cursor-pointer border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--lcs-progress-wash)]" style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}>
                         <Upload className="h-3.5 w-3.5" />
                         Upload
                         <input type="file" className="sr-only" onChange={() => console.log("upload — Claude Code will wire")} />
                       </label>
-                      <button
-                        onClick={() => { setDeclineMode(req.id); setDeclineReason(""); }}
-                        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
-                      >
+                      <LcsButton variant="destructive" onClick={() => { setDeclineMode(req.id); setDeclineReason(""); }}>
                         Decline
-                      </button>
+                      </LcsButton>
                     </div>
                   )}
 
@@ -557,18 +544,18 @@ function InformationPage() {
                         onChange={(e) => setDeclineReason(e.target.value)}
                         rows={2}
                         placeholder="Reason for declining"
-                        className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-900 placeholder:text-[#71717A] outline-none resize-none"
+                        className="w-full border px-3 py-2 text-xs outline-none resize-none"
+                        style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                       />
                       <div className="flex gap-2">
-                        <button onClick={() => setDeclineMode(null)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs text-gray-500">Cancel</button>
-                        <button
+                        <LcsButton variant="secondary" onClick={() => setDeclineMode(null)}>Cancel</LcsButton>
+                        <LcsButton
+                          variant="destructive"
                           onClick={() => declineRequest(req.id)}
                           disabled={!declineReason.trim() || respondingReqId === req.id}
-                          className="rounded-lg px-3 py-1.5 text-xs font-medium text-foreground disabled:opacity-50"
-                          style={{ background: "#EF4444" }}
                         >
                           {respondingReqId === req.id ? <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> : "Submit"}
-                        </button>
+                        </LcsButton>
                       </div>
                     </div>
                   )}
@@ -579,113 +566,105 @@ function InformationPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-4 flex items-center justify-between">
-        <span className="text-sm text-gray-600">Documents & links have moved to their own tab.</span>
+      <div className="border px-6 py-4 flex items-center justify-between" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+        <span className="text-sm" style={{ color: "var(--lcs-ink-muted)" }}>Documents & links have moved to their own tab.</span>
         <Link
           to={"/app/deal-rooms/$id/documents" as any}
           params={{ id: dealRoomId }}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-1.5 text-xs font-medium text-brand hover:bg-accent"
+          className="inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--lcs-progress-wash)]"
+          style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-accent)", borderRadius: "var(--radius-lcs-control)" }}
         >
           Open Documents →
         </Link>
       </div>
 
       {isInvestor && (
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(0,0,0,0.08)]">
-            <span className="text-sm font-semibold text-gray-900">My Notes</span>
-            <button
-              onClick={() => setShowNoteForm((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-foreground"
-              style={{ background: "var(--gradient-brand)" }}
-              data-testid="iv-add-note-btn"
-            >
+        <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--lcs-line)" }}>
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>My Notes</span>
+            <LcsButton variant="primary" onClick={() => setShowNoteForm((v) => !v)} data-testid="iv-add-note-btn">
               <Plus className="h-3.5 w-3.5" /> Add note
-            </button>
+            </LcsButton>
           </div>
 
           {showNoteForm && (
-            <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)] bg-gray-50 space-y-3">
+            <div className="px-6 py-4 border-b space-y-3" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)" }}>
               <input
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
                 placeholder="Note title"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none focus:border-brand"
+                className="w-full border px-3 py-2.5 text-sm outline-none"
+                style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
               />
               <textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 rows={4}
                 placeholder="Write your notes here..."
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder:text-[#71717A] outline-none resize-none focus:border-brand"
+                className="w-full border px-3 py-2.5 text-sm outline-none resize-none"
+                style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
               />
               <div className="flex items-center gap-3 flex-wrap">
                 <select
                   value={noteVisibility}
                   onChange={(e) => setNoteVisibility(e.target.value as "private" | "shared")}
-                  className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none"
+                  className="border px-3 py-2 text-sm outline-none"
+                  style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-surface)", color: "var(--lcs-ink)", borderRadius: "var(--radius-lcs-control)" }}
                 >
                   <option value="private">Private (only me)</option>
                   <option value="shared">Share with founder</option>
                 </select>
-                <button
-                  onClick={() => console.log("AI note generation — Claude Code will wire")}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 px-3 py-2 text-xs font-medium text-brand hover:bg-accent"
-                >
+                <LcsButton variant="secondary" onClick={() => console.log("AI note generation — Claude Code will wire")}>
                   <Sparkles className="h-3.5 w-3.5" /> Generate with AI
-                </button>
+                </LcsButton>
                 <div className="ml-auto flex items-center gap-2">
-                  <button onClick={() => setShowNoteForm(false)} className="rounded-lg border border-[rgba(0,0,0,0.08)] px-3 py-2 text-xs text-gray-500">Cancel</button>
-                  <button
-                    onClick={saveNote}
-                    disabled={!noteContent.trim() || noteSaving}
-                    className="rounded-lg px-4 py-2 text-xs font-medium text-foreground disabled:opacity-50"
-                    style={{ background: "var(--gradient-brand)" }}
-                    data-testid="iv-save-note-btn"
-                  >
+                  <LcsButton variant="secondary" onClick={() => setShowNoteForm(false)}>Cancel</LcsButton>
+                  <LcsButton variant="primary" onClick={saveNote} disabled={!noteContent.trim() || noteSaving} data-testid="iv-save-note-btn">
                     {noteSaving ? <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> : "Save"}
-                  </button>
+                  </LcsButton>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y" style={{ borderColor: "var(--lcs-line)" }}>
             {(notes as any[]).length === 0 ? (
-              <V2EmptyState text="No notes yet." />
+              <LcsEmptyState text="No notes yet." />
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4 group">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      {note.title && <div className="text-sm font-semibold text-gray-900 mb-1">{note.title}</div>}
-                      <p className={cn("text-sm text-gray-600 whitespace-pre-wrap", expandedNoteId !== note.id && "line-clamp-2")}>
+                      {note.title && <div className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)" }}>{note.title}</div>}
+                      <p className={cn("text-sm whitespace-pre-wrap", expandedNoteId !== note.id && "line-clamp-2")} style={{ color: "var(--lcs-ink-muted)" }}>
                         {note.content}
                       </p>
                       {note.content?.length > 120 && (
                         <button
                           onClick={() => setExpandedNoteId(expandedNoteId === note.id ? null : note.id)}
-                          className="text-xs text-brand mt-1 hover:underline"
+                          className="text-xs mt-1 hover:underline"
+                          style={{ color: "var(--lcs-accent)" }}
                         >
                           {expandedNoteId === note.id ? "Show less" : "Show more"}
                         </button>
                       )}
                       <div className="mt-2 flex items-center gap-2">
-                        <span className={cn("text-[10px] rounded-full px-2 py-0.5 font-medium",
-                          note.visibility === "shared"
-                            ? "bg-green-50 text-green-700"
-                            : "bg-gray-100 text-gray-500"
-                        )}>
-                          {note.visibility === "shared" ? "Shared" : "Private"}
-                        </span>
-                        <span className="text-[10px] text-[#71717A]">
+                        {/* Genuine 2-state visibility signal — shared/private —
+                            mapped onto satisfied/pending, no forced adverse. */}
+                        <LcsStatusPill
+                          status={note.visibility === "shared" ? "satisfied" : "pending"}
+                          label={note.visibility === "shared" ? "Shared" : "Private"}
+                          dot={false}
+                        />
+                        <span className="text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
                           {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
                         </span>
                       </div>
                     </div>
                     <button
                       onClick={() => deleteNote(note.id)}
-                      className="hidden group-hover:grid h-7 w-7 place-items-center rounded text-[#71717A] hover:text-red-500"
+                      className="hidden group-hover:grid h-7 w-7 place-items-center"
+                      style={{ borderRadius: "var(--radius-lcs-control)", color: "var(--lcs-ink-muted)" }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -698,19 +677,19 @@ function InformationPage() {
       )}
 
       {isFounder && (
-        <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none overflow-hidden">
-          <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.08)]">
-            <span className="text-sm font-semibold text-gray-900">Notes from investor</span>
+        <div className="border overflow-hidden" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <div className="px-6 py-4 border-b" style={{ borderColor: "var(--lcs-line)" }}>
+            <span className="text-sm font-semibold" style={{ color: "var(--lcs-ink)" }}>Notes from investor</span>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y" style={{ borderColor: "var(--lcs-line)" }}>
             {(notes as any[]).length === 0 ? (
-              <V2EmptyState text="No shared notes yet." />
+              <LcsEmptyState text="No shared notes yet." />
             ) : (
               (notes as any[]).map((note: any) => (
                 <div key={note.id} className="px-6 py-4">
-                  {note.title && <div className="text-sm font-semibold text-gray-900 mb-1">{note.title}</div>}
-                  <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-wrap">{note.content}</p>
-                  <div className="mt-2 text-[10px] text-[#71717A]">
+                  {note.title && <div className="text-sm font-semibold mb-1" style={{ color: "var(--lcs-ink)" }}>{note.title}</div>}
+                  <p className="text-sm line-clamp-2 whitespace-pre-wrap" style={{ color: "var(--lcs-ink-muted)" }}>{note.content}</p>
+                  <div className="mt-2 text-[10px]" style={{ color: "var(--lcs-ink-muted)" }}>
                     {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
                   </div>
                 </div>
@@ -735,18 +714,17 @@ function InformationPage() {
           CLAUDE.md §20.2, and is the same gap §20.1's open item (5)
           already tracks for passDeal. "Request next stage" below is
           untouched: it is a real, authorized action. */}
-      <div className="bg-white border border-[rgba(0,0,0,0.08)] rounded-none px-6 py-5">
+      <div className="border px-6 py-5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
         <div className="flex items-center justify-end gap-4 flex-wrap">
-          <button
+          <LcsButton
+            variant="primary"
             onClick={onRequestNextStage}
             disabled={stageRequesting}
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
-            style={{ background: "var(--gradient-brand)" }}
             data-testid="info-vault-next-stage"
           >
             {stageRequesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Request next stage →
-          </button>
+          </LcsButton>
         </div>
       </div>
     </div>

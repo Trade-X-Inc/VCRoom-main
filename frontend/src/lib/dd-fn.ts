@@ -28,14 +28,19 @@ export const getDDData = createServerFn({ method: "POST" })
     const auth = await requireUser(data.userAccessToken);
     if (!auth.ok) return { categories: [], items: [], error: auth.error };
 
-    // Verify user is a member
+    // Verify user is a founder/investor principal — a room-native lawyer
+    // (role='lawyer') is a legitimate deal_room_members row but is scoped
+    // closing-only (LawyerRoomView.tsx) and must not read diligence state.
+    // See CLAUDE.md §20.1.
     const { data: member } = await sb
       .from("deal_room_members")
-      .select("user_id")
+      .select("role")
       .eq("deal_room_id", data.dealRoomId)
       .eq("user_id", auth.uid)
       .maybeSingle();
-    if (!member) return { categories: [], items: [], error: "Unauthorized" };
+    if (!member || (member.role !== "founder" && member.role !== "investor")) {
+      return { categories: [], items: [], error: "Unauthorized" };
+    }
 
     // Seed if first time
     const { data: existing } = await sb
@@ -76,13 +81,16 @@ export const updateDDStatus = createServerFn({ method: "POST" })
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const auth = await requireUser(data.userAccessToken);
     if (!auth.ok) return { success: false, error: auth.error };
+    // Founder/investor principals only — see getDDData's comment above.
     const { data: member } = await sb
       .from("deal_room_members")
-      .select("user_id")
+      .select("role")
       .eq("deal_room_id", data.dealRoomId)
       .eq("user_id", auth.uid)
       .maybeSingle();
-    if (!member) return { success: false, error: "Unauthorized" };
+    if (!member || (member.role !== "founder" && member.role !== "investor")) {
+      return { success: false, error: "Unauthorized" };
+    }
 
     const { error } = await sb
       .from("dd_categories")
@@ -105,13 +113,16 @@ export const updateDDNotes = createServerFn({ method: "POST" })
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const auth = await requireUser(data.userAccessToken);
     if (!auth.ok) return { success: false, error: auth.error };
+    // Founder/investor principals only — see getDDData's comment above.
     const { data: member } = await sb
       .from("deal_room_members")
-      .select("user_id")
+      .select("role")
       .eq("deal_room_id", data.dealRoomId)
       .eq("user_id", auth.uid)
       .maybeSingle();
-    if (!member) return { success: false, error: "Unauthorized" };
+    if (!member || (member.role !== "founder" && member.role !== "investor")) {
+      return { success: false, error: "Unauthorized" };
+    }
 
     const { error } = await sb
       .from("dd_categories")
@@ -134,13 +145,16 @@ export const toggleChecklistItem = createServerFn({ method: "POST" })
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const auth = await requireUser(data.userAccessToken);
     if (!auth.ok) return { success: false, error: auth.error };
+    // Founder/investor principals only — see getDDData's comment above.
     const { data: member } = await sb
       .from("deal_room_members")
-      .select("user_id")
+      .select("role")
       .eq("deal_room_id", data.dealRoomId)
       .eq("user_id", auth.uid)
       .maybeSingle();
-    if (!member) return { success: false, error: "Unauthorized" };
+    if (!member || (member.role !== "founder" && member.role !== "investor")) {
+      return { success: false, error: "Unauthorized" };
+    }
 
     const { error } = await sb
       .from("dd_checklist_items")
@@ -163,13 +177,16 @@ export const overrideAutoDetectedItem = createServerFn({ method: "POST" })
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
     const auth = await requireUser(data.userAccessToken);
     if (!auth.ok) return { success: false, error: auth.error };
+    // Founder/investor principals only — see getDDData's comment above.
     const { data: member } = await sb
       .from("deal_room_members")
-      .select("user_id")
+      .select("role")
       .eq("deal_room_id", data.dealRoomId)
       .eq("user_id", auth.uid)
       .maybeSingle();
-    if (!member) return { success: false, error: "Unauthorized" };
+    if (!member || (member.role !== "founder" && member.role !== "investor")) {
+      return { success: false, error: "Unauthorized" };
+    }
 
     const { error } = await sb
       .from("dd_checklist_items")
@@ -212,13 +229,16 @@ export const runAutoDetection = createServerFn({ method: "POST" })
     // See CLAUDE.md §51.
     const auth = await requireUser(data.userAccessToken);
     if (!auth.ok) return { detected: [], error: auth.error };
+    // Founder/investor principals only — see getDDData's comment above.
     const { data: member } = await sb
       .from("deal_room_members")
-      .select("user_id")
+      .select("role")
       .eq("deal_room_id", data.dealRoomId)
       .eq("user_id", auth.uid)
       .maybeSingle();
-    if (!member) return { detected: [], error: "Unauthorized" };
+    if (!member || (member.role !== "founder" && member.role !== "investor")) {
+      return { detected: [], error: "Unauthorized" };
+    }
 
     // Get deal room → startup_id
     const { data: room } = await sb
@@ -541,10 +561,17 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
     const { data: userData } = await sb.auth.getUser(data.userAccessToken);
     const uid = userData?.user?.id;
     if (!uid) return { ok: false, error: "not_authenticated" };
+    // Membership alone is not enough: deal_room_members also includes the
+    // room-native lawyer (role='lawyer'), whose scope is closing-only
+    // (LawyerRoomView.tsx) and must never trigger investor-facing AI
+    // diligence output. Only founder/investor principals may run this.
+    // Mirrors deal-room-fn.ts's principalRoomMember(). See CLAUDE.md §20.1.
     const { data: membership } = await sb
-      .from("deal_room_members").select("id")
+      .from("deal_room_members").select("role")
       .eq("deal_room_id", data.dealRoomId).eq("user_id", uid).maybeSingle();
-    if (!membership) return { ok: false, error: "not_authorized" };
+    if (!membership || (membership.role !== "founder" && membership.role !== "investor")) {
+      return { ok: false, error: "not_authorized" };
+    }
 
     // 1. All documents: founder library docs + deal-room uploads
     const [{ data: founderDocs }, { data: roomDocs }] = await Promise.all([

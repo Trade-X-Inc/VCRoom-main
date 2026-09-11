@@ -1,7 +1,8 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import {
-  FileText, CheckCircle2, AlertCircle, Zap,
+  FileText, CheckCircle2, AlertCircle,
   ArrowRight, ChevronDown, Loader2, X, Upload, Trash2,
+  ChevronRight,
 } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
 import { useMemo, useState } from "react";
@@ -9,8 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { EmptyState, PageBreadcrumb } from "@/components/system";
+import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus } from "@/components/lcs";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -232,29 +232,23 @@ function formatFileSize(bytes?: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function getStatusBorderColor(status?: string) {
+// 5-value document status collapsed onto LCS's closed 4-value vocabulary
+// (pending/in-progress/satisfied/attention). "draft" and "ai_extracted"
+// both map to in-progress, but the label override preserves the real
+// distinction the old status-icon/label pairing carried ("you started
+// this" vs. "AI filled this, check it") — same reasoning as diligence.tsx's
+// Strengths/Risks/Flags collapse in Group 6 (CLAUDE.md, evaluative labels
+// don't get flattened just because they share a tone). The redundant
+// colored left-border (a second encoding of the same status) is dropped
+// now that the pill itself carries it.
+function getStatusPillProps(status: string): { status: LcsStatus; label: string } {
   switch (status) {
-    case "draft": return "border-l-amber-500/60";
-    case "ai_extracted": return "border-l-blue-500/60";
-    case "complete": return "border-l-green-500/60";
-    default: return "border-l-white/10";
-  }
-}
-
-function getStatusIcon(status: string): { Icon: any; color: string; label: string } {
-  switch (status) {
-    case "empty":
-      return { Icon: () => <div className="w-5 h-5 rounded-full border-2 border-border shrink-0" />, color: "text-faint", label: "Not started" };
-    case "draft":
-      return { Icon: AlertCircle, color: "text-amber-400", label: "In progress" };
-    case "ai_extracted":
-      return { Icon: Zap, color: "text-blue-400", label: "AI extracted — needs review" };
-    case "complete":
-      return { Icon: CheckCircle2, color: "text-green-400", label: "Complete" };
-    case "needs_review":
-      return { Icon: AlertCircle, color: "text-amber-400", label: "Needs attention" };
-    default:
-      return { Icon: FileText, color: "text-muted-foreground", label: status };
+    case "empty": return { status: "pending", label: "Not started" };
+    case "draft": return { status: "in-progress", label: "In progress" };
+    case "ai_extracted": return { status: "in-progress", label: "AI extracted — needs review" };
+    case "complete": return { status: "satisfied", label: "Complete" };
+    case "needs_review": return { status: "attention", label: "Needs attention" };
+    default: return { status: "pending", label: status };
   }
 }
 
@@ -715,9 +709,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
   if (user?.role === "investor") {
     return (
       <div className="p-6 lg:p-8 max-w-2xl mx-auto text-center py-20">
-        <FileText className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
-        <h2 className="text-lg font-semibold mb-2">Documents are for founders</h2>
-        <p className="text-sm text-muted-foreground">This section is only available to startup founders.</p>
+        <FileText className="h-10 w-10 mx-auto mb-4" style={{ color: "var(--lcs-line)" }} />
+        <h2 className="text-[16px] font-semibold mb-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Documents are for founders</h2>
+        <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>This section is only available to startup founders.</p>
       </div>
     );
   }
@@ -726,17 +720,26 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     <div className="flex flex-col h-full overflow-hidden">
     <div className="flex-1 overflow-y-auto p-6 lg:p-8">
       {/* Header */}
-      <PageBreadcrumb items={[{ label: "Your raise", to: "/app/prepare" }, { label: "Documents" }]} />
+      <div
+        className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
+        style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
+      >
+        <Link to={"/app/prepare" as any} style={{ color: "var(--lcs-ink-muted)" }} className="hover:underline">
+          Your raise
+        </Link>
+        <ChevronRight style={{ width: 12, height: 12 }} />
+        <span>Documents</span>
+      </div>
       <div className="flex items-start justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+          <h1 className="text-[24px] font-semibold mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>
             {view === "document-intake" ? "Document Intake"
               : view === "source-files" ? "Source Files"
               : view === "digital-document-vault" ? "Digital Document Vault"
               : view === "privacy-settings" ? "Document Privacy Settings"
               : "Documents"}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
             {view === "document-intake" ? "Add the documents investors expect for your stage."
               : view === "source-files" ? "The original files you uploaded."
               : view === "digital-document-vault" ? "Your Lengdon-processed documents."
@@ -746,18 +749,19 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         </div>
         <div className="flex items-center gap-2">
           <PageGuide pageId="documents" />
-          <span className="text-sm text-muted-foreground">Stage:</span>
+          <span className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Stage:</span>
           <div className="relative inline-flex">
             <select
               value={selectedStage}
               onChange={(e) => setSelectedStage(e.target.value as Stage)}
-              className="appearance-none bg-card border border-border/60 rounded-md px-3 py-1.5 text-sm pr-8 focus:outline-none focus:border-brand/50 cursor-pointer"
+              className="appearance-none cursor-pointer"
+              style={{ height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 13, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 28px 0 10px", outline: "none" }}
             >
               {STAGE_OPTIONS.map(stage => (
                 <option key={stage} value={stage}>{stage}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" style={{ color: "var(--lcs-ink-muted)" }} />
           </div>
         </div>
       </div>
@@ -766,8 +770,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           lifecycle, stated plainly so founders never wonder why this page
           exists once documents are extracted. */}
       {view === "source-files" && (
-        <div className="mb-6 rounded-none border border-border bg-[#FAFAFA] px-5 py-4">
-          <p className="text-sm" style={{ color: "#52525B" }}>
+        <div className="mb-6 px-5 py-4" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+          <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
             Original files you uploaded. Once information is extracted into your Digital Document Vault,
             these originals serve one purpose. Attachment into a deal room if an investor requests the
             physical document. They are never public. You may delete them after extraction.
@@ -788,16 +792,15 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       {(!view || view === "document-intake") && (
       <>
       {/* How it works — collapsible */}
-      <div className="mb-6 border border-border rounded-none p-5 bg-white/[0.02]">
+      <div className="mb-6 p-5" style={{ border: "1px solid var(--lcs-line)" }}>
         <div
           className="flex items-center justify-between cursor-pointer"
           onClick={() => setShowInstructions(prev => !prev)}
         >
           <div className="flex items-center gap-2">
-            <span className="text-brand">✦</span>
-            <span className="text-sm font-medium text-foreground">How your document workspace works</span>
+            <span className="text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>How your document workspace works</span>
           </div>
-          <span className="text-muted-foreground text-xs">{showInstructions ? "Hide" : "Show"}</span>
+          <span className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{showInstructions ? "Hide" : "Show"}</span>
         </div>
         {showInstructions && (
           <div className="mt-4 grid sm:grid-cols-3 gap-4">
@@ -806,10 +809,10 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
               { n: "02", title: "AI reviews for gaps", body: "Our AI checks each document against what investors actually ask for your stage. It flags weak areas and tells you what to improve." },
               { n: "03", title: "Investors see what matters", body: "Stage 2 documents unlock when an investor connects. Stage 3 (financials, cap table, legal) unlock only inside a deal room. You control all access." },
             ].map(({ n, title, body }) => (
-              <div key={n} className="bg-accent rounded-lg p-4">
-                <div className="text-brand text-lg font-semibold mb-2">{n}</div>
-                <div className="text-sm font-medium text-foreground mb-1">{title}</div>
-                <div className="text-xs text-muted-foreground leading-relaxed">{body}</div>
+              <div key={n} className="p-4" style={{ background: "var(--lcs-surface)" }}>
+                <div className="text-[16px] font-semibold mb-2 tabular-nums" style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-data)" }}>{n}</div>
+                <div className="text-[13px] font-medium mb-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{title}</div>
+                <div className="text-[12px] leading-relaxed" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{body}</div>
               </div>
             ))}
           </div>
@@ -817,26 +820,31 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       </div>
 
       {/* Stage guidance */}
-      <div className="mb-6 p-4 rounded-lg border border-brand/20 bg-accent">
-        <p className="text-brand text-xs font-semibold uppercase tracking-wider mb-1">Stage guidance — {selectedStage}</p>
-        <p className="text-brand/80 text-sm mt-1">{STAGE_GUIDANCE[selectedStage]}</p>
+      <div className="mb-6 p-4" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-progress-wash)" }}>
+        <p className="text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-data)" }}>Stage guidance — {selectedStage}</p>
+        <p className="text-[13px] mt-1" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{STAGE_GUIDANCE[selectedStage]}</p>
       </div>
 
       {/* Main content: sidebar + documents */}
       <div className="flex flex-col sm:grid sm:grid-cols-12 gap-4 sm:gap-6 items-start">
-        {/* Categories — horizontal scrollable chips on mobile, vertical rail from sm: up */}
+        {/* Categories — a content FILTER, not navigation, so it's deliberately
+            styled distinctly from the app's real nav rail (Group 7 Phase-0
+            decision 3): plain bordered segmented control, not the sidebar's
+            active-link treatment. Horizontal scrollable chips on mobile,
+            vertical rail from sm: up. */}
         <div className="w-full sm:col-span-3">
-          <div className="flex sm:flex-col gap-2 sm:gap-1 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0">
+          <div className="flex sm:flex-col gap-1.5 sm:gap-1 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0">
             {TEMPLATE_CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={cn(
-                  "shrink-0 whitespace-nowrap text-left px-4 py-2 rounded-full sm:rounded-lg text-sm font-medium transition-colors",
-                  selectedCategory === cat
-                    ? "hs-gradient text-white"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground bg-accent/40 sm:bg-transparent"
-                )}
+                className="shrink-0 whitespace-nowrap text-left px-3 py-2 text-[13px] font-medium transition-colors"
+                style={{
+                  fontFamily: "var(--font-lcs-ui)",
+                  color: selectedCategory === cat ? "var(--lcs-white)" : "var(--lcs-ink-muted)",
+                  background: selectedCategory === cat ? "var(--lcs-accent)" : "transparent",
+                  border: selectedCategory === cat ? "1px solid var(--lcs-accent)" : "1px solid var(--lcs-line)",
+                }}
               >
                 {CATEGORY_LABELS[cat] ?? cat}
               </button>
@@ -852,14 +860,15 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
             {(!view || view === "document-intake") && (
               <button
                 onClick={() => { setCustomExtractError(null); setShowCustomUpload(true); }}
-                className="w-full rounded-none border border-dashed border-border bg-card p-5 text-left hover:border-brand/50 hover:bg-accent/20 transition-colors flex items-center gap-3"
+                className="w-full p-5 text-left transition-colors flex items-center gap-3"
+                style={{ border: "1px dashed var(--lcs-line)", background: "var(--lcs-white)" }}
               >
-                <div className="grid h-9 w-9 place-items-center rounded-none bg-accent shrink-0">
-                  <Upload className="h-4 w-4 text-brand" />
+                <div className="grid h-9 w-9 place-items-center shrink-0" style={{ background: "var(--lcs-surface)" }}>
+                  <Upload className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-foreground">Add a custom document</div>
-                  <div className="text-xs text-muted-foreground">Upload any file not covered by a template — AI extracts structured data automatically.</div>
+                  <div className="text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Add a custom document</div>
+                  <div className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Upload any file not covered by a template — AI extracts structured data automatically.</div>
                 </div>
               </button>
             )}
@@ -869,25 +878,26 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
             {(!view || view === "document-intake") && (
               <button
                 onClick={() => { setEmployeeExtractError(null); setShowEmployeeUpload(true); }}
-                className="w-full rounded-none border border-dashed border-border bg-card p-5 text-left hover:border-brand/50 hover:bg-accent/20 transition-colors flex items-center gap-3"
+                className="w-full p-5 text-left transition-colors flex items-center gap-3"
+                style={{ border: "1px dashed var(--lcs-line)", background: "var(--lcs-white)" }}
               >
-                <div className="grid h-9 w-9 place-items-center rounded-none bg-accent shrink-0">
-                  <Upload className="h-4 w-4 text-brand" />
+                <div className="grid h-9 w-9 place-items-center shrink-0" style={{ background: "var(--lcs-surface)" }}>
+                  <Upload className="h-4 w-4" style={{ color: "var(--lcs-accent)" }} />
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-foreground">Add employee 1-pager</div>
-                  <div className="text-xs text-muted-foreground">Upload a one-page employee profile — AI extracts name, designation, contact, and a short description.</div>
+                  <div className="text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Add employee 1-pager</div>
+                  <div className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Upload a one-page employee profile — AI extracts name, designation, contact, and a short description.</div>
                 </div>
               </button>
             )}
             {filteredDocs.length === 0 ? (
-              <EmptyState kind="empty" title="No documents" />
+              <LcsEmptyState title="No documents" text="Documents you add appear here." />
             ) : (
               filteredDocs.map((template, i) => {
                 const showCategoryHeader = selectedCategory === "All" && (i === 0 || filteredDocs[i - 1].category !== template.category);
                 const doc = template.founderDoc;
                 const status = doc?.status ?? "empty";
-                const { Icon: StatusIcon, color: statusColor } = getStatusIcon(status);
+                const pillProps = getStatusPillProps(status);
                 const buttonAction = !doc || status === "empty" ? "Start"
                   : status === "ai_extracted" ? "Review"
                   : status === "draft" ? "Continue"
@@ -898,84 +908,83 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 const hasFeedback = !!(doc?.ai_feedback && typeof doc.ai_feedback === "object" && Object.keys(doc.ai_feedback).length > 0);
                 const feedbackScore = hasFeedback ? (doc!.ai_feedback as AIFeedback).overall_score : undefined;
                 const feedbackSignal = hasFeedback ? (doc!.ai_feedback as AIFeedback).signal : undefined;
+                // Evaluative signal (not a category) — strong/adequate/weak/
+                // critical collapse onto the 3 tones the closed vocabulary
+                // supports, weak and critical deliberately sharing attention
+                // (no third negative tier), same reasoning as Group 6's
+                // Strengths/Risks/Flags collapse.
+                const feedbackStatus: LcsStatus = feedbackSignal === "strong" ? "satisfied" : feedbackSignal === "adequate" ? "in-progress" : "attention";
                 const extractionError = (doc?.content as any)?.extraction_error as string | undefined;
 
                 return (
                   <div key={template.id}>
                   {showCategoryHeader && (
-                    <div className={cn("text-xs font-semibold uppercase tracking-wider text-muted-foreground", i === 0 ? "mb-2" : "mt-5 mb-2")}>
+                    <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)", marginTop: i === 0 ? undefined : 20, marginBottom: 8 }}>
                       {CATEGORY_LABELS[template.category] ?? template.category}
                     </div>
                   )}
                   <div
-                    className={cn(
-                      "rounded-none border border-border/60 bg-card p-5 hover:border-border transition-all border-l-2",
-                      getStatusBorderColor(status)
-                    )}
+                    className="p-5 transition-colors"
+                    style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <StatusIcon className={cn("h-4 w-4 shrink-0", statusColor)} />
-                          <h3 className="text-sm font-semibold text-foreground">{template.name}</h3>
+                          <LcsStatusPill status={pillProps.status} label={pillProps.label} />
+                          <h3 className="text-[13px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{template.name}</h3>
                           {hasFeedback && feedbackScore !== undefined && (
-                            <span className={cn(
-                              "text-xs font-bold px-2 py-0.5 rounded-full",
-                              feedbackSignal === "strong" ? "bg-green-500/15 text-green-400"
-                              : feedbackSignal === "adequate" ? "bg-amber-500/15 text-amber-400"
-                              : "bg-red-500/15 text-red-400"
-                            )}>
-                              {feedbackScore}/10
-                            </span>
+                            <LcsStatusPill status={feedbackStatus} label={`${feedbackScore}/10`} />
                           )}
-                          {template.is_required ? (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/15 text-red-400">
-                              Required
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-accent text-muted-foreground">
-                              Optional
-                            </span>
-                          )}
+                          {/* Required/Optional: an attribute of the template, not a
+                              state — plain text, no color (decision 5: "no red
+                              anywhere" applied to what was previously a red badge). */}
+                          <span className="text-[10px] font-medium px-1.5 py-0.5" style={{ color: "var(--lcs-ink-muted)", border: "1px solid var(--lcs-line)", fontFamily: "var(--font-lcs-ui)" }}>
+                            {template.is_required ? "Required" : "Optional"}
+                          </span>
+                          {/* Stage-tier badges: decorative categorical labels
+                              (access tier), not states — plain text per decision 5. */}
                           {isStage3 && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-orange-400/10 text-orange-400">
+                            <span className="text-[10px] font-medium" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                               Deal room
                             </span>
                           )}
                           {isStage2 && !isStage3 && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-400/10 text-brand">
+                            <span className="text-[10px] font-medium" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                               Detail pack
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground break-words sm:truncate">
-                          {doc?.file_name
-                            ? `📎 ${doc.file_name}`
-                            : doc && status !== "empty"
-                            ? doc.title
-                            : `Create your ${template.name.toLowerCase()}`}
+                        <p className="text-[12px] break-words sm:truncate flex items-center gap-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+                          {doc?.file_name ? (
+                            <><FileText className="h-3 w-3 shrink-0" />{doc.file_name}</>
+                          ) : doc && status !== "empty" ? (
+                            doc.title
+                          ) : (
+                            `Create your ${template.name.toLowerCase()}`
+                          )}
                         </p>
                         {doc && doc.completeness_score > 0 && status !== "complete" && (
                           <div className="mt-2 flex items-center gap-2">
-                            <div className="flex-1 bg-accent h-1 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1 overflow-hidden" style={{ background: "var(--lcs-line)" }}>
                               <div
-                                className="h-full bg-amber-400 rounded-full transition-all"
-                                style={{ width: `${doc.completeness_score}%` }}
+                                className="h-full transition-all"
+                                style={{ width: `${doc.completeness_score}%`, background: "var(--lcs-progress)" }}
                               />
                             </div>
-                            <span className="text-[10px] text-muted-foreground tabular-nums">{doc.completeness_score}%</span>
+                            <span className="text-[10px] tabular-nums" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{doc.completeness_score}%</span>
                           </div>
                         )}
                         {/* R11: honest extraction-failure state — never a
                             silent empty result. */}
                         {extractionError && (
-                          <div className="mt-2 rounded-none border border-amber-500/30 bg-amber-500/5 px-2.5 py-2">
-                            <p className="text-xs font-medium text-amber-600">Could not extract — document stored in Source Files.</p>
-                            <p className="text-xs mt-0.5" style={{ color: "#71717A" }}>{extractionError}</p>
+                          <div className="mt-2 px-2.5 py-2" style={{ border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)" }}>
+                            <p className="text-[12px] font-medium" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}>Could not extract — document stored in Source Files.</p>
+                            <p className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{extractionError}</p>
                             <button
                               onClick={(e) => { e.stopPropagation(); handleRetryExtraction(doc!); }}
                               disabled={retryingDocId === doc?.id}
-                              className="inline-flex items-center gap-1 mt-1.5 text-xs font-medium text-brand hover:underline disabled:opacity-50"
+                              className="inline-flex items-center gap-1 mt-1.5 text-[12px] font-medium hover:underline disabled:opacity-50"
+                              style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-ui)" }}
                             >
                               {retryingDocId === doc?.id ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
                               {retryingDocId === doc?.id ? "Retrying…" : "Retry extraction"}
@@ -984,7 +993,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                         )}
                         {/* Per-document coaching hint */}
                         {hasFeedback && Array.isArray((doc!.ai_feedback as Record<string, unknown>).recommendations) && (
-                          <p className="text-xs text-amber-400/80 mt-1.5">
+                          <p className="text-[12px] mt-1.5" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}>
                             → {((doc!.ai_feedback as Record<string, unknown[]>).recommendations)[0]}
                           </p>
                         )}
@@ -999,21 +1008,22 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                               refetchFounderDocs();
                             }}
                             title={doc.visibility === "deal_room" ? "Visible in deal room — click to restrict" : "Not in deal room — click to include"}
-                            className={cn(
-                              "mt-1.5 text-xs px-2 py-0.5 rounded-full transition-colors",
-                              doc.visibility === "deal_room"
-                                ? "bg-orange-500/15 text-orange-400 hover:bg-orange-500/25"
-                                : "bg-accent text-muted-foreground hover:bg-accent"
-                            )}
+                            className="mt-1.5 inline-flex items-center gap-1 text-[12px] px-2 py-0.5 transition-colors"
+                            style={{
+                              fontFamily: "var(--font-lcs-ui)",
+                              color: doc.visibility === "deal_room" ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                              border: "1px solid " + (doc.visibility === "deal_room" ? "var(--lcs-accent)" : "var(--lcs-line)"),
+                            }}
                           >
-                            {doc.visibility === "deal_room" ? "🏛 Deal room" : "+ Add to deal room"}
+                            {doc.visibility === "deal_room" ? "Deal room" : "+ Add to deal room"}
                           </button>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
                         {/* Start/Edit button */}
-                        <button
+                        <LcsButton
+                          variant="primary"
                           onClick={() => {
                             setEditingDoc(doc ?? {
                               id: "",
@@ -1027,18 +1037,18 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                               updated_at: new Date().toISOString(),
                             });
                           }}
-                          className="inline-flex items-center gap-1.5 rounded-md bg-gradient-brand text-brand-foreground px-3 py-1.5 text-xs font-medium hover:shadow-glow transition-shadow"
+                          className="inline-flex items-center gap-1.5 text-[12px]"
                         >
                           {buttonAction} <ArrowRight className="h-3 w-3" />
-                        </button>
+                        </LcsButton>
 
                         {/* Upload instead */}
                         {isUploading ? (
                           <div className="px-2 py-1.5">
-                            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" style={{ color: "var(--lcs-ink-muted)" }} />
                           </div>
                         ) : (
-                          <label className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-1 py-1.5">
+                          <label className="inline-flex items-center gap-1 text-[12px] transition-colors cursor-pointer px-1 py-1.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                             <Upload className="h-3 w-3" />
                             Upload
                             <input
@@ -1072,7 +1082,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       {view === "source-files" && (
         <div className="space-y-3">
           {filteredDocs.length === 0 ? (
-            <EmptyState kind="empty" title="No files uploaded yet" />
+            <LcsEmptyState title="No files uploaded yet" text="Files you upload appear here." />
           ) : (
             filteredDocs.map((template, i) => {
               const showCategoryHeader = i === 0 || filteredDocs[i - 1].category !== template.category;
@@ -1080,30 +1090,28 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
               const attached = doc.visibility === "deal_room";
               const extractionError = (doc.content as any)?.extraction_error as string | undefined;
               const extracted = !extractionError && (Object.keys(doc.content ?? {}).length > 0 || ["ai_extracted", "complete"].includes(doc.status));
+              const extractPill: { status: LcsStatus; label: string } = extractionError
+                ? { status: "attention", label: "Extraction failed" }
+                : extracted
+                  ? { status: "satisfied", label: "Extracted" }
+                  : { status: "pending", label: "Not yet extracted" };
               return (
                 <div key={template.id}>
                 {showCategoryHeader && (
-                  <div className={cn("text-xs font-semibold uppercase tracking-wider text-muted-foreground", i === 0 ? "mb-2" : "mt-5 mb-2")}>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)", marginTop: i === 0 ? undefined : 20, marginBottom: 8 }}>
                     {CATEGORY_LABELS[template.category] ?? template.category}
                   </div>
                 )}
-                <div className="rounded-none border border-border bg-white p-5 flex items-center justify-between gap-4">
+                <div className="p-5 flex items-center justify-between gap-4" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="grid h-10 w-10 place-items-center rounded-none bg-accent shrink-0">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
+                    <div className="grid h-10 w-10 place-items-center shrink-0" style={{ background: "var(--lcs-surface)" }}>
+                      <FileText className="h-4 w-4" style={{ color: "var(--lcs-ink-muted)" }} />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-medium text-foreground truncate">{doc.file_name ?? template.name}</div>
-                      <div className="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style={{ color: "#71717A" }}>
+                      <div className="text-[13px] font-medium truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{doc.file_name ?? template.name}</div>
+                      <div className="text-[12px] mt-0.5 flex items-center gap-1.5 flex-wrap" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                         <span>{template.name} · {formatFileSize(doc.file_size)} · Uploaded {new Date(doc.updated_at).toLocaleDateString()}</span>
-                        <span className={cn(
-                          "inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full",
-                          extractionError ? "bg-amber-500/10 text-amber-600"
-                            : extracted ? "bg-green-500/10 text-green-600"
-                            : "bg-accent text-muted-foreground",
-                        )}>
-                          {extractionError ? "Extraction failed" : extracted ? "Extracted" : "Not yet extracted"}
-                        </span>
+                        <LcsStatusPill status={extractPill.status} label={extractPill.label} />
                       </div>
                     </div>
                   </div>
@@ -1115,12 +1123,12 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                         if (error) { toast.error("Could not update."); return; }
                         if (startup?.id) queryClient.invalidateQueries({ queryKey: ["founder-documents", startup.id] });
                       }}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors",
-                        attached
-                          ? "border-brand bg-accent text-brand"
-                          : "border-border text-muted-foreground hover:bg-accent",
-                      )}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium transition-colors"
+                      style={{
+                        fontFamily: "var(--font-lcs-ui)",
+                        color: attached ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                        border: "1px solid " + (attached ? "var(--lcs-accent)" : "var(--lcs-line)"),
+                      }}
                     >
                       {attached ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
                       {attached ? "Ready to attach" : "Attach to deal room"}
@@ -1129,7 +1137,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                       onClick={() => handleDeleteSourceFile(doc)}
                       disabled={deletingDocId === doc.id}
                       title="Delete original file"
-                      className="inline-flex items-center gap-1 rounded-none border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:border-red-500/40 hover:text-red-500 transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[12px] transition-colors disabled:opacity-50"
+                      style={{ color: "var(--lcs-ink-muted)", border: "1px solid var(--lcs-line)", fontFamily: "var(--font-lcs-ui)" }}
                     >
                       {deletingDocId === doc.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                     </button>
@@ -1148,11 +1157,11 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       {view === "digital-document-vault" && (
         <div className="space-y-4">
           {employeeOnePagers.length > 0 && (
-            <div className="rounded-none border border-border bg-white overflow-hidden">
-              <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
+            <div style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
+              <div className="px-5 py-4 flex items-center justify-between gap-4" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
                 <div>
-                  <div className="text-sm font-semibold text-foreground">Digital employee data</div>
-                  <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                  <div className="text-[13px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Digital employee data</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                     {employeeOnePagers.length} compiled from employee 1-pagers — name, designation, contact, short description only.
                   </div>
                 </div>
@@ -1166,27 +1175,27 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                     if (error) { toast.error("Could not update."); return; }
                     refetchFounderDocs();
                   }}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors shrink-0",
-                    employeeOnePagers.every(d => d.visibility === "deal_room")
-                      ? "border-brand bg-accent text-brand"
-                      : "border-border text-muted-foreground hover:bg-accent/40",
-                  )}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium transition-colors shrink-0"
+                  style={{
+                    fontFamily: "var(--font-lcs-ui)",
+                    color: employeeOnePagers.every(d => d.visibility === "deal_room") ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                    border: "1px solid " + (employeeOnePagers.every(d => d.visibility === "deal_room") ? "var(--lcs-accent)" : "var(--lcs-line)"),
+                  }}
                 >
                   {employeeOnePagers.every(d => d.visibility === "deal_room") ? "Attached to deal room" : "Attach to deal room"}
                 </button>
               </div>
-              <div className="divide-y divide-border">
-                {employeeOnePagers.map((doc) => {
+              <div>
+                {employeeOnePagers.map((doc, idx) => {
                   const c = (doc.content ?? {}) as Record<string, any>;
                   return (
-                    <div key={doc.id} className="px-5 py-3 flex items-center justify-between gap-4">
+                    <div key={doc.id} className="px-5 py-3 flex items-center justify-between gap-4" style={{ borderTop: idx === 0 ? undefined : "1px solid var(--lcs-line)" }}>
                       <div className="min-w-0">
-                        <div className="text-sm font-medium text-foreground truncate">{c.name || doc.file_name || "Unnamed"}</div>
-                        <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                        <div className="text-[13px] font-medium truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{c.name || doc.file_name || "Unnamed"}</div>
+                        <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                           {[c.designation, c.contact].filter(Boolean).join(" · ") || "—"}
                         </div>
-                        {c.short_description && <div className="text-xs mt-1" style={{ color: "#52525B" }}>{c.short_description}</div>}
+                        {c.short_description && <div className="text-[12px] mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{c.short_description}</div>}
                       </div>
                     </div>
                   );
@@ -1195,7 +1204,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
             </div>
           )}
           {filteredDocs.length === 0 ? (
-            <EmptyState kind="empty" title="No processed documents yet" />
+            <LcsEmptyState title="No processed documents yet" text="Documents appear here once processing finishes." />
           ) : (
             filteredDocs.map((template, i) => {
               const showCategoryHeader = i === 0 || filteredDocs[i - 1].category !== template.category;
@@ -1213,15 +1222,15 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
               return (
                 <div key={template.id}>
                 {showCategoryHeader && (
-                  <div className={cn("text-xs font-semibold uppercase tracking-wider text-muted-foreground", i === 0 ? "mb-2" : "mt-5 mb-2")}>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)", marginTop: i === 0 ? undefined : 20, marginBottom: 8 }}>
                     {CATEGORY_LABELS[template.category] ?? template.category}
                   </div>
                 )}
-                <div className="rounded-none border border-border bg-white overflow-hidden">
-                  <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
+                <div style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
+                  <div className="px-5 py-4 flex items-center justify-between gap-4" style={{ borderBottom: "1px solid var(--lcs-line)" }}>
                     <div>
-                      <div className="text-sm font-semibold text-foreground">{template.name}</div>
-                      <div className="text-xs mt-0.5" style={{ color: "#71717A" }}>
+                      <div className="text-[13px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{template.name}</div>
+                      <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                         {doc.completeness_score}% complete · Updated {new Date(doc.updated_at).toLocaleDateString()}
                       </div>
                     </div>
@@ -1232,25 +1241,27 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                         if (error) { toast.error("Could not update."); return; }
                         refetchFounderDocs();
                       }}
-                      className={cn(
-                        "shrink-0 inline-flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-xs font-medium transition-colors",
-                        attached ? "border-brand bg-accent text-brand" : "border-border text-muted-foreground hover:bg-accent",
-                      )}
+                      className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium transition-colors"
+                      style={{
+                        fontFamily: "var(--font-lcs-ui)",
+                        color: attached ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                        border: "1px solid " + (attached ? "var(--lcs-accent)" : "var(--lcs-line)"),
+                      }}
                     >
                       {attached ? "Ready to attach" : "Attach to deal room"}
                     </button>
                   </div>
                   <div className="p-5 space-y-4">
                     {doc.content?.ai_summary && (
-                      <p className="text-sm leading-relaxed" style={{ color: "#52525B" }}>{String(doc.content.ai_summary)}</p>
+                      <p className="text-[13px] leading-relaxed" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{String(doc.content.ai_summary)}</p>
                     )}
                     {isCustomDoc && Array.isArray(content.highlights) && content.highlights.length > 0 && (
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Highlights</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Highlights</div>
                         <ul className="space-y-1.5">
                           {content.highlights.map((h: string, idx: number) => (
-                            <li key={idx} className="text-sm flex gap-2" style={{ color: "#52525B" }}>
-                              <span className="text-brand shrink-0">✦</span>{h}
+                            <li key={idx} className="text-[13px] flex gap-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+                              <span className="shrink-0" style={{ color: "var(--lcs-accent)" }}>•</span>{h}
                             </li>
                           ))}
                         </ul>
@@ -1260,32 +1271,32 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                       <div className="grid gap-3 sm:grid-cols-2">
                         {content.funding_ask && (
                           <div>
-                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Funding ask</div>
-                            <div className="mt-1 text-sm text-foreground">{content.funding_ask}</div>
+                            <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Funding ask</div>
+                            <div className="mt-1 text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{content.funding_ask}</div>
                           </div>
                         )}
                         {content.use_of_funds && (
                           <div>
-                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Use of funds</div>
-                            <div className="mt-1 text-sm text-foreground">{content.use_of_funds}</div>
+                            <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Use of funds</div>
+                            <div className="mt-1 text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{content.use_of_funds}</div>
                           </div>
                         )}
                         {content.projections && (
                           <div className="sm:col-span-2">
-                            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>Projections</div>
-                            <div className="mt-1 text-sm text-foreground">{content.projections}</div>
+                            <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Projections</div>
+                            <div className="mt-1 text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{content.projections}</div>
                           </div>
                         )}
                       </div>
                     )}
                     {isCustomDoc && Array.isArray(content.key_metrics) && content.key_metrics.length > 0 && (
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#71717A" }}>Key metrics</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Key metrics</div>
                         <div className="grid gap-3 sm:grid-cols-3">
                           {content.key_metrics.map((m: { label: string; value: string }, idx: number) => (
-                            <div key={idx} className="rounded-none border border-border bg-[#FAFAFA] p-3">
-                              <div className="text-xs" style={{ color: "#71717A" }}>{m.label}</div>
-                              <div className="mt-1 text-sm font-medium text-foreground">{m.value}</div>
+                            <div key={idx} className="p-3" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+                              <div className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{m.label}</div>
+                              <div className="mt-1 text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{m.value}</div>
                             </div>
                           ))}
                         </div>
@@ -1293,13 +1304,13 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                     )}
                     {!isCustomDoc && (
                       contentEntries.length === 0 ? (
-                        <p className="text-sm" style={{ color: "#71717A" }}>No structured data extracted yet.</p>
+                        <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>No structured data extracted yet.</p>
                       ) : (
                         <div className="grid gap-3 sm:grid-cols-2">
                           {contentEntries.map(([key, val]) => (
                             <div key={key}>
-                              <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#71717A" }}>{labelFor(key)}</div>
-                              <div className="mt-1 text-sm text-foreground">{String(val)}</div>
+                              <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{labelFor(key)}</div>
+                              <div className="mt-1 text-[13px]" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{String(val)}</div>
                             </div>
                           ))}
                         </div>
@@ -1333,20 +1344,20 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                     ["ai_extracted", "complete", "needs_review"].includes(t.founderDoc.status)));
             return (
               <div key={key}>
-                <div className="text-sm font-semibold text-foreground">{label}</div>
-                <p className="text-xs mt-1 mb-3" style={{ color: "#71717A" }}>{description}</p>
+                <div className="text-[13px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{label}</div>
+                <p className="text-[12px] mt-1 mb-3" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{description}</p>
                 {docsForSection.length === 0 ? (
-                  <EmptyState kind="empty" title="Nothing here yet" />
+                  <LcsEmptyState title="Nothing here yet" text="Documents in this section appear here." />
                 ) : (
-                  <div className="rounded-none border border-border bg-white divide-y divide-border">
-                    {docsForSection.map((template) => {
+                  <div style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
+                    {docsForSection.map((template, idx) => {
                       const doc = template.founderDoc!;
                       const attached = doc.visibility === "deal_room";
                       return (
-                        <div key={template.id} className="flex items-center justify-between gap-4 px-5 py-3.5">
+                        <div key={template.id} className="flex items-center justify-between gap-4 px-5 py-3.5" style={{ borderTop: idx === 0 ? undefined : "1px solid var(--lcs-line)" }}>
                           <div className="min-w-0">
-                            <div className="text-sm font-medium text-foreground truncate">{template.name}</div>
-                            <div className="text-xs" style={{ color: "#71717A" }}>{doc.file_name ?? doc.title}</div>
+                            <div className="text-[13px] font-medium truncate" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{template.name}</div>
+                            <div className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{doc.file_name ?? doc.title}</div>
                           </div>
                           <button
                             onClick={async () => {
@@ -1357,15 +1368,13 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                             }}
                             role="switch"
                             aria-checked={attached}
-                            className={cn(
-                              "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-                              attached ? "bg-brand" : "bg-accent",
-                            )}
+                            className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors"
+                            style={{ background: attached ? "var(--lcs-accent)" : "var(--lcs-line)" }}
                           >
-                            <span className={cn(
-                              "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transition-transform",
-                              attached ? "translate-x-5" : "translate-x-0",
-                            )} />
+                            <span
+                              className="pointer-events-none inline-block h-5 w-5 rounded-full transition-transform"
+                              style={{ background: "var(--lcs-white)", transform: attached ? "translateX(20px)" : "translateX(2px)", marginTop: 2 }}
+                            />
                           </button>
                         </div>
                       );
@@ -1394,67 +1403,72 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
 
       {/* Custom Document upload modal */}
       {showCustomUpload && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !customUploading && setShowCustomUpload(false)}>
-          <div className="w-full max-w-md rounded-none border border-border bg-white p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "color-mix(in srgb, var(--lcs-ink) 50%, transparent)" }} onClick={() => !customUploading && setShowCustomUpload(false)}>
+          <div className="w-full max-w-md p-6" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>Add a custom document</h3>
-              <button onClick={() => !customUploading && setShowCustomUpload(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-[15px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Add a custom document</h3>
+              <button onClick={() => !customUploading && setShowCustomUpload(false)} style={{ color: "var(--lcs-ink-muted)" }}>
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>Document title</label>
+                <label className="text-[12px] font-medium block mb-1.5" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Document title</label>
                 <input
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="e.g. Letter of Intent — Acme Corp"
-                  className="w-full rounded-none border border-border bg-white px-3 py-2 text-sm outline-none focus:border-brand/50"
+                  className="w-full outline-none"
+                  style={{ height: 32, fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)", background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px" }}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>Category</label>
+                <label className="text-[12px] font-medium block mb-1.5" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Category</label>
                 <div className="grid grid-cols-5 gap-1.5">
                   {(["market", "financials", "team", "product", "legal"] as const).map((cat) => (
                     <button
                       key={cat}
                       type="button"
                       onClick={() => setCustomCategory(cat)}
-                      className={cn(
-                        "rounded-none border px-2 py-1.5 text-xs font-medium capitalize transition-colors",
-                        customCategory === cat ? "border-brand bg-accent text-brand" : "border-border text-muted-foreground hover:bg-accent/40",
-                      )}
+                      className="px-2 py-1.5 text-[12px] font-medium capitalize transition-colors"
+                      style={{
+                        fontFamily: "var(--font-lcs-ui)",
+                        color: customCategory === cat ? "var(--lcs-accent)" : "var(--lcs-ink-muted)",
+                        border: "1px solid " + (customCategory === cat ? "var(--lcs-accent)" : "var(--lcs-line)"),
+                        background: customCategory === cat ? "var(--lcs-progress-wash)" : "transparent",
+                      }}
                     >
                       {cat}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs mt-1.5" style={{ color: "#71717A" }}>AI will suggest a category once extracted — you can change it later.</p>
+                <p className="text-[12px] mt-1.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>AI will suggest a category once extracted — you can change it later.</p>
               </div>
               <div>
-                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>File</label>
-                <label className="rounded-none border border-dashed border-border p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
-                  <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
-                  <div className="text-sm font-medium mt-2">{customFile ? customFile.name : "Choose a file"}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOCX, PPTX, XLSX, CSV · Max 50MB</div>
+                <label className="text-[12px] font-medium block mb-1.5" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>File</label>
+                <label className="p-5 text-center cursor-pointer transition-colors block" style={{ border: "1px dashed var(--lcs-line)" }}>
+                  <Upload className="h-5 w-5 mx-auto" style={{ color: "var(--lcs-ink-muted)" }} />
+                  <div className="text-[13px] font-medium mt-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{customFile ? customFile.name : "Choose a file"}</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>PDF, DOCX, PPTX, XLSX, CSV · Max 50MB</div>
                   <input type="file" accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
                 </label>
               </div>
               {customExtractError && (
-                <div className="rounded-none border border-amber-500/30 bg-amber-500/5 px-3 py-2.5">
-                  <p className="text-xs font-medium text-amber-600">Could not extract this document.</p>
-                  <p className="text-xs mt-0.5" style={{ color: "#71717A" }}>{customExtractError}</p>
-                  <p className="text-xs mt-1" style={{ color: "#71717A" }}>It's stored in Source Files — retry, or fill it in manually.</p>
+                <div className="px-3 py-2.5" style={{ border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)" }}>
+                  <p className="text-[12px] font-medium" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}>Could not extract this document.</p>
+                  <p className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{customExtractError}</p>
+                  <p className="text-[12px] mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>It's stored in Source Files — retry, or fill it in manually.</p>
                 </div>
               )}
-              <button
+              <LcsButton
+                variant="primary"
                 onClick={handleCustomDocumentUpload}
                 disabled={customUploading || !customFile || !customTitle.trim() || !customCategory}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-none hs-gradient text-brand-foreground px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 text-[13px]"
               >
                 {customUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {customUploading ? "Uploading & extracting…" : customExtractError ? "Retry" : "Upload & extract"}
-              </button>
+              </LcsButton>
             </div>
           </div>
         </div>
@@ -1462,42 +1476,43 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
 
       {/* Employee 1-pager upload modal — R13B step 6 */}
       {showEmployeeUpload && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !employeeUploading && setShowEmployeeUpload(false)}>
-          <div className="w-full max-w-md rounded-none border border-border bg-white p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "color-mix(in srgb, var(--lcs-ink) 50%, transparent)" }} onClick={() => !employeeUploading && setShowEmployeeUpload(false)}>
+          <div className="w-full max-w-md p-6" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold" style={{ fontFamily: "Syne, sans-serif" }}>Add employee 1-pager</h3>
-              <button onClick={() => !employeeUploading && setShowEmployeeUpload(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-[15px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Add employee 1-pager</h3>
+              <button onClick={() => !employeeUploading && setShowEmployeeUpload(false)} style={{ color: "var(--lcs-ink-muted)" }}>
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="space-y-4">
-              <p className="text-xs" style={{ color: "#71717A" }}>
+              <p className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
                 For team members who aren't key people. AI extracts only name, designation, contact, and a short description — narrower than a key-person profile.
               </p>
               <div>
-                <label className="text-xs font-medium block mb-1.5" style={{ color: "#52525B" }}>File</label>
-                <label className="rounded-none border border-dashed border-border p-5 text-center cursor-pointer hover:border-brand/50 hover:bg-accent/20 transition-colors block">
-                  <Upload className="h-5 w-5 text-muted-foreground mx-auto" />
-                  <div className="text-sm font-medium mt-2">{employeeFile ? employeeFile.name : "Choose a file"}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOCX, PPTX · Max 50MB</div>
+                <label className="text-[12px] font-medium block mb-1.5" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>File</label>
+                <label className="p-5 text-center cursor-pointer transition-colors block" style={{ border: "1px dashed var(--lcs-line)" }}>
+                  <Upload className="h-5 w-5 mx-auto" style={{ color: "var(--lcs-ink-muted)" }} />
+                  <div className="text-[13px] font-medium mt-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{employeeFile ? employeeFile.name : "Choose a file"}</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>PDF, DOCX, PPTX · Max 50MB</div>
                   <input type="file" accept=".pdf,.pptx,.ppt,.docx,.doc" className="sr-only" onChange={(e) => e.target.files?.[0] && setEmployeeFile(e.target.files[0])} />
                 </label>
               </div>
               {employeeExtractError && (
-                <div className="rounded-none border border-amber-500/30 bg-amber-500/5 px-3 py-2.5">
-                  <p className="text-xs font-medium text-amber-600">Could not extract this document.</p>
-                  <p className="text-xs mt-0.5" style={{ color: "#71717A" }}>{employeeExtractError}</p>
-                  <p className="text-xs mt-1" style={{ color: "#71717A" }}>It's stored in Source Files — retry, or fill it in manually.</p>
+                <div className="px-3 py-2.5" style={{ border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)" }}>
+                  <p className="text-[12px] font-medium" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-ui)" }}>Could not extract this document.</p>
+                  <p className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{employeeExtractError}</p>
+                  <p className="text-[12px] mt-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>It's stored in Source Files — retry, or fill it in manually.</p>
                 </div>
               )}
-              <button
+              <LcsButton
+                variant="primary"
                 onClick={handleEmployeeOnePagerUpload}
                 disabled={employeeUploading || !employeeFile}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-none hs-gradient text-brand-foreground px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 text-[13px]"
               >
                 {employeeUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {employeeUploading ? "Uploading & extracting…" : employeeExtractError ? "Retry" : "Upload & extract"}
-              </button>
+              </LcsButton>
             </div>
           </div>
         </div>
@@ -1595,32 +1610,46 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
     }
   };
 
-  const inputCls = "w-full rounded-lg border border-border bg-accent px-3 py-2.5 text-sm text-foreground placeholder:text-faint focus:outline-none focus:border-brand/60 focus:ring-1 focus:ring-brand/20";
+  const inputStyle: React.CSSProperties = {
+    width: "100%", fontFamily: "var(--font-lcs-ui)", fontSize: 14, color: "var(--lcs-ink)",
+    background: "var(--lcs-white)", border: "1px solid var(--lcs-line)", borderRadius: 0, padding: "0 10px", height: 32, outline: "none",
+  };
+
+  // AI-review signal collapsed onto the closed 3-tone set used throughout
+  // this pass — weak and critical deliberately share attention (no third
+  // negative tier), same reasoning as Group 6's Strengths/Risks/Flags and
+  // this file's own document-card feedback-score pill above.
+  const signalStatus: LcsStatus | null = reviewFeedback
+    ? reviewFeedback.signal === "strong" ? "satisfied" : reviewFeedback.signal === "adequate" ? "in-progress" : "attention"
+    : null;
+  const signalColor = signalStatus === "satisfied" ? "var(--lcs-satisfied)" : signalStatus === "in-progress" ? "var(--lcs-progress)" : "var(--lcs-attention)";
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 grid place-items-center backdrop-blur-sm p-4 overflow-y-auto"
+      style={{ background: "color-mix(in srgb, var(--lcs-ink) 70%, transparent)" }}
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-3xl rounded-2xl border border-border/60 bg-card shadow-2xl overflow-hidden my-auto"
+        className="w-full max-w-3xl overflow-hidden my-auto"
+        style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between sticky top-0 bg-card z-10">
+        <div className="px-6 py-4 flex items-center justify-between sticky top-0 z-10" style={{ borderBottom: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
           <div className="flex-1 min-w-0 pr-4">
-            <h2 className="text-base font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>{template?.name ?? "Document"}</h2>
+            <h2 className="text-[15px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{template?.name ?? "Document"}</h2>
             <div className="flex items-center gap-2 mt-1.5">
-              <div className="flex-1 bg-accent h-1 rounded-full overflow-hidden">
+              <div className="flex-1 h-1 overflow-hidden" style={{ background: "var(--lcs-line)" }}>
                 <div
-                  className="h-full hs-gradient rounded-full transition-all duration-300"
-                  style={{ width: `${liveScore}%` }}
+                  className="h-full transition-all duration-300"
+                  style={{ width: `${liveScore}%`, background: "var(--lcs-accent)" }}
                 />
               </div>
-              <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{liveScore}% complete</span>
+              <span className="text-[10px] tabular-nums shrink-0" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>{liveScore}% complete</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+          <button onClick={onClose} className="shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -1629,21 +1658,22 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         <div className="px-6 py-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
           {fields.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm text-muted-foreground">No fields</p>
+              <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>No fields</p>
             </div>
           ) : (
             fields.map(field => (
               <div key={field.key}>
-                <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium block mb-1.5">
+                <label className="text-[11px] uppercase tracking-wider font-medium block mb-1.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>
                   {field.label}
-                  {field.required && <span className="text-red-400 ml-1">*</span>}
+                  {field.required && <span className="ml-1" style={{ color: "var(--lcs-attention)" }}>*</span>}
                 </label>
                 {field.type === "textarea" ? (
                   <textarea
                     value={content[field.key] ?? ""}
                     onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
                     placeholder={field.placeholder}
-                    className={cn(inputCls, "resize-none min-h-[100px]")}
+                    className="resize-none"
+                    style={{ ...inputStyle, height: "auto", minHeight: 100, padding: "8px 10px" }}
                   />
                 ) : field.type === "number" ? (
                   <input
@@ -1651,7 +1681,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
                     value={content[field.key] ?? ""}
                     onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
                     placeholder={field.placeholder}
-                    className={inputCls}
+                    style={inputStyle}
                   />
                 ) : field.type === "percentage" ? (
                   <div className="flex items-center gap-2">
@@ -1662,9 +1692,10 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
                       value={content[field.key] ?? ""}
                       onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
                       placeholder={field.placeholder}
-                      className={cn(inputCls, "flex-1")}
+                      className="flex-1"
+                      style={inputStyle}
                     />
-                    <span className="text-sm text-muted-foreground">%</span>
+                    <span className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>%</span>
                   </div>
                 ) : (
                   <input
@@ -1672,7 +1703,7 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
                     value={content[field.key] ?? ""}
                     onChange={(e) => setContent(prev => ({ ...prev, [field.key]: e.target.value }))}
                     placeholder={field.placeholder}
-                    className={inputCls}
+                    style={inputStyle}
                   />
                 )}
               </div>
@@ -1682,44 +1713,43 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
         {/* Error */}
         {reviewError && (
-          <div className="mx-6 mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mx-6 mb-4 p-3 text-[13px]" style={{ border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)", color: "var(--lcs-attention)" }}>
             {reviewError}
           </div>
         )}
 
         {/* AI Feedback */}
-        {reviewFeedback && (
+        {reviewFeedback && signalStatus && (
           <div className="mx-6 mb-6 space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg bg-accent border border-border">
+            <div className="flex items-center justify-between p-4" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
               <div className="flex-1 min-w-0 pr-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">AI Review</p>
-                <p className="text-sm text-foreground leading-relaxed">{reviewFeedback.summary}</p>
+                <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>AI Review</p>
+                <p className="text-[13px] leading-relaxed" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{reviewFeedback.summary}</p>
               </div>
-              <div className={cn(
-                "shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold border-2",
-                reviewFeedback.signal === "strong" ? "border-green-500 text-green-400"
-                : reviewFeedback.signal === "adequate" ? "border-amber-500 text-amber-400"
-                : reviewFeedback.signal === "weak" ? "border-orange-500 text-orange-400"
-                : "border-red-500 text-red-400"
-              )}>
+              <div
+                className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-bold"
+                style={{ border: `2px solid ${signalColor}`, color: signalColor, fontFamily: "var(--font-lcs-data)" }}
+              >
                 {reviewFeedback.overall_score}
               </div>
             </div>
 
             {reviewFeedback.investor_flag && (
-              <div className="p-3 rounded-lg bg-red-500/8 border border-red-500/20">
-                <p className="text-xs text-red-400 uppercase tracking-wider mb-1">⚠ Investor will push back on</p>
-                <p className="text-sm text-muted-foreground">{reviewFeedback.investor_flag}</p>
+              <div className="p-3" style={{ border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)" }}>
+                <p className="text-[11px] uppercase tracking-wider mb-1 flex items-center gap-1.5" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-data)" }}>
+                  <AlertCircle className="h-3 w-3" /> Investor will push back on
+                </p>
+                <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{reviewFeedback.investor_flag}</p>
               </div>
             )}
 
             {reviewFeedback.strengths?.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Strengths</p>
+                <p className="text-[11px] uppercase tracking-wider mb-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Strengths</p>
                 <ul className="space-y-1">
                   {reviewFeedback.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="text-green-400 mt-0.5 shrink-0">✓</span>{s}
+                    <li key={i} className="flex items-start gap-2 text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+                      <span className="mt-0.5 shrink-0" style={{ color: "var(--lcs-satisfied)" }}>✓</span>{s}
                     </li>
                   ))}
                 </ul>
@@ -1728,11 +1758,11 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
             {reviewFeedback.gaps?.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Gaps to address</p>
+                <p className="text-[11px] uppercase tracking-wider mb-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Gaps to address</p>
                 <ul className="space-y-1">
                   {reviewFeedback.gaps.map((g, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="text-amber-400 mt-0.5 shrink-0">→</span>{g}
+                    <li key={i} className="flex items-start gap-2 text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+                      <span className="mt-0.5 shrink-0" style={{ color: "var(--lcs-attention)" }}>→</span>{g}
                     </li>
                   ))}
                 </ul>
@@ -1741,11 +1771,11 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
 
             {reviewFeedback.recommendations?.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Fix these</p>
+                <p className="text-[11px] uppercase tracking-wider mb-2" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>Fix these</p>
                 <ul className="space-y-1">
                   {reviewFeedback.recommendations.map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="text-brand mt-0.5 shrink-0 font-bold">{i + 1}</span>{r}
+                    <li key={i} className="flex items-start gap-2 text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
+                      <span className="mt-0.5 shrink-0 font-bold tabular-nums" style={{ color: "var(--lcs-accent)", fontFamily: "var(--font-lcs-data)" }}>{i + 1}</span>{r}
                     </li>
                   ))}
                 </ul>
@@ -1755,30 +1785,19 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         )}
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border/60 flex items-center justify-between sticky bottom-0 bg-card">
-          <button
-            onClick={onClose}
-            className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          >
+        <div className="px-6 py-4 flex items-center justify-between sticky bottom-0" style={{ borderTop: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
+          <LcsButton variant="secondary" onClick={onClose} className="text-[13px]">
             Close
-          </button>
+          </LcsButton>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleAIReview}
-              disabled={isReviewing}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-brand/40 text-brand px-4 py-2 text-sm hover:bg-accent disabled:opacity-50 transition-colors"
-            >
+            <LcsButton variant="secondary" onClick={handleAIReview} disabled={isReviewing} className="inline-flex items-center gap-1.5 text-[13px]">
               {isReviewing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {isReviewing ? "Reviewing…" : "AI Review"}
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-lg hs-gradient text-foreground px-4 py-2 text-sm font-medium hover:bg-[#6d28d9] disabled:opacity-50 transition-colors"
-            >
+            </LcsButton>
+            <LcsButton variant="primary" onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 text-[13px]">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               Save
-            </button>
+            </LcsButton>
           </div>
         </div>
       </div>
