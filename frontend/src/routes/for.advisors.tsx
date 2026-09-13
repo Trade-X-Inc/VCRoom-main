@@ -12,6 +12,13 @@ import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 // one. "The sealed export" removed — no export capability exists (see
 // CLAUDE.md §12, §20.15) — replaced with the real permanent, in-room
 // record. "Transaction room(s)" corrected to "deal room(s)" throughout.
+//
+// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the `quote`
+// prop ("Corporate Finance Advisor, 2026") was a fabricated testimonial
+// attributed to a person who does not exist — same pattern found and
+// removed across four other for.* pages in the same sweep. `quote` is
+// optional on SimpleAudiencePage, so removing the prop entirely (rather
+// than passing an empty value) correctly omits the section.
 
 export const Route = createFileRoute("/for/advisors")({
   component: Advisors,
@@ -33,10 +40,6 @@ function Advisors() {
         { title: "Multi-party coordination", desc: "Manage deals where you're coordinating across multiple principals, counsel teams, and investors — all within a single, structured room." },
         { title: "Full audit trail", desc: "The append-only record of the room — every action, confirmation, and signature — stays in place and inspectable for the life of the deal." },
       ]}
-      quote={{
-        text: "\"As an advisor, I need to see everything without owning anything. Lengdon gives me full visibility into the deal without putting me in the chain of custody.\"",
-        attribution: "Corporate Finance Advisor, 2026",
-      }}
       ctaTitle="Work with us."
       ctaSubtitle="We work with advisors and agents directly. Get in touch to discuss your workflow."
       ctaSecondaryLabel="Contact us →"

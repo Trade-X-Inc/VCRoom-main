@@ -12,6 +12,13 @@ import { PageHero } from "@/components/site/PageHero";
 // "Export at close" ("Both parties receive a sealed, signed copy") — no
 // export capability of any kind exists (CLAUDE.md §12, §20.15). Both
 // reworded to describe the real permanent, in-room record.
+//
+// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the
+// testimonial ("Founder, Technology Company — Series A, 2026") was a
+// fabricated quote attributed to a person who does not exist — same
+// pattern as for.investors.tsx's removed testimonial, found during the
+// same sweep. No real quote exists to replace it with, so the section
+// was removed outright.
 
 export const Route = createFileRoute("/for/founders")({
   component: Founders,
@@ -59,7 +66,7 @@ function Founders() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">How it works for you</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">How it works for you</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             FROM FIRST CALL<br />TO SEALED CLOSE
@@ -78,7 +85,7 @@ function Founders() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef] bg-[#f8f9fb]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Why Founders use Lengdon</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Why Founders use Lengdon</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             PROTECTED.<br />DOCUMENTED.<br />YOURS.
@@ -91,18 +98,6 @@ function Founders() {
                 <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">{b.body}</p>
               </div>
             ))}
-          </div>
-        </section>
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="max-w-[780px]">
-            <div className="w-8 h-px bg-[#d4af37]/60 mb-8" />
-            <blockquote style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[26px] leading-[1.4] tracking-[-0.5px] mb-6">
-              "We needed a closing process that protected us and our investor equally. Not a data room — a record. Lengdon gave us both."
-            </blockquote>
-            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[13px] tracking-[0.5px]">
-              Founder, Technology Company — Series A, 2026
-            </div>
           </div>
         </section>
 
