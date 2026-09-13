@@ -162,6 +162,16 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      // Preload the two actual font files behind the four Geist:*/Inter:*
+      // @font-face declarations in styles.css (Geist_wght__1 serves both
+      // SemiBold and Regular via variable weight; Inter_1 serves both
+      // Regular and Medium the same way — two files, not four). Added
+      // 13 Sep 2026 alongside font-display: swap, so the browser starts
+      // fetching from static.figma.com as early as possible rather than
+      // only discovering the need once it parses the CSS that references
+      // them — shortens the fallback-to-real-font gap on slow connections.
+      { rel: "preload", href: "https://static.figma.com/font/Geist_wght__1", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+      { rel: "preload", href: "https://static.figma.com/font/Inter_1", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
       // No site-wide canonical here: a root-level canonical pointing at the
       // apex made EVERY subpage (/pricing, /tools/*, /blog/*) declare itself
       // a duplicate of the homepage — actively harmful for indexing. Routes

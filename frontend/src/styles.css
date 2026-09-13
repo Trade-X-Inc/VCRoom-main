@@ -728,29 +728,42 @@ img { max-width: 100%; height: auto; }
    file's values, unchanged, only the identifiers are prefixed.
    ───────────────────────────────────────────────────────────────────── */
 
+/* font-display: swap added 13 Sep 2026 (legal/compliance-audit
+   follow-up) — the default (font-display: auto) lets a browser hold
+   text invisible while these fetch from a third-party CDN
+   (static.figma.com), with no upper bound of its own. swap renders the
+   fallback immediately and swaps in the real face once it arrives, so
+   real users on slow connections see readable text right away instead
+   of a blank wait. Paired with the <link rel="preload"> hints in
+   __root.tsx, which start the fetch as early as possible for the same
+   reason. */
 @font-face {
   font-family: "Geist:SemiBold";
   src: url("https://static.figma.com/font/Geist_wght__1") format("woff2");
   font-style: normal;
   font-weight: 600;
+  font-display: swap;
 }
 @font-face {
   font-family: "Geist:Regular";
   src: url("https://static.figma.com/font/Geist_wght__1") format("woff2");
   font-style: normal;
   font-weight: 400;
+  font-display: swap;
 }
 @font-face {
   font-family: "Inter:Regular";
   src: url("https://static.figma.com/font/Inter_1") format("woff2");
   font-style: normal;
   font-weight: 400;
+  font-display: swap;
 }
 @font-face {
   font-family: "Inter:Medium";
   src: url("https://static.figma.com/font/Inter_1") format("woff2");
   font-style: normal;
   font-weight: 500;
+  font-display: swap;
 }
 
 @keyframes pub-ticker-x {
