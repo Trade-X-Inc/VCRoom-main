@@ -97,7 +97,7 @@ function ProductCard() {
   }, []);
 
   return (
-    <div className="pub-card-float relative w-[420px] shrink-0">
+    <div className="pub-card-float relative w-[540px] shrink-0">
       <div className="absolute -inset-4 bg-gradient-to-br from-[#0a2540]/8 via-transparent to-[#0a2540]/4 blur-2xl rounded-2xl" />
 
       <div className="relative bg-white border border-[#e0e5ee] shadow-[0_24px_64px_rgba(10,37,64,0.12),0_4px_16px_rgba(10,37,64,0.06)] overflow-hidden">
@@ -200,7 +200,7 @@ function HeroSection() {
         }} />
 
       <div className="relative z-10 flex-1 flex items-center max-w-[1280px] mx-auto w-full px-10 pt-28 pb-12">
-        <div className="flex items-center justify-between gap-8 w-full">
+        <div className="flex items-start justify-between gap-8 w-full">
           <div className="flex flex-col gap-8 max-w-[600px] min-w-0">
             <div className="flex items-center gap-3">
               <div className="w-4 h-px bg-[#0a2540]/40" />
@@ -232,7 +232,7 @@ function HeroSection() {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-start justify-end flex-1 pt-24">
+          <div className="hidden lg:flex items-start justify-end flex-1 pt-[56px]">
             <ProductCard />
           </div>
         </div>
@@ -311,9 +311,9 @@ function AppendOnlyRecordSection() {
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-start">
             <div className="lg:w-[400px] shrink-0">
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3px] mb-8">
-                <span className="block text-[#0a2540] text-[80px]">THE</span>
-                <span className="block text-[#0a2540] text-[80px]">APPEND-ONLY</span>
-                <span className="block text-[80px]"
+                <span className="block text-[#0a2540] text-[clamp(48px,7vw,80px)]">THE</span>
+                <span className="block text-[#0a2540] text-[clamp(48px,7vw,80px)]">APPEND-ONLY</span>
+                <span className="block text-[clamp(48px,7vw,80px)]"
                   style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
                   RECORD.
                 </span>
@@ -468,7 +468,7 @@ function DemoSection() {
       <div className="px-12 lg:px-16">
         <Reveal>
           <SectionLabel>Demo</SectionLabel>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[64px] lg:text-[80px] leading-[0.9] tracking-[-2.5px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(40px,7vw,80px)] leading-[0.9] tracking-[-2.5px] mb-16">
             SEE LENGDON CLOSE
           </h2>
         </Reveal>
@@ -887,7 +887,7 @@ function SecuritySection() {
       <div className="flex flex-col lg:flex-row">
         <Reveal className="flex-1 px-12 lg:px-16 py-24 border-r border-[#e6e9ef]">
           <SectionLabel>Trust</SectionLabel>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[64px] leading-[0.9] tracking-[-2px] mb-8">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(40px,7vw,64px)] leading-[0.9] tracking-[-2px] mb-8">
             SECURITY<br />&amp; TRUST
           </h2>
           <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] max-w-[400px] mb-10">
@@ -1058,7 +1058,7 @@ function AudienceSection() {
             </div>
             <div className="relative z-10 flex flex-col items-center gap-3">
               <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Role</span>
-              <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[56px] leading-none tracking-[-2px]">
+              <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(36px,7vw,56px)] leading-none tracking-[-2px]">
                 {String(active + 1).padStart(2, "0")}
               </span>
               <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>

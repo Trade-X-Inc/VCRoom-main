@@ -69,7 +69,7 @@ function PrivateEquity() {
             <div className="w-5 h-px bg-[#0a2540]/30" />
             <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">PE-specific capabilities</span>
           </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
             BUILT FOR<br />THE COMPLEXITY.
           </h2>
           <div className="flex flex-col gap-0 border border-[#e6e9ef] divide-y divide-[#e6e9ef]">
@@ -95,7 +95,7 @@ function PrivateEquity() {
               { stat: "∞", label: "Sealed record retention", sub: "Preserved, unchanged, permanently" },
             ].map((s) => (
               <div key={s.stat} className="p-10 flex flex-col gap-2">
-                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[56px] leading-none tracking-[-3px]">{s.stat}</div>
+                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(36px,7vw,56px)] leading-none tracking-[-3px]">{s.stat}</div>
                 <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[14px] tracking-[-0.2px]">{s.label}</div>
                 <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">{s.sub}</div>
               </div>

@@ -68,7 +68,7 @@ function Founders() {
             <div className="w-5 h-px bg-[#0a2540]/30" />
             <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">How it works for you</span>
           </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
             FROM FIRST CALL<br />TO SEALED CLOSE
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-[#e6e9ef]">
@@ -87,7 +87,7 @@ function Founders() {
             <div className="w-5 h-px bg-[#0a2540]/30" />
             <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Why Founders use Lengdon</span>
           </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
             PROTECTED.<br />DOCUMENTED.<br />YOURS.
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef]">

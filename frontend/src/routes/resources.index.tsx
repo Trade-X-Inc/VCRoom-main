@@ -66,7 +66,7 @@ function ResourcesIndex() {
               <div className="w-5 h-px bg-white/20" />
               <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Lengdon · Resources</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[72px] leading-[0.88] tracking-[-3px] mb-6">
+            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(44px,7vw,72px)] leading-[0.88] tracking-[-3px] mb-6">
               RESOURCES.
             </h1>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[520px]">

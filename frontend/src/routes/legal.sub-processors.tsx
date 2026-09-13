@@ -54,7 +54,7 @@ function SubProcessors() {
               <div className="w-5 h-px bg-white/20" />
               <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Legal · Sub-processors</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[56px] leading-[0.9] tracking-[-2.5px] mb-4">
+            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
               SUB-<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>PROCESSORS.</span>
             </h1>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[14px]">Last updated: 1 August 2025 · Changes notified 30 days in advance</p>
