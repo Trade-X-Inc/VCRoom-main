@@ -46,7 +46,7 @@ function Registry() {
             <div className="p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-4 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">What it is</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">What it is</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-5">
                 A REFERENCE.<br />NOT THE DEAL.
@@ -58,7 +58,7 @@ function Registry() {
             <div className="p-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-4 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">What it proves</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">What it proves</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-5">
                 THE CLOSE<br />HAPPENED.
@@ -73,7 +73,7 @@ function Registry() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">How a reference is generated</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">How a reference is generated</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             THREE STEPS.<br />ONE RECORD.

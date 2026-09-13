@@ -97,7 +97,7 @@ function Contact() {
             <div className="lg:w-[380px] shrink-0">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Contact</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Contact</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.9] tracking-[-1.5px] mb-8">
                 WE READ EVERY MESSAGE.
@@ -111,14 +111,14 @@ function Contact() {
                   { label: "Press", email: "press@lengdon.com" },
                 ].map(item => (
                   <div key={item.label}>
-                    <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-1">{item.label}</div>
+                    <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-1">{item.label}</div>
                     <a href={`mailto:${item.email}`} style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[15px] hover:opacity-60 transition-opacity">{item.email}</a>
                   </div>
                 ))}
               </div>
 
               <div className="mt-8 border-t border-[#e6e9ef] pt-8">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-3">Office</div>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-3">Office</div>
                 <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">
                   Venture Tech LLC<br />
                   DIFC FinTech Hive<br />

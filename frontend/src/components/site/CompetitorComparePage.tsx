@@ -84,14 +84,14 @@ export function CompetitorComparePage({
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef] divide-y lg:divide-y-0 lg:divide-x divide-[#e6e9ef]">
             <div className="p-10">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-5">{competitorName}</div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#94a3b8] text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{competitorBlurbTitle}</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px] leading-[1.75]">
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase mb-5">{competitorName}</div>
+              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#64748b] text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{competitorBlurbTitle}</h3>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] leading-[1.75]">
                 {competitorBlurb}
               </p>
             </div>
             <div className="p-10 bg-[#0a2540]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/40 text-[11px] tracking-[2px] uppercase mb-5">Lengdon</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[2px] uppercase mb-5">Lengdon</div>
               <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{lengdonBlurbTitle}</h3>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/60 text-[14px] leading-[1.75]">
                 {lengdonBlurb}
@@ -103,15 +103,15 @@ export function CompetitorComparePage({
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
           <div className="border border-[#e6e9ef] overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Capability</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#64748b] text-[11px] tracking-[1px] uppercase">Capability</div>
               <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-5 font-semibold text-[#0a2540] text-[13px] text-center border-l border-[#e6e9ef]">Lengdon</div>
-              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#94a3b8] text-[13px] text-center border-l border-[#e6e9ef]">{competitorName}</div>
+              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#64748b] text-[13px] text-center border-l border-[#e6e9ef]">{competitorName}</div>
             </div>
             {rows.map((row, i) => (
               <div key={i} className={`grid grid-cols-[1fr_160px_160px] ${i < rows.length - 1 ? "border-b border-[#e6e9ef]" : ""} hover:bg-[#fafbfc] transition-colors`}>
                 <div className="px-8 py-5">
                   <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] mb-1">{row.feature}</div>
-                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{row.note}</div>}
+                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{row.note}</div>}
                 </div>
                 <div className="px-6 py-5 flex items-center justify-center border-l border-[#e6e9ef]">
                   {row.lengdon ? (

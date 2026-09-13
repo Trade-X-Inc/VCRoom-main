@@ -127,7 +127,7 @@ function SignUp() {
         <div className="relative z-10 mb-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-white/20" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">
               In beta
             </span>
           </div>
@@ -171,11 +171,11 @@ function SignUp() {
           <Link to="/" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="lg:hidden font-semibold text-[#0a2540] text-[18px] tracking-[-0.4px]">
             Lengdon
           </Link>
-          <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden lg:block text-[#94a3b8] text-[13px]">
+          <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden lg:block text-[#64748b] text-[13px]">
             Join the waitlist
           </span>
           <div className="flex items-center gap-2 ml-auto">
-            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px]">
+            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">
               Have an account?
             </span>
             <Link to="/sign-in" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[13px] hover:opacity-60 transition-opacity">
@@ -195,7 +195,7 @@ function SignUp() {
                       ? "bg-[#0a2540] text-white"
                       : step > s
                       ? "bg-emerald-500 text-white"
-                      : "border border-[#e6e9ef] text-[#94a3b8]"
+                      : "border border-[#e6e9ef] text-[#64748b]"
                   }`}
                 >
                   {step > s ? (
@@ -248,14 +248,14 @@ function SignUp() {
                 <div className="mb-10">
                   <div className="flex items-center gap-3 mb-5">
                     <div className="w-4 h-px bg-[#0a2540]/30" />
-                    <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2.5px] uppercase text-[#94a3b8]">
+                    <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2.5px] uppercase text-[#64748b]">
                       Step 1 of 2
                     </span>
                   </div>
                   <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
                     We're not onboarding new accounts right now
                   </h1>
-                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
+                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">
                     Join the waitlist and we'll reach out. Tell us how you'd use Lengdon.
                   </p>
                 </div>
@@ -277,7 +277,7 @@ function SignUp() {
                           <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[16px] tracking-[-0.3px] mb-1 ${role === opt.id ? "text-white" : "text-[#0a2540]"}`}>
                             {opt.label}
                           </div>
-                          <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] leading-[1.5] ${role === opt.id ? "text-white/60" : "text-[#94a3b8]"}`}>
+                          <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] leading-[1.5] ${role === opt.id ? "text-white/60" : "text-[#64748b]"}`}>
                             {opt.desc}
                           </div>
                         </div>
@@ -312,20 +312,20 @@ function SignUp() {
                   <button
                     onClick={() => { setStep(1); setError('') }}
                     style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                    className="flex items-center gap-2 text-[#94a3b8] text-[13px] hover:text-[#0a2540] transition-colors mb-6"
+                    className="flex items-center gap-2 text-[#64748b] text-[13px] hover:text-[#0a2540] transition-colors mb-6"
                   >
                     ← Back
                   </button>
                   <div className="flex items-center gap-3 mb-5">
                     <div className="w-4 h-px bg-[#0a2540]/30" />
-                    <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2.5px] uppercase text-[#94a3b8]">
+                    <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2.5px] uppercase text-[#64748b]">
                       Step 2 of 2 · {role === "founder" ? "Founder" : "Investor"}
                     </span>
                   </div>
                   <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
                     Your details
                   </h1>
-                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
+                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">
                     We'll use this to reach out when we're ready for you.
                   </p>
                 </div>
@@ -392,9 +392,9 @@ function SignUp() {
 
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px] leading-[1.6] text-center">
                     By joining the waitlist, you agree to our{" "}
-                    <Link to="/legal/terms" className="text-[#94a3b8] hover:text-[#0a2540] transition-colors">Terms</Link>
+                    <Link to="/legal/terms" className="text-[#64748b] hover:text-[#0a2540] transition-colors">Terms</Link>
                     {" "}and{" "}
-                    <Link to="/legal/privacy" className="text-[#94a3b8] hover:text-[#0a2540] transition-colors">Privacy Policy</Link>.
+                    <Link to="/legal/privacy" className="text-[#64748b] hover:text-[#0a2540] transition-colors">Privacy Policy</Link>.
                   </p>
                 </form>
               </>

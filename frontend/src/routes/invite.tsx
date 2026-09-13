@@ -78,7 +78,7 @@ function Invite() {
 
         <section className="bg-[#f8f9fb] max-w-[1280px] mx-auto w-full px-10 py-20">
           <div className="max-w-[480px] mx-auto text-center">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px] mb-6">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px] mb-6">
               Free during beta. No credit card required.
             </p>
             <Link
@@ -90,11 +90,11 @@ function Invite() {
               Join the waitlist
             </Link>
             {referralCode && (
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] mt-4">
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] mt-4">
                 Referral code: {referralCode}
               </p>
             )}
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px] mt-6">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px] mt-6">
               Already have an account?{" "}
               <Link to="/sign-in" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="text-[#0a2540] hover:opacity-60 transition-opacity">
                 Sign in

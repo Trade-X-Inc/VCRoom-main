@@ -120,7 +120,7 @@ function Compare() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Feature Comparison</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Feature Comparison</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             HEAD TO HEAD
@@ -128,9 +128,9 @@ function Compare() {
 
           <div className="border border-[#e6e9ef] overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Feature</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#64748b] text-[11px] tracking-[1px] uppercase">Feature</div>
               <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-5 font-semibold text-[#0a2540] text-[13px] text-center border-l border-[#e6e9ef]">Lengdon</div>
-              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#94a3b8] text-[13px] text-center border-l border-[#e6e9ef]">Data Room</div>
+              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#64748b] text-[13px] text-center border-l border-[#e6e9ef]">Data Room</div>
             </div>
 
             {COMPARISON.map((row, i) => (
@@ -141,7 +141,7 @@ function Compare() {
                 <div className="px-8 py-5">
                   <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] mb-1">{row.feature}</div>
                   {row.note && (
-                    <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{row.note}</div>
+                    <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{row.note}</div>
                   )}
                 </div>
                 <div className="px-6 py-5 flex items-center justify-center border-l border-[#e6e9ef]">

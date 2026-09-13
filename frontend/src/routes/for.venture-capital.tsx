@@ -64,7 +64,7 @@ function VentureCapital() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Built for VC</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Built for VC</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             FIRM-GRADE<br />INFRASTRUCTURE.
@@ -88,7 +88,7 @@ function VentureCapital() {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Across the fund lifecycle</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Across the fund lifecycle</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-6">
                 FROM FIRST<br />CLOSE TO EXIT.

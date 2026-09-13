@@ -56,7 +56,7 @@ function About() {
             <div className="lg:w-[400px] shrink-0">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">The origin</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">The origin</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px]">
                 THE GAP
@@ -81,7 +81,7 @@ function About() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef] bg-[#f8f9fb]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">How we think</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">How we think</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             PRINCIPLES
@@ -102,7 +102,7 @@ function About() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">The company</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">The company</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             ENTITY DETAIL
@@ -110,7 +110,7 @@ function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#e6e9ef]">
             {ENTITY.map((e, i) => (
               <div key={e.label} className={`p-8 ${i < ENTITY.length - 1 ? "border-b md:border-b-0 md:border-r border-[#e6e9ef]" : ""}`}>
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-3">{e.label}</div>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-3">{e.label}</div>
                 <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.4px]">{e.value}</div>
               </div>
             ))}

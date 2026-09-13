@@ -108,7 +108,7 @@ function ProductCard() {
             <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
           </div>
           <div className="flex-1 bg-white border border-[#e6e9ef] rounded-sm px-3 py-1 text-center">
-            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[0.3px]">
+            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[10px] text-[#64748b] tracking-[0.3px]">
               app.lengdon.com/room/000042
             </span>
           </div>
@@ -142,7 +142,7 @@ function ProductCard() {
                 }`}>{g.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8]">{g.party}</span>
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#64748b]">{g.party}</span>
                 {g.done ? (
                   <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
@@ -158,17 +158,17 @@ function ProductCard() {
         </div>
 
         <div className="border-t border-[#e6e9ef] bg-[#f8f9fb] px-5 py-3">
-          <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[1px] uppercase mb-2">
+          <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#64748b] tracking-[1px] uppercase mb-2">
             Latest Activity
           </div>
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-3">
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[10px] w-10 shrink-0">14:32</span>
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[10px] w-10 shrink-0">14:32</span>
               <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[11px]">Condition Met: Regulatory Approval</span>
             </div>
             {newEvent && (
               <div className="flex items-center gap-3" style={{ animation: "pub-data-in 0.5s ease-out" }}>
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[10px] w-10 shrink-0">15:45</span>
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[10px] w-10 shrink-0">15:45</span>
                 <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[11px]">Term Accepted: Board Seat</span>
                 <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="ml-auto text-[9px] text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-sm tracking-[0.5px]">NEW</span>
               </div>
@@ -182,7 +182,7 @@ function ProductCard() {
         <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[9px] text-[#d4af37]/70 tracking-[1px] mb-1">AUDIT LOG</div>
         <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/60 font-mono">REF-0017</div>
         <div className="w-px h-3 bg-white/20 mx-auto my-0.5" />
-        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/40 font-mono">REF-0018</div>
+        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/50 font-mono">REF-0018</div>
       </div>
     </div>
   );
@@ -204,7 +204,7 @@ function HeroSection() {
           <div className="flex flex-col gap-8 max-w-[600px] min-w-0">
             <div className="flex items-center gap-3">
               <div className="w-4 h-px bg-[#0a2540]/40" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase">
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase">
                 Private Capital · Closing Infrastructure
               </span>
             </div>
@@ -256,7 +256,7 @@ function HeroSection() {
               "000021 · Payment Proof Uploaded · 9d4c...6b7a",
               "000022 · Close Confirmed: Both Parties · 2e5f...0c9d",
             ]).map((ev, i) => (
-              <span key={i} style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] text-white/35 tracking-[0.5px] mx-8">
+              <span key={i} style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] text-white/50 tracking-[0.5px] mx-8">
                 <span className="text-white/20 mr-2">▸</span>{ev}
               </span>
             ))}
@@ -272,7 +272,7 @@ function SectionLabel({ children }: { children: string }) {
   return (
     <div className="flex items-center gap-3 mb-6">
       <div className="w-5 h-px bg-[#0a2540]/30" />
-      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">
+      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">
         {children}
       </span>
     </div>
@@ -358,7 +358,7 @@ function AppendOnlyRecordSection() {
                               </div>
                               <div className="w-px h-3 bg-[#e6e9ef]" />
                             </div>
-                            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#94a3b8] tracking-[0.5px]">
+                            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#64748b] tracking-[0.5px]">
                               next entry in the record
                             </div>
                           </div>
@@ -369,7 +369,7 @@ function AppendOnlyRecordSection() {
                           <div className="pl-6 pr-6 py-5">
                             <div className="flex items-start justify-between gap-4 mb-3">
                               <div className="flex items-center gap-3">
-                                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[11px]">
+                                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[11px]">
                                   {entry.ts}
                                 </span>
                               </div>
@@ -382,7 +382,7 @@ function AppendOnlyRecordSection() {
                               {entry.action}
                             </p>
                             <div className="flex items-center gap-2">
-                              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#94a3b8] tracking-[0.3px]">REFERENCE:</span>
+                              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#64748b] tracking-[0.3px]">REFERENCE:</span>
                               <span className="font-mono text-[12px] text-[#425466] bg-[#f8f9fb] px-2 py-0.5 border border-[#e6e9ef]">
                                 {entry.ref}
                               </span>
@@ -525,7 +525,7 @@ function DemoSection() {
                 {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch, i) => (
                   <div key={ch} className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${playing && i === 2 ? "bg-white" : "bg-white/30"}`} />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/40 text-[10px] tracking-[0.5px]">{ch}</span>
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[10px] tracking-[0.5px]">{ch}</span>
                   </div>
                 ))}
               </div>
@@ -766,7 +766,7 @@ function ProcessSection() {
                   </span>
 
                   <div className="ml-auto flex items-center gap-5 shrink-0">
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden md:block text-[#94a3b8] text-[11px] tracking-[0.3px]">
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden md:block text-[#64748b] text-[11px] tracking-[0.3px]">
                       {phase.party}
                     </span>
                     <svg
@@ -1057,7 +1057,7 @@ function AudienceSection() {
               </span>
             </div>
             <div className="relative z-10 flex flex-col items-center gap-3">
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Role</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Role</span>
               <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[56px] leading-none tracking-[-2px]">
                 {String(active + 1).padStart(2, "0")}
               </span>
@@ -1118,7 +1118,7 @@ function CTASection() {
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <div className="w-1 h-1 rounded-full bg-[#d4af37]/60" />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/35 text-[12px] tracking-[0.3px]">{item}</span>
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[12px] tracking-[0.3px]">{item}</span>
                   </div>
                 ))}
               </div>
@@ -1138,7 +1138,7 @@ function CTASection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540]/60 to-transparent pointer-events-none" />
               <div className="absolute bottom-6 left-8 right-8">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/40 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
                 <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-white/80 text-[13px] tracking-[-0.2px]">
                   000042 · Conditions gate — 5 of 6 satisfied
                 </div>
@@ -1156,7 +1156,7 @@ function CTASection() {
                   <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[36px] leading-none tracking-[-1.5px]">
                     {s.val}
                   </span>
-                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] leading-[1.4]">
+                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] leading-[1.4]">
                     {s.label}
                   </span>
                 </div>

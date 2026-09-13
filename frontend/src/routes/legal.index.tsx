@@ -57,7 +57,7 @@ function LegalIndex() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Lengdon · Legal</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Lengdon · Legal</span>
             </div>
             <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[72px] leading-[0.88] tracking-[-3px] mb-6">
               LEGAL.
@@ -82,7 +82,7 @@ function LegalIndex() {
                       {doc.title}
                     </h2>
                     {doc.tag && (
-                      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[1.5px] uppercase text-[#94a3b8] border border-[#e6e9ef] px-2 py-0.5">
+                      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[1.5px] uppercase text-[#64748b] border border-[#e6e9ef] px-2 py-0.5">
                         {doc.tag}
                       </span>
                     )}
@@ -90,7 +90,7 @@ function LegalIndex() {
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] max-w-[640px]">{doc.desc}</p>
                 </div>
                 <div className="px-8 py-7 lg:border-l border-t lg:border-t-0 border-[#e6e9ef] flex flex-col justify-between">
-                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">Updated {doc.updated}</div>
+                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">Updated {doc.updated}</div>
                   <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px] group-hover:underline mt-4">
                     Read document →
                   </div>

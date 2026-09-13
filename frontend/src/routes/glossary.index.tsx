@@ -82,7 +82,7 @@ function Glossary() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Private capital · Terminology</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Private capital · Terminology</span>
             </div>
             <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[72px] leading-[0.88] tracking-[-3px] mb-6">
               GLOSSARY.
@@ -106,7 +106,7 @@ function Glossary() {
                 key={l}
                 onClick={() => { setActive(a => a === l ? "" : l); setSearch(""); }}
                 style={{ fontFamily: "'Inter:Medium', sans-serif" }}
-                className={`w-8 h-8 text-[12px] transition-all ${active === l ? "bg-[#0a2540] text-white" : "border border-[#e6e9ef] text-[#94a3b8] hover:border-[#0a2540]/30 hover:text-[#0a2540]"}`}
+                className={`w-8 h-8 text-[12px] transition-all ${active === l ? "bg-[#0a2540] text-white" : "border border-[#e6e9ef] text-[#64748b] hover:border-[#0a2540]/30 hover:text-[#0a2540]"}`}
               >
                 {l}
               </button>
@@ -116,7 +116,7 @@ function Glossary() {
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16">
           {Object.keys(grouped).length === 0 ? (
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">No terms match your search.</p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">No terms match your search.</p>
           ) : (
             Object.entries(grouped).map(([letter, terms]) => (
               <div key={letter} className="mb-12">

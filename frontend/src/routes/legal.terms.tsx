@@ -149,7 +149,7 @@ function Terms() {
           <div className="flex flex-col lg:flex-row gap-16">
             <div className="lg:w-[280px] shrink-0">
               <div className="sticky top-24">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-4">Contents</div>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-4">Contents</div>
                 <nav className="flex flex-col gap-2">
                   {SECTIONS.map((s, i) => (
                     <a key={i} href={`#term-${i}`}

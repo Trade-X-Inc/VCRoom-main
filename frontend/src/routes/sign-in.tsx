@@ -107,7 +107,7 @@ function SignIn() {
         <div className="relative z-10 mb-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-white/20" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">
               Closing Infrastructure
             </span>
           </div>
@@ -133,7 +133,7 @@ function SignIn() {
           </div>
           {AUDIT_PREVIEW.map((row) => (
             <div key={row.ref} className="flex items-center gap-3 py-2 border-b border-white/6 last:border-b-0">
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/40 text-[12px] flex-1 truncate">{row.action}</span>
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[12px] flex-1 truncate">{row.action}</span>
               <span className="font-mono text-white/18 text-[10px] shrink-0">{row.ts}</span>
             </div>
           ))}
@@ -146,11 +146,11 @@ function SignIn() {
           <Link to="/" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="lg:hidden font-semibold text-[#0a2540] text-[18px] tracking-[-0.4px]">
             Lengdon
           </Link>
-          <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden lg:block text-[#94a3b8] text-[13px]">
+          <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden lg:block text-[#64748b] text-[13px]">
             Sign in to your account
           </span>
           <div className="flex items-center gap-2 ml-auto">
-            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px]">
+            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">
               No account?
             </span>
             <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[13px] hover:opacity-60 transition-opacity">
@@ -164,14 +164,14 @@ function SignIn() {
             <div className="mb-10">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-4 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2.5px] uppercase text-[#94a3b8]">
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2.5px] uppercase text-[#64748b]">
                   Welcome back
                 </span>
               </div>
               <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[36px] leading-[1.0] tracking-[-1.5px]">
                 Sign in
               </h1>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px] mt-2">
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] mt-2">
                 Access your deal rooms and records.
               </p>
             </div>
@@ -199,7 +199,7 @@ function SignIn() {
                   <label htmlFor="signin-password" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">
                     Password
                   </label>
-                  <Link to="/forgot-password" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[12px] text-[#94a3b8] hover:text-[#0a2540] transition-colors">
+                  <Link to="/forgot-password" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[12px] text-[#64748b] hover:text-[#0a2540] transition-colors">
                     Forgot password?
                   </Link>
                 </div>
@@ -265,16 +265,16 @@ function SignIn() {
 
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="mt-8 text-[#c9d0db] text-[12px] leading-[1.6] text-center">
               By signing in, you agree to our{" "}
-              <Link to="/legal/terms" className="text-[#94a3b8] hover:text-[#0a2540] transition-colors">Terms</Link>
+              <Link to="/legal/terms" className="text-[#64748b] hover:text-[#0a2540] transition-colors">Terms</Link>
               {" "}and{" "}
-              <Link to="/legal/privacy" className="text-[#94a3b8] hover:text-[#0a2540] transition-colors">Privacy Policy</Link>.
+              <Link to="/legal/privacy" className="text-[#64748b] hover:text-[#0a2540] transition-colors">Privacy Policy</Link>.
             </p>
 
             <div className="mt-8 border border-[#e6e9ef] bg-[#f8f9fb] p-5">
               <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[14px] tracking-[-0.3px] mb-1">
                 New to Lengdon?
               </div>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px] mb-4 leading-[1.55]">
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px] mb-4 leading-[1.55]">
                 Free to start. Your first deal room is open the moment you sign up.
               </p>
               <Link

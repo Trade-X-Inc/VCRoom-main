@@ -74,12 +74,12 @@ function AcceptableUse() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Legal · Platform policy</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Legal · Platform policy</span>
             </div>
             <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[56px] leading-[0.9] tracking-[-2.5px] mb-4">
               ACCEPTABLE<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>USE POLICY.</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/40 text-[14px]">Effective date: 1 January 2025 · Last updated: 1 August 2025</p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[14px]">Effective date: 1 January 2025 · Last updated: 1 August 2025</p>
           </div>
         </div>
 
@@ -127,7 +127,7 @@ function AcceptableUse() {
           </div>
 
           <div className="mt-8 border-t border-[#e6e9ef] pt-8">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px] leading-[1.7]">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px] leading-[1.7]">
               Report suspected policy violations or abuse to trust@lengdon.com.
             </p>
           </div>

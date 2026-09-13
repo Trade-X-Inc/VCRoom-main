@@ -73,7 +73,7 @@ function HowItWorks() {
             <div className="lg:w-[320px] shrink-0">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">The Sequence</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">The Sequence</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-6">
                 THE GATES
@@ -97,7 +97,7 @@ function HowItWorks() {
                       <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px]">
                         {gate.title}
                       </h3>
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] border border-[#e6e9ef] px-2.5 py-1">
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] border border-[#e6e9ef] px-2.5 py-1">
                         {gate.party}
                       </span>
                     </div>
@@ -106,7 +106,7 @@ function HowItWorks() {
                     </p>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-px bg-[#d4af37]/60" />
-                      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[12px] italic">{gate.detail}</span>
+                      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[12px] italic">{gate.detail}</span>
                     </div>
                   </div>
                 </div>
@@ -118,7 +118,7 @@ function HowItWorks() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef] bg-[#f8f9fb]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Design Principles</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Design Principles</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
             BUILT ON THESE<br />GUARANTEES

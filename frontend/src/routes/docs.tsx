@@ -83,7 +83,7 @@ function Docs() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Documentation</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Documentation</span>
             </div>
             <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[72px] leading-[0.88] tracking-[-3px] mb-6">
               DOCS.
@@ -111,7 +111,7 @@ function Docs() {
                       <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] tracking-[-0.2px] mb-0.5 group-hover:text-[#425466] transition-colors cursor-pointer">
                         {a.title}
                       </div>
-                      <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] leading-[1.5]">{a.desc}</div>
+                      <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] leading-[1.5]">{a.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -123,7 +123,7 @@ function Docs() {
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef]">
             <div className="p-10 border-r border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-4">Quick start</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase mb-4">Quick start</div>
               <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">New to Lengdon?</h3>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">We're not onboarding new accounts right now. Join the waitlist and we'll reach out.</p>
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
@@ -131,7 +131,7 @@ function Docs() {
               </Link>
             </div>
             <div className="p-10">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[2px] uppercase mb-4">Questions</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase mb-4">Questions</div>
               <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">Need something specific?</h3>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">Reach out and we'll walk you through how a deal room fits your transaction.</p>
               <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-block border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
