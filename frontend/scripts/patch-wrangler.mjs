@@ -124,18 +124,51 @@ const cfEnvPatch = `\
 // reported instead. COOP and CORP are safe (Google OAuth here is a full-page
 // redirect via redirectTo, never a window.open popup, so COOP: same-origin
 // doesn't sever anything) and are included below.
-const CSP_REPORT_ONLY = [
+// ENFORCING as of 13 Sep 2026 (was Report-Only since R7C). The flip was
+// gated on real violation data, and that data is what shaped this policy:
+// 489 reports had accumulated in CSP_REPORTS_DB, and 484 of them were two
+// real breakages that WOULD have taken down analytics and every custom
+// font had this been flipped blind —
+//   272x  script-src-elem  static.cloudflareinsights.com/beacon.min.js
+//   212x  font-src         static.figma.com (Geist/Inter)
+// Both are now allowlisted below. The remaining 5: 3x `eval` from a single
+// spoofed iOS-11 user-agent with source_file:null (not our code — our only
+// bundled eval is inside jszip, dynamically imported solely by the document
+// -extraction path, and it did not produce these), and 1x a visitor's
+// scamsniffer browser extension. Neither warrants weakening the policy, so
+// 'unsafe-eval' is deliberately NOT present.
+//
+// Takes a per-request nonce: see __makeCspNonce / the x-csp-nonce request
+// header below. Adding a nonce makes browsers IGNORE 'unsafe-inline' in
+// script-src, which is exactly the point — but it also means any script we
+// do not control (the CF beacon) must be allowlisted by origin, since it
+// never carries our nonce.
+const buildCsp = (nonce) => [
   "default-src 'self'",
   // Tailwind/inline style props are used throughout (design system is all
   // inline `style={{}}`) — 'unsafe-inline' on style-src is required, not
-  // optional, given the current styling approach.
+  // optional, given the current styling approach. DELIBERATELY UNCHANGED in
+  // this pass: React `style={{}}` serializes to real style="..." attributes
+  // in SSR'd HTML (29-92 per page, measured), so removing this needs a
+  // styling-architecture decision, not a config edit. Tracked as CSP Phase 2.
+  // Inline *styles* are also a far weaker vector than inline *scripts*, which
+  // is what this pass actually closes.
   "style-src 'self' 'unsafe-inline'",
-  // React hydration + Vite's dev/prod bundle currently rely on inline
-  // bootstrap scripts; Turnstile and Daily's SDK are loaded as external
-  // scripts from their own origins.
-  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://*.daily.co",
+  // 'unsafe-inline' REMOVED from script-src. The only executable inline
+  // script we emit is TanStack Start's $tsr-stream-barrier (verified: exactly
+  // one per page across every route category; the other inline block is
+  // application/ld+json, which is non-executable and not governed by
+  // script-src). It now carries the nonce, stamped by the framework itself
+  // (router-core ssr-server.js sets attrs.nonce on the barrier tag, and
+  // react-router renderRouterToStream passes the same nonce to React's SSR
+  // renderer) — so one value covers every inline script we generate.
+  // static.cloudflareinsights.com = CF Web Analytics beacon, injected by
+  // Cloudflare at the edge, not present in our source.
+  `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com https://*.daily.co https://static.cloudflareinsights.com`,
   "img-src 'self' data: blob: https://ldimninnjlvxozubheib.supabase.co https://*.daily.co",
-  "font-src 'self' data:",
+  // static.figma.com hosts the Geist/Inter faces referenced by @font-face in
+  // styles.css (two variable files serving four declared families).
+  "font-src 'self' data: https://static.figma.com",
   "connect-src 'self' https://ldimninnjlvxozubheib.supabase.co wss://ldimninnjlvxozubheib.supabase.co https://*.daily.co wss://*.daily.co https://challenges.cloudflare.com",
   "frame-src 'self' https://challenges.cloudflare.com https://*.daily.co",
   "media-src 'self' blob: https://*.daily.co",
@@ -166,7 +199,11 @@ const SECURITY_HEADERS = {
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
-  "Content-Security-Policy-Report-Only": CSP_REPORT_ONLY,
+  // NOTE: Content-Security-Policy is deliberately NOT in this static map —
+  // it carries a per-request nonce and is therefore built and set per
+  // response inside __applySecurityHeaders. Do not add a static CSP here:
+  // a single reused nonce is worse than no nonce at all, because it looks
+  // enforcing while being trivially replayable.
 };
 
 // 4c. public/_redirects, applied inside the worker.
@@ -212,7 +249,29 @@ function __checkRedirect(request) {
 
 const headerInjectionSnippet = `
 const __SECURITY_HEADERS = ${JSON.stringify(SECURITY_HEADERS)};
-function __applySecurityHeaders(request, response) {
+
+// Per-request CSP nonce. crypto.randomUUID() is available in the Workers
+// runtime and is CSPRNG-backed; the dashes are stripped only for a tidier
+// header (a nonce is an opaque token, its format carries no meaning).
+// MUST be unique per response — a reused nonce is replayable and would make
+// the policy look enforcing while providing no real protection.
+function __makeCspNonce() {
+  try { return crypto.randomUUID().replace(/-/g, ""); }
+  catch (e) {
+    // No silent fallback to a weak/constant value: a predictable nonce is
+    // strictly worse than failing loudly, so degrade to a random-enough
+    // value built from two sources rather than a fixed string.
+    return (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)).slice(0, 32);
+  }
+}
+
+// Built per request (see the buildCsp comment block above for why each
+// source is present and why 'unsafe-inline' is gone from script-src).
+function __buildCsp(nonce) {
+  return ${JSON.stringify(buildCsp("__NONCE__"))}.replace("__NONCE__", nonce);
+}
+
+function __applySecurityHeaders(request, response, cspNonce) {
   try {
     const url = new URL(request.url);
     // /app/* keeps its own noindex header (still set below) but does not need
@@ -224,8 +283,23 @@ function __applySecurityHeaders(request, response) {
     const isDocument = contentType.includes("text/html");
     const headers = new Headers(response.headers);
     for (const [k, v] of Object.entries(__SECURITY_HEADERS)) {
-      if (!isDocument && (k === "Content-Security-Policy-Report-Only" || k === "X-Frame-Options" || k === "Frame-Options")) continue;
+      if (!isDocument && (k === "X-Frame-Options" || k === "Frame-Options")) continue;
       headers.set(k, v);
+    }
+    // Enforcing CSP, document responses only, carrying the same nonce that
+    // was handed to the SSR renderer via the x-csp-nonce request header. If
+    // cspNonce is missing we must NOT fall back to a policy without a nonce
+    // (that would silently re-admit 'unsafe-inline'-style behaviour for the
+    // barrier script, i.e. a broken page) nor to a fixed value (replayable).
+    // A missing nonce here means the request never went through the wrapper,
+    // which is not a reachable path for document responses — but if it ever
+    // happens, a fresh nonce still yields a correct, strict policy; the page
+    // would fail closed (blocked inline script) rather than open.
+    if (isDocument) {
+      headers.set("Content-Security-Policy", __buildCsp(cspNonce || __makeCspNonce()));
+      // Drop any stale Report-Only header so the two can never disagree
+      // about what is actually in force.
+      headers.delete("Content-Security-Policy-Report-Only");
     }
     if (url.pathname.startsWith("/app/")) {
       headers.set("X-Robots-Tag", "noindex, nofollow");
@@ -544,19 +618,34 @@ const __patchedServer = {
     // real content-type contracts and must not be silently coerced) so a
     // crawler asking for markdown still gets real HTML (200) instead of a
     // 500 with a JSON error body.
+    // One nonce per request, generated here and used in exactly two places:
+    // handed INWARD to the SSR renderer via the x-csp-nonce request header
+    // (src/router.tsx reads it and sets router.options.ssr.nonce, which the
+    // framework stamps onto the $tsr-stream-barrier script and passes to
+    // React's SSR renderer), and set OUTWARD in the CSP header below. Both
+    // must be the same value or hydration breaks — that is the single
+    // invariant this whole mechanism rests on.
+    const __cspNonce = __makeCspNonce();
+
     let __req = request;
     try {
       const __u2 = new URL(request.url);
       const __accept = request.headers.get('Accept') || '';
       const __ok = __accept.includes('*/*') || __accept.includes('text/html');
+      const __h = new Headers(request.headers);
+      // Strip any client-supplied x-csp-nonce before setting our own: this
+      // header is an internal worker->SSR channel and must never be
+      // attacker-controllable, or a caller could pin the nonce to a value
+      // they already know and defeat the entire policy.
+      __h.delete('x-csp-nonce');
+      __h.set('x-csp-nonce', __cspNonce);
       if (!__ok && !__u2.pathname.startsWith('/api/')) {
-        const __h = new Headers(request.headers);
         __h.set('Accept', 'text/html');
-        __req = new Request(request, { headers: __h });
       }
+      __req = new Request(request, { headers: __h });
     } catch(e) {}
     const __response = await __origServer.fetch(__req, env, ctx);
-    return __applySecurityHeaders(request, __response);
+    return __applySecurityHeaders(request, __response, __cspNonce);
   }
 };
 // IMPORTANT: Only export default — CF Workers runtime rejects named exports that

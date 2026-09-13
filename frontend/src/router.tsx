@@ -54,13 +54,53 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
   );
 }
 
-export const getRouter = () => {
+// CSP nonce (13 Sep 2026 — Content-Security-Policy moved from Report-Only
+// to enforcing; see scripts/patch-wrangler.mjs for the full policy and the
+// violation data that shaped it).
+//
+// The worker generates one nonce per request and passes it inward on the
+// x-csp-nonce header. Setting it here as router.options.ssr.nonce is all
+// that is required: @tanstack/router-core stamps it onto the
+// $tsr-stream-barrier inline script (ssr-server.js, attrs.nonce) and
+// @tanstack/react-router forwards the same value to React's SSR renderer
+// (renderRouterToStream.js), so every inline script we emit carries it.
+//
+// Server-only by construction. getRouter() runs on both client and server,
+// but the import below is inside the server branch so the server entry
+// never reaches the client bundle. On the client this is a no-op — the
+// nonce is already baked into the HTML the server sent, and the client
+// re-reads it from <meta property="csp-nonce"> via the framework's own
+// ssr-client hydration path.
+// import.meta.env.SSR is replaced with a literal by Vite at build time, so
+// this whole branch — and the server-only import it guards — is statically
+// eliminated from the client bundle. A runtime `typeof window` check would
+// NOT achieve that: the import would still be emitted and bundled.
+// Verified after build by grepping dist/client for getRequestHeader.
+// async is safe and intentional: the framework's server entry does
+// `router = await entries.routerEntry.getRouter()`, so returning a promise
+// is part of the supported contract (verified in the built server output).
+export const getRouter = async () => {
+  let nonce: string | undefined;
+  if (import.meta.env.SSR) {
+    try {
+      const { getRequestHeader } = await import("@tanstack/react-start/server");
+      nonce = getRequestHeader("x-csp-nonce") || undefined;
+    } catch {
+      // Never throw out of router construction over a header read — a
+      // missing nonce yields a page whose inline script is blocked (fails
+      // closed, loudly visible) rather than one that silently runs
+      // unprotected.
+      nonce = undefined;
+    }
+  }
+
   const router = createRouter({
     routeTree,
     context: {},
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
     defaultErrorComponent: DefaultErrorComponent,
+    ...(nonce ? { ssr: { nonce } } : {}),
   });
 
   return router;
