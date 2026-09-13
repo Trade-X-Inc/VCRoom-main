@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { Toaster } from "@/components/ui/sonner";
 import { setupAuthListener } from "@/lib/auth-store";
+import { CookieConsentBanner } from "@/components/site/CookieConsentBanner";
 
 // Single auth listener — must run once before any route beforeLoad
 if (typeof window !== 'undefined') setupAuthListener();
@@ -209,6 +210,7 @@ function RootComponent() {
         <AuthProvider>
           <Outlet />
           <Toaster />
+          <CookieConsentBanner />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

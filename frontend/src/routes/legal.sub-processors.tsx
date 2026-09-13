@@ -14,8 +14,20 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // lib/email/templates.ts, lib/email/triggers.ts). "Vercel" -> Cloudflare
 // Pages/Workers (the real deploy target — CLAUDE.md §5/§12, "Never run
 // npm run deploy... Git integration deploys"). AWS, Cloudflare (CDN
-// row), Stripe, and Sentry were checked and left as-is — consistent with
-// real usage. "Transaction room" wording also corrected to "deal room."
+// row), and Stripe were checked and left as-is — consistent with real
+// usage. "Transaction room" wording also corrected to "deal room."
+//
+// Corrected 13 Sep 2026 (legal/compliance audit): Sentry was removed —
+// no Sentry package dependency and no code reference anywhere in the
+// repo (grepped package.json and full source tree); it was never a
+// real integration, just carried over from the Figma-export boilerplate
+// like the three vendors above. HubSpot was added — it was missing
+// entirely despite being a real, live processor of personal data
+// (email, name, signup role) on every account signup, footer waitlist
+// submission, and contact-form submission (see lib/hubspot.ts,
+// routes/auth.callback.tsx). A processor that receives real personal
+// data and isn't disclosed is a bigger gap than a disclosed vendor that
+// doesn't exist — this direction of error was previously unchecked.
 
 export const Route = createFileRoute("/legal/sub-processors")({
   component: SubProcessors,
@@ -27,7 +39,7 @@ const PROCESSORS = [
   { name: "Stripe", category: "Payment processing", location: "United States", purpose: "Payment method storage and processing for Lengdon subscription billing. Not used for transaction payment confirmation in closing rooms." },
   { name: "Resend", category: "Transactional email", location: "United States", purpose: "Delivery of system notifications, gate confirmation emails, and account verification messages." },
   { name: "Supabase", category: "Database & authentication", location: "United States / EU", purpose: "PostgreSQL database hosting, authentication, and file storage for deal room data, audit logs, and user accounts." },
-  { name: "Sentry", category: "Error monitoring", location: "United States", purpose: "Application error tracking and performance monitoring. PII is scrubbed before transmission." },
+  { name: "HubSpot", category: "CRM & contact management", location: "United States / EU", purpose: "Stores contact records (name, email, account role) created on signup, waitlist join, or contact form submission. Used for account communications and support — not for advertising." },
 ];
 
 function SubProcessors() {
@@ -40,12 +52,12 @@ function SubProcessors() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Legal · Sub-processors</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Legal · Sub-processors</span>
             </div>
             <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[56px] leading-[0.9] tracking-[-2.5px] mb-4">
               SUB-<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>PROCESSORS.</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/40 text-[14px]">Last updated: 1 August 2025 · Changes notified 30 days in advance</p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[14px]">Last updated: 1 August 2025 · Changes notified 30 days in advance</p>
           </div>
         </div>
 
@@ -58,15 +70,15 @@ function SubProcessors() {
 
           <div className="border border-[#e6e9ef] overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-4 text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Sub-processor</div>
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#94a3b8] text-[11px] tracking-[1px] uppercase border-l border-[#e6e9ef]">Category</div>
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#94a3b8] text-[11px] tracking-[1px] uppercase border-l border-[#e6e9ef]">Location</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-4 text-[#64748b] text-[11px] tracking-[1px] uppercase">Sub-processor</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#64748b] text-[11px] tracking-[1px] uppercase border-l border-[#e6e9ef]">Category</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#64748b] text-[11px] tracking-[1px] uppercase border-l border-[#e6e9ef]">Location</div>
             </div>
             {PROCESSORS.map((p, i) => (
               <div key={p.name} className={`grid grid-cols-[1fr_160px_160px] ${i < PROCESSORS.length - 1 ? "border-b border-[#e6e9ef]" : ""}`}>
                 <div className="px-8 py-5">
                   <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[14px] tracking-[-0.2px] mb-1">{p.name}</div>
-                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] leading-[1.5]">{p.purpose}</div>
+                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] leading-[1.5]">{p.purpose}</div>
                 </div>
                 <div className="px-6 py-5 border-l border-[#e6e9ef]">
                   <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px]">{p.category}</span>
@@ -79,7 +91,7 @@ function SubProcessors() {
           </div>
 
           <div className="mt-10 border-t border-[#e6e9ef] pt-8 max-w-[680px]">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px] leading-[1.7]">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px] leading-[1.7]">
               To receive advance notification of sub-processor changes, contact privacy@lengdon.com. For questions about our Data Processing Agreement, see the full DPA at lengdon.com/legal/dpa.
             </p>
           </div>

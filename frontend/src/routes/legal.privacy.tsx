@@ -95,7 +95,9 @@ Where we transfer data outside the UK or EEA, we ensure that appropriate safegua
   },
   {
     title: "Cookies",
-    content: `We use strictly necessary cookies to operate the Lengdon platform (session management, authentication state). We do not use advertising cookies, tracking cookies, or third-party analytics cookies.
+    content: `We use strictly necessary cookies to operate the Lengdon platform (session management, authentication state). We do not use advertising cookies, tracking cookies, or third-party analytics cookies today.
+
+If that changes, the cookie banner shown on your first visit lets you choose before any non-essential cookie is set — nothing non-essential loads until you accept it.
 
 You can manage cookie preferences through your browser settings. Disabling strictly necessary cookies will prevent you from using the platform.`,
   },
@@ -123,7 +125,7 @@ function Privacy() {
           <div className="flex flex-col lg:flex-row gap-16">
             <div className="lg:w-[280px] shrink-0">
               <div className="sticky top-24">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-4">Contents</div>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-4">Contents</div>
                 <nav className="flex flex-col gap-2">
                   {SECTIONS.map((s, i) => (
                     <a key={i} href={`#section-${i}`}
