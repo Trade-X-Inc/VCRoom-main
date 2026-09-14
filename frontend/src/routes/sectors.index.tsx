@@ -107,7 +107,7 @@ function Sectors() {
                   {s.examples.map((ex) => (
                     <div key={ex} className="flex items-center gap-2">
                       <div className="w-1 h-1 bg-[#94a3b8] shrink-0" />
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{ex}</span>
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{ex}</span>
                     </div>
                   ))}
                 </div>
@@ -120,7 +120,7 @@ function Sectors() {
           <div className="max-w-[640px]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-[#0a2540]/30" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Universal principle</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Universal principle</span>
             </div>
             <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-6">
               THE CLOSE IS<br />THE SAME.

@@ -1,10 +1,20 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { Loader2, Check, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+
+// Legal/compliance audit, 13 Sep 2026: this account-creation flow had no
+// Terms/Privacy acceptance at all (join-room.tsx had the same gap;
+// join-investor.$token.tsx had an unlinked sentence with no real link,
+// no checkbox, and no record of acceptance). TERMS_VERSION mirrors the
+// "last updated" date already on legal.terms.tsx/legal.privacy.tsx —
+// bump it whenever either document's substance changes, not on every
+// edit, so an acceptance record stays meaningfully tied to what was
+// actually agreed to.
+const TERMS_VERSION = "2026-08-26";
 
 export const Route = createFileRoute("/join")({
   component: JoinTeamPage,
@@ -38,6 +48,7 @@ function JoinTeamPage() {
   const [authMode, setAuthMode] = useState<"signup" | "signin">("signup");
   const [authError, setAuthError] = useState("");
   const [authing, setAuthing] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     if (!token) { setPageState("invalid"); return; }
@@ -113,10 +124,17 @@ function JoinTeamPage() {
       if (authMode === "signup") {
         if (!signupName.trim()) { setAuthError("Enter your name"); setAuthing(false); return; }
         if (signupPassword.length < 6) { setAuthError("Password must be at least 6 characters"); setAuthing(false); return; }
+        if (!termsAccepted) { setAuthError("You must agree to the Terms of Service and Privacy Policy to continue"); setAuthing(false); return; }
         const { error } = await supabase.auth.signUp({
           email: invite.email,
           password: signupPassword,
-          options: { data: { full_name: signupName.trim() } },
+          options: {
+            data: {
+              full_name: signupName.trim(),
+              terms_accepted_at: new Date().toISOString(),
+              terms_version: TERMS_VERSION,
+            },
+          },
         });
         if (error) throw error;
         toast.success("Account created — please check your email to confirm, then sign in.");
@@ -305,13 +323,31 @@ function JoinTeamPage() {
               <div style={{ fontSize: 12, color: "#EF4444", marginBottom: 12 }}>{authError}</div>
             )}
 
+            {authMode === "signup" && (
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16, cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => { setTermsAccepted(e.target.checked); setAuthError(""); }}
+                  style={{ marginTop: 2, width: 14, height: 14, cursor: "pointer", flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>
+                  I agree to Lengdon's{" "}
+                  <Link to="/legal/terms" target="_blank" style={{ color: "var(--brand)" }}>Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link to="/legal/privacy" target="_blank" style={{ color: "var(--brand)" }}>Privacy Policy</Link>.
+                </span>
+              </label>
+            )}
+
             <button
               onClick={handleAuth}
-              disabled={authing}
+              disabled={authing || (authMode === "signup" && !termsAccepted)}
               style={{
                 width: "100%", background: "#7C3AED", color: "#fff", border: "none",
                 borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 600,
-                cursor: authing ? "not-allowed" : "pointer", opacity: authing ? 0.7 : 1,
+                cursor: (authing || (authMode === "signup" && !termsAccepted)) ? "not-allowed" : "pointer",
+                opacity: (authing || (authMode === "signup" && !termsAccepted)) ? 0.5 : 1,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
               }}
             >

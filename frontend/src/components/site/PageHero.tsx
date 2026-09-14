@@ -34,7 +34,7 @@ export function PageHero({ eyebrow, title, titleOutline, subtitle, cta, dark = f
           <div className={`w-4 h-px ${dark ? "bg-white/40" : "bg-[#0a2540]/40"}`} />
           <span
             style={{ fontFamily: "'Inter:Medium', sans-serif" }}
-            className={`text-[11px] tracking-[2px] uppercase ${dark ? "text-white/50" : "text-[#94a3b8]"}`}
+            className={`text-[11px] tracking-[2px] uppercase ${dark ? "text-white/50" : "text-[#64748b]"}`}
           >
             {eyebrow}
           </span>

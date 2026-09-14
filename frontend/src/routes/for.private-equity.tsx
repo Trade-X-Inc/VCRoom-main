@@ -17,6 +17,12 @@ import { PageHero } from "@/components/site/PageHero";
 // investment and follow-on structuring). The stats row's "Sealed record
 // retention — Export yours at close, permanently" repeated the same
 // export fabrication a second time on this page and is corrected too.
+//
+// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the
+// testimonial ("Principal, lower middle-market PE fund, 2025") was a
+// fabricated quote attributed to a person who does not exist — same
+// pattern as the other for.* testimonials found and removed in the
+// same sweep. Removed outright, no replacement invented.
 
 export const Route = createFileRoute("/for/private-equity")({
   component: PrivateEquity,
@@ -61,9 +67,9 @@ function PrivateEquity() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">PE-specific capabilities</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">PE-specific capabilities</span>
           </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
             BUILT FOR<br />THE COMPLEXITY.
           </h2>
           <div className="flex flex-col gap-0 border border-[#e6e9ef] divide-y divide-[#e6e9ef]">
@@ -89,21 +95,11 @@ function PrivateEquity() {
               { stat: "∞", label: "Sealed record retention", sub: "Preserved, unchanged, permanently" },
             ].map((s) => (
               <div key={s.stat} className="p-10 flex flex-col gap-2">
-                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[56px] leading-none tracking-[-3px]">{s.stat}</div>
+                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(36px,7vw,56px)] leading-none tracking-[-3px]">{s.stat}</div>
                 <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[14px] tracking-[-0.2px]">{s.label}</div>
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px]">{s.sub}</div>
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">{s.sub}</div>
               </div>
             ))}
-          </div>
-        </section>
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef] bg-[#f8f9fb]">
-          <div className="max-w-[680px]">
-            <div className="w-8 h-px bg-[#d4af37]/60 mb-8" />
-            <blockquote style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[22px] leading-[1.45] tracking-[-0.4px] mb-6">
-              "We used to manage closing checklists in spreadsheets and hope everyone was looking at the same version. Lengdon replaced that entire workflow with something that actually produces a defensible record."
-            </blockquote>
-            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[13px]">Principal, lower middle-market PE fund, 2025</div>
           </div>
         </section>
 

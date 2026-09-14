@@ -40,7 +40,7 @@ function Feedback() {
             <div className="lg:w-[360px] shrink-0">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Our commitment</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Our commitment</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[36px] leading-[0.95] tracking-[-1px] mb-6">
                 EVERY COMPLAINT IS REVIEWED.
@@ -52,7 +52,7 @@ function Feedback() {
               </div>
 
               <div className="mt-8 border-t border-[#e6e9ef] pt-6">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase mb-2">Direct contact</div>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-2">Direct contact</div>
                 <a href="mailto:complaints@lengdon.com" style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[15px] hover:opacity-60 transition-opacity">
                   complaints@lengdon.com
                 </a>

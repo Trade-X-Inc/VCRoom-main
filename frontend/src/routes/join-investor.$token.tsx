@@ -13,12 +13,20 @@
  * app.profile.tsx after the founder saves their profile for the first time.
  */
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Loader2, Link as LinkIcon, AlertTriangle, Check, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+
+// Legal/compliance audit, 13 Sep 2026: replaced the bare, unlinked
+// "By joining, you agree to Lengdon's terms of service." sentence at
+// the bottom of this page with a real checkbox — linked documents,
+// required before signup, and recorded on the account (terms_accepted_at
+// / terms_version in user_metadata). See join.tsx's TERMS_VERSION
+// comment for the versioning convention.
+const TERMS_VERSION = "2026-08-26";
 
 export const Route = createFileRoute("/join-investor/$token")({
   component: JoinViaInviteLinkPage,
@@ -61,6 +69,7 @@ function JoinViaInviteLinkPage() {
   const [password, setPassword] = useState("");
   const [authing, setAuthing] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Load link info
   useEffect(() => {
@@ -109,11 +118,23 @@ function JoinViaInviteLinkPage() {
     setAuthing(true);
     setAuthError("");
     try {
+      if (authMode === "signup" && !termsAccepted) {
+        setAuthError("You must agree to the Terms of Service and Privacy Policy to continue");
+        setAuthing(false);
+        return;
+      }
       if (authMode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: name, role: "founder" } },
+          options: {
+            data: {
+              full_name: name,
+              role: "founder",
+              terms_accepted_at: new Date().toISOString(),
+              terms_version: TERMS_VERSION,
+            },
+          },
         });
         if (error) throw error;
         toast.success("Account created — check your email to confirm, then continue.");
@@ -203,7 +224,28 @@ function JoinViaInviteLinkPage() {
                 <div style={{ fontSize: 12, color: "#EF4444", padding: "8px 12px", background: "rgba(239,68,68,0.08)", borderRadius: 6 }}>{authError}</div>
               )}
 
-              <button type="submit" disabled={authing} style={{ ...btnPrimary, opacity: authing ? 0.6 : 1 }}>
+              {authMode === "signup" && (
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 8, cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => { setTermsAccepted(e.target.checked); setAuthError(""); }}
+                    style={{ marginTop: 2, width: 14, height: 14, cursor: "pointer", flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>
+                    I agree to Lengdon's{" "}
+                    <Link to="/legal/terms" target="_blank" style={{ color: "var(--brand)" }}>Terms of Service</Link>
+                    {" "}and{" "}
+                    <Link to="/legal/privacy" target="_blank" style={{ color: "var(--brand)" }}>Privacy Policy</Link>.
+                  </span>
+                </label>
+              )}
+
+              <button
+                type="submit"
+                disabled={authing || (authMode === "signup" && !termsAccepted)}
+                style={{ ...btnPrimary, opacity: (authing || (authMode === "signup" && !termsAccepted)) ? 0.5 : 1, cursor: (authing || (authMode === "signup" && !termsAccepted)) ? "not-allowed" : "pointer" }}
+              >
                 {authing
                   ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} /> Continuing…</span>
                   : authMode === "signup" ? "Create account & connect" : "Sign in & connect"
@@ -221,7 +263,9 @@ function JoinViaInviteLinkPage() {
       </div>
 
       <p style={{ color: "var(--faint)", fontSize: 11, marginTop: 20, textAlign: "center" }}>
-        By joining, you agree to Lengdon's terms of service.
+        <Link to="/legal/terms" style={{ color: "var(--faint)" }}>Terms of Service</Link>
+        {" "}·{" "}
+        <Link to="/legal/privacy" style={{ color: "var(--faint)" }}>Privacy Policy</Link>
       </p>
     </div>
   );

@@ -64,9 +64,9 @@ function ResourcesIndex() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Lengdon · Resources</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Lengdon · Resources</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[72px] leading-[0.88] tracking-[-3px] mb-6">
+            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(44px,7vw,72px)] leading-[0.88] tracking-[-3px] mb-6">
               RESOURCES.
             </h1>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[520px]">
@@ -87,7 +87,7 @@ function ResourcesIndex() {
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-2 h-2 bg-[#0a2540]/10 group-hover:bg-[#d4af37] transition-colors" />
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2px] uppercase text-[#94a3b8] border border-[#e6e9ef] px-2 py-0.5">
+                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2px] uppercase text-[#64748b] border border-[#e6e9ef] px-2 py-0.5">
                     {hub.tag}
                   </span>
                 </div>
@@ -101,11 +101,11 @@ function ResourcesIndex() {
                   {hub.items.map((item) => (
                     <div key={item} className="flex items-center gap-2">
                       <div className="w-1 h-1 bg-[#94a3b8] shrink-0" />
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{item}</span>
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{item}</span>
                     </div>
                   ))}
                 </div>
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[12px] group-hover:text-[#0a2540] transition-colors">
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[12px] group-hover:text-[#0a2540] transition-colors">
                   Explore {hub.label.toLowerCase()} →
                 </div>
               </Link>
@@ -119,7 +119,7 @@ function ResourcesIndex() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[28px] leading-[1.0] tracking-[-1px] mb-1">
                 Ready to close your first transaction?
               </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">
                 We're not onboarding new accounts right now. Join the waitlist and we'll reach out.
               </p>
             </div>

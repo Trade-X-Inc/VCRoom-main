@@ -45,7 +45,7 @@ function CompareDealroom() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Transaction phases</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Transaction phases</span>
           </div>
           <div className="flex flex-col sm:flex-row gap-0 border border-[#e6e9ef]">
             {[
@@ -55,7 +55,7 @@ function CompareDealroom() {
               { phase: "Closing", tool: "Lengdon", active: true },
             ].map((p, i) => (
               <div key={p.phase} className={`flex-1 p-8 ${i < 3 ? "border-r border-[#e6e9ef]" : ""} ${p.active ? "bg-[#0a2540]" : ""}`}>
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12px] mb-2 ${p.active ? "text-white/40" : "text-[#94a3b8]"}`}>Phase {i + 1}</div>
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12px] mb-2 ${p.active ? "text-white/50" : "text-[#64748b]"}`}>Phase {i + 1}</div>
                 <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[22px] tracking-[-0.6px] mb-1 ${p.active ? "text-white" : "text-[#c9d0db]"}`}>{p.phase}</div>
                 <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] ${p.active ? "text-white/60" : "text-[#c9d0db]"}`}>{p.tool}</div>
               </div>
@@ -66,15 +66,15 @@ function CompareDealroom() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
           <div className="border border-[#e6e9ef] overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Capability</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#64748b] text-[11px] tracking-[1px] uppercase">Capability</div>
               <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-5 font-semibold text-[#0a2540] text-[13px] text-center border-l border-[#e6e9ef]">Lengdon</div>
-              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#94a3b8] text-[13px] text-center border-l border-[#e6e9ef]">Dealroom</div>
+              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#64748b] text-[13px] text-center border-l border-[#e6e9ef]">Dealroom</div>
             </div>
             {ROWS.map((row, i) => (
               <div key={i} className={`grid grid-cols-[1fr_160px_160px] ${i < ROWS.length - 1 ? "border-b border-[#e6e9ef]" : ""} hover:bg-[#fafbfc] transition-colors`}>
                 <div className="px-8 py-5">
                   <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] mb-1">{row.feature}</div>
-                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{row.note}</div>}
+                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{row.note}</div>}
                 </div>
                 <div className="px-6 py-5 flex items-center justify-center border-l border-[#e6e9ef]">
                   {row.lengdon ? (

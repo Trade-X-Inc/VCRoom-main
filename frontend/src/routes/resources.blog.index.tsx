@@ -96,7 +96,7 @@ function BlogIndex() {
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16 border-b border-[#e6e9ef]">
           {posts.length === 0 ? (
-            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-center py-24 text-[#94a3b8] text-[15px]">
+            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-center py-24 text-[#64748b] text-[15px]">
               No posts published yet — check back soon.
             </div>
           ) : (
@@ -111,9 +111,9 @@ function BlogIndex() {
                     {featured.tags[0] && (
                       <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] tracking-[1.5px] uppercase bg-[#0a2540] text-white px-3 py-1">{featured.tags[0]}</span>
                     )}
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{formatDate(featured.publishDate)}</span>
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">·</span>
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{featured.readingTime}</span>
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{formatDate(featured.publishDate)}</span>
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">·</span>
+                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{featured.readingTime}</span>
                   </div>
                   <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[28px] leading-[1.2] tracking-[-0.5px] mb-4 group-hover:opacity-80 transition-opacity">
                     {featured.title}
@@ -135,14 +135,14 @@ function BlogIndex() {
                       {post.tags[0] && (
                         <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[1px] uppercase border border-[#e6e9ef] text-[#425466] px-2.5 py-1">{post.tags[0]}</span>
                       )}
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[11px]">{post.readingTime}</span>
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[11px]">{post.readingTime}</span>
                     </div>
                     <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] leading-[1.3] tracking-[-0.3px] mb-3 group-hover:opacity-75 transition-opacity flex-1">
                       {post.title}
                     </h3>
                     <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px] leading-[1.65] mb-5">{post.excerpt.substring(0, 120)}...</p>
                     <div className="flex items-center justify-between mt-auto">
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{formatDate(post.publishDate)}</span>
+                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{formatDate(post.publishDate)}</span>
                       <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] group-hover:underline">Read →</span>
                     </div>
                   </Link>
@@ -162,7 +162,7 @@ function BlogIndex() {
                 No newsletter cadence. We send when we have something worth reading.
               </p>
             </div>
-            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px]">
+            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">
               Subscribe from the footer below.
             </div>
           </div>

@@ -49,9 +49,9 @@ export function SimpleAudiencePage({
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">{sectionLabel}</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">{sectionLabel}</span>
           </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
             {sectionTitle}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-[#e6e9ef]">
@@ -72,7 +72,7 @@ export function SimpleAudiencePage({
               <blockquote style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[24px] leading-[1.4] tracking-[-0.5px] mb-6">
                 {quote.text}
               </blockquote>
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[13px]">{quote.attribution}</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[13px]">{quote.attribution}</div>
             </div>
           </section>
         )}

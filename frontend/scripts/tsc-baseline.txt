@@ -1,0 +1,55 @@
+src/components/app/AppShell.tsx: error TS2554: Expected 1 arguments, but got 0.
+src/hooks/useStageTransition.ts: error TS2322: Type '(transitionId: string) => Promise<{ ok: boolean; } | undefined>' is not assignable to type '(transitionId: string) => Promise<void>'.
+src/lib/document-extractor.ts: error TS2353: Object literal may only specify known properties, and 'isEvalSupported' does not exist in type 'DocumentInitParameters'.
+src/lib/document-extractor.ts: error TS2353: Object literal may only specify known properties, and 'isEvalSupported' does not exist in type 'DocumentInitParameters'.
+src/lib/investor-profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => FundDeckExtractInput>) => Promise<FundDeckExtractResult>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => FundDeckExtractInput, Promise<FundDeckExtractResult>, true>'.
+src/lib/profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => DetectExtractInput>) => Promise<TypedExtraction>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => DetectExtractInput, Promise<TypedExtraction>, true>'.
+src/lib/profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => DocumentExtractInput>) => Promise<ExtractionResult>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => DocumentExtractInput, Promise<ExtractionResult>, true>'.
+src/lib/profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => InterviewExtractInput>) => Promise<ExtractionResult>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => InterviewExtractInput, Promise<ExtractionResult>, true>'.
+src/routes/api.admin.tsx: error TS2339: Property 'search' does not exist on type 'LoaderFnContext<Register, RootRoute<Register, undefined, {}, AnyContext, AnyContext, {}, undefined, unknown, unknown, unknown, unknown, undefined>, "/api/admin", ... 6 more ..., undefined>'.
+src/routes/api.emailtest.tsx: error TS2339: Property 'search' does not exist on type 'LoaderFnContext<Register, RootRoute<Register, undefined, {}, AnyContext, AnyContext, {}, undefined, unknown, unknown, unknown, unknown, undefined>, "/api/emailtest", ... 6 more ..., undefined>'.
+src/routes/api.health.ts: error TS2307: Cannot find module '@tanstack/react-start/api' or its corresponding type declarations.
+src/routes/api.hubspot-sync.tsx: error TS2339: Property 'search' does not exist on type 'LoaderFnContext<Register, RootRoute<Register, undefined, {}, AnyContext, AnyContext, {}, undefined, unknown, unknown, unknown, unknown, undefined>, "/api/hubspot-sync", ... 6 more ..., undefined>'.
+src/routes/api.internal.data.tsx: error TS2339: Property 'search' does not exist on type 'LoaderFnContext<Register, RootRoute<Register, undefined, {}, AnyContext, AnyContext, {}, undefined, unknown, unknown, unknown, unknown, undefined>, "/api/internal/data", ... 6 more ..., undefined>'.
+src/routes/api.internal.email-test.tsx: error TS2339: Property 'search' does not exist on type 'LoaderFnContext<Register, RootRoute<Register, undefined, {}, AnyContext, AnyContext, {}, undefined, unknown, unknown, unknown, unknown, undefined>, "/api/internal/email-test", ... 6 more ..., undefined>'.
+src/routes/api.invites.ts: error TS2307: Cannot find module '@tanstack/react-start/api' or its corresponding type declarations.
+src/routes/api.invites.ts: error TS7031: Binding element 'request' implicitly has an 'any' type.
+src/routes/api.webhooks.resend.ts: error TS2307: Cannot find module '@tanstack/react-start/api' or its corresponding type declarations.
+src/routes/api.webhooks.resend.ts: error TS7031: Binding element 'request' implicitly has an 'any' type.
+src/routes/app.deal-rooms.$id.information.tsx: error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ParamsReducerFn<RouterCore<Route<Register, any, "/", "/", string, "__root__", undefined, {}, {}, AnyContext, AnyContext, {}, undefined, RootRouteChildren, FileRouteTypes, unknown, unknown, undefined>, "never", false, RouterHistory, Record<...>>, "PATH", string, any>'.
+src/routes/app.deal-rooms.$id.tsx: error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ParamsReducerFn<RouterCore<Route<Register, any, "/", "/", string, "__root__", undefined, {}, {}, AnyContext, AnyContext, {}, undefined, RootRouteChildren, FileRouteTypes, unknown, unknown, undefined>, "never", false, RouterHistory, Record<...>>, "PATH", string, any>'.
+src/routes/app.documents.tsx: error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/routes/app.documents.tsx: error TS2352: Conversion of type 'AIFeedback | null | undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/routes/app.documents.tsx: error TS2352: Conversion of type 'AIFeedback | null | undefined' to type 'Record<string, unknown[]>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/routes/app.investor.connections.tsx: error TS2503: Cannot find namespace 'JSX'.
+src/routes/app.investor.decisions.tsx: error TS2339: Property 'user_metadata' does not exist on type 'AppUser'.
+src/routes/app.investor.decisions.tsx: error TS2339: Property 'user_metadata' does not exist on type 'AppUser'.
+src/routes/app.investor.decisions.tsx: error TS2339: Property 'user_metadata' does not exist on type 'AppUser'.
+src/routes/app.investor.decisions.tsx: error TS2339: Property 'user_metadata' does not exist on type 'AppUser'.
+src/routes/app.investor.settings.tsx: error TS2554: Expected 1 arguments, but got 0.
+src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.investor.team.tsx: error TS2352: Conversion of type '{ id: any; user_id: any; role: any; status: any; joined_at: any; display_name: any; avatar_url: any; team_member_profiles: { first_name: any; last_name: any; title: any; avatar_url: any; }[]; }[]' to type 'TeamMemberRow[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/routes/app.member-profile.tsx: error TS2554: Expected 1 arguments, but got 0.
+src/routes/app.member.index.tsx: error TS2352: Conversion of type '{ deal_room_id: any; deal_rooms: { id: any; startups: { company_name: any; }[]; }[]; }[]' to type '{ deal_room_id: string; deal_rooms: { id: string; startups: { company_name: string | null; } | null; } | null; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/routes/app.member.index.tsx: error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ParamsReducerFn<RouterCore<Route<Register, any, "/", "/", string, "__root__", undefined, {}, {}, AnyContext, AnyContext, {}, undefined, RootRouteChildren, FileRouteTypes, unknown, unknown, undefined>, "never", false, RouterHistory, Record<...>>, "PATH", string, any>'.
+src/routes/app.messages.tsx: error TS2554: Expected 1 arguments, but got 0.
+src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
+src/routes/app.profile-builder.tsx: error TS2322: Type 'unknown' is not assignable to type 'TypedExtraction'.
+src/routes/app.profile.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.profile.tsx: error TS2367: This comparison appears to be unintentional because the types '"quick"' and '"full"' have no overlap.
+src/routes/app.users.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.users.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
+src/routes/app.users.tsx: error TS2352: Conversion of type '{ id: any; user_id: any; role: any; status: any; joined_at: any; display_name: any; avatar_url: any; team_member_profiles: { first_name: any; last_name: any; title: any; avatar_url: any; }[]; }[]' to type 'TeamAccountRow[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/routes/i.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.
+src/routes/join.team.$token.tsx: error TS18047: 'user' is possibly 'null'.
+src/routes/join.team.$token.tsx: error TS18047: 'user' is possibly 'null'.
+src/routes/join.team.$token.tsx: error TS18047: 'user' is possibly 'null'.
+src/routes/p.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.
+src/routes/p.$slug.tsx: error TS2352: Conversion of type 'undefined' to type '{ startup: PublicStartup | null; slug: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/routes/resources.blog.$slug.tsx: error TS2352: Conversion of type 'undefined' to type 'BlogPostWithContent | null' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+vite.config.ts: error TS2769: No overload matches this call.

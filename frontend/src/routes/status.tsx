@@ -55,19 +55,19 @@ function Status() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Services</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Services</span>
           </div>
           <div className="border border-[#e6e9ef]">
             <div className="grid grid-cols-[1fr_200px] bg-[#f8f9fb] border-b border-[#e6e9ef] px-6 py-3">
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Service</span>
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Status</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase">Service</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase">Status</span>
             </div>
             {SERVICES.map((name, i) => (
               <div key={name} className={`grid grid-cols-[1fr_200px] px-6 py-4 items-center ${i < SERVICES.length - 1 ? "border-b border-[#e6e9ef]" : ""}`}>
                 <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">{name}</span>
                 <div className="inline-flex items-center gap-1.5 border px-2.5 py-1 w-fit border-[#e6e9ef] bg-white">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#c9d0db]" />
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] text-[#94a3b8]">Not monitored yet</span>
+                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] text-[#64748b]">Not monitored yet</span>
                 </div>
               </div>
             ))}
@@ -77,7 +77,7 @@ function Status() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Incident history</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Incident history</span>
           </div>
           <div className="max-w-[820px] border border-[#e6e9ef] p-8">
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65]">

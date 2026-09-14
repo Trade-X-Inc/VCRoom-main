@@ -71,7 +71,7 @@ function Changelog() {
                         <time
                           dateTime={entry.date}
                           style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                          className="text-[#94a3b8] text-[12px] tabular-nums"
+                          className="text-[#64748b] text-[12px] tabular-nums"
                         >
                           {new Date(entry.date + "T00:00:00Z").toLocaleDateString("en-GB", {
                             day: "2-digit",
@@ -84,7 +84,7 @@ function Changelog() {
                         <span
                           style={{ fontFamily: "'Inter:Medium', sans-serif" }}
                           className={`inline-block self-start text-[10px] tracking-[0.5px] uppercase border px-2 py-0.5 ${
-                            AREA_STYLES[entry.area] ?? "border-[#e6e9ef] text-[#94a3b8]"
+                            AREA_STYLES[entry.area] ?? "border-[#e6e9ef] text-[#64748b]"
                           }`}
                         >
                           {entry.area}
@@ -114,7 +114,7 @@ function Changelog() {
                 We'll notify you when this page updates. No other email from us.
               </p>
             </div>
-            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[13px]">
+            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">
               Subscribe from the footer below.
             </div>
           </div>

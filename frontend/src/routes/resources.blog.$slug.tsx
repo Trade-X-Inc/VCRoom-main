@@ -97,7 +97,7 @@ function BlogArticle() {
             />
           )}
 
-          <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex flex-wrap items-center gap-6 text-[13px] text-[#94a3b8] border-t border-[#e6e9ef] pt-6">
+          <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex flex-wrap items-center gap-6 text-[13px] text-[#64748b] border-t border-[#e6e9ef] pt-6">
             <span>By {post.author}{post.author.includes("Lengdon") ? "" : ", Lengdon"}</span>
             <span>{formatDate(post.publishDate)}</span>
             <span>{post.readingTime}</span>
@@ -116,7 +116,7 @@ function BlogArticle() {
             prose-code:text-[#0a2540] prose-code:bg-[#f8f9fb] prose-code:before:content-none prose-code:after:content-none
             prose-pre:bg-[#0a2540] prose-pre:text-white
             prose-hr:border-[#e6e9ef]
-            [&_figure]:my-6 [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#94a3b8]"
+            [&_figure]:my-6 [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#64748b]"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
 

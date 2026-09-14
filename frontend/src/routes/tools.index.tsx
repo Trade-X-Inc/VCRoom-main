@@ -36,7 +36,7 @@ function ToolsIndex() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/35 text-[10px] tracking-[2.5px] uppercase">Free tools · Private capital</span>
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Free tools · Private capital</span>
             </div>
             <h1
               style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(48px, 6vw, 88px)" }}
@@ -70,7 +70,7 @@ function ToolsIndex() {
                   </h2>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px] leading-[1.65]">{tool.desc}</p>
                 </div>
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[12px] group-hover:text-[#0a2540] transition-colors mt-auto">
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[12px] group-hover:text-[#0a2540] transition-colors mt-auto">
                   Open tool →
                 </div>
               </Link>
@@ -84,7 +84,7 @@ function ToolsIndex() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
                 Ready to close?
               </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[14px]">
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">
                 Once the numbers work, Lengdon closes the transaction.
               </p>
             </div>

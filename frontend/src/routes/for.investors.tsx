@@ -14,6 +14,15 @@ import { PageHero } from "@/components/site/PageHero";
 // fabricated "sealed export" as an attributed factual claim, which is
 // worse than an unattributed one (§7.4); reworded to describe the real
 // mechanism. "Transaction room" corrected to "deal room."
+//
+// Corrected 13 Sep 2026 (legal/compliance audit): the testimonial itself
+// was the deeper problem, not just its "sealed export" wording — it is
+// a fabricated quote attributed to a real-seeming person ("Angel
+// investor, Series A round, 2026") who does not exist. No real user
+// testimonial exists to replace it with, so the section was removed
+// outright rather than reworded again. A fabricated attribution to a
+// real person is a more serious category than an unattributed marketing
+// claim (§7.4) and was fixed ahead of the scheduled fake-reviews sweep.
 
 export const Route = createFileRoute("/for/investors")({
   component: Investors,
@@ -66,7 +75,7 @@ function Investors() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">By investor type</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">By investor type</span>
           </div>
           <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-12">
             FIND YOUR<br />PROFILE.
@@ -81,20 +90,10 @@ function Investors() {
                 <div className="w-1.5 h-1.5 bg-[#0a2540]/20 group-hover:bg-[#d4af37] transition-colors mb-8" />
                 <div>
                   <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[15px] tracking-[-0.3px] mb-1">{t.label}</div>
-                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px] group-hover:text-[#0a2540] transition-colors">View →</div>
+                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] group-hover:text-[#0a2540] transition-colors">View →</div>
                 </div>
               </Link>
             ))}
-          </div>
-        </section>
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef] bg-[#f8f9fb]">
-          <div className="max-w-[700px]">
-            <div className="w-8 h-px bg-[#d4af37]/60 mb-8" />
-            <blockquote style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[24px] leading-[1.4] tracking-[-0.5px] mb-6">
-              "The first time I used Lengdon on a deal, I realized I'd never had a proper record of any of my prior deals. Now every close leaves a permanent, append-only record I can point back to whenever I need it."
-            </blockquote>
-            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[13px]">Angel investor, Series A round, 2026</div>
           </div>
         </section>
 

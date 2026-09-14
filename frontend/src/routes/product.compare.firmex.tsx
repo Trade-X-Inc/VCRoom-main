@@ -57,8 +57,8 @@ function CompareFirmex() {
               { label: "Lengdon delivers", text: "Both parties confirmed, signed, paid, and closed — with every gate action permanently on record.", dim: false, dark: true },
             ].map((c, i) => (
               <div key={i} className={`p-10 ${i < 2 ? "border-r border-[#e6e9ef]" : ""} ${c.dark ? "bg-[#0a2540]" : ""}`}>
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[11px] tracking-[2px] uppercase mb-4 ${c.dark ? "text-white/40" : "text-[#94a3b8]"}`}>{c.label}</div>
-                <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[20px] leading-[1.35] tracking-[-0.4px] ${c.dim ? "text-[#94a3b8]" : c.dark ? "text-white" : "text-[#0a2540]"}`}>{c.text}</p>
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[11px] tracking-[2px] uppercase mb-4 ${c.dark ? "text-white/50" : "text-[#64748b]"}`}>{c.label}</div>
+                <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[20px] leading-[1.35] tracking-[-0.4px] ${c.dim ? "text-[#64748b]" : c.dark ? "text-white" : "text-[#0a2540]"}`}>{c.text}</p>
               </div>
             ))}
           </div>
@@ -67,15 +67,15 @@ function CompareFirmex() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
           <div className="border border-[#e6e9ef] overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#94a3b8] text-[11px] tracking-[1px] uppercase">Capability</div>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#64748b] text-[11px] tracking-[1px] uppercase">Capability</div>
               <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-5 font-semibold text-[#0a2540] text-[13px] text-center border-l border-[#e6e9ef]">Lengdon</div>
-              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#94a3b8] text-[13px] text-center border-l border-[#e6e9ef]">Firmex</div>
+              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#64748b] text-[13px] text-center border-l border-[#e6e9ef]">Firmex</div>
             </div>
             {ROWS.map((row, i) => (
               <div key={i} className={`grid grid-cols-[1fr_160px_160px] ${i < ROWS.length - 1 ? "border-b border-[#e6e9ef]" : ""} hover:bg-[#fafbfc] transition-colors`}>
                 <div className="px-8 py-5">
                   <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] mb-1">{row.feature}</div>
-                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#94a3b8] text-[12px]">{row.note}</div>}
+                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{row.note}</div>}
                 </div>
                 <div className="px-6 py-5 flex items-center justify-center border-l border-[#e6e9ef]">
                   {row.lengdon ? (

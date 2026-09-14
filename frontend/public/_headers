@@ -4,6 +4,16 @@
 # by _worker.js, which _headers never reaches (see CLAUDE.md §44). Editing
 # one list without the other silently diverges what's actually live between
 # static and SSR-routed responses.
+#
+# Content-Security-Policy is DELIBERATELY ABSENT here, and that is not a
+# drift from patch-wrangler.mjs (13 Sep 2026, CSP flipped to enforcing).
+# Two reasons: (1) this file only covers static assets — JS/CSS/images/fonts
+# — and a document-oriented CSP on a .js or .png response governs nothing;
+# (2) the enforcing policy carries a PER-REQUEST nonce, which a static text
+# file physically cannot express. Do not "fix" this by adding a CSP line
+# here: a nonce-less policy would either be ignored (harmless but
+# misleading) or, if it ever did apply to a document, would block the
+# nonce-carrying inline bootstrap script and white-screen the site.
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff

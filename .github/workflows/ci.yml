@@ -1,0 +1,155 @@
+name: CI
+
+# Runs on every push and PR targeting main. A PR trigger already covers
+# every feature branch by construction — this repo's branches use no
+# single consistent naming prefix (r10-*, fix/*, perf/*, phase0/*,
+# internal-app/*, profile-founder/*, ...), so pattern-matching branch
+# names would either miss real branches or need constant upkeep. Pushing
+# straight to a feature branch (not yet a PR) also runs the checks, via
+# the `push` trigger's branch list below — add a branch there only if it
+# needs checks before a PR exists; main is always covered.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# All real app code lives in frontend/ — the repo root's package.json is
+# a stale, unrelated 4-line i18next stub with no scripts (pre-dates the
+# current app, never wired to anything real). Every job below runs with
+# working-directory: frontend, not the repo root.
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # CORRECTED before this went live: a bare `npx tsc --noEmit` exits
+      # non-zero the moment ANY error exists — it has no concept of
+      # "pre-existing" vs "new". This project carries a known, tracked
+      # set of pre-existing errors (currently 55, CLAUDE.md §5's
+      # baseline table); a raw tsc CI step would be red on its very
+      # first run and stay red regardless of whether a PR introduces a
+      # real regression. scripts/check-tsc-baseline.mjs reproduces this
+      # session's own manual practice — an error-SET diff against the
+      # tracked baseline (scripts/tsc-baseline.txt), not a bare exit
+      # code or count (two different 55-sized error sets is not a pass
+      # — CLAUDE.md §20.3). Fails only on a genuinely NEW error; a
+      # SHRUNK baseline (an error got fixed) passes and prints a
+      # reminder to update the baseline file, matching CLAUDE.md §5's
+      # own "if it drops, update this line and record why" convention.
+      # Verified against three real scenarios before wiring in: parity
+      # (pass), a real injected new error (correctly fails), and a
+      # simulated fix (baseline shrinks, correctly passes).
+      - run: node scripts/check-tsc-baseline.mjs
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # `npm run build` runs `vite build` then (via the package.json
+      # "postbuild" script) `node scripts/patch-wrangler.mjs`, which
+      # itself invokes `node scripts/check-action-split.mjs` and exits
+      # non-zero if it fails (CLAUDE.md §20.11's build gate — verifies
+      # every gateway action binds through runAction and that zero
+      # pack_api handler bodies leak into the client bundle). This is
+      # the same script this project has run manually before every
+      # verified change all session. It is NOT wired in separately below
+      # — it already runs as part of this one `npm run build` call, and
+      # a failure here already fails this job. Do not add a second,
+      # separate "action-split guard" step; that would just re-run part
+      # of this same build and could silently drift from what postbuild
+      # actually does.
+      - run: npm run build
+      # Ceiling check, matching CLAUDE.md §5's own bundle rule (CF Pages
+      # hard limit is 1 MB gzip; the worker's own build output already
+      # prints "_worker.js gzip size" and warns internally, but nothing
+      # in the build script currently fails CI on it — this step is the
+      # actual gate).
+      - name: Enforce worker bundle size ceiling (1 MB gzip)
+        run: |
+          SIZE_BYTES=$(gzip -c dist/client/_worker.js | wc -c)
+          # Pure integer bash arithmetic (no `bc` dependency) — two
+          # decimal places via scaled integer division.
+          SIZE_MB=$(( (SIZE_BYTES * 100) / 1048576 ))
+          echo "Worker bundle gzip size: ${SIZE_BYTES} bytes (~$(( SIZE_MB / 100 )).$(( SIZE_MB % 100 )) MB)"
+          if [ "$SIZE_BYTES" -gt 1048576 ]; then
+            echo "::error::Worker bundle exceeds the 1 MB gzip ceiling (CF Pages hard limit)."
+            exit 1
+          fi
+
+  test:
+    name: Test suite
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      # No CI-runnable test exists today — documented here rather than
+      # silently omitted, so this isn't later mistaken for an oversight.
+      # 58 Playwright specs exist in tests/:
+      #   - 56 of 58 require SUPABASE_SERVICE_ROLE_KEY plus real fixture
+      #     credentials (TEST_FOUNDER_EMAIL/PASSWORD, etc.) read from
+      #     .env.local / .env.test, both gitignored and never present in
+      #     a CI checkout. They mint real sessions and read/write real
+      #     production Supabase data (test-founder@/test-investor@
+      #     fixtures) — not safe to run against production from every PR
+      #     even if the secret were injected.
+      #   - The remaining 2 (landing-page.spec.ts, landing-v2.spec.ts)
+      #     need no secret, but hardcode `https://lengdon.com` as their
+      #     target with no environment override — they would test live
+      #     production, not this PR's own build, and currently assert
+      #     stale content (old $49/month pricing, an old hero mockup)
+      #     that predates several of this session's own content passes.
+      # Tracked as a real follow-up in CLAUDE.md (not a TODO left only
+      # here) — see the "CI test-suite rework" entry.
+      - name: Report test-suite status (no CI-runnable tests exist)
+        run: |
+          echo "::warning::No test in tests/ is safely or meaningfully CI-runnable today — see step comments and CLAUDE.md's CI test-suite rework entry."
+          echo "58 Playwright specs exist in frontend/tests/."
+          echo "56/58 require SUPABASE_SERVICE_ROLE_KEY + real fixture credentials (.env.local/.env.test, gitignored, not present in CI) and mutate real production data."
+          echo "The remaining 2 (landing-page.spec.ts, landing-v2.spec.ts) hardcode https://lengdon.com with no override, and assert stale content."
+          echo "This step is intentionally a no-op — it does not run, skip silently, or fake a pass. See CLAUDE.md for the tracked rework item."
+
+  dependency-audit:
+    name: Dependency vulnerability scan
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # `npm audit` exits non-zero on ANY finding at any severity — real
+      # findings exist in this project today, including `high`. Per
+      # explicit instruction: report, do not block merge on this alone.
+      # continue-on-error means this job is reported as failed/red in
+      # the PR checks list (visible, not hidden) but does NOT count
+      # toward GitHub's required-status-check gate unless main's branch
+      # protection explicitly requires this specific job — so it can't
+      # silently block merge the way typecheck/build/test can.
+      - name: npm audit (report only, non-blocking)
+        continue-on-error: true
+        run: npm audit --audit-level=low

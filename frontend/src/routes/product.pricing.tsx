@@ -185,15 +185,15 @@ function Pricing() {
                   <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#d4af37]/70" />
                 )}
                 <div className="mb-8">
-                  <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[11px] tracking-[2px] uppercase mb-4 ${plan.primary ? "text-white/40" : "text-[#94a3b8]"}`}>
+                  <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[11px] tracking-[2px] uppercase mb-4 ${plan.primary ? "text-white/50" : "text-[#64748b]"}`}>
                     {plan.name}
                   </div>
                   <div className="flex items-end gap-2 mb-1">
-                    <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[48px] leading-none tracking-[-2px] ${plan.primary ? "text-white" : "text-[#0a2540]"}`}>
+                    <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[clamp(32px,6vw,48px)] leading-none tracking-[-2px] ${plan.primary ? "text-white" : "text-[#0a2540]"}`}>
                       {plan.price}
                     </span>
                   </div>
-                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] mb-5 ${plan.primary ? "text-white/40" : "text-[#94a3b8]"}`}>
+                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] mb-5 ${plan.primary ? "text-white/50" : "text-[#64748b]"}`}>
                     {plan.period}
                   </div>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[14px] leading-[1.65] ${plan.primary ? "text-white/65" : "text-[#425466]"}`}>
@@ -235,7 +235,7 @@ function Pricing() {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">In beta</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">In beta</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[28px] leading-[1.1] tracking-[-0.8px] mb-3">
                 Beta pricing: deferred, not discounted.
@@ -258,9 +258,9 @@ function Pricing() {
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#94a3b8] text-[10px] tracking-[2px] uppercase">Common Questions</span>
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Common Questions</span>
           </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[48px] leading-[0.9] tracking-[-2px] mb-16">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
             FAQ
           </h2>
           <div className="max-w-[780px] flex flex-col gap-0 border border-[#e6e9ef]">
