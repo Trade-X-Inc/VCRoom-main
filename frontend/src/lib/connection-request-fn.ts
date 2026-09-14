@@ -206,10 +206,19 @@ export const approveConnectionRequest = createServerFn({ method: "POST" })
     // nda_acceptances row, so no extra gating is needed here.
     let dealRoomId: string | undefined = leftover?.[0]?.id;
     if (!dealRoomId) {
+      // Build Step 2: this path is for EXISTING users (an investor already
+      // has an account/profile to have sent a connection request from; the
+      // founder is already discoverable). Both parties have already
+      // cleared most of the prep bar informally, so this room skips the
+      // prep gate entirely — explicit prep_status='live', not relying on
+      // the column default, so intent is visible at this call site the
+      // same way the other creation path (app.deal-rooms.index.tsx) states
+      // its own 'in_prep' explicitly.
       const rooms: any[] = await sbFetch(url, key, "deal_rooms", "POST", {
         startup_id: startup.id,
         status: "active",
         workflow_stage: "nda_signed",
+        prep_status: "live",
         investor_name: investorName,
         investor_company: fundName,
         investor_email: investorEmail,

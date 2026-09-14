@@ -8,6 +8,7 @@ import { DealRoomCtx } from "@/hooks/useDealRoom";
 import { STAGES, STAGE_KEY_TO_PATH, stageRank, type DealRoomStageKey } from "@/lib/deal-room-stages";
 import { Timeline } from "@/components/app/DealRoomTimeline";
 import { LawyerRoomView } from "@/components/app/LawyerRoomView";
+import { PrepBoard } from "@/components/app/PrepBoard";
 
 export const Route = createFileRoute("/app/deal-rooms/$id")({
   component: DealRoomLayout,
@@ -34,23 +35,47 @@ function DealRoomLayout() {
   const navigate = useNavigate();
 
   const ctx = useDealRoomContext(dealRoomId);
-  const { room, companyName, isInvestor, isLawyer, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, accessError, connectionOrigin } = ctx;
+  const { room, roomLoading, companyName, isInvestor, isLawyer, isTeamMember, teamAssignment, teamAssignmentLoading, ndaAcceptance, ndaLoading, accessError, connectionOrigin } = ctx;
 
   const isNdaRoute = path.endsWith("/nda");
+  const prepStatus = (room as any)?.prep_status as "in_prep" | "live" | "cancelled" | undefined;
+  const isInPrep = prepStatus === "in_prep";
 
   // ── Redirect to NDA page if not yet signed ───────────────────
   // Never redirect when already on /nda — that route is the exception below.
+  // Build Step 2: never redirect an in-prep room to /nda either — prep
+  // happens before NDA signing is even meaningful (the room has no live
+  // workflow_stage progression yet). Guarded on room having loaded
+  // (roomLoading false) so this doesn't fire on the brief window before
+  // prep_status is known.
   useEffect(() => {
-    if (!ndaLoading && user?.id && !ndaAcceptance && !isNdaRoute) {
+    if (!ndaLoading && !roomLoading && user?.id && !ndaAcceptance && !isNdaRoute && !isInPrep) {
       navigate({ to: "/app/deal-rooms/$id/nda", params: { id: dealRoomId } });
     }
-  }, [ndaLoading, ndaAcceptance, user?.id, navigate, dealRoomId, isNdaRoute]);
+  }, [ndaLoading, roomLoading, ndaAcceptance, user?.id, navigate, dealRoomId, isNdaRoute, isInPrep]);
 
   // Auth + NDA-status still resolving — brief spinner, applies to every route.
   if (!user?.id || ndaLoading) {
     return (
       <div className="flex h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] items-center justify-center">
         <div className="text-sm animate-pulse" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>Verifying access…</div>
+      </div>
+    );
+  }
+
+  // Build Step 2: an in-prep room renders the prep board instead of the
+  // normal shell — additive guard, placed before the NDA/lawyer/stage-bar
+  // logic below so none of it ever executes for a room still in prep.
+  // StageTabBar, stageRank consumers, and MutualDisclosure are never
+  // reached from this branch. Rendered in the same bare-shell style as the
+  // /nda exception below (no stage bar, no DealRoomCtx-dependent tabs) —
+  // the prep board is self-contained, same reasoning as nda.tsx.
+  if (isInPrep) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)]">
+        <main className="flex-1 overflow-y-auto min-h-0" style={{ background: "var(--lcs-surface)" }}>
+          <PrepBoard dealRoomId={dealRoomId} />
+        </main>
       </div>
     );
   }

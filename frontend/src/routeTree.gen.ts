@@ -50,6 +50,7 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as LegalDpaRouteImport } from './routes/legal.dpa'
 import { Route as LegalAcceptableUseRouteImport } from './routes/legal.acceptable-use'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
+import { Route as JoinDealRoomTokenRouteImport } from './routes/join-deal-room.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
 import { Route as ForVentureCapitalRouteImport } from './routes/for.venture-capital'
 import { Route as ForSyndicatesRouteImport } from './routes/for.syndicates'
@@ -400,6 +401,11 @@ const LegalAcceptableUseRoute = LegalAcceptableUseRouteImport.update({
 const JoinInvestorTokenRoute = JoinInvestorTokenRouteImport.update({
   id: '/join-investor/$token',
   path: '/join-investor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinDealRoomTokenRoute = JoinDealRoomTokenRouteImport.update({
+  id: '/join-deal-room/$token',
+  path: '/join-deal-room/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ISlugRoute = ISlugRouteImport.update({
@@ -1234,6 +1240,7 @@ export interface FileRoutesByFullPath {
   '/for/syndicates': typeof ForSyndicatesRoute
   '/for/venture-capital': typeof ForVentureCapitalRoute
   '/i/$slug': typeof ISlugRoute
+  '/join-deal-room/$token': typeof JoinDealRoomTokenRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/legal/acceptable-use': typeof LegalAcceptableUseRoute
   '/legal/dpa': typeof LegalDpaRoute
@@ -1419,6 +1426,7 @@ export interface FileRoutesByTo {
   '/for/syndicates': typeof ForSyndicatesRoute
   '/for/venture-capital': typeof ForVentureCapitalRoute
   '/i/$slug': typeof ISlugRoute
+  '/join-deal-room/$token': typeof JoinDealRoomTokenRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/legal/acceptable-use': typeof LegalAcceptableUseRoute
   '/legal/dpa': typeof LegalDpaRoute
@@ -1608,6 +1616,7 @@ export interface FileRoutesById {
   '/for/syndicates': typeof ForSyndicatesRoute
   '/for/venture-capital': typeof ForVentureCapitalRoute
   '/i/$slug': typeof ISlugRoute
+  '/join-deal-room/$token': typeof JoinDealRoomTokenRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/legal/acceptable-use': typeof LegalAcceptableUseRoute
   '/legal/dpa': typeof LegalDpaRoute
@@ -1798,6 +1807,7 @@ export interface FileRouteTypes {
     | '/for/syndicates'
     | '/for/venture-capital'
     | '/i/$slug'
+    | '/join-deal-room/$token'
     | '/join-investor/$token'
     | '/legal/acceptable-use'
     | '/legal/dpa'
@@ -1983,6 +1993,7 @@ export interface FileRouteTypes {
     | '/for/syndicates'
     | '/for/venture-capital'
     | '/i/$slug'
+    | '/join-deal-room/$token'
     | '/join-investor/$token'
     | '/legal/acceptable-use'
     | '/legal/dpa'
@@ -2171,6 +2182,7 @@ export interface FileRouteTypes {
     | '/for/syndicates'
     | '/for/venture-capital'
     | '/i/$slug'
+    | '/join-deal-room/$token'
     | '/join-investor/$token'
     | '/legal/acceptable-use'
     | '/legal/dpa'
@@ -2342,6 +2354,7 @@ export interface RootRouteChildren {
   ForSyndicatesRoute: typeof ForSyndicatesRoute
   ForVentureCapitalRoute: typeof ForVentureCapitalRoute
   ISlugRoute: typeof ISlugRoute
+  JoinDealRoomTokenRoute: typeof JoinDealRoomTokenRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   LegalAcceptableUseRoute: typeof LegalAcceptableUseRoute
   LegalDpaRoute: typeof LegalDpaRoute
@@ -2673,6 +2686,13 @@ declare module '@tanstack/react-router' {
       path: '/join-investor/$token'
       fullPath: '/join-investor/$token'
       preLoaderRoute: typeof JoinInvestorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join-deal-room/$token': {
+      id: '/join-deal-room/$token'
+      path: '/join-deal-room/$token'
+      fullPath: '/join-deal-room/$token'
+      preLoaderRoute: typeof JoinDealRoomTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/i/$slug': {
@@ -4016,6 +4036,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForSyndicatesRoute: ForSyndicatesRoute,
   ForVentureCapitalRoute: ForVentureCapitalRoute,
   ISlugRoute: ISlugRoute,
+  JoinDealRoomTokenRoute: JoinDealRoomTokenRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   LegalAcceptableUseRoute: LegalAcceptableUseRoute,
   LegalDpaRoute: LegalDpaRoute,

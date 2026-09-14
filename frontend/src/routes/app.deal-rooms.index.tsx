@@ -639,11 +639,24 @@ function CreateRoomForm({
     setError("");
     try {
       // 1. Create deal room with investor details
+      // Build Step 2: new-flow rooms (this founder self-create path) start
+      // prep_status='in_prep' explicitly — the founder and the investor
+      // they invite via a deal-room invite link (generated from inside
+      // this room's prep board) must each complete a checklist before the
+      // room graduates to live. Explicit rather than relying on the
+      // column's own 'live' default, so intent is visible at the call
+      // site rather than depending on a migration detail this file never
+      // references. workflow_stage is intentionally omitted here, exactly
+      // as before this change — the column default handles it, unaffected
+      // by prep_status, which is an orthogonal axis (CLAUDE.md §7.4-shaped:
+      // status/workflow_stage/prep_status are three separately-owned
+      // lifecycle signals, not one reconciled into another).
       const { data: newRoom, error: roomErr } = await supabase
         .from("deal_rooms")
         .insert({
           startup_id: startupId,
           status: inviteEmail.trim() ? "pending" : "new",
+          prep_status: "in_prep",
           investor_name: investorName.trim(),
           investor_email: inviteEmail.trim() || null,
           investor_company: investorFirm.trim() || null,
