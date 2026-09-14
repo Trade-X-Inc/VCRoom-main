@@ -53,13 +53,28 @@ work — not a footnote to it.
 - [ ] **A route filename containing `.client.` is denied to the server environment and takes the ENTIRE route tree down with a 500.** `tsc` passes clean. — *§20.15.*
 - [ ] **Open the new route in a real browser before calling it done.** Static tooling has never caught either bug above.
 
-> ⚠️ **Live instance, found while writing this file, NOT fixed:** `join.tsx` is a parent
-> layout for `join.team.$token.tsx` (`routeTree.gen.ts:3994` builds
-> `JoinRouteWithChildren` from `JoinTeamTokenRoute`), and `join.tsx` renders `JoinTeamPage`
-> with **no `<Outlet />`**. Navigating to a team-invite link should render the child and
-> cannot. Needs a live click-through to confirm user impact, then the standard
-> trailing-underscore fix (`join_.team.$token.tsx`). Not touched here — out of scope for
-> a documentation pass.
+> ⚠️ **Open instance, found while writing this very item — tracked as §19o, NOT fixed.**
+> `join.tsx` is an `<Outlet />`-less layout parent for `join.team.$token.tsx`
+> (`routeTree.gen.ts:3986-3994`), so `/join/team/:token` resolves, changes the URL, and
+> never mounts the child.
+>
+> **The obvious fix is the wrong one here, and that is the point.** The child is a **dead
+> legacy path**, confirmed on 28 Jul 2026 by migration `20260728050000`'s own comment;
+> real invite emails use the search-param shape (`triggers.ts:299` → `/join?token=`) that
+> `join.tsx` handles correctly. The two files are independent, divergent implementations
+> of the same feature: the live one resolves everything through `SECURITY DEFINER` RPCs,
+> the dead one reads `invites` directly from the client and writes `accepted_at` with a
+> client-side `.update()`. **The missing `<Outlet />` is currently the only thing keeping
+> that client-trusting write path unreachable by URL** — so adding an `<Outlet />`, or
+> applying this section's own trailing-underscore rename, would *reactivate* it rather
+> than repair anything.
+>
+> **Correct remedy: re-confirm dead via a live click-through, then delete the legacy path
+> entirely** — remove the surface rather than fix the routing gap. Blocked on that
+> click-through per §5 (confirm-first); nothing activated or deleted pending it.
+>
+> Read this callout as the worked example for §4 generally: **a routing gap can be
+> load-bearing.** Establish what the child actually does before you make it reachable.
 
 ## 5. Real external side effects — confirm first, every time
 
