@@ -30,7 +30,7 @@ export const Route = createFileRoute("/app/deal-rooms/$id/documents")({
   component: DocumentsPage,
 });
 
-const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf", "pptx", "ppt", "xlsx", "xls", "docx", "doc", "csv", "png", "jpg", "jpeg"]);
+const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf", "pptx", "ppt", "docx", "doc", "csv", "png", "jpg", "jpeg"]);
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
 
 const TEXT_EXTS = new Set(["pdf", "docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt"]);
@@ -584,7 +584,7 @@ function DocumentsPage() {
               Documents shared here are visible to the investor and appear in their workstation automatically.
             </div>
             <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-              {["PDF", "PPTX", "DOCX", "XLSX", "CSV", "PNG/JPG"].map((ext) => (
+              {["PDF", "PPTX", "DOCX", "CSV", "PNG/JPG"].map((ext) => (
                 <span key={ext} className="border px-1.5 py-0.5 font-medium uppercase" style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)", borderRadius: "var(--radius-lcs-control)", fontSize: "10px" }}>{ext}</span>
               ))}
               <span style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Max 50 MB per file</span>
@@ -915,7 +915,7 @@ function DocumentsPage() {
               <input
                 type="file"
                 className="sr-only"
-                accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                accept=".pdf,.pptx,.ppt,.docx,.doc,.csv,.png,.jpg,.jpeg"
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file || !userId) return;
@@ -987,7 +987,7 @@ function DocumentsPage() {
                     <input
                       type="file"
                       className="sr-only"
-                      accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                      accept=".pdf,.pptx,.ppt,.docx,.doc,.csv,.png,.jpg,.jpeg"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file || !userId) return;

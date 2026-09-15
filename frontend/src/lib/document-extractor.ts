@@ -18,7 +18,6 @@ export async function extractDocumentText(
     if (ext === "pdf") return await extractPDF(buf, fileName);
     if (["docx", "doc"].includes(ext)) return await extractDOCX(buf);
     if (["pptx", "ppt"].includes(ext)) return await extractPPTX(buf);
-    if (["xlsx", "xls"].includes(ext)) return await extractXLSX(buf);
     if (ext === "csv") return await extractCSV(buf);
     if (["txt", "md", "rtf"].includes(ext)) {
       const text = new TextDecoder().decode(new Uint8Array(buf));
@@ -36,7 +35,7 @@ export async function extractDocumentText(
 // ── Intake-specific extraction ─────────────────────────────────────────────────
 // Returns structured per-file results for the Deal Intake page.
 
-const INTAKE_ALLOWED_EXTS = ["pdf", "xlsx", "xls", "csv"];
+const INTAKE_ALLOWED_EXTS = ["pdf", "csv"];
 
 export type IntakeFileResult = {
   file: string;
@@ -53,7 +52,7 @@ export async function extractForIntake(file: File): Promise<IntakeFileResult> {
       file: file.name,
       status: "rejected",
       reason:
-        "Unsupported file type. We accept pitch decks (PDF) and contact lists (Excel, CSV) only.",
+        "Unsupported file type. We accept pitch decks (PDF) and contact lists (CSV) only.",
     };
   }
 
@@ -71,28 +70,6 @@ export async function extractForIntake(file: File): Promise<IntakeFileResult> {
         };
       }
       return { file: file.name, status: "ok", text };
-    }
-
-    if (["xlsx", "xls"].includes(ext)) {
-      try {
-        const text = await extractXLSX(buf);
-        if (!text || text === "No data found in spreadsheet") {
-          return {
-            file: file.name,
-            status: "extraction_failed",
-            reason:
-              "Could not read this spreadsheet. Ensure it has column headers and is not password-protected.",
-          };
-        }
-        return { file: file.name, status: "ok", text };
-      } catch {
-        return {
-          file: file.name,
-          status: "extraction_failed",
-          reason:
-            "Could not read this spreadsheet. Ensure it has column headers and is not password-protected.",
-        };
-      }
     }
 
     if (ext === "csv") {
@@ -372,24 +349,6 @@ async function extractPPTX(buf: ArrayBuffer): Promise<string> {
   const result = slides.join("\n");
   console.log(`[PPTX] extracted: ${result.length} chars`);
   return result.slice(0, 15000) || "No text found in PPTX slides";
-}
-
-// ── XLSX ─────────────────────────────────────────────────────────────────────
-async function extractXLSX(buf: ArrayBuffer): Promise<string> {
-  const XLSX = await import("xlsx");
-  const workbook = XLSX.read(new Uint8Array(buf), { type: "array" });
-
-  const sheets: string[] = [];
-  for (const sheetName of workbook.SheetNames) {
-    const sheet = workbook.Sheets[sheetName];
-    const csv = XLSX.utils.sheet_to_csv(sheet);
-    const filtered = csv.split("\n").filter((row) => row.replace(/,/g, "").trim()).join("\n");
-    if (filtered.trim()) sheets.push(`[Sheet: ${sheetName}]\n${filtered}`);
-  }
-
-  const result = sheets.join("\n\n");
-  console.log(`[XLSX] ${workbook.SheetNames.length} sheets, ${result.length} chars`);
-  return result.slice(0, 15000) || "No data found in spreadsheet";
 }
 
 // ── CSV ───────────────────────────────────────────────────────────────────────

@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus } from "@/components/lcs";
 
-const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 export const Route = createFileRoute("/app/documents")({
@@ -1040,7 +1040,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                             <input
                               type="file"
                               className="sr-only"
-                              accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv"
+                              accept=".pdf,.pptx,.ppt,.docx,.doc,.csv"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) handleFileUpload(template.slug, template.name, template.id, file);
@@ -1435,8 +1435,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 <label className="p-5 text-center cursor-pointer transition-colors block" style={{ border: "1px dashed var(--lcs-line)" }}>
                   <Upload className="h-5 w-5 mx-auto" style={{ color: "var(--lcs-ink-muted)" }} />
                   <div className="text-[13px] font-medium mt-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{customFile ? customFile.name : "Choose a file"}</div>
-                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>PDF, DOCX, PPTX, XLSX, CSV · Max 50MB</div>
-                  <input type="file" accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
+                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>PDF, DOCX, PPTX, CSV · Max 50MB</div>
+                  <input type="file" accept=".pdf,.pptx,.ppt,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
                 </label>
               </div>
               {customExtractError && (

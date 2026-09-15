@@ -2,7 +2,7 @@ import { useState, useRef, type DragEvent } from "react";
 import { Upload, FileText, X, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg","mp4","txt"]);
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg","mp4","txt"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 function validateFile(file: File): string | null {
@@ -79,7 +79,7 @@ function MismatchDialog({
 export function Dropzone({
   onFiles,
   title = "Drag & drop or click to upload",
-  hint = "Up to 50 MB · PDF, DOCX, XLSX, PPTX, PNG, JPG, CSV, TXT, MP4",
+  hint = "Up to 50 MB · PDF, DOCX, PPTX, PNG, JPG, CSV, TXT, MP4",
   dealRoomId,
   uploadedByRole,
   onUploadComplete,
@@ -240,7 +240,7 @@ export function Dropzone({
             type="file"
             multiple
             className="hidden"
-            accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
+            accept=".pdf,.docx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
             onChange={(e) => handleFiles(e.target.files)}
           />
         </div>
