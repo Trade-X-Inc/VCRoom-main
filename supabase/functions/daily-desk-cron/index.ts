@@ -344,10 +344,16 @@ async function generatePlaybookTractionGapTask(admin: any, founderId: string, st
     .map((d: any) => {
       const name = d.file_name ?? d.template_slug;
       const fb = d.ai_feedback;
-      if (fb && typeof fb === "object" && fb.overall_score) {
-        return `${name}: score ${fb.overall_score}/100, signal: ${fb.signal ?? "unknown"}`;
+      // §15/§25 — no score or signal is emitted into this prompt. Gating on
+      // summary (not overall_score, removed from review-document 15 Sep 2026)
+      // is load-bearing, not cosmetic: the old field is now permanently absent,
+      // so an overall_score gate would report every REVIEWED document as "not
+      // yet analyzed" — a falsehood fed to a model that writes founder-facing
+      // tasks. Silence would be better than that; accuracy is better still.
+      if (fb && typeof fb === "object" && fb.summary) {
+        return `${name}: reviewed — ${String(fb.summary).slice(0, 180)}`;
       }
-      return `${name}: not yet analyzed`;
+      return `${name}: not yet reviewed`;
     })
     .join("; ") || "No documents uploaded";
 
