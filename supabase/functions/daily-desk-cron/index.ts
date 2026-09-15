@@ -1,13 +1,35 @@
 /**
- * daily-desk-cron — Intelligent task generator for the Daily Desk
+ * daily-desk-cron — founder playbook task generator (single-founder path only)
  *
- * MENTAL MODEL (read CLAUDE.md §3 before editing):
- *   Tasks are NOT "here's something to do." Tasks arrive with the AI work already done.
- *   'autonomous_done'   → AI completed real work (doc analysis, deal brief). Card is FYI.
- *   'awaiting_checkpoint' → AI drafted something; human must review before it leaves the platform.
- *   'single'            → simple prompt task (profile gap), no chain logic.
+ * AUTH (11 Aug 2026): verify_jwt flipped false→true. Previously reachable with
+ * NO credentials at all.
  *
- * Runs once daily via Supabase cron. All AI calls happen HERE, at generation time.
+ * BATCH PASS RETIRED (11 Aug 2026): the parameterless branch ran an UNBOUNDED
+ * pass over every founder and every investor, spending OpenAI credit per user
+ * and writing desk_tasks rows for all of them — reachable by ANY authenticated
+ * caller, including anyone holding the public anon key (which ships in every
+ * frontend bundle). Found by triggering it accidentally during the 11 Aug
+ * OpenAI-key audit: an empty-body POST with an anon-key JWT processed 4
+ * founders and created 9 real desk_tasks rows across 5 real user accounts.
+ * Those rows were deleted by id and the state re-verified; no notification,
+ * email, or activity_log entry had fired off them.
+ *
+ * The mistake worth keeping: §19c Audit B recorded this batch path as having
+ * "no trigger of any kind — no cron entry, zero callers." That is true of
+ * AUTOMATIC invocation and says nothing about reachability. A manual POST is a
+ * trigger. Same trigger-vs-function conflation already recorded twice in §7.1.
+ *
+ * No admin-secret gate was added, deliberately: an unused manual capability
+ * bolted onto a function being narrowed is a liability nobody asked for (same
+ * reasoning as deleting triggerDeskCron). The retired batch logic remains in
+ * git history; it is not shipped.
+ *
+ * PARTIAL FIX, NOT CLOSED — see CLAUDE.md §7.1: founder_id/startup_id still
+ * arrive as query params with no in-function identity derivation, mitigated
+ * only by the CALLER (seedFounderPlaybook) checking ownership before invoking.
+ * Any authenticated principal can still target another founder's ids. Full fix
+ * (requireUser + ownership check INSIDE this function) is scoped for this
+ * function's rebuild.
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -21,8 +43,6 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// ── OpenAI call ────────────────────────────────────────────────────────────────
 
 async function callOpenAI(systemPrompt: string, userMessage: string, maxTokens = 600): Promise<string> {
   if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY not set");
@@ -49,8 +69,6 @@ function parseJSON(raw: string): any {
   try { return JSON.parse(cleaned); } catch { return null; }
 }
 
-// ── Dedupe guard ───────────────────────────────────────────────────────────────
-
 async function dedupeExists(admin: any, userId: string, dedupeKey: string): Promise<boolean> {
   const { data } = await admin
     .from("desk_tasks")
@@ -62,22 +80,14 @@ async function dedupeExists(admin: any, userId: string, dedupeKey: string): Prom
   return !!data;
 }
 
-// ── Insert task ────────────────────────────────────────────────────────────────
-
 async function insertTask(admin: any, task: Record<string, unknown>): Promise<void> {
   const { error } = await admin.from("desk_tasks").insert(task);
   if (error) console.error("[desk-cron] Insert error:", error.message, "task:", task.dedupe_key);
 }
 
-// Batch-pass task generators (founder access-request, doc-fix, profile-gap,
-// follow-up; investor watchlist-stale, profile-gap) REMOVED from the repo copy
-// 11 Aug 2026 when the batch pass was retired — they were reachable only from
-// that pass and are absent from the deployed function. Retained in git history
-// (commit cca34a9 and earlier) if the rebuild needs them.
-
-// ══════════════════════════════════════════════════════════════════════════════
-// PLAYBOOK TASK GENERATORS
-// ══════════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════════════
+// PLAYBOOK TASK GENERATORS (the only live path)
+// ════════════════════════════════════════════════════════════════════════════════════
 
 type FounderStage =
   | "profile_incomplete"
@@ -86,10 +96,6 @@ type FounderStage =
   | "requests_no_deal_room"
   | "deal_room_active";
 
-/**
- * Stage detection — same logic as getFounderStage() in desk-fn.ts.
- * Most-advanced-unresolved wins, checked in order.
- */
 async function detectFounderStage(admin: any, founderId: string, startupId: string): Promise<FounderStage> {
   const [sessionRes, requestsRes, roomsRes] = await Promise.all([
     admin
@@ -116,7 +122,6 @@ async function detectFounderStage(admin: any, founderId: string, startupId: stri
   if (roomCount > 0) return "deal_room_active";
   if (requestCount > 0) return "requests_no_deal_room";
 
-  // Need view count for the last two stages
   const { count: viewCount } = await admin
     .from("document_views")
     .select("id", { count: "exact", head: true })
@@ -129,18 +134,12 @@ async function detectFounderStage(admin: any, founderId: string, startupId: stri
   return "profile_done_no_visibility";
 }
 
-/**
- * Auto-resolve stale playbook tasks whose stage has advanced.
- * If a task_type starts with 'playbook_' and its embedded stage no longer
- * matches the current stage, mark it done.
- */
 async function resolveStalePlaybookTasks(admin: any, founderId: string, currentStage: FounderStage): Promise<void> {
   const STAGE_TO_TASK_TYPE: Record<string, string> = {
     profile_done_no_visibility: "playbook_visibility",
     getting_seen_no_traction: "playbook_traction_gap",
   };
 
-  // Get all open playbook tasks for this founder
   const { data: openPlaybook } = await admin
     .from("desk_tasks")
     .select("id, task_type")
@@ -154,7 +153,6 @@ async function resolveStalePlaybookTasks(admin: any, founderId: string, currentS
 
   for (const task of openPlaybook) {
     if (task.task_type !== currentTaskType) {
-      // This task belongs to a stage the founder has moved past — resolve it
       await admin
         .from("desk_tasks")
         .update({ status: "done", chain_phase: "completed", completed_at: new Date().toISOString() })
@@ -164,12 +162,6 @@ async function resolveStalePlaybookTasks(admin: any, founderId: string, currentS
   }
 }
 
-/**
- * STAGE: profile_done_no_visibility
- * Generates one card with 2 sub-options stored in draft_content as JSON.
- * Option A: 7 social post drafts (generated at creation time from real startup data)
- * Option B: cold outreach draft (generated at creation time)
- */
 async function generatePlaybookVisibilityTask(admin: any, founderId: string, startupId: string): Promise<number> {
   const dedupeKey = `playbook_visibility_${startupId}`;
   if (await dedupeExists(admin, founderId, dedupeKey)) return 0;
@@ -188,9 +180,7 @@ async function generatePlaybookVisibilityTask(admin: any, founderId: string, sta
   const companyName = startup?.company_name ?? "your company";
   const stage = startup?.stage ?? "seed";
   const sector = startup?.sector ?? "tech";
-  const fundingTarget = startup?.funding_target ? `$${startup.funding_target}` : "seed round";
 
-  // Build data block from only the fields that are actually populated — never substitute fiction for a missing field
   function field(label: string, value: any): string | null {
     if (value === null || value === undefined || String(value).trim() === "") return null;
     return `${label}: ${String(value).trim()}`;
@@ -227,7 +217,6 @@ async function generatePlaybookVisibilityTask(admin: any, founderId: string, sta
     "If specific numbers are not available for a given angle, write about qualitative strengths instead of inventing numbers. " +
     "Every claim in every post must be derivable from the data block below — nothing else.";
 
-  // OPTION A: Generate 7 real social post drafts at task creation time
   let socialPosts: string[] = [];
   try {
     const raw = await callOpenAI(
@@ -246,11 +235,9 @@ Return ONLY valid JSON: { "posts": ["post1", "post2", "post3", "post4", "post5",
     const parsed = parseJSON(raw);
     if (parsed?.posts && Array.isArray(parsed.posts)) {
       socialPosts = parsed.posts.slice(0, 7);
-      // Sector mismatch check — if the real sector is present, warn if any post mentions a different industry
       if (startup?.sector) {
         const realSectorLower = startup.sector.toLowerCase();
         const allPostText = socialPosts.join(" ").toLowerCase();
-        // Common hallucination sectors — flag if they appear and the real sector doesn't
         const hallucSectors = ["cleantech", "climate", "carbon", "sustainability", "fintech", "edtech", "healthtech", "saas"];
         for (const hs of hallucSectors) {
           if (allPostText.includes(hs) && !realSectorLower.includes(hs)) {
@@ -265,7 +252,6 @@ Return ONLY valid JSON: { "posts": ["post1", "post2", "post3", "post4", "post5",
     console.warn("[desk-cron] Social posts gen failed:", (e as Error).message);
   }
 
-  // OPTION B: Generate one cold outreach draft at task creation time
   let outreachDraft = "";
   try {
     outreachDraft = await callOpenAI(
@@ -284,7 +270,6 @@ Return ONLY the message text — no subject line, no JSON.`,
     outreachDraft = `Hi [Investor Name],\n\nI'm raising a ${stage} round for ${companyName} — we're in the ${sector} space. Would love 20 minutes to share what we're working on.\n\n[Your name]`;
   }
 
-  // Store all sub-option content as structured JSON in draft_content
   const subOptions = {
     optionA: {
       label: "7 days of content, drafted",
@@ -326,17 +311,10 @@ Return ONLY the message text — no subject line, no JSON.`,
   return 1;
 }
 
-/**
- * STAGE: getting_seen_no_traction
- * Uses the same doc-analysis AI prompt pattern the retired batch-pass doc-fix
- * generator used (removed 11 Aug 2026; see the note above).
- * Produces a real "what might be holding investors back" analysis.
- */
 async function generatePlaybookTractionGapTask(admin: any, founderId: string, startupId: string): Promise<number> {
   const dedupeKey = `playbook_traction_gap_${startupId}`;
   if (await dedupeExists(admin, founderId, dedupeKey)) return 0;
 
-  // Get view count for the title
   const dealRoomIds = (await admin.from("deal_rooms").select("id").eq("startup_id", startupId)).data?.map((r: any) => r.id) ?? [];
   const { count: viewCount } = await admin
     .from("document_views")
@@ -447,15 +425,12 @@ Return ONLY valid JSON: { "reasons": [{ "issue": "...", "fix": "..." }, ...] }`,
   return 1;
 }
 
-/**
- * Main playbook dispatcher — detects stage, resolves stale tasks, generates appropriate move.
- */
 async function generateFounderPlaybookTasks(admin: any, founderId: string, startupId: string): Promise<number> {
   const stage = await detectFounderStage(admin, founderId, startupId);
   await resolveStalePlaybookTasks(admin, founderId, stage);
 
   if (stage === "deal_room_active" || stage === "requests_no_deal_room" || stage === "profile_incomplete") {
-    return 0; // no playbook move for these stages this session
+    return 0;
   }
   if (stage === "profile_done_no_visibility") {
     return generatePlaybookVisibilityTask(admin, founderId, startupId);
@@ -466,9 +441,9 @@ async function generateFounderPlaybookTasks(admin: any, founderId: string, start
   return 0;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// MAIN HANDLER
-// ══════════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════════════
+// MAIN HANDLER — single-founder fast path only
+// ════════════════════════════════════════════════════════════════════════════════════
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -479,10 +454,9 @@ serve(async (req) => {
     }
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // ── SINGLE-FOUNDER FAST PATH ──────────────────────────────────────────────
-    // Called from app.profile-builder.tsx immediately on profile confirmation.
-    // Scoped to one founder — no batch, no investor pass, no admin secret needed
-    // (auth is via the service-role key already required to reach this endpoint).
+    // ── SINGLE-FOUNDER FAST PATH ────────────────────────────────────────────
+    // Called from app.profile-builder.tsx immediately on profile confirmation,
+    // via seedFounderPlaybook (lib/desk-fn.ts) using the service-role key.
     const url = new URL(req.url);
     const singleFounderId = url.searchParams.get("founder_id");
     const singleStartupId = url.searchParams.get("startup_id");
@@ -495,16 +469,6 @@ serve(async (req) => {
     }
 
     // Batch pass retired 11 Aug 2026 — see the file header.
-    // The parameterless branch ran an UNBOUNDED pass over every founder and
-    // investor, spending OpenAI credit per user and writing desk_tasks rows for
-    // all of them — reachable by ANY authenticated caller, including anyone
-    // holding the public anon key. Found by triggering it accidentally during
-    // the 11 Aug OpenAI-key audit (9 real rows created across 5 accounts, since
-    // deleted by id and re-verified). §19c Audit B had recorded this path as
-    // having "no trigger of any kind," which was true of AUTOMATIC invocation
-    // and said nothing about reachability — a manual POST is a trigger.
-    // No admin-secret gate was added, deliberately: an unused manual capability
-    // on a function being narrowed is a liability nobody asked for.
     return new Response(
       JSON.stringify({ error: "Gone", detail: "Batch pass retired. Use ?founder_id=&startup_id= for the single-founder path." }),
       { status: 410, headers: { ...corsHeaders, "Content-Type": "application/json" } },
