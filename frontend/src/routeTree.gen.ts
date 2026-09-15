@@ -113,7 +113,6 @@ import { Route as ProductCompareFirmexRouteImport } from './routes/product.compa
 import { Route as ProductCompareDocsendRouteImport } from './routes/product.compare.docsend'
 import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
 import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
-import { Route as JoinTeamTokenRouteImport } from './routes/join.team.$token'
 import { Route as DealsPreviewProfileThesisRouteImport } from './routes/deals-preview.profile_.thesis'
 import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-preview.profile_.team'
 import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
@@ -718,11 +717,6 @@ const ProductCompareDatasiteRoute = ProductCompareDatasiteRouteImport.update({
   path: '/product/compare/datasite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JoinTeamTokenRoute = JoinTeamTokenRouteImport.update({
-  id: '/team/$token',
-  path: '/team/$token',
-  getParentRoute: () => JoinRoute,
-} as any)
 const DealsPreviewProfileThesisRoute =
   DealsPreviewProfileThesisRouteImport.update({
     id: '/deals-preview/profile_/thesis',
@@ -1187,7 +1181,7 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite': typeof InviteRoute
-  '/join': typeof JoinRouteWithChildren
+  '/join': typeof JoinRoute
   '/join-room': typeof JoinRoomRoute
   '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
@@ -1303,7 +1297,6 @@ export interface FileRoutesByFullPath {
   '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
   '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
   '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
-  '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
   '/product/compare/docsend': typeof ProductCompareDocsendRoute
@@ -1374,7 +1367,7 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite': typeof InviteRoute
-  '/join': typeof JoinRouteWithChildren
+  '/join': typeof JoinRoute
   '/join-room': typeof JoinRoomRoute
   '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
@@ -1489,7 +1482,6 @@ export interface FileRoutesByTo {
   '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
   '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
   '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
-  '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
   '/product/compare/docsend': typeof ProductCompareDocsendRoute
@@ -1563,7 +1555,7 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite': typeof InviteRoute
-  '/join': typeof JoinRouteWithChildren
+  '/join': typeof JoinRoute
   '/join-room': typeof JoinRoomRoute
   '/lcs-preview': typeof LcsPreviewRoute
   '/registry': typeof RegistryRoute
@@ -1679,7 +1671,6 @@ export interface FileRoutesById {
   '/deals-preview/profile_/full': typeof DealsPreviewProfileFullRoute
   '/deals-preview/profile_/team': typeof DealsPreviewProfileTeamRoute
   '/deals-preview/profile_/thesis': typeof DealsPreviewProfileThesisRoute
-  '/join/team/$token': typeof JoinTeamTokenRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
   '/product/compare/docsend': typeof ProductCompareDocsendRoute
@@ -1870,7 +1861,6 @@ export interface FileRouteTypes {
     | '/deals-preview/profile/full'
     | '/deals-preview/profile/team'
     | '/deals-preview/profile/thesis'
-    | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
     | '/product/compare/docsend'
@@ -2056,7 +2046,6 @@ export interface FileRouteTypes {
     | '/deals-preview/profile/full'
     | '/deals-preview/profile/team'
     | '/deals-preview/profile/thesis'
-    | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
     | '/product/compare/docsend'
@@ -2245,7 +2234,6 @@ export interface FileRouteTypes {
     | '/deals-preview/profile_/full'
     | '/deals-preview/profile_/team'
     | '/deals-preview/profile_/thesis'
-    | '/join/team/$token'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
     | '/product/compare/docsend'
@@ -2319,7 +2307,7 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   InviteRoute: typeof InviteRoute
-  JoinRoute: typeof JoinRouteWithChildren
+  JoinRoute: typeof JoinRoute
   JoinRoomRoute: typeof JoinRoomRoute
   LcsPreviewRoute: typeof LcsPreviewRoute
   RegistryRoute: typeof RegistryRoute
@@ -3128,13 +3116,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/product/compare/datasite'
       preLoaderRoute: typeof ProductCompareDatasiteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/join/team/$token': {
-      id: '/join/team/$token'
-      path: '/team/$token'
-      fullPath: '/join/team/$token'
-      preLoaderRoute: typeof JoinTeamTokenRouteImport
-      parentRoute: typeof JoinRoute
     }
     '/deals-preview/profile_/thesis': {
       id: '/deals-preview/profile_/thesis'
@@ -3983,16 +3964,6 @@ const DocsV2RouteChildren: DocsV2RouteChildren = {
 const DocsV2RouteWithChildren =
   DocsV2Route._addFileChildren(DocsV2RouteChildren)
 
-interface JoinRouteChildren {
-  JoinTeamTokenRoute: typeof JoinTeamTokenRoute
-}
-
-const JoinRouteChildren: JoinRouteChildren = {
-  JoinTeamTokenRoute: JoinTeamTokenRoute,
-}
-
-const JoinRouteWithChildren = JoinRoute._addFileChildren(JoinRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
@@ -4001,7 +3972,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   InviteRoute: InviteRoute,
-  JoinRoute: JoinRouteWithChildren,
+  JoinRoute: JoinRoute,
   JoinRoomRoute: JoinRoomRoute,
   LcsPreviewRoute: LcsPreviewRoute,
   RegistryRoute: RegistryRoute,

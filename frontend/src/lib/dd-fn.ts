@@ -576,7 +576,15 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
     // 1. All documents: founder library docs + deal-room uploads
     const [{ data: founderDocs }, { data: roomDocs }] = await Promise.all([
       sb.from("founder_documents")
-        .select("title, template_slug, status, file_name, file_path, ai_feedback")
+        // ai_feedback deliberately NOT selected — same reasoning as the
+        // startup_claims verdict fields below (§19g). Only file_path,
+        // file_name, title and status are consumed by the loop that builds
+        // docPayloads; ai_feedback was fetched and discarded. It is an
+        // AI assessment of the founder's own document, and this function is
+        // investor-triggered with output rendering to BOTH parties, so a
+        // stale wide select is one refactor away from leaking it into
+        // investor-facing findings. §19f: exposure is what you QUERY.
+        .select("title, template_slug, status, file_name, file_path")
         .eq("startup_id", data.startupId),
       sb.from("documents")
         .select("file_name, category, storage_path, ai_summary")
