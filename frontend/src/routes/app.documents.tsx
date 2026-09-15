@@ -15,6 +15,25 @@ import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus } from "@/compo
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
+// Upload-security gate — must run after every insert into founder_documents
+// (and documents, in the deal-room upload route) before scan_status flips
+// from its 'pending' default. Fire-and-forget from the caller's
+// perspective is NOT acceptable here: the row must not be treated as
+// usable until this resolves, per the gate's own design (a client that
+// never calls it leaves scan_status stuck at 'pending' forever, and every
+// display query filters on scan_status='clean' — see the read-side
+// changes in this same commit).
+async function runUploadSecurityGate(documentId: string, table: "founder_documents" | "documents") {
+  const { data, error } = await supabase.functions.invoke("upload-security-gate", {
+    body: { documentId, table },
+  });
+  if (error) {
+    console.error("[upload-security-gate]", error);
+    return { ok: false as const };
+  }
+  return data as { ok: boolean; verdict?: string; reason?: string };
+}
+
 export const Route = createFileRoute("/app/documents")({
   // R9: relocated to Prepare › IP Vault — old URL redirects to the default leaf.
   beforeLoad: () => {
@@ -312,10 +331,13 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     queryKey: ["founder-documents", startup?.id],
     enabled: !!startup?.id,
     queryFn: async () => {
+      // scan_status='clean' — a row still 'pending' (gate hasn't resolved
+      // yet) or 'quarantined' (failed and removed) must never surface here.
       const { data } = await supabase
         .from("founder_documents")
         .select("*")
-        .eq("startup_id", startup!.id);
+        .eq("startup_id", startup!.id)
+        .eq("scan_status", "clean");
       return (data ?? []) as FounderDocument[];
     },
   });
@@ -482,7 +504,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const extractionSucceeded = !result.error && !!result.data;
       const category = result.data?.suggested_category ?? customCategory;
 
-      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+      const { data: upsertedDoc, error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: null,
         template_slug: slug,
@@ -496,10 +518,24 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           : { category, extraction_error: result.error || "Could not extract structured data from this document." },
         completeness_score: extractionSucceeded ? 100 : 0,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "startup_id,template_slug" });
+      }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
 
-      if (extractionSucceeded) {
+      // Upload-security gate — scan_status stays 'pending' (not surfaced,
+      // not usable) until this resolves. Awaited before any success
+      // messaging so the toast reflects what actually happened to the file.
+      const gateResult = upsertedDoc?.id
+        ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
+        : { ok: false as const };
+
+      if (gateResult.verdict === "quarantined") {
+        toast.error(
+          gateResult.reason === "malware"
+            ? "This file failed our security scan and was removed."
+            : `This file isn't a valid ${ext.toUpperCase()}.`,
+        );
+        setCustomExtractError(null);
+      } else if (extractionSucceeded) {
         toast.success(`${customTitle.trim()} uploaded and extracted`);
       } else {
         setCustomExtractError(result.error || "Could not extract structured data.");
@@ -571,7 +607,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const extractionSucceeded = !result.error && !!result.data;
       const title = result.data?.name ? `${result.data.name} — employee profile` : file.name;
 
-      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+      const { data: upsertedDoc, error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: null,
         template_slug: slug,
@@ -585,10 +621,21 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           : { category: "team", kind: "employee_one_pager", extraction_error: result.error || "Could not extract structured data from this document." },
         completeness_score: extractionSucceeded ? 100 : 0,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "startup_id,template_slug" });
+      }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
 
-      if (extractionSucceeded) {
+      const gateResult = upsertedDoc?.id
+        ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
+        : { ok: false as const };
+
+      if (gateResult.verdict === "quarantined") {
+        toast.error(
+          gateResult.reason === "malware"
+            ? "This file failed our security scan and was removed."
+            : `This file isn't a valid ${ext.toUpperCase()}.`,
+        );
+        setEmployeeExtractError(null);
+      } else if (extractionSucceeded) {
         toast.success(`${title} uploaded and extracted`);
       } else {
         setEmployeeExtractError(result.error || "Could not extract structured data.");

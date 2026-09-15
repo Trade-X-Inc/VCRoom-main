@@ -33,6 +33,22 @@ export const Route = createFileRoute("/app/deal-rooms/$id/documents")({
 const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf", "pptx", "ppt", "docx", "doc", "csv", "png", "jpg", "jpeg"]);
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
 
+// Upload-security gate — must run after docInsert, before scan_status
+// leaves 'pending'. See app.documents.tsx's copy of this same helper for
+// the full rationale; kept as a separate small function per file rather
+// than a shared module, matching this codebase's existing convention of
+// small per-route helpers over a premature shared abstraction.
+async function runUploadSecurityGate(documentId: string, table: "founder_documents" | "documents") {
+  const { data, error } = await supabase.functions.invoke("upload-security-gate", {
+    body: { documentId, table },
+  });
+  if (error) {
+    console.error("[upload-security-gate]", error);
+    return { ok: false as const };
+  }
+  return data as { ok: boolean; verdict?: string; reason?: string };
+}
+
 const TEXT_EXTS = new Set(["pdf", "docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt"]);
 
 function getFileTypeIcon(ext: string) {
@@ -926,15 +942,34 @@ function DocumentsPage() {
                   const { error } = await supabase.storage.from("documents").upload(path, file);
                   if (error) { toast.error("Upload failed"); return; }
                   // uploader_id derived server-side from the token (not passed).
+                  let insertedId: string | null = null;
                   try {
-                    await callAction(docInsert, dealRoomId, {
+                    const insRes = await callAction<{ id: string }>(docInsert, dealRoomId, {
                       dealRoomId, storagePath: path, fileName: file.name,
                       category: "Other", uploadedByRole: null, fileSize: file.size,
                     });
+                    insertedId = insRes.id;
                   } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                   queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-                  toast.success("Uploaded");
                   e.target.value = "";
+
+                  // Upload-security gate — scan_status stays 'pending' (not
+                  // surfaced via doc_list_room, see the migration for the
+                  // read-side note) until this resolves. Investor
+                  // notification below is skipped on quarantine — nothing
+                  // real for a counterparty to be notified about.
+                  const gateResult = insertedId
+                    ? await runUploadSecurityGate(insertedId, "documents")
+                    : { ok: false as const };
+                  if (gateResult.verdict === "quarantined") {
+                    toast.error(
+                      gateResult.reason === "malware"
+                        ? "This file failed our security scan and was removed."
+                        : `This file isn't a valid ${ext.toUpperCase()}.`,
+                    );
+                    return;
+                  }
+                  toast.success("Uploaded");
                   // §B — future migration group: deal_room_members read (deal-room-core group).
                   const { data: members } = await supabase
                     .from("deal_room_members")
@@ -998,15 +1033,31 @@ function DocumentsPage() {
                         const { error: upErr } = await supabase.storage.from("documents").upload(path, file);
                         if (upErr) { toast.error("Upload failed"); return; }
                         // uploader_id derived server-side from the token (not passed).
+                        let insertedId: string | null = null;
                         try {
-                          await callAction(docInsert, dealRoomId, {
+                          const insRes = await callAction<{ id: string }>(docInsert, dealRoomId, {
                             dealRoomId, storagePath: path, fileName: file.name,
                             category: expected.category, uploadedByRole: null, fileSize: file.size,
                           });
+                          insertedId = insRes.id;
                         } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
                         queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
-                        toast.success(`${file.name} uploaded`);
                         e.target.value = "";
+
+                        // Upload-security gate — see the other upload
+                        // handler in this file for the full rationale.
+                        const gateResult = insertedId
+                          ? await runUploadSecurityGate(insertedId, "documents")
+                          : { ok: false as const };
+                        if (gateResult.verdict === "quarantined") {
+                          toast.error(
+                            gateResult.reason === "malware"
+                              ? "This file failed our security scan and was removed."
+                              : `This file isn't a valid ${ext.toUpperCase()}.`,
+                          );
+                          return;
+                        }
+                        toast.success(`${file.name} uploaded`);
                         // §B — future migration group: deal_room_members read (deal-room-core group).
                         const { data: members } = await supabase
                           .from("deal_room_members")
