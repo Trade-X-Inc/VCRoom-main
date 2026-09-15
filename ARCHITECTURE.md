@@ -367,7 +367,49 @@ sensitive-content routing is an open counsel question (`CLAUDE.md §17`).
 
 ---
 
-## 10. Edge functions
+## 10. Upload and AI-input security
+
+Data-pack builder uploads, closing-stage uploads (by either party or counsel), and any
+external link added anywhere in a document — **every file and every link is
+attacker-controlled input, treated as hostile until proven otherwise.** Three distinct
+threats, three distinct controls, **none a backstop for the others.**
+
+1. **Malware in files.** No file is usable until it passes a server-side scan
+   (AV/reputation) run **before** the document row is marked available. Unscanned or
+   failed files are quarantined — never served, never parsed, never shown to a
+   counterparty. **Supabase Storage has no built-in scanning** — this is an explicit
+   pipeline step, not an assumption baked into "we use managed storage."
+2. **Malicious links.** Any URL added as, or found inside, a document is checked
+   against a reputation service at add-time and re-checked before display. Links never
+   auto-navigate, always render their true destination, and open with
+   `rel="noopener noreferrer"`. A "document link" is a phishing vector by default, not
+   an edge case.
+3. **Prompt injection.** Uploaded document content and link text are the single
+   largest injection surface in the product — a line planted in a document can hijack
+   an AI builder or a human reviewer the moment it is read or clicked. Document content
+   reaches any model strictly as **delimited data, never as instruction** — this is the
+   same rule already governing `review-document` and diligence (§9), applied here
+   before a document is scanned rather than after. A Read-class AI operation on
+   document content **cannot chain into another tool in the same turn.**
+   Content-derived values may populate fields awaiting human confirmation; they may
+   never become arguments to a Prepare or Commit action without it. **The human's
+   confirmation is the warranty; the original file is always authoritative.**
+
+**No check performed only in the browser is a control.** File size (the tier's 50MB
+cap), allowed MIME type, and scan verdict are all enforced **server-side** — the client
+is part of the attack surface, not part of the defense, the same standing rule §4/§5
+already apply to authorization and Path B queries respectively.
+
+> **Status: this is the specified posture, not yet a verified one.** Unlike the rest of
+> this file, the controls above have not been individually confirmed against a live
+> pipeline or a built artifact the way §5's authorization rules and §12's CSP/secret
+> rules have. Verify each of the three controls against the actual upload path
+> (data-pack builder, closing uploads) before relying on this section as a completed
+> audit — re-measure rather than assume, per this file's own standing rule.
+
+---
+
+## 11. Edge functions
 
 12 deployed. Identity derivation is **gated, not optional** (`CLAUDE.md §19d.1`, which
 carries the same blocking weight as the confirm-first rule):
@@ -389,7 +431,7 @@ must be applied to all copies and re-verified identical.
 
 ---
 
-## 11. Security posture
+## 12. Security posture
 
 Beyond §5:
 
@@ -422,7 +464,7 @@ the data model (`CLAUDE.md §11.2`).
 
 ---
 
-## 12. Testing and verification
+## 13. Testing and verification
 
 **Live authenticated browser verification is available and is the expected standard.**
 A fixture session mints via the password-grant endpoint (hCaptcha is only on sign-up,
@@ -452,7 +494,7 @@ Non-negotiables drawn from real failures:
 
 ---
 
-## 13. Known-fragile areas
+## 14. Known-fragile areas
 
 Read before touching. Each has bitten.
 
@@ -469,7 +511,7 @@ Read before touching. Each has bitten.
 
 ---
 
-## 14. Where to look
+## 15. Where to look
 
 | For | Read |
 |---|---|
