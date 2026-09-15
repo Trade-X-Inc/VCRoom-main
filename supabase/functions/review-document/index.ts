@@ -57,12 +57,18 @@ serve(async (req) => {
     const { templateSlug, content, stage } = await req.json()
     if (!templateSlug || !content) return new Response(JSON.stringify({ error: 'templateSlug and content required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     const contentText = Object.entries(content).filter(([,v]) => v && String(v).trim()).map(([k,v]) => `${k.replace(/_/g,' ').toUpperCase()}:\n${v}`).join('\n\n')
-    if (!contentText || contentText.length < 20) return new Response(JSON.stringify({ success: true, feedback: { overall_score: 0, signal: 'empty', summary: 'Fill in the fields first.', strengths: [], gaps: ['Document is empty'], recommendations: ['Fill all required fields first'] } }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    if (!contentText || contentText.length < 20) return new Response(JSON.stringify({ success: true, feedback: { summary: 'Fill in the fields first.', strengths: [], gaps: ['Document is empty'], recommendations: ['Fill all required fields first'] } }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     const ai = getAIConfig('review')
     if (!ai) return new Response(JSON.stringify({ error: 'Document review is unavailable.' }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     const stageContext = STAGE_CONTEXT[stage?.toLowerCase() ?? 'seed'] ?? STAGE_CONTEXT['seed']
     const reviewPrompt = DOCUMENT_REVIEW_PROMPTS[templateSlug] ?? 'Review this document for investment readiness.'
-    const systemPrompt = `You are a senior VC analyst. Give founders honest, specific, actionable feedback.\n${stageContext}\n${reviewPrompt}\nReturn ONLY valid JSON:\n{\n  "overall_score": <1-10>,\n  "signal": <"strong"|"adequate"|"weak"|"critical">,\n  "summary": <2-3 sentences>,\n  "strengths": [<up to 3, under 15 words each>],\n  "gaps": [<up to 5, under 20 words each>],\n  "recommendations": [<up to 4, under 25 words each>],\n  "investor_flag": <single most important pushback or null>\n}\nBe harsh but fair. No validation. Flag real issues.`
+    // §15/§25 — no scoring, ranking or assessment. This prompt returns
+    // qualitative findings only: a factual summary, observed strengths,
+    // absences against the document's own schedule, and drafted next steps.
+    // It must never be given a score, rating, signal, grade, verdict, or any
+    // field expressing how a third party would judge the founder. Removed
+    // 15 Sep 2026; see CLAUDE.md. Do not reintroduce.
+    const systemPrompt = `You are reviewing a founder's document. Give honest, specific, actionable feedback.\n${stageContext}\n${reviewPrompt}\nReturn ONLY valid JSON:\n{\n  "summary": <2-3 sentences>,\n  "strengths": [<up to 3, under 15 words each>],\n  "gaps": [<up to 5, under 20 words each>],\n  "recommendations": [<up to 4, under 25 words each>]\n}\nBe specific and factual. Flag real issues. Do not score, rate or grade.`
     const response = await fetch(`${ai.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${ai.apiKey}`, 'Content-Type': 'application/json', ...ai.headers },
