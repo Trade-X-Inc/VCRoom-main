@@ -247,7 +247,7 @@ function DocumentsPage() {
       // couples to the investor group via discovery_requests — see AUTHZ_MAPPING.md).
       const { data, error } = await supabase
         .from("founder_documents")
-        .select(`id, template_slug, title, status, content, completeness_score, ai_feedback, visibility, updated_at, document_templates ( name, category )`)
+        .select(`id, template_slug, title, status, content, completeness_score, visibility, updated_at, document_templates ( name, category )`)
         .eq("startup_id", startupId!)
         .eq("visibility", "deal_room")
         .in("status", ["complete", "ai_extracted", "needs_review"])
@@ -1297,13 +1297,6 @@ function DocumentsPage() {
                 <p className="text-center py-8" style={{ color: "var(--lcs-ink-muted)", fontSize: "13px" }}>No content available</p>
               )}
             </div>
-            {viewingDoc.ai_feedback && (viewingDoc.ai_feedback as Record<string, unknown>).overall_score && (
-              <div className="p-4 flex items-center gap-3" style={{ borderTop: "1px solid var(--lcs-line)" }}>
-                <div style={{ color: "var(--lcs-ink-muted)", fontSize: "11.5px" }}>
-                  {String((viewingDoc.ai_feedback as Record<string, unknown>).summary ?? "").substring(0, 120)}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

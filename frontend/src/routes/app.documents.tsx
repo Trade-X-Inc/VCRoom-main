@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import {
-  FileText, CheckCircle2, AlertCircle,
+  FileText, CheckCircle2,
   ArrowRight, ChevronDown, Loader2, X, Upload, Trash2,
   ChevronRight,
 } from "lucide-react";
@@ -58,13 +58,10 @@ interface DocumentTemplate {
 }
 
 interface AIFeedback {
-  overall_score: number;
-  signal: "strong" | "adequate" | "weak" | "critical";
   summary: string;
   strengths: string[];
   gaps: string[];
   recommendations: string[];
-  investor_flag: string | null;
 }
 
 interface FounderDocument {
@@ -906,14 +903,6 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 const isStage2 = STAGE2_SLUGS.has(template.slug);
                 const isStage3 = STAGE3_SLUGS.has(template.slug);
                 const hasFeedback = !!(doc?.ai_feedback && typeof doc.ai_feedback === "object" && Object.keys(doc.ai_feedback).length > 0);
-                const feedbackScore = hasFeedback ? (doc!.ai_feedback as AIFeedback).overall_score : undefined;
-                const feedbackSignal = hasFeedback ? (doc!.ai_feedback as AIFeedback).signal : undefined;
-                // Evaluative signal (not a category) — strong/adequate/weak/
-                // critical collapse onto the 3 tones the closed vocabulary
-                // supports, weak and critical deliberately sharing attention
-                // (no third negative tier), same reasoning as Group 6's
-                // Strengths/Risks/Flags collapse.
-                const feedbackStatus: LcsStatus = feedbackSignal === "strong" ? "satisfied" : feedbackSignal === "adequate" ? "in-progress" : "attention";
                 const extractionError = (doc?.content as any)?.extraction_error as string | undefined;
 
                 return (
@@ -932,9 +921,6 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <LcsStatusPill status={pillProps.status} label={pillProps.label} />
                           <h3 className="text-[13px] font-semibold" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{template.name}</h3>
-                          {hasFeedback && feedbackScore !== undefined && (
-                            <LcsStatusPill status={feedbackStatus} label={`${feedbackScore}/10`} />
-                          )}
                           {/* Required/Optional: an attribute of the template, not a
                               state — plain text, no color (decision 5: "no red
                               anywhere" applied to what was previously a red badge). */}
@@ -1619,10 +1605,6 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
   // this pass — weak and critical deliberately share attention (no third
   // negative tier), same reasoning as Group 6's Strengths/Risks/Flags and
   // this file's own document-card feedback-score pill above.
-  const signalStatus: LcsStatus | null = reviewFeedback
-    ? reviewFeedback.signal === "strong" ? "satisfied" : reviewFeedback.signal === "adequate" ? "in-progress" : "attention"
-    : null;
-  const signalColor = signalStatus === "satisfied" ? "var(--lcs-satisfied)" : signalStatus === "in-progress" ? "var(--lcs-progress)" : "var(--lcs-attention)";
 
   return (
     <div
@@ -1719,29 +1701,13 @@ function DocumentEditorModal({ doc, template, startup, onClose, onSave }: Docume
         )}
 
         {/* AI Feedback */}
-        {reviewFeedback && signalStatus && (
+        {reviewFeedback && (
           <div className="mx-6 mb-6 space-y-4">
-            <div className="flex items-center justify-between p-4" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
-              <div className="flex-1 min-w-0 pr-4">
-                <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>AI Review</p>
-                <p className="text-[13px] leading-relaxed" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{reviewFeedback.summary}</p>
-              </div>
-              <div
-                className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-bold"
-                style={{ border: `2px solid ${signalColor}`, color: signalColor, fontFamily: "var(--font-lcs-data)" }}
-              >
-                {reviewFeedback.overall_score}
-              </div>
+            <div className="p-4" style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-surface)" }}>
+              <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-data)" }}>AI Review</p>
+              <p className="text-[13px] leading-relaxed" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{reviewFeedback.summary}</p>
             </div>
 
-            {reviewFeedback.investor_flag && (
-              <div className="p-3" style={{ border: "1px solid var(--lcs-attention)", background: "var(--lcs-attention-wash)" }}>
-                <p className="text-[11px] uppercase tracking-wider mb-1 flex items-center gap-1.5" style={{ color: "var(--lcs-attention)", fontFamily: "var(--font-lcs-data)" }}>
-                  <AlertCircle className="h-3 w-3" /> Investor will push back on
-                </p>
-                <p className="text-[13px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{reviewFeedback.investor_flag}</p>
-              </div>
-            )}
 
             {reviewFeedback.strengths?.length > 0 && (
               <div>
