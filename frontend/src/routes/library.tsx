@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { useAuthStore } from "@/lib/auth-store";
+import { extractDocumentText } from "@/lib/document-extractor";
+import { callAction } from "@/lib/actions/call";
+import { libraryClarityCheck } from "@/lib/actions/library";
 import {
   LcsPageShell,
   LcsPageHeader,
@@ -90,6 +93,12 @@ const CATEGORY_ORDER: Record<string, number> = Object.fromEntries(
 const ALLOWED_EXTENSIONS = new Set(["pdf", "csv", "pptx", "docx", "html", "png", "jpg", "jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
+interface ClarityFeedback {
+  summary: string;
+  flags: string[];
+  recommendations: string[];
+}
+
 interface LibraryDocument {
   id: string;
   owner_type: "founder" | "investor";
@@ -97,6 +106,12 @@ interface LibraryDocument {
   source: "uploaded" | "builder_created";
   category: Category;
   scan_status: "pending" | "clean" | "quarantined";
+  // analysis_status is SEPARATE from scan_status and from clarity_feedback's
+  // own contents — the UI must branch on this column first, never on
+  // clarity_feedback.flags.length, per §7.4 (the same completeness_score=0
+  // "plausible-wrong" trap founder_documents already made once).
+  analysis_status: "unanalyzed" | "analyzing" | "analyzed";
+  clarity_feedback: ClarityFeedback | null;
   visibility: string;
   file_path: string | null;
   file_name: string | null;
@@ -138,6 +153,7 @@ function LibraryPage() {
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<LibraryDocument | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [checkingId, setCheckingId] = useState<string | null>(null);
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["library-documents", user?.id],
@@ -295,6 +311,56 @@ function LibraryPage() {
     }
   };
 
+  // Per-document clarity check — user-click ONLY, never automatic. This is
+  // the sole place this action is ever invoked from; there is no
+  // on-upload or on-schedule trigger anywhere in this file. The rate-limit
+  // RPC fails open on infra error (confirmed during 3a-ii's recon), so it
+  // is NOT the spend guard here — this click is.
+  const handleClarityCheck = async (doc: LibraryDocument) => {
+    if (!doc.file_path) return;
+    setCheckingId(doc.id);
+    // Optimistic local state matches the server's own immediate
+    // 'analyzing' write (the action flips this before the AI call even
+    // starts) — invalidate right away so a fast re-render shows the real
+    // held state rather than the pre-click 'unanalyzed'.
+    queryClient.setQueryData<LibraryDocument[]>(
+      ["library-documents", user?.id],
+      (old) => (old ?? []).map((d) => (d.id === doc.id ? { ...d, analysis_status: "analyzing" } : d)),
+    );
+    try {
+      const { data: blob, error: dlError } = await supabase.storage
+        .from("documents")
+        .download(doc.file_path);
+      if (dlError || !blob) {
+        toast.error("Could not read this file — try again.");
+        queryClient.invalidateQueries({ queryKey: ["library-documents", user?.id] });
+        return;
+      }
+      const arrayBuffer = await (blob as Blob).arrayBuffer();
+      const documentText = await extractDocumentText(arrayBuffer, doc.file_name ?? "");
+
+      const result = await callAction<{ ok: boolean; feedback?: ClarityFeedback; error?: string }>(
+        libraryClarityCheck,
+        doc.owner_id,
+        { documentId: doc.id, documentText, category: doc.category },
+      );
+      if (!result.ok) {
+        toast.error(result.error ?? "Clarity check failed — try again.");
+        return;
+      }
+      toast.success("Clarity check complete");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Clarity check failed — try again.");
+    } finally {
+      setCheckingId(null);
+      // The server is the source of truth for analysis_status regardless
+      // of outcome (success -> 'analyzed', any failure -> reset to
+      // 'unanalyzed' inside the action's own bulletproofed handler) — a
+      // real refetch here, not a guess about which state it landed in.
+      queryClient.invalidateQueries({ queryKey: ["library-documents", user?.id] });
+    }
+  };
+
   return (
     <LcsPageShell
       searchPlaceholder="Search your Library"
@@ -365,27 +431,67 @@ function LibraryPage() {
           grouped.map(([category, docs]) => (
             <LcsCard key={category} title={CATEGORY_LABEL[category] ?? category} count={docs.length}>
               <div className="divide-y" style={{ borderColor: "var(--lcs-line)" }}>
-                {docs.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center justify-between gap-3 px-4 py-3"
-                  >
-                    <div className="min-w-0">
-                      <div className="text-sm truncate" style={{ color: "var(--lcs-ink)" }}>
-                        {doc.file_name}
+                {docs.map((doc) => {
+                  // analysis_status is checked FIRST, always — never
+                  // clarity_feedback.flags.length. A real 'analyzed' result
+                  // with zero flags is a genuine "nothing found," which
+                  // must never render identically to 'unanalyzed' (never
+                  // checked at all). See CLAUDE.md §7.4.
+                  const isChecking = doc.analysis_status === "analyzing" || checkingId === doc.id;
+                  return (
+                    <div key={doc.id} className="flex flex-col gap-2 px-4 py-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-sm truncate" style={{ color: "var(--lcs-ink)" }}>
+                            {doc.file_name}
+                          </div>
+                          <div className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>
+                            {doc.file_size ? `${(doc.file_size / 1024).toFixed(0)} KB` : ""}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <LcsStatusPill status={scanStatusToLcs(doc.scan_status)} label="Clean" />
+                          <LcsButton
+                            variant="secondary"
+                            disabled={isChecking}
+                            onClick={() => handleClarityCheck(doc)}
+                          >
+                            {isChecking ? "Analyzing…" : "Check for clarity"}
+                          </LcsButton>
+                          <LcsButton variant="text-link" onClick={() => setDeleteTarget(doc)}>
+                            Delete
+                          </LcsButton>
+                        </div>
                       </div>
-                      <div className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>
-                        {doc.file_size ? `${(doc.file_size / 1024).toFixed(0)} KB` : ""}
-                      </div>
+                      {doc.analysis_status === "analyzed" && (
+                        <div
+                          className="mt-1 p-3 text-sm flex flex-col gap-2"
+                          style={{ background: "var(--lcs-surface)", border: "1px solid var(--lcs-line)" }}
+                        >
+                          <div style={{ color: "var(--lcs-ink)" }}>
+                            {doc.clarity_feedback?.summary || "No summary returned."}
+                          </div>
+                          {doc.clarity_feedback && doc.clarity_feedback.flags.length > 0 ? (
+                            <ul className="list-disc pl-4" style={{ color: "var(--lcs-ink-muted)" }}>
+                              {doc.clarity_feedback.flags.map((f, i) => (
+                                <li key={i}>{f}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <div style={{ color: "var(--lcs-ink-muted)" }}>No issues flagged.</div>
+                          )}
+                          {doc.clarity_feedback && doc.clarity_feedback.recommendations.length > 0 && (
+                            <ul className="list-disc pl-4" style={{ color: "var(--lcs-ink-muted)" }}>
+                              {doc.clarity_feedback.recommendations.map((r, i) => (
+                                <li key={i}>{r}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <LcsStatusPill status={scanStatusToLcs(doc.scan_status)} label="Clean" />
-                      <LcsButton variant="text-link" onClick={() => setDeleteTarget(doc)}>
-                        Delete
-                      </LcsButton>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </LcsCard>
           ))

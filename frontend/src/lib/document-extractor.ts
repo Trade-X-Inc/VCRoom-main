@@ -352,8 +352,19 @@ async function extractPPTX(buf: ArrayBuffer): Promise<string> {
 }
 
 // ── CSV ───────────────────────────────────────────────────────────────────────
+// Buffer capped BEFORE decode (stress-test pass, Item 4): a pathologically
+// large CSV previously decoded its FULL raw buffer (up to the 50MB bucket
+// ceiling) before any truncation ever ran — a real, un-mitigated
+// input-side cost (huge full-buffer TextDecoder.decode) ahead of the
+// output-side 15,000-char cap every branch already applies. ~2MB of raw
+// bytes decodes to comfortably more than 15,000 characters for any real
+// text encoding, so this cap never truncates legitimate small/medium
+// files short of their own natural content.
+const MAX_CSV_DECODE_BYTES = 2_000_000;
 async function extractCSV(buf: ArrayBuffer): Promise<string> {
-  const text = new TextDecoder().decode(new Uint8Array(buf));
-  console.log(`[CSV] full length: ${text.length} chars`);
+  const capped =
+    buf.byteLength > MAX_CSV_DECODE_BYTES ? buf.slice(0, MAX_CSV_DECODE_BYTES) : buf;
+  const text = new TextDecoder().decode(new Uint8Array(capped));
+  console.log(`[CSV] full length: ${text.length} chars (raw buffer ${buf.byteLength} bytes)`);
   return text.slice(0, 15000);
 }
