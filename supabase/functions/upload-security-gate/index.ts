@@ -59,8 +59,8 @@ const ALLOWED_EXTS = new Set(Object.values(ALLOWED_MIME_TO_EXT))
 // zip" without resolving further, that's treated as a mismatch, not
 // silently accepted — an unresolvable zip is not the same as a confirmed
 // docx/pptx.
-type TableName = 'founder_documents' | 'documents'
-const ALLOWED_TABLES: TableName[] = ['founder_documents', 'documents']
+type TableName = 'founder_documents' | 'documents' | 'library_documents'
+const ALLOWED_TABLES: TableName[] = ['founder_documents', 'documents', 'library_documents']
 
 function jsonResponse(body: unknown, status: number) {
   return new Response(JSON.stringify(body), {
@@ -96,16 +96,20 @@ serve(async (req) => {
       return jsonResponse({ error: 'documentId required' }, 400)
     }
     if (typeof table !== 'string' || !ALLOWED_TABLES.includes(table as TableName)) {
-      return jsonResponse({ error: 'table must be founder_documents or documents' }, 400)
+      return jsonResponse({ error: 'table must be founder_documents, documents, or library_documents' }, 400)
     }
 
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     // ── Ownership check — the caller's uid must actually own this document,
-    // never trusted from the documentId alone (CLAUDE.md §7.1). The two
+    // never trusted from the documentId alone (CLAUDE.md §7.1). The three
     // tables have different ownership shapes, checked separately:
     //   founder_documents: startup_id -> startups.founder_id = caller
     //   documents:          uploader_id = caller directly
+    //   library_documents: owner_id = caller directly (simplest shape, no
+    //                       join — library_documents has no startup_id/
+    //                       deal_room_id concept at all, per its own
+    //                       single-owner-isolation design)
     let filePath: string | null = null
     let claimedMime: string | null = null
 
@@ -129,7 +133,7 @@ serve(async (req) => {
         return jsonResponse({ ok: true, already: doc.scan_status }, 200)
       }
       filePath = doc.file_path
-    } else {
+    } else if (table === 'documents') {
       const { data: doc, error: docErr } = await sb
         .from('documents')
         .select('id, uploader_id, storage_path, scan_status')
@@ -141,6 +145,18 @@ serve(async (req) => {
         return jsonResponse({ ok: true, already: doc.scan_status }, 200)
       }
       filePath = doc.storage_path
+    } else {
+      const { data: doc, error: docErr } = await sb
+        .from('library_documents')
+        .select('id, owner_id, file_path, scan_status')
+        .eq('id', documentId)
+        .maybeSingle()
+      if (docErr || !doc) return jsonResponse({ error: 'not_found' }, 404)
+      if (doc.owner_id !== uid) return jsonResponse({ error: 'forbidden' }, 403)
+      if (doc.scan_status !== 'pending') {
+        return jsonResponse({ ok: true, already: doc.scan_status }, 200)
+      }
+      filePath = doc.file_path
     }
 
     if (!filePath) return jsonResponse({ error: 'no_file_path' }, 500)

@@ -12,6 +12,8 @@ Generated 4 Sep 2026, by a step-0 audit (Explore agent, Opus) of the current rep
 
 Full inventory of `src/routes/app.*.tsx` and `src/routes/app.investor.*.tsx` (100 files scanned), excluding the `deals-preview.*`/`app.advisor-preview.*`/`app.lcs-preview.tsx` sandbox (never v1 — built directly against LCS, unauthenticated, no nav, not part of this migration) and the already-migrated files from Groups 0–4. Every file classified as: still v1 (real work), already on the intermediate v2 tokens (tracked-open elsewhere, not in scope here), already LCS, or a thin alias/redirect (no styling of its own — covered for free once its target component is migrated).
 
+**`/library` (added 17 Sep 2026) is a different case from the `deals-preview`/`advisor-preview`/`lcs-preview` sandboxes above and is called out separately so it isn't miscounted as one of them.** It is placed outside `/app/*` for the identical shell-nesting reason (`app.tsx`'s layout route would double-wrap a real `LcsPageShell` inside `AdminShell`/`MemberShell`), but unlike the sandboxes it is a **real feature with a real `beforeLoad` auth gate** holding genuine private user data (the Library container, `library_documents`) — not mock/preview content. Same temporary-placement discipline applies: **`/library` cuts over to `/app/library` once the real app shell migrates to the LCS Component System** — tracked here so it isn't rediscovered as stray drift outside the namespace, same as the note already carried for `deals-preview/*` in CLAUDE.md's Amendment log (1 Sep 2026 entry).
+
 ## Totals
 
 | Class | Count |
