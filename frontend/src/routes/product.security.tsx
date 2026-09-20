@@ -36,6 +36,18 @@ import { PageHero } from "@/components/site/PageHero";
 // disclosed), and an explicit regulatory-boundary statement (software
 // infrastructure, not a regulated financial institution, works alongside
 // regulated counsel and compliance functions rather than replacing them).
+//
+// Added 20 Sep 2026: an Accessibility section, same volunteer-the-gap
+// discipline as the SOC 2 line above. Grounded only in what this session
+// verified live (18 keyboard-trap fixes, 6 broken upload/toggle controls,
+// LcsFormField's htmlFor wiring — see git history caa0e08/5e12e60 and
+// SECURITY-CHECKLIST.md §9). Explicitly does NOT claim WCAG conformance:
+// 226 of the original 229 raw unlabeled-input defects found by the same
+// audit remain open (including on the public /tools/* calculators), one
+// known text-contrast failure (#c9d0db, 1.55:1) is flagged but unfixed
+// across 16 files (ac64cf3), and no automated accessibility testing
+// exists at all (axe-core is an unused dependency; no CI check). All of
+// that is stated in the copy, not left implicit.
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
@@ -166,6 +178,30 @@ function Security() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-5 h-px bg-[#0a2540]/30" />
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Accessibility</span>
+          </div>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-6">
+            WE TEST IT BY<br />USING IT.
+          </h2>
+          <div className="max-w-[720px] flex flex-col gap-5">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              We build every internal control from a shared component set, and we verify it by operating it — tabbing to a control, pressing Enter or Space, confirming a screen reader would have something to say about it. That has already caught real problems: an admin toggle with no keyboard access, five document-upload controls a keyboard user couldn't operate at all, and a shared form-field component whose labels weren't wired to their inputs.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's fixed today:</span> every custom interactive control we've audited — elements standing in for buttons, sortable table headers, drag-and-drop cards — now exposes a real role, keyboard focus, and a keyboard-triggerable action. Every form built from our shared field component has its label programmatically tied to its input, verified by confirming that keyboard focus actually moves when the label is activated.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's still open:</span> that fix hasn't reached every form yet — a number of individual fields, including on our public calculators, still need labels wired by hand. We also have one known colour-contrast gap on a secondary text style that we've found but not corrected everywhere it appears. We don't run automated accessibility testing yet; everything above was found by manually operating the product, which is thorough but slower than we'd like, and we're working to add that automation rather than rely on manual checks indefinitely.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              We're not claiming WCAG conformance. We're telling you what we've verified, what we haven't gotten to, and that a control nobody can operate with a keyboard is a defect here, not a nice-to-have.
+            </p>
           </div>
         </section>
 
