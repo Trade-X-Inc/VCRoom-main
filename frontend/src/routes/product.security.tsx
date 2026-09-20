@@ -79,6 +79,23 @@ import { PageHero } from "@/components/site/PageHero";
 // code exists anywhere in this codebase (confirmed by grep; the only
 // "key rotation"-shaped hits were CSS @keyframes false positives).
 // Removed and replaced with an accurate, sourced statement.
+//
+// Corrected 20 Sep 2026 (second pass, compliance audit): the
+// "Multi-factor authentication" pillar claimed "MFA is mandatory for all
+// participants in every room. There is no mechanism to disable it."
+// Both sentences false — verified live: auth.mfa_factors holds ZERO
+// enrolled factors across all 9 real users, and no MFA enrollment or
+// verification code exists anywhere in src/ (the only hits for
+// mfa/totp/aal2 were marketing copy and an unused input-otp UI
+// primitive). This was the THIRD fabricated security control found on
+// this page in one session, after the per-room key-rotation claim and
+// the sealed-export family — the shared cause each time is unreviewed
+// Figma-export boilerplate that reads as plausible infrastructure.
+// Retitled to "Individual authentication" and rewritten around what is
+// actually true (per-person named auth, no shared/company login, per-
+// user audit entries), with MFA's absence stated plainly as planned-
+// not-built. Pillar count unchanged at eight, so the section heading
+// still holds.
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
@@ -98,8 +115,8 @@ const PILLARS = [
     body: "Every action taken in a room is written to an append-only log. No entry can be deleted, modified, or reordered. Altering any earlier entry is detectable — the record makes tampering evident, not merely logged.",
   },
   {
-    title: "Multi-factor authentication",
-    body: "MFA is mandatory for all participants in every room. There is no mechanism to disable it. Authentication events are recorded individually in the audit log.",
+    title: "Individual authentication",
+    body: "Every participant authenticates as a named individual — there is no shared or company-level login, and access is granted per person, never per organisation. Authentication events are recorded individually in the audit log. Multi-factor authentication is not yet available; it is planned before signups open to the public, and we say so rather than imply a control that isn't there.",
   },
   {
     title: "Role-scoped access",
