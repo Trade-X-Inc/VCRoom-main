@@ -48,6 +48,37 @@ import { PageHero } from "@/components/site/PageHero";
 // across 16 files (ac64cf3), and no automated accessibility testing
 // exists at all (axe-core is an unused dependency; no CI check). All of
 // that is stated in the copy, not left implicit.
+//
+// Added 20 Sep 2026 (second pass): an "Infrastructure and practice"
+// section. Every vendor named (Cloudflare, Supabase, Stripe, Resend,
+// HubSpot) was checked against its own official trust/security page
+// before being named — only vendors with a real, checkable SOC 2/ISO/PCI
+// certification are listed. RLS coverage (140/140 public tables) was
+// queried live against the production database at the time of writing,
+// not carried over from CLAUDE.md's own already-once-stale figure. CSP
+// enforcement was confirmed by curling the live production response
+// headers. Strix: the repo's strix_runs/ directory and git history show
+// exactly ONE manual run (13 Sep 2026), no schedule, no CI integration —
+// its single finding was fictional (SECURITY-CHECKLIST.md §3). The copy
+// states this plainly and describes penetration testing as a standing
+// intent, not a cadence that doesn't exist. The upload-security-gate
+// edge function's real, deployed source was read directly: Check 2
+// (magic-byte file-type verification) is real and live; Check 3
+// (malware scanning) is a hardcoded stub that always returns "clean" —
+// scanner.ts's own header calls this out as NOT a real scanner and a
+// blocking pre-launch item. The copy accordingly states only the
+// file-type check as verified fact and flags malware scanning as a
+// separate, clearly-labeled "In progress" line — never blended into the
+// verified section. Same pass also corrected the pre-existing
+// "Encryption at rest and in transit" pillar: AES-256/TLS 1.3 are
+// independently confirmed (Supabase's own security docs; TLS 1.3
+// reconfirmed live via a real handshake against both
+// ldimninnjlvxozubheib.supabase.co and lengdon.com), but "Encryption
+// keys are managed per-room and rotated at close" was a fabricated
+// mechanism-specific claim — no per-room key-management or rotation
+// code exists anywhere in this codebase (confirmed by grep; the only
+// "key rotation"-shaped hits were CSS @keyframes false positives).
+// Removed and replaced with an accurate, sourced statement.
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
@@ -56,7 +87,7 @@ export const Route = createFileRoute("/product/security")({
 const PILLARS = [
   {
     title: "Encryption at rest and in transit",
-    body: "All data is encrypted using AES-256 at rest and TLS 1.3 in transit. Encryption keys are managed per-room and rotated at close. No Lengdon employee has access to transaction content.",
+    body: "All data is encrypted using AES-256 at rest and TLS 1.3 in transit, provided by our infrastructure providers (Cloudflare, Supabase) and confirmed independently against their own security documentation. No Lengdon employee has access to transaction content.",
   },
   {
     title: "Per-person NDA enforcement",
@@ -202,6 +233,36 @@ function Security() {
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
               We're not claiming WCAG conformance. We're telling you what we've verified, what we haven't gotten to, and that a control nobody can operate with a keyboard is a defect here, not a nice-to-have.
             </p>
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-5 h-px bg-[#0a2540]/30" />
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Infrastructure &amp; Practice</span>
+          </div>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-6">
+            WHAT WE RUN ON,<br />AND HOW WE CHECK IT.
+          </h2>
+          <div className="max-w-[720px] flex flex-col gap-5">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              Our infrastructure runs on SOC 2 Type II and ISO 27001–certified providers: Cloudflare (network, edge, hosting) and Supabase (database, authentication, storage). Payment processing runs through Stripe, which holds PCI DSS Level 1 certification and SOC 2 Type II. Email delivery and CRM run through Resend and HubSpot, both SOC 2 Type II certified.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              Every table in our database enforces row-level security — 140 of 140, checked directly against the live database, not assumed from documentation. Our production traffic runs behind a Content Security Policy with a unique cryptographic value per page load, verified to block a real attempt at unauthorized script injection, not just left unconfigured. Every code change passes an automated build and type-check gate before it ships, plus a dependency vulnerability scan on every commit.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              Every uploaded document is checked against its actual file content, not just its filename — a file whose real format doesn't match what it claims to be is rejected and removed automatically.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              We do not yet run a scheduled, automated penetration-testing program. We've run one manual automated scan to date — it produced a false finding that we caught by attempting to reproduce it, which is now a standing rule in how we evaluate security tooling internally. We treat penetration testing as a standing practice, not a one-time event, and are expanding its frequency and scope as the platform grows.
+            </p>
+            <div className="border-t border-[#e6e9ef] pt-5 mt-1">
+              <p style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px] tracking-[0.02em] uppercase mb-2">In progress</p>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+                Malware scanning on uploaded documents is planned but not yet built. Signups are closed during this phase, which is the reason this can wait — it is not a claim that scanning is already in place today.
+              </p>
+            </div>
           </div>
         </section>
 
