@@ -350,13 +350,16 @@ function MemberProfilePage() {
       <Card title="Profile info">
         <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24 }}>
           {/* Avatar — click to upload */}
-          <div
+          <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
+            aria-label="Upload profile photo. Max 2MB, cropped to 400 by 400 square."
             style={{
               width: 96, height: 96, borderRadius: "50%", flexShrink: 0,
               background: "var(--lcs-surface)", border: "2px solid var(--lcs-line)",
               cursor: "pointer", overflow: "hidden", position: "relative",
               display: "flex", alignItems: "center", justifyContent: "center",
+              padding: 0,
             }}
           >
             {avatarUploading
@@ -381,12 +384,14 @@ function MemberProfilePage() {
               <User size={20} style={{ color: "var(--lcs-white)" }} />
               <span style={{ fontSize: 10, color: "var(--lcs-white)", fontWeight: 600, marginTop: 4, fontFamily: "var(--font-lcs-ui)" }}>Upload</span>
             </div>
-          </div>
+          </button>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             style={{ display: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) handleAvatarUpload(file);

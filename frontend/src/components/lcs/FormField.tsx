@@ -33,16 +33,18 @@ function FieldShell({
   label,
   helper,
   error,
+  htmlFor,
   children,
 }: {
   label: string;
   helper?: string;
   error?: boolean;
+  htmlFor: string;
   children: ReactNode;
 }) {
   return (
     <div className={fieldWrapClass}>
-      <label style={labelStyle}>{label}</label>
+      <label htmlFor={htmlFor} style={labelStyle}>{label}</label>
       {children}
       {helper && <span style={helperStyle(!!error)}>{helper}</span>}
     </div>
@@ -59,7 +61,7 @@ export function LcsTextField({
   const autoId = useId();
   const fieldId = id ?? autoId;
   return (
-    <FieldShell label={label} helper={helper} error={error}>
+    <FieldShell label={label} helper={helper} error={error} htmlFor={fieldId}>
       <input id={fieldId} className="w-full outline-none" style={inputBase(!!error)} {...rest} />
     </FieldShell>
   );
@@ -76,7 +78,7 @@ export function LcsSelectField({
   const autoId = useId();
   const fieldId = id ?? autoId;
   return (
-    <FieldShell label={label} helper={helper} error={error}>
+    <FieldShell label={label} helper={helper} error={error} htmlFor={fieldId}>
       <select id={fieldId} className="w-full outline-none" style={inputBase(!!error)} {...rest}>
         {children}
       </select>
@@ -95,7 +97,7 @@ export function LcsTextareaField({
   const autoId = useId();
   const fieldId = id ?? autoId;
   return (
-    <FieldShell label={label} helper={helper} error={error}>
+    <FieldShell label={label} helper={helper} error={error} htmlFor={fieldId}>
       <textarea
         id={fieldId}
         rows={rows}
@@ -122,7 +124,7 @@ export function LcsDropzone({
 }) {
   const autoId = useId();
   return (
-    <FieldShell label={label} helper={helper} error={error}>
+    <FieldShell label={label} helper={helper} error={error} htmlFor={autoId}>
       <label
         htmlFor={autoId}
         className="w-full flex items-center justify-center text-center cursor-pointer"

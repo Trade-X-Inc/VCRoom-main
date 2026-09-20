@@ -1627,9 +1627,18 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
             <div><label style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Role *</label><input value={mf.role} onChange={(e) => setMf((f) => ({ ...f, role: e.target.value }))} required style={{ ...inputStyle, marginTop: 4 }} placeholder="Partner" /></div>
             <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 8 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <div style={{ height: 16, width: 32, borderRadius: 8, position: "relative", background: mf.is_admin ? "#7C3AED" : "var(--lcs-line)" }} onClick={() => setMf((f) => ({ ...f, is_admin: !f.is_admin }))}>
-                  <div style={{ position: "absolute", top: 2, height: 12, width: 12, borderRadius: "50%", background: "#fff", transform: mf.is_admin ? "translateX(18px)" : "translateX(2px)", transition: "transform 0.15s" }} />
-                </div>
+                <span style={{ position: "relative", height: 16, width: 32, flexShrink: 0, display: "inline-block" }}>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={mf.is_admin}
+                    onChange={(e) => setMf((f) => ({ ...f, is_admin: e.target.checked }))}
+                    style={{ position: "absolute", inset: 0, margin: 0, opacity: 0, cursor: "pointer", height: "100%", width: "100%" }}
+                  />
+                  <span aria-hidden="true" style={{ display: "block", height: 16, width: 32, borderRadius: 8, position: "relative", background: mf.is_admin ? "#7C3AED" : "var(--lcs-line)", pointerEvents: "none" }}>
+                    <span style={{ position: "absolute", top: 2, height: 12, width: 12, borderRadius: "50%", background: "#fff", transform: mf.is_admin ? "translateX(18px)" : "translateX(2px)", transition: "transform 0.15s" }} />
+                  </span>
+                </span>
                 <span style={{ fontSize: 12, color: "var(--lcs-ink-muted)" }}>Fund admin</span>
               </label>
             </div>

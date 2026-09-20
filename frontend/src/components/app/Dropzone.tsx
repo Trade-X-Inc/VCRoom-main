@@ -212,12 +212,14 @@ export function Dropzone({
   return (
     <>
       <div className="space-y-3">
-        <div
+        <button
+          type="button"
           onDragOver={(e) => { e.preventDefault(); setIsOver(true); }}
           onDragLeave={() => setIsOver(false)}
           onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
-          className="relative border border-dashed p-8 text-center cursor-pointer transition-colors"
+          aria-label={`${title}. ${hint}`}
+          className="relative w-full border border-dashed p-8 text-center cursor-pointer transition-colors"
           style={{
             borderColor: isOver ? "var(--lcs-accent)" : "var(--lcs-line)",
             background: isOver ? "var(--lcs-progress-wash)" : "var(--lcs-surface)",
@@ -240,10 +242,12 @@ export function Dropzone({
             type="file"
             multiple
             className="hidden"
+            tabIndex={-1}
+            aria-hidden="true"
             accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
             onChange={(e) => handleFiles(e.target.files)}
           />
-        </div>
+        </button>
 
         {files.length > 0 && (
           <div style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>
