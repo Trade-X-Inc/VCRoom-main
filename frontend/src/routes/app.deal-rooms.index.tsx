@@ -120,18 +120,27 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
     queryKey: ["dr-team-assignments-list", user?.id, roomIds.join(",")],
     enabled: !!user?.id && roomIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase
+      // startup_team_accounts has no FK to `users` (only to investor_profiles,
+      // team_invites, startups) and team_member_profiles has NO foreign keys
+      // at all (user_id is a plain column, not FK-constrained) — both nested
+      // embeds 400 (PGRST200), confirmed live via information_schema and a
+      // real REST call. Same pre-existing schema gap already documented for
+      // app.users.tsx's identical team_member_profiles embed (CLAUDE.md
+      // §19j) — deliberately not re-attempted here; startup_team_accounts's
+      // own display_name/avatar_url columns are used directly instead.
+      const { data, error } = await supabase
         .from("deal_room_team_assignments")
         .select(`
           deal_room_id,
           team_account_id,
           startup_team_accounts!inner(
             role,
-            users(full_name, avatar_url),
-            team_member_profiles(first_name, last_name, avatar_url)
+            display_name,
+            avatar_url
           )
         `)
         .in("deal_room_id", roomIds);
+      if (error) console.error("[deal-rooms] team assignments query error:", error.message);
       return (data ?? []) as any[];
     },
   });
@@ -236,11 +245,7 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
                       {roomTeam.length === 0
                         ? <span className="text-v2-ink-muted">None assigned</span>
                         : roomTeam.map((a: any) => {
-                            const prof = a.startup_team_accounts?.team_member_profiles;
-                            const usr = a.startup_team_accounts?.users;
-                            const name = prof?.first_name
-                              ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
-                              : (usr?.full_name ?? "Unknown");
+                            const name = a.startup_team_accounts?.display_name ?? "Unknown";
                             const role = a.startup_team_accounts?.role ?? "member";
                             return `${name} (${role})`;
                           }).join(", ")}
@@ -441,11 +446,7 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
                       <Td colSpan={8}>
                         <div className="flex flex-wrap gap-2" style={{ padding: "4px 0" }}>
                           {roomTeam.map((a: any) => {
-                            const prof = a.startup_team_accounts?.team_member_profiles;
-                            const usr = a.startup_team_accounts?.users;
-                            const name = prof?.first_name
-                              ? `${prof.first_name} ${prof.last_name ?? ""}`.trim()
-                              : (usr?.full_name ?? "Unknown");
+                            const name = a.startup_team_accounts?.display_name ?? "Unknown";
                             const role = a.startup_team_accounts?.role ?? "member";
                             return (
                               <span
