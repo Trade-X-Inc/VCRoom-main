@@ -118,6 +118,10 @@ work — not a footnote to it.
 
 ## 9. Accessibility — WCAG 2.2 Level AA, before merge, no exceptions
 
+> Also maintained standalone as `ACCESSIBILITY-CHECKLIST.md` (identical content).
+> **Change both in the same commit** — a rule that has drifted between two copies
+> is worse than a rule in one place.
+
 **Standard: WCAG 2.2 Level AA.** Not "be accessible." When a question isn't
 settled by the lines below, the success criterion is the authority.
 
