@@ -4,6 +4,7 @@ import { Shield, AlertTriangle, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { eraseAccount } from "@/lib/erase-account-fn";
 import { LcsButton, LcsModal, LcsTextField } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/settings/security")({
@@ -56,14 +57,38 @@ function SecuritySettings() {
     if (!user?.id) return;
     setDeleting(true);
     try {
-      // Soft-delete: mark user as deleted in DB, then sign out.
-      // The update must be verified — signing out on a failed update would
-      // leave the account fully active while the user believes it's deleted.
-      const { error } = await supabase.from("users").update({ role: "deleted", updated_at: new Date().toISOString() } as any).eq("id", user.id);
-      if (error) throw new Error(`Could not delete account: ${error.message}`);
+      // Real erasure (20 Sep 2026). This previously set role = 'deleted'
+      // and nothing else — the account stayed signable-in with every
+      // FK-linked row attached (CLAUDE.md §19q). eraseAccount now runs the
+      // real two-step path: pack_api.erase_user_account() for the public
+      // schema (cascade + anonymise-to-sentinel + hard delete), then the
+      // Admin API delete of auth.users, which is the step that actually
+      // disables sign-in and which SQL cannot perform.
+      const { data: sess } = await supabase.auth.getSession();
+      const accessToken = sess?.session?.access_token;
+      const res = await eraseAccount({ data: { accessToken } });
+
+      if (!res.ok) {
+        if (res.error === "blocked") {
+          // Not a failure — a deliberate refusal with a real reason.
+          // Surfaced verbatim so the user knows what to resolve.
+          setDeleting(false);
+          toast.error(
+            `Account can't be deleted yet: ${res.blockReasons.join("; ")}.`,
+            { duration: 10000 },
+          );
+          return;
+        }
+        throw new Error(
+          res.error === "not_authenticated"
+            ? "Your session expired. Sign in again and retry."
+            : "Could not delete account. Nothing was changed — please try again.",
+        );
+      }
+
       await supabase.auth.signOut();
       nav({ to: "/", replace: true });
-      toast.success("Account deleted. Sorry to see you go.");
+      toast.success("Account deleted.");
     } catch (err: any) {
       toast.error(err.message || "Failed to delete account");
     } finally {
@@ -148,7 +173,7 @@ function SecuritySettings() {
           <div>
             <div className="text-sm font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>Delete account</div>
             <div className="text-xs mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
-              Permanently removes your account and all associated data. This cannot be undone.
+              Removes your profile, documents, messages and account data, and permanently disables sign-in.
             </div>
           </div>
           <LcsButton variant="destructive" onClick={() => setShowDeleteModal(true)}>Delete account</LcsButton>
@@ -173,7 +198,7 @@ function SecuritySettings() {
           }
         >
           <p className="text-sm" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
-            This will permanently delete your account, all deal rooms, documents, and data. This action cannot be undone.
+            Deleting your account removes your profile, documents, messages and account data, and permanently disables sign-in. Where you were party to a completed deal, the transaction record itself is retained — your entries are replaced with a permanent anonymous reference so the other party&rsquo;s record stays intact. This cannot be undone.
           </p>
           <LcsTextField
             label="Type DELETE to confirm"

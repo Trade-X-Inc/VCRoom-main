@@ -475,9 +475,12 @@ function DemoSection() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <Reveal className="flex-1">
-            <div
-              className="relative bg-[#0a2540] overflow-hidden cursor-pointer group h-full min-h-[420px]"
+            <button
+              type="button"
+              className="relative bg-[#0a2540] overflow-hidden cursor-pointer group h-full min-h-[420px] w-full text-left block"
               onClick={() => setPlaying(!playing)}
+              aria-label={playing ? "Pause product walkthrough video" : "Play product walkthrough video"}
+              aria-pressed={playing}
             >
               <img
                 src="/images/homepage/demo-video-poster.jpg"
@@ -529,7 +532,7 @@ function DemoSection() {
                   </div>
                 ))}
               </div>
-            </div>
+            </button>
           </Reveal>
 
           <Reveal delay={150} className="flex-1 max-w-[480px]">
@@ -748,6 +751,11 @@ function ProcessSection() {
                 className={`group overflow-hidden cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isLast ? "border-b border-[#e6e9ef]" : ""}`}
                 style={{ height: isOpen ? 540 : 90 }}
                 onClick={() => toggle(phase.num)}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isOpen}
+                aria-label={`Gate ${phase.num}: ${phase.title}`}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(phase.num); } }}
               >
                 <div className="h-[90px] flex items-center px-8 lg:px-12 gap-6 select-none relative overflow-hidden">
                   <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#c9d0db] text-[10px] tracking-[2px] w-5 shrink-0">

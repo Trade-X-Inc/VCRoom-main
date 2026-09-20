@@ -36,6 +36,66 @@ import { PageHero } from "@/components/site/PageHero";
 // disclosed), and an explicit regulatory-boundary statement (software
 // infrastructure, not a regulated financial institution, works alongside
 // regulated counsel and compliance functions rather than replacing them).
+//
+// Added 20 Sep 2026: an Accessibility section, same volunteer-the-gap
+// discipline as the SOC 2 line above. Grounded only in what this session
+// verified live (18 keyboard-trap fixes, 6 broken upload/toggle controls,
+// LcsFormField's htmlFor wiring — see git history caa0e08/5e12e60 and
+// SECURITY-CHECKLIST.md §9). Explicitly does NOT claim WCAG conformance:
+// 226 of the original 229 raw unlabeled-input defects found by the same
+// audit remain open (including on the public /tools/* calculators), one
+// known text-contrast failure (#c9d0db, 1.55:1) is flagged but unfixed
+// across 16 files (ac64cf3), and no automated accessibility testing
+// exists at all (axe-core is an unused dependency; no CI check). All of
+// that is stated in the copy, not left implicit.
+//
+// Added 20 Sep 2026 (second pass): an "Infrastructure and practice"
+// section. Every vendor named (Cloudflare, Supabase, Stripe, Resend,
+// HubSpot) was checked against its own official trust/security page
+// before being named — only vendors with a real, checkable SOC 2/ISO/PCI
+// certification are listed. RLS coverage (140/140 public tables) was
+// queried live against the production database at the time of writing,
+// not carried over from CLAUDE.md's own already-once-stale figure. CSP
+// enforcement was confirmed by curling the live production response
+// headers. Strix: the repo's strix_runs/ directory and git history show
+// exactly ONE manual run (13 Sep 2026), no schedule, no CI integration —
+// its single finding was fictional (SECURITY-CHECKLIST.md §3). The copy
+// states this plainly and describes penetration testing as a standing
+// intent, not a cadence that doesn't exist. The upload-security-gate
+// edge function's real, deployed source was read directly: Check 2
+// (magic-byte file-type verification) is real and live; Check 3
+// (malware scanning) is a hardcoded stub that always returns "clean" —
+// scanner.ts's own header calls this out as NOT a real scanner and a
+// blocking pre-launch item. The copy accordingly states only the
+// file-type check as verified fact and flags malware scanning as a
+// separate, clearly-labeled "In progress" line — never blended into the
+// verified section. Same pass also corrected the pre-existing
+// "Encryption at rest and in transit" pillar: AES-256/TLS 1.3 are
+// independently confirmed (Supabase's own security docs; TLS 1.3
+// reconfirmed live via a real handshake against both
+// ldimninnjlvxozubheib.supabase.co and lengdon.com), but "Encryption
+// keys are managed per-room and rotated at close" was a fabricated
+// mechanism-specific claim — no per-room key-management or rotation
+// code exists anywhere in this codebase (confirmed by grep; the only
+// "key rotation"-shaped hits were CSS @keyframes false positives).
+// Removed and replaced with an accurate, sourced statement.
+//
+// Corrected 20 Sep 2026 (second pass, compliance audit): the
+// "Multi-factor authentication" pillar claimed "MFA is mandatory for all
+// participants in every room. There is no mechanism to disable it."
+// Both sentences false — verified live: auth.mfa_factors holds ZERO
+// enrolled factors across all 9 real users, and no MFA enrollment or
+// verification code exists anywhere in src/ (the only hits for
+// mfa/totp/aal2 were marketing copy and an unused input-otp UI
+// primitive). This was the THIRD fabricated security control found on
+// this page in one session, after the per-room key-rotation claim and
+// the sealed-export family — the shared cause each time is unreviewed
+// Figma-export boilerplate that reads as plausible infrastructure.
+// Retitled to "Individual authentication" and rewritten around what is
+// actually true (per-person named auth, no shared/company login, per-
+// user audit entries), with MFA's absence stated plainly as planned-
+// not-built. Pillar count unchanged at eight, so the section heading
+// still holds.
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
@@ -44,7 +104,7 @@ export const Route = createFileRoute("/product/security")({
 const PILLARS = [
   {
     title: "Encryption at rest and in transit",
-    body: "All data is encrypted using AES-256 at rest and TLS 1.3 in transit. Encryption keys are managed per-room and rotated at close. No Lengdon employee has access to transaction content.",
+    body: "All data is encrypted using AES-256 at rest and TLS 1.3 in transit, provided by our infrastructure providers (Cloudflare, Supabase) and confirmed independently against their own security documentation. No Lengdon employee has access to transaction content.",
   },
   {
     title: "Per-person NDA enforcement",
@@ -55,8 +115,8 @@ const PILLARS = [
     body: "Every action taken in a room is written to an append-only log. No entry can be deleted, modified, or reordered. Altering any earlier entry is detectable — the record makes tampering evident, not merely logged.",
   },
   {
-    title: "Multi-factor authentication",
-    body: "MFA is mandatory for all participants in every room. There is no mechanism to disable it. Authentication events are recorded individually in the audit log.",
+    title: "Individual authentication",
+    body: "Every participant authenticates as a named individual — there is no shared or company-level login, and access is granted per person, never per organisation. Authentication events are recorded individually in the audit log. Multi-factor authentication is not yet available; it is planned before signups open to the public, and we say so rather than imply a control that isn't there.",
   },
   {
     title: "Role-scoped access",
@@ -165,6 +225,60 @@ function Security() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-5 h-px bg-[#0a2540]/30" />
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Accessibility</span>
+          </div>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-6">
+            WE TEST IT BY<br />USING IT.
+          </h2>
+          <div className="max-w-[720px] flex flex-col gap-5">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              We build every internal control from a shared component set, and we verify it by operating it — tabbing to a control, pressing Enter or Space, confirming a screen reader would have something to say about it. That has already caught real problems: an admin toggle with no keyboard access, five document-upload controls a keyboard user couldn't operate at all, and a shared form-field component whose labels weren't wired to their inputs.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's fixed today:</span> every custom interactive control we've audited — elements standing in for buttons, sortable table headers, drag-and-drop cards — now exposes a real role, keyboard focus, and a keyboard-triggerable action. Every form built from our shared field component has its label programmatically tied to its input, verified by confirming that keyboard focus actually moves when the label is activated.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's still open:</span> that fix hasn't reached every form yet — a number of individual fields, including on our public calculators, still need labels wired by hand. We also have one known colour-contrast gap on a secondary text style that we've found but not corrected everywhere it appears. We don't run automated accessibility testing yet; everything above was found by manually operating the product, which is thorough but slower than we'd like, and we're working to add that automation rather than rely on manual checks indefinitely.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              We're not claiming WCAG conformance. We're telling you what we've verified, what we haven't gotten to, and that a control nobody can operate with a keyboard is a defect here, not a nice-to-have.
+            </p>
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-5 h-px bg-[#0a2540]/30" />
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Infrastructure &amp; Practice</span>
+          </div>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-6">
+            WHAT WE RUN ON,<br />AND HOW WE CHECK IT.
+          </h2>
+          <div className="max-w-[720px] flex flex-col gap-5">
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              Our infrastructure runs on SOC 2 Type II and ISO 27001–certified providers: Cloudflare (network, edge, hosting) and Supabase (database, authentication, storage). Payment processing runs through Stripe, which holds PCI DSS Level 1 certification and SOC 2 Type II. Email delivery and CRM run through Resend and HubSpot, both SOC 2 Type II certified.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              Every table in our database enforces row-level security — 140 of 140, checked directly against the live database, not assumed from documentation. Our production traffic runs behind a Content Security Policy with a unique cryptographic value per page load, verified to block a real attempt at unauthorized script injection, not just left unconfigured. Every code change passes an automated build and type-check gate before it ships, plus a dependency vulnerability scan on every commit.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              Every uploaded document is checked against its actual file content, not just its filename — a file whose real format doesn't match what it claims to be is rejected and removed automatically.
+            </p>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              We do not yet run a scheduled, automated penetration-testing program. We've run one manual automated scan to date — it produced a false finding that we caught by attempting to reproduce it, which is now a standing rule in how we evaluate security tooling internally. We treat penetration testing as a standing practice, not a one-time event, and are expanding its frequency and scope as the platform grows.
+            </p>
+            <div className="border-t border-[#e6e9ef] pt-5 mt-1">
+              <p style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px] tracking-[0.02em] uppercase mb-2">In progress</p>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+                Malware scanning on uploaded documents is planned but not yet built. Signups are closed during this phase, which is the reason this can wait — it is not a claim that scanning is already in place today.
+              </p>
             </div>
           </div>
         </section>

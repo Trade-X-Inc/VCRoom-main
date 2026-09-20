@@ -649,7 +649,13 @@ function ListView({ entries, advancing, onAdvance, onDecision }: {
   const toggleSort = (col: typeof sortCol) => { if (sortCol === col) setSortDir((d) => (d === 1 ? -1 : 1)); else { setSortCol(col); setSortDir(1); } };
 
   const th = (col: typeof sortCol, label: string) => (
-    <th onClick={() => toggleSort(col)} style={{ padding: "8px 12px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: sortCol === col ? "#A855F7" : "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
+    <th
+      onClick={() => toggleSort(col)}
+      role="button"
+      tabIndex={0}
+      aria-sort={sortCol === col ? (sortDir === 1 ? "ascending" : "descending") : "none"}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSort(col); } }}
+      style={{ padding: "8px 12px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: sortCol === col ? "#A855F7" : "var(--color-muted-foreground)", textTransform: "uppercase" as const, letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap" as const, borderBottom: "1px solid var(--color-border)", background: "var(--color-card)" }}>
       {label}{sortCol === col ? (sortDir === 1 ? " ↑" : " ↓") : ""}
     </th>
   );

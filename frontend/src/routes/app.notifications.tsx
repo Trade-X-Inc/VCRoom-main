@@ -194,10 +194,11 @@ function NotificationsPage() {
             {list.map((n, i) => {
               const Icon = iconFor(n.kind);
               const tone = toneFor(n.kind);
+              const RowTag = n.action_url ? "div" : "button";
               const row = (
-                <div
-                  onClick={() => { if (!n.read) markRead(n.id); }}
-                  className="flex gap-4 px-5 py-4 cursor-pointer"
+                <RowTag
+                  {...(!n.action_url ? { type: "button" as const, onClick: () => { if (!n.read) markRead(n.id); } } : {})}
+                  className="flex gap-4 px-5 py-4 cursor-pointer w-full text-left"
                   style={{
                     borderTop: i > 0 ? "1px solid var(--lcs-line)" : undefined,
                     background: !n.read ? "var(--lcs-progress-wash)" : "transparent",
@@ -224,7 +225,7 @@ function NotificationsPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </RowTag>
               );
 
               return n.action_url ? (

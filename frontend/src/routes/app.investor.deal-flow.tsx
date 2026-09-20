@@ -377,6 +377,10 @@ export function DealFlowPage() {
                   <tr
                     key={room.id}
                     onClick={() => navigate({ to: "/app/deal-rooms/$id", params: { id: room.id } })}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${room.company || "Deal room"} — open deal room`}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate({ to: "/app/deal-rooms/$id", params: { id: room.id } }); } }}
                     style={{ height: 44, borderBottom: "1px solid var(--lcs-line)", cursor: "pointer" }}
                     className="hover:bg-accent/30 transition-colors"
                   >

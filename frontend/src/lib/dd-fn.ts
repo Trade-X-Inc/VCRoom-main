@@ -375,8 +375,17 @@ Respond with ONLY valid JSON: {"contains": true} or {"contains": false}`;
     }
 
     // ── Per-item matching ────────────────────────────────────────────────────
+    // NOTE: deal_room_id/category/label are carried through even though they
+    // never change here — PostgREST upserts via INSERT ... ON CONFLICT DO
+    // UPDATE, and Postgres validates NOT NULL constraints against the INSERT
+    // row before ON CONFLICT ever redirects it, so omitting these (all
+    // NOT NULL on this table) throws 23502 on every call. Verified live in a
+    // rolled-back transaction against a real row before shipping this fix.
     const updates: Array<{
       id: string;
+      deal_room_id: string;
+      category: string;
+      label: string;
       auto_detected: boolean;
       auto_source: string | null;
       auto_source_label: string | null;
@@ -416,22 +425,17 @@ Respond with ONLY valid JSON: {"contains": true} or {"contains": false}`;
       }
 
       if (match) {
-        updates.push({ id: item.id, auto_detected: true, auto_source: match.source, auto_source_label: match.label, checked: true });
+        updates.push({ id: item.id, deal_room_id: data.dealRoomId, category: item.category, label: item.label, auto_detected: true, auto_source: match.source, auto_source_label: match.label, checked: true });
         detected.push({ label: item.label, source: match.source, sourceLabel: match.label });
       } else {
-        updates.push({ id: item.id, auto_detected: false, auto_source: null, auto_source_label: null, checked: false });
+        updates.push({ id: item.id, deal_room_id: data.dealRoomId, category: item.category, label: item.label, auto_detected: false, auto_source: null, auto_source_label: null, checked: false });
       }
     }
 
-    // Batch update all items
-    for (const u of updates) {
-      const { error: updErr } = await sb.from("dd_checklist_items").update({
-        auto_detected: u.auto_detected,
-        auto_source: u.auto_source,
-        auto_source_label: u.auto_source_label,
-        checked: u.checked,
-      }).eq("id", u.id);
-      if (updErr) console.error("[dd-fn] item update failed:", updErr.message);
+    // Batch update all items in a single upsert (was N sequential UPDATEs)
+    if (updates.length > 0) {
+      const { error: updErr } = await sb.from("dd_checklist_items").upsert(updates);
+      if (updErr) console.error("[dd-fn] batch item update failed:", updErr.message);
     }
 
     return { detected };
