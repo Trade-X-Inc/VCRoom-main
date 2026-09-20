@@ -450,6 +450,10 @@ function TaskCard({ task, onDragStart, onClick }: {
       draggable
       onDragStart={onDragStart}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`${task.title} — open task`}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
       className="p-3 cursor-grab active:cursor-grabbing transition-colors"
       style={{ background: "var(--lcs-white)", border: "1px solid var(--lcs-line)" }}
     >

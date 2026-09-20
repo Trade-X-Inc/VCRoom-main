@@ -793,15 +793,17 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       <>
       {/* How it works — collapsible */}
       <div className="mb-6 p-5" style={{ border: "1px solid var(--lcs-line)" }}>
-        <div
-          className="flex items-center justify-between cursor-pointer"
+        <button
+          type="button"
+          className="flex items-center justify-between cursor-pointer w-full text-left"
           onClick={() => setShowInstructions(prev => !prev)}
+          aria-expanded={showInstructions}
         >
           <div className="flex items-center gap-2">
             <span className="text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>How your document workspace works</span>
           </div>
           <span className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{showInstructions ? "Hide" : "Show"}</span>
-        </div>
+        </button>
         {showInstructions && (
           <div className="mt-4 grid sm:grid-cols-3 gap-4">
             {[

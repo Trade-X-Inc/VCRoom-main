@@ -594,19 +594,20 @@ export function StartupsPage() {
                     const slug = startup?.profile_slug ?? null;
                     const badge = l.status === "New" ? "Pending founder response" : l.status === "Replied" ? "Connected" : l.status === "Rejected" ? "Declined" : l.status;
                     const badgeCls = l.status === "New" ? "bg-amber-500/10 text-amber-600" : l.status === "Replied" ? "bg-success/10 text-success" : l.status === "Rejected" ? "bg-destructive/10 text-destructive" : "bg-muted/10 text-muted-foreground";
+                    const CardTag = slug ? "button" : "div";
                     return (
-                      <div
+                      <CardTag
                         key={l.id}
-                        onClick={() => slug && navigate({ to: "/p/$slug", params: { slug } })}
+                        {...(slug ? { type: "button" as const, onClick: () => navigate({ to: "/p/$slug", params: { slug } }) } : {})}
                         title={slug ? undefined : "No Lengdon profile — add their details manually"}
-                        className="rounded-2xl bg-card p-5 group relative overflow-hidden transition-all"
+                        className="w-full text-left rounded-2xl bg-card p-5 group relative overflow-hidden transition-all"
                         style={{
                           border: "1px solid var(--border)",
                           cursor: slug ? "pointer" : "default",
                           transition: "border-color 0.15s, box-shadow 0.15s",
                         }}
-                        onMouseEnter={(e) => { if (slug) { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(124,58,237,0.4)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 0 0 1px rgba(124,58,237,0.15)"; } }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
+                        onMouseEnter={(e) => { if (slug) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.4)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 1px rgba(124,58,237,0.15)"; } }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-3 min-w-0">
@@ -636,7 +637,7 @@ export function StartupsPage() {
                             </span>
                           )}
                         </div>
-                      </div>
+                      </CardTag>
                     );
                   })}
                 </div>
@@ -684,10 +685,16 @@ export function StartupsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
-                {filteredWatchlist.map((c: any) => (
+                {filteredWatchlist.map((c: any) => {
+                  const openRow = () => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c);
+                  return (
                   <tr
                     key={c.id}
-                    onClick={() => c.profile_slug ? navigate({ to: "/p/$slug", params: { slug: c.profile_slug } }) : setSelectedWatchlist(c)}
+                    onClick={openRow}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${c.company_name || "Company"} — open details`}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openRow(); } }}
                     className="transition-colors group"
                     style={{ cursor: "pointer", height: 44 }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = c.profile_slug ? "rgba(124,58,237,0.06)" : ""; }}
@@ -750,7 +757,8 @@ export function StartupsPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -1365,15 +1373,17 @@ function StartupCsvImportModal({
 
         <div className="px-6 py-5 space-y-4">
           {!mapped && (
-            <div
+            <button
+              type="button"
               onClick={() => fileRef.current?.click()}
-              className="rounded-none border border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-10 text-center cursor-pointer transition-all"
+              aria-label="Click to select a CSV file. Download the sample CSV first to see the expected format."
+              className="w-full rounded-none border border-dashed border-border/60 bg-muted/30 hover:bg-accent/40 hover:border-brand/50 p-10 text-center cursor-pointer transition-all"
             >
               <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
               <p className="text-sm font-medium">Click to select a CSV file</p>
               <p className="text-xs text-muted-foreground mt-1">Download the sample CSV first to see the expected format</p>
-              <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFile} />
-            </div>
+              <input ref={fileRef} type="file" accept=".csv" className="hidden" tabIndex={-1} aria-hidden="true" onChange={handleFile} />
+            </button>
           )}
 
           {mapped && (

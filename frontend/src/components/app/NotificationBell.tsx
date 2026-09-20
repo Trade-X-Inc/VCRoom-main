@@ -184,16 +184,17 @@ export function NotificationBell() {
                 if (!n.read) await markOneRead(n.id);
                 setOpen(false);
               };
+              const ContentTag = n.action_url ? "div" : "button";
               const content = (
-                <div
-                  className="flex gap-3 p-3.5 transition-colors cursor-pointer"
+                <ContentTag
+                  {...(!n.action_url ? { type: "button" as const, onClick: handleClick } : {})}
+                  className="flex gap-3 p-3.5 transition-colors cursor-pointer w-full text-left"
                   style={{
                     borderTop: i === 0 ? "none" : "1px solid var(--v2-rule-light)",
                     borderInlineStart: !n.read ? "3px solid var(--v2-accent)" : "3px solid transparent",
                   }}
-                  onClick={!n.action_url ? handleClick : undefined}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--v2-accent-wash)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  onMouseEnter={(e: React.MouseEvent<HTMLElement>) => { e.currentTarget.style.background = "var(--v2-accent-wash)"; }}
+                  onMouseLeave={(e: React.MouseEvent<HTMLElement>) => { e.currentTarget.style.background = "transparent"; }}
                 >
                   <div
                     className="grid h-8 w-8 place-items-center shrink-0"
@@ -219,7 +220,7 @@ export function NotificationBell() {
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                     </div>
                   </div>
-                </div>
+                </ContentTag>
               );
               // Absolute URLs (e.g. invite links) can't go through the router
               return n.action_url ? (

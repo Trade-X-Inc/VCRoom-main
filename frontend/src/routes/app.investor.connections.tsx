@@ -79,11 +79,12 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
   const isNew = row.auto_added && !row.seen_by_investor;
   const statusStyle = STATUS_COLORS[row.status] ?? STATUS_COLORS.Watching;
 
+  const RowTag = isNew ? "button" : "div";
   return (
-    <div
+    <RowTag
+      {...(isNew ? { type: "button" as const, onClick: () => onMarkSeen(row.id), "aria-label": `${row.company_name} — mark as seen` } : {})}
       style={{ background: "var(--hs-bg-secondary)", border: `1px solid ${isNew ? "rgba(124,58,237,0.35)" : "var(--hs-border)"}`, borderRadius: 10, padding: "12px 16px", cursor: isNew ? "pointer" : "default" }}
-      onClick={() => { if (isNew) onMarkSeen(row.id); }}
-      className="flex items-center gap-3 transition-colors"
+      className="flex items-center gap-3 transition-colors w-full text-left"
     >
       {/* New dot */}
       {isNew && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--gradient-brand)", flexShrink: 0 }} title="New — auto-added via invite link" />}
@@ -127,7 +128,7 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
       )}
 
       {!isNew && <ChevronRight className="h-4 w-4 text-faint flex-shrink-0" />}
-    </div>
+    </RowTag>
   );
 }
 
