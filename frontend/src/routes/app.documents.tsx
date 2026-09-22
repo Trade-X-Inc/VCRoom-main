@@ -12,8 +12,25 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus } from "@/components/lcs";
 
-const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg"]);
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+// Upload-security gate — must run after every insert/upsert into
+// founder_documents, before the row's scan_status default of 'pending'
+// is treated as usable. Awaited, never fire-and-forget: a client that
+// doesn't call this leaves scan_status stuck at 'pending' forever, and
+// the read query below filters on scan_status='clean' — a row this gate
+// never resolves simply never appears, by design, not by omission.
+async function runUploadSecurityGate(documentId: string, table: "founder_documents" | "documents") {
+  const { data, error } = await supabase.functions.invoke("upload-security-gate", {
+    body: { documentId, table },
+  });
+  if (error) {
+    console.error("[upload-security-gate]", error);
+    return { ok: false as const };
+  }
+  return data as { ok: boolean; verdict?: string; reason?: string };
+}
 
 export const Route = createFileRoute("/app/documents")({
   // R9: relocated to Prepare › IP Vault — old URL redirects to the default leaf.
@@ -315,10 +332,14 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     queryKey: ["founder-documents", startup?.id],
     enabled: !!startup?.id,
     queryFn: async () => {
+      // scan_status='clean' only — a row still 'pending' (gate hasn't
+      // resolved yet) or 'quarantined' (failed and removed) must never
+      // surface here as though it were a usable document.
       const { data } = await supabase
         .from("founder_documents")
         .select("*")
-        .eq("startup_id", startup!.id);
+        .eq("startup_id", startup!.id)
+        .eq("scan_status", "clean");
       return (data ?? []) as FounderDocument[];
     },
   });
@@ -413,7 +434,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         .from("documents")
         .upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
-      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+      const { data: upsertedDoc, error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: templateId,
         template_slug: templateSlug,
@@ -425,9 +446,25 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         content: {},
         completeness_score: 100,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "startup_id,template_slug" });
+      }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
-      toast.success(`${templateName} uploaded`);
+
+      // Upload-security gate — scan_status stays 'pending' (not surfaced,
+      // not usable) until this resolves. Awaited before any success
+      // messaging so the toast reflects what actually happened to the file.
+      const gateResult = upsertedDoc?.id
+        ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
+        : { ok: false as const };
+
+      if (gateResult.verdict === "quarantined") {
+        toast.error(
+          gateResult.reason === "malware"
+            ? "This file failed our security scan and was removed."
+            : `This file isn't a valid ${ext.toUpperCase()}.`,
+        );
+      } else {
+        toast.success(`${templateName} uploaded`);
+      }
       // Readiness-checklist refresh removed 18 Aug 2026 — Foundation §15/§25.
       // This fired generateFounderChecklist on every document upload, writing
       // an AI-generated 0-100 readiness score. Fire-and-forget with its own
@@ -485,7 +522,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const extractionSucceeded = !result.error && !!result.data;
       const category = result.data?.suggested_category ?? customCategory;
 
-      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+      const { data: upsertedDoc, error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: null,
         template_slug: slug,
@@ -499,10 +536,24 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           : { category, extraction_error: result.error || "Could not extract structured data from this document." },
         completeness_score: extractionSucceeded ? 100 : 0,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "startup_id,template_slug" });
+      }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
 
-      if (extractionSucceeded) {
+      // Upload-security gate — scan_status stays 'pending' (not surfaced,
+      // not usable) until this resolves. Awaited before any success
+      // messaging so the toast reflects what actually happened to the file.
+      const gateResult = upsertedDoc?.id
+        ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
+        : { ok: false as const };
+
+      if (gateResult.verdict === "quarantined") {
+        toast.error(
+          gateResult.reason === "malware"
+            ? "This file failed our security scan and was removed."
+            : `This file isn't a valid ${ext.toUpperCase()}.`,
+        );
+        setCustomExtractError(null);
+      } else if (extractionSucceeded) {
         toast.success(`${customTitle.trim()} uploaded and extracted`);
       } else {
         setCustomExtractError(result.error || "Could not extract structured data.");
@@ -525,7 +576,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         target_label: customTitle.trim(),
         detail: `Uploaded ${file.name}`,
       });
-      if (extractionSucceeded) {
+      if (extractionSucceeded && gateResult.verdict !== "quarantined") {
         setShowCustomUpload(false);
         setCustomTitle("");
         setCustomFile(null);
@@ -574,7 +625,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       const extractionSucceeded = !result.error && !!result.data;
       const title = result.data?.name ? `${result.data.name} — employee profile` : file.name;
 
-      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+      const { data: upsertedDoc, error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: null,
         template_slug: slug,
@@ -588,10 +639,24 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           : { category: "team", kind: "employee_one_pager", extraction_error: result.error || "Could not extract structured data from this document." },
         completeness_score: extractionSucceeded ? 100 : 0,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "startup_id,template_slug" });
+      }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
 
-      if (extractionSucceeded) {
+      // Upload-security gate — scan_status stays 'pending' (not surfaced,
+      // not usable) until this resolves. Awaited before any success
+      // messaging so the toast reflects what actually happened to the file.
+      const gateResult = upsertedDoc?.id
+        ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
+        : { ok: false as const };
+
+      if (gateResult.verdict === "quarantined") {
+        toast.error(
+          gateResult.reason === "malware"
+            ? "This file failed our security scan and was removed."
+            : `This file isn't a valid ${ext.toUpperCase()}.`,
+        );
+        setEmployeeExtractError(null);
+      } else if (extractionSucceeded) {
         toast.success(`${title} uploaded and extracted`);
       } else {
         setEmployeeExtractError(result.error || "Could not extract structured data.");
@@ -609,7 +674,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         target_label: title,
         detail: `Uploaded ${file.name}`,
       });
-      if (extractionSucceeded) {
+      if (extractionSucceeded && gateResult.verdict !== "quarantined") {
         setShowEmployeeUpload(false);
         setEmployeeFile(null);
       }
@@ -1056,7 +1121,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                             <input
                               type="file"
                               className="sr-only"
-                              accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv"
+                              accept=".pdf,.pptx,.ppt,.docx,.doc,.csv"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) handleFileUpload(template.slug, template.name, template.id, file);
@@ -1451,8 +1516,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
                 <label className="p-5 text-center cursor-pointer transition-colors block" style={{ border: "1px dashed var(--lcs-line)" }}>
                   <Upload className="h-5 w-5 mx-auto" style={{ color: "var(--lcs-ink-muted)" }} />
                   <div className="text-[13px] font-medium mt-2" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>{customFile ? customFile.name : "Choose a file"}</div>
-                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>PDF, DOCX, PPTX, XLSX, CSV · Max 50MB</div>
-                  <input type="file" accept=".pdf,.pptx,.ppt,.xlsx,.xls,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
+                  <div className="text-[12px] mt-0.5" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>PDF, DOCX, PPTX, CSV · Max 50MB</div>
+                  <input type="file" accept=".pdf,.pptx,.ppt,.docx,.doc,.csv" className="sr-only" onChange={(e) => e.target.files?.[0] && setCustomFile(e.target.files[0])} />
                 </label>
               </div>
               {customExtractError && (

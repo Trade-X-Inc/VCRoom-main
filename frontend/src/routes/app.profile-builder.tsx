@@ -283,12 +283,12 @@ function ProfileBuilder() {
   // ── Path A — Upload flow ───────────────────────────────────────────────────
 
   const addFiles = useCallback((incoming: FileList | File[]) => {
-    const allowed = ["pdf", "pptx", "ppt", "docx", "doc", "xlsx", "xls", "csv"];
+    const allowed = ["pdf", "pptx", "ppt", "docx", "doc", "csv"];
     const valid = Array.from(incoming).filter((f) => {
       const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
       return allowed.includes(ext);
     });
-    if (valid.length < incoming.length) toast.warning("Some files skipped — only PDF, PPTX, DOCX, XLSX, CSV allowed.");
+    if (valid.length < incoming.length) toast.warning("Some files skipped — only PDF, PPTX, DOCX, CSV allowed.");
     setUploadedFiles((prev) => {
       const names = new Set(prev.map((f) => f.name));
       return [...prev, ...valid.filter((f) => !names.has(f.name))];
@@ -957,7 +957,7 @@ function UploadScreen({
           Upload your documents
         </h2>
         <p style={{ fontSize: 13, color: "var(--lcs-ink-muted)", marginBottom: 28, fontFamily: "var(--font-lcs-ui)" }}>
-          PDF, PPTX, DOCX, or XLSX. Add as many as you like — we'll extract from all of them.
+          PDF, PPTX, or DOCX. Add as many as you like — we'll extract from all of them.
         </p>
 
         {/* Drop zone */}
@@ -993,7 +993,7 @@ function UploadScreen({
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv"
+          accept=".pdf,.pptx,.ppt,.docx,.doc,.csv"
           style={{ display: "none" }}
           tabIndex={-1}
           aria-hidden="true"

@@ -2,7 +2,7 @@ import { useState, useRef, type DragEvent } from "react";
 import { Upload, FileText, X, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","xlsx","xls","docx","doc","csv","png","jpg","jpeg","mp4","txt"]);
+const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg","mp4","txt"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 function validateFile(file: File): string | null {
@@ -79,7 +79,7 @@ function MismatchDialog({
 export function Dropzone({
   onFiles,
   title = "Drag & drop or click to upload",
-  hint = "Up to 50 MB · PDF, DOCX, XLSX, PPTX, PNG, JPG, CSV, TXT, MP4",
+  hint = "Up to 50 MB · PDF, DOCX, PPTX, PNG, JPG, CSV, TXT, MP4",
   dealRoomId,
   uploadedByRole,
   onUploadComplete,
@@ -110,15 +110,39 @@ export function Dropzone({
     storagePath: string,
     category: string,
   ) => {
-    const { error: insertError } = await supabase.from("documents").insert({
+    const { data: inserted, error: insertError } = await supabase.from("documents").insert({
       deal_room_id: dealRoomId,
       uploader_id: user!.id,
       storage_path: storagePath,
       category,
       status: "uploaded",
       ...(uploadedByRole ? { uploaded_by_role: uploadedByRole } : {}),
-    });
+    }).select("id").single();
     if (insertError) throw insertError;
+
+    // Upload-security gate — scan_status stays 'pending' (not surfaced by
+    // doc_list_room/library/investor, all of which filter scan_status='clean'
+    // server-side) until this resolves. Awaited before any success messaging.
+    const gateResult = inserted?.id
+      ? await (async () => {
+          const { data, error } = await supabase.functions.invoke("upload-security-gate", {
+            body: { documentId: inserted.id, table: "documents" as const },
+          });
+          if (error) { console.error("[upload-security-gate]", error); return { ok: false as const }; }
+          return data as { ok: boolean; verdict?: string; reason?: string };
+        })()
+      : { ok: false as const };
+
+    if (gateResult.verdict === "quarantined") {
+      const ext = nf.name.split(".").pop()?.toLowerCase() ?? "";
+      toast.error(
+        gateResult.reason === "malware"
+          ? "This file failed our security scan and was removed."
+          : `This file isn't a valid ${ext.toUpperCase()}.`,
+      );
+      setFiles((xs) => xs.filter((x) => x.id !== nf.id));
+      return;
+    }
 
     await logActivity(dealRoomId!, user!.id, "Uploaded a document", { filename: nf.name });
     setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 100 } : x));
@@ -244,7 +268,7 @@ export function Dropzone({
             className="hidden"
             tabIndex={-1}
             aria-hidden="true"
-            accept=".pdf,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
+            accept=".pdf,.docx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
             onChange={(e) => handleFiles(e.target.files)}
           />
         </button>

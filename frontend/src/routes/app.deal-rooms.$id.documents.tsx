@@ -30,8 +30,25 @@ export const Route = createFileRoute("/app/deal-rooms/$id/documents")({
   component: DocumentsPage,
 });
 
-const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf", "pptx", "ppt", "xlsx", "xls", "docx", "doc", "csv", "png", "jpg", "jpeg"]);
+const ALLOWED_UPLOAD_EXTENSIONS = new Set(["pdf", "pptx", "ppt", "docx", "doc", "csv", "png", "jpg", "jpeg"]);
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
+
+// Upload-security gate — must run after every doc_insert, before the row's
+// scan_status default of 'pending' is treated as usable. Awaited, never
+// fire-and-forget: a client that doesn't call this leaves scan_status stuck
+// at 'pending' forever, and every read of this table (docListRoom etc.)
+// filters on scan_status='clean' server-side, so an ungated row simply
+// never surfaces — by design, not by omission.
+async function runUploadSecurityGate(documentId: string, table: "founder_documents" | "documents") {
+  const { data, error } = await supabase.functions.invoke("upload-security-gate", {
+    body: { documentId, table },
+  });
+  if (error) {
+    console.error("[upload-security-gate]", error);
+    return { ok: false as const };
+  }
+  return data as { ok: boolean; verdict?: string; reason?: string };
+}
 
 const TEXT_EXTS = new Set(["pdf", "docx", "doc", "xlsx", "xls", "csv", "pptx", "ppt", "txt"]);
 
@@ -584,7 +601,7 @@ function DocumentsPage() {
               Documents shared here are visible to the investor and appear in their workstation automatically.
             </div>
             <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-              {["PDF", "PPTX", "DOCX", "XLSX", "CSV", "PNG/JPG"].map((ext) => (
+              {["PDF", "PPTX", "DOCX", "CSV", "PNG/JPG"].map((ext) => (
                 <span key={ext} className="border px-1.5 py-0.5 font-medium uppercase" style={{ borderColor: "var(--lcs-line)", color: "var(--lcs-ink-muted)", borderRadius: "var(--radius-lcs-control)", fontSize: "10px" }}>{ext}</span>
               ))}
               <span style={{ color: "var(--lcs-ink-muted)", fontSize: "11px" }}>Max 50 MB per file</span>
@@ -915,7 +932,7 @@ function DocumentsPage() {
               <input
                 type="file"
                 className="sr-only"
-                accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                accept=".pdf,.pptx,.ppt,.docx,.doc,.csv,.png,.jpg,.jpeg"
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file || !userId) return;
@@ -926,13 +943,33 @@ function DocumentsPage() {
                   const { error } = await supabase.storage.from("documents").upload(path, file);
                   if (error) { toast.error("Upload failed"); return; }
                   // uploader_id derived server-side from the token (not passed).
+                  let insertedId: string | null = null;
                   try {
-                    await callAction(docInsert, dealRoomId, {
+                    const inserted = await callAction<{ id?: string }>(docInsert, dealRoomId, {
                       dealRoomId, storagePath: path, fileName: file.name,
                       category: "Other", uploadedByRole: null, fileSize: file.size,
                     });
+                    insertedId = inserted?.id ?? null;
                   } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
+
+                  // Upload-security gate — scan_status stays 'pending' (not
+                  // surfaced by doc_list_room/library/investor, all of which
+                  // filter scan_status='clean' server-side) until this
+                  // resolves. Awaited before any success messaging.
+                  const gateResult = insertedId
+                    ? await runUploadSecurityGate(insertedId, "documents")
+                    : { ok: false as const };
+
                   queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                  if (gateResult.verdict === "quarantined") {
+                    toast.error(
+                      gateResult.reason === "malware"
+                        ? "This file failed our security scan and was removed."
+                        : `This file isn't a valid ${ext.toUpperCase()}.`,
+                    );
+                    e.target.value = "";
+                    return;
+                  }
                   toast.success("Uploaded");
                   e.target.value = "";
                   // §B — future migration group: deal_room_members read (deal-room-core group).
@@ -987,7 +1024,7 @@ function DocumentsPage() {
                     <input
                       type="file"
                       className="sr-only"
-                      accept=".pdf,.pptx,.ppt,.docx,.doc,.xlsx,.xls,.csv,.png,.jpg,.jpeg"
+                      accept=".pdf,.pptx,.ppt,.docx,.doc,.csv,.png,.jpg,.jpeg"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file || !userId) return;
@@ -998,13 +1035,34 @@ function DocumentsPage() {
                         const { error: upErr } = await supabase.storage.from("documents").upload(path, file);
                         if (upErr) { toast.error("Upload failed"); return; }
                         // uploader_id derived server-side from the token (not passed).
+                        let insertedId: string | null = null;
                         try {
-                          await callAction(docInsert, dealRoomId, {
+                          const inserted = await callAction<{ id?: string }>(docInsert, dealRoomId, {
                             dealRoomId, storagePath: path, fileName: file.name,
                             category: expected.category, uploadedByRole: null, fileSize: file.size,
                           });
+                          insertedId = inserted?.id ?? null;
                         } catch (insErr: any) { console.error("[docs] insert after upload failed:", insErr); toast.error("Upload failed — please try again."); return; }
+
+                        // Upload-security gate — scan_status stays 'pending'
+                        // (not surfaced by doc_list_room/library/investor,
+                        // all of which filter scan_status='clean' server-
+                        // side) until this resolves. Awaited before any
+                        // success messaging.
+                        const gateResult = insertedId
+                          ? await runUploadSecurityGate(insertedId, "documents")
+                          : { ok: false as const };
+
                         queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
+                        if (gateResult.verdict === "quarantined") {
+                          toast.error(
+                            gateResult.reason === "malware"
+                              ? "This file failed our security scan and was removed."
+                              : `This file isn't a valid ${ext.toUpperCase()}.`,
+                          );
+                          e.target.value = "";
+                          return;
+                        }
                         toast.success(`${file.name} uploaded`);
                         e.target.value = "";
                         // §B — future migration group: deal_room_members read (deal-room-core group).
