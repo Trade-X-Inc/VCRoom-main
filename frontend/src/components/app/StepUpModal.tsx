@@ -35,7 +35,17 @@ export function StepUpModal({
 }) {
   const [password, setPassword] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
+  // Focus-return-to-trigger is handled by useStepUpGate (restoreFocus),
+  // NOT here. Originally captured document.activeElement in this effect,
+  // keyed on `open` — but every real call site disables its trigger button
+  // (setBusy/setGenerating) before the async gate that eventually flips
+  // `open` true, and a disabled element loses focus in most browsers by
+  // then. Found live in the focus-trap adversarial test: Escape returned
+  // focus to <body>, not the clicked button. useStepUpGate.wrapGated()
+  // captures the trigger as its own first synchronous statement instead,
+  // before any state update can disable/blur it.
   useEffect(() => {
     if (open) {
       setPassword("");
@@ -43,12 +53,48 @@ export function StepUpModal({
       // immediately retype — never leaves them clicking back into the field.
       requestAnimationFrame(() => inputRef.current?.focus());
     }
-  }, [open, error]);
+  }, [open]);
+
+  // Re-focus the password field after an error re-render specifically
+  // (not on every open — that's the effect above), same "never leaves them
+  // clicking back into the field" guarantee.
+  useEffect(() => {
+    if (open && error) requestAnimationFrame(() => inputRef.current?.focus());
+  }, [error]);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !busy) onCancel();
+      if (e.key === "Escape" && !busy) {
+        onCancel();
+        return;
+      }
+      // Focus trap: Tab/Shift+Tab cycle within the modal's own focusable
+      // elements only. Queried live on every keypress rather than cached,
+      // since which buttons are enabled/disabled changes with `busy` and
+      // `password` — a stale list would trap focus on a now-disabled
+      // element. querySelectorAll order matches DOM order, which matches
+      // visual/tab order here (no explicit tabIndex overrides in this
+      // component), so this doesn't need its own sort.
+      if (e.key === "Tab" && panelRef.current) {
+        const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+          'input:not(:disabled), button:not(:disabled), [href], select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        if (e.shiftKey && active === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+        // Any other Tab (moving between two enabled elements already
+        // inside the modal) is left alone — native tab order handles it.
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -68,6 +114,11 @@ export function StepUpModal({
       onClick={() => !busy && onCancel()}
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="step-up-title"
+        aria-describedby="step-up-description"
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-sm bg-white"
         style={{
@@ -87,10 +138,10 @@ export function StepUpModal({
             <Lock style={{ width: 16, height: 16, color: "#57544E" }} />
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#1a1a19" }}>
+            <div id="step-up-title" style={{ fontSize: 14, fontWeight: 600, color: "#1a1a19" }}>
               Confirm your password
             </div>
-            <div style={{ fontSize: 12.5, color: "#6b6862", marginTop: 1 }}>
+            <div id="step-up-description" style={{ fontSize: 12.5, color: "#6b6862", marginTop: 1 }}>
               This action requires re-entering your password.
             </div>
           </div>
