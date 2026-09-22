@@ -95,6 +95,8 @@ const COLS: { heading: string; items: FooterLink[] }[] = [
       { label: "Legal overview", to: "/legal" },
       { label: "Privacy Policy", to: "/legal/privacy" },
       { label: "Terms of Service", to: "/legal/terms" },
+      { label: "Cookie Policy", to: "/legal/cookies" },
+      { label: "Refund Terms", to: "/legal/refunds" },
       { label: "DPA", to: "/legal/dpa" },
       { label: "Sub-processors", to: "/legal/sub-processors" },
       { label: "Acceptable Use", to: "/legal/acceptable-use" },

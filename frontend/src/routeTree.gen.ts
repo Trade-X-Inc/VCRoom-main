@@ -46,8 +46,10 @@ import { Route as ProductHowItWorksRouteImport } from './routes/product.how-it-w
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalSubProcessorsRouteImport } from './routes/legal.sub-processors'
+import { Route as LegalRefundsRouteImport } from './routes/legal.refunds'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as LegalDpaRouteImport } from './routes/legal.dpa'
+import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalAcceptableUseRouteImport } from './routes/legal.acceptable-use'
 import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
 import { Route as ISlugRouteImport } from './routes/i.$slug'
@@ -382,6 +384,11 @@ const LegalSubProcessorsRoute = LegalSubProcessorsRouteImport.update({
   path: '/legal/sub-processors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalRefundsRoute = LegalRefundsRouteImport.update({
+  id: '/legal/refunds',
+  path: '/legal/refunds',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   id: '/legal/privacy',
   path: '/legal/privacy',
@@ -390,6 +397,11 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
 const LegalDpaRoute = LegalDpaRouteImport.update({
   id: '/legal/dpa',
   path: '/legal/dpa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/legal/cookies',
+  path: '/legal/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalAcceptableUseRoute = LegalAcceptableUseRouteImport.update({
@@ -1236,8 +1248,10 @@ export interface FileRoutesByFullPath {
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/legal/acceptable-use': typeof LegalAcceptableUseRoute
+  '/legal/cookies': typeof LegalCookiesRoute
   '/legal/dpa': typeof LegalDpaRoute
   '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/refunds': typeof LegalRefundsRoute
   '/legal/sub-processors': typeof LegalSubProcessorsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
@@ -1421,8 +1435,10 @@ export interface FileRoutesByTo {
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/legal/acceptable-use': typeof LegalAcceptableUseRoute
+  '/legal/cookies': typeof LegalCookiesRoute
   '/legal/dpa': typeof LegalDpaRoute
   '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/refunds': typeof LegalRefundsRoute
   '/legal/sub-processors': typeof LegalSubProcessorsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
@@ -1610,8 +1626,10 @@ export interface FileRoutesById {
   '/i/$slug': typeof ISlugRoute
   '/join-investor/$token': typeof JoinInvestorTokenRoute
   '/legal/acceptable-use': typeof LegalAcceptableUseRoute
+  '/legal/cookies': typeof LegalCookiesRoute
   '/legal/dpa': typeof LegalDpaRoute
   '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/refunds': typeof LegalRefundsRoute
   '/legal/sub-processors': typeof LegalSubProcessorsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
@@ -1800,8 +1818,10 @@ export interface FileRouteTypes {
     | '/i/$slug'
     | '/join-investor/$token'
     | '/legal/acceptable-use'
+    | '/legal/cookies'
     | '/legal/dpa'
     | '/legal/privacy'
+    | '/legal/refunds'
     | '/legal/sub-processors'
     | '/legal/terms'
     | '/p/$slug'
@@ -1985,8 +2005,10 @@ export interface FileRouteTypes {
     | '/i/$slug'
     | '/join-investor/$token'
     | '/legal/acceptable-use'
+    | '/legal/cookies'
     | '/legal/dpa'
     | '/legal/privacy'
+    | '/legal/refunds'
     | '/legal/sub-processors'
     | '/legal/terms'
     | '/p/$slug'
@@ -2173,8 +2195,10 @@ export interface FileRouteTypes {
     | '/i/$slug'
     | '/join-investor/$token'
     | '/legal/acceptable-use'
+    | '/legal/cookies'
     | '/legal/dpa'
     | '/legal/privacy'
+    | '/legal/refunds'
     | '/legal/sub-processors'
     | '/legal/terms'
     | '/p/$slug'
@@ -2344,8 +2368,10 @@ export interface RootRouteChildren {
   ISlugRoute: typeof ISlugRoute
   JoinInvestorTokenRoute: typeof JoinInvestorTokenRoute
   LegalAcceptableUseRoute: typeof LegalAcceptableUseRoute
+  LegalCookiesRoute: typeof LegalCookiesRoute
   LegalDpaRoute: typeof LegalDpaRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalRefundsRoute: typeof LegalRefundsRoute
   LegalSubProcessorsRoute: typeof LegalSubProcessorsRoute
   LegalTermsRoute: typeof LegalTermsRoute
   PSlugRoute: typeof PSlugRoute
@@ -2647,6 +2673,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalSubProcessorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/refunds': {
+      id: '/legal/refunds'
+      path: '/legal/refunds'
+      fullPath: '/legal/refunds'
+      preLoaderRoute: typeof LegalRefundsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/privacy': {
       id: '/legal/privacy'
       path: '/legal/privacy'
@@ -2659,6 +2692,13 @@ declare module '@tanstack/react-router' {
       path: '/legal/dpa'
       fullPath: '/legal/dpa'
       preLoaderRoute: typeof LegalDpaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/legal/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/acceptable-use': {
@@ -4018,8 +4058,10 @@ const rootRouteChildren: RootRouteChildren = {
   ISlugRoute: ISlugRoute,
   JoinInvestorTokenRoute: JoinInvestorTokenRoute,
   LegalAcceptableUseRoute: LegalAcceptableUseRoute,
+  LegalCookiesRoute: LegalCookiesRoute,
   LegalDpaRoute: LegalDpaRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalRefundsRoute: LegalRefundsRoute,
   LegalSubProcessorsRoute: LegalSubProcessorsRoute,
   LegalTermsRoute: LegalTermsRoute,
   PSlugRoute: PSlugRoute,
