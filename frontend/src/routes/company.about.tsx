@@ -89,7 +89,7 @@ function About() {
           <div className="flex flex-col gap-0 border border-[#e6e9ef]">
             {PRINCIPLES.map((p, i) => (
               <div key={p.num} className={`flex gap-8 p-8 bg-white ${i < PRINCIPLES.length - 1 ? "border-b border-[#e6e9ef]" : ""}`}>
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#c9d0db] text-[11px] tracking-[2px] w-8 shrink-0 pt-1">{p.num}</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] w-8 shrink-0 pt-1">{p.num}</span>
                 <div>
                   <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.4px] mb-3">{p.title}</h3>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">{p.body}</p>

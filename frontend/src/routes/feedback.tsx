@@ -98,7 +98,7 @@ function Feedback() {
                     <textarea rows={6} placeholder="Describe your feedback or complaint in as much detail as possible..."
                       value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors resize-none" />
+                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors resize-none" />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
@@ -106,7 +106,7 @@ function Feedback() {
                     <input type="email" placeholder="your@email.com"
                       value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors" />
+                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
                   </div>
 
                   <label className="flex items-center gap-3 cursor-pointer">

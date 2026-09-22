@@ -43,11 +43,22 @@ import { PageHero } from "@/components/site/PageHero";
 // LcsFormField's htmlFor wiring — see git history caa0e08/5e12e60 and
 // SECURITY-CHECKLIST.md §9). Explicitly does NOT claim WCAG conformance:
 // 226 of the original 229 raw unlabeled-input defects found by the same
-// audit remain open (including on the public /tools/* calculators), one
-// known text-contrast failure (#c9d0db, 1.55:1) is flagged but unfixed
-// across 16 files (ac64cf3), and no automated accessibility testing
-// exists at all (axe-core is an unused dependency; no CI check). All of
-// that is stated in the copy, not left implicit.
+// audit remain open (including on the public /tools/* calculators). All
+// of that is stated in the copy, not left implicit.
+//
+// Updated 22 Sep 2026: the #c9d0db/#94a3b8 (INK_FAINT) text-contrast
+// failure this comment used to name (1.55:1 / 2.56:1 against white,
+// across every text-role occurrence in 18 files) is fixed — both
+// swapped to #64748b (4.76:1), already this codebase's established
+// caption-text color elsewhere. Non-text occurrences (background,
+// border, SVG stroke) were deliberately left unchanged — verified they
+// were never using INK_FAINT in the first place, so no split constant
+// was needed. axe-core is also no longer unused: @axe-core/playwright
+// runs report-only in CI (tests/a11y-scan.spec.ts) against 5
+// unauthenticated routes — a starting scope, not full coverage, and
+// still no gate (a violation doesn't fail the build). The copy above
+// was updated in the same pass so it doesn't assert a gap that's
+// already closed, or omit that automated scanning now exists.
 //
 // Added 20 Sep 2026 (second pass): an "Infrastructure and practice"
 // section. Every vendor named (Cloudflare, Supabase, Stripe, Resend,
@@ -257,7 +268,7 @@ function Security() {
               <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's fixed today:</span> every custom interactive control we've audited — elements standing in for buttons, sortable table headers, drag-and-drop cards — now exposes a real role, keyboard focus, and a keyboard-triggerable action. Every form built from our shared field component has its label programmatically tied to its input, verified by confirming that keyboard focus actually moves when the label is activated.
             </p>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's still open:</span> that fix hasn't reached every form yet — a number of individual fields, including on our public calculators, still need labels wired by hand. We also have one known colour-contrast gap on a secondary text style that we've found but not corrected everywhere it appears. We don't run automated accessibility testing yet; everything above was found by manually operating the product, which is thorough but slower than we'd like, and we're working to add that automation rather than rely on manual checks indefinitely.
+              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">What's still open:</span> that fix hasn't reached every form yet — a number of individual fields, including on our public calculators, still need labels wired by hand. Everything above was found by manually operating the product; we've since added an automated accessibility scan to our build pipeline as a second check, not a replacement for it.
             </p>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
               We're not claiming WCAG conformance. We're telling you what we've verified, what we haven't gotten to, and that a control nobody can operate with a keyboard is a defect here, not a nice-to-have.

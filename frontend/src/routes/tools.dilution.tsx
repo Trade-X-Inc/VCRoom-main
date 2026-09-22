@@ -68,7 +68,7 @@ function Dilution() {
                   <div key={i} className="border border-[#e6e9ef] p-5 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <input value={r.name} onChange={(e) => updateRound(i, "name", e.target.value)} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[15px] tracking-[-0.3px] focus:outline-none border-b border-transparent focus:border-[#e6e9ef] pb-0.5" />
-                      <button onClick={() => setRounds((p) => p.filter((_, idx) => idx !== i))} className="text-[#c9d0db] hover:text-red-400 text-[18px] transition-colors">×</button>
+                      <button onClick={() => setRounds((p) => p.filter((_, idx) => idx !== i))} className="text-[#64748b] hover:text-red-400 text-[18px] transition-colors">×</button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1">

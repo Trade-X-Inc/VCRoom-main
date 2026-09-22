@@ -28,7 +28,7 @@ const FONT_INTER = "'Inter:Regular', sans-serif";
 
 const INK = "#0a2540";
 const INK_MUTED = "#425466";
-const INK_FAINT = "#94a3b8";
+const INK_FAINT = "#64748b";
 const RULE = "#e6e9ef";
 
 type NavLink = { label: string; to: string; desc: string };
@@ -148,6 +148,7 @@ export function SiteHeader() {
       </a>
 
       <nav
+        aria-label="Primary"
         className={`sticky top-0 z-50 transition-all duration-400 ${scrolled ? "bg-white/98 backdrop-blur-sm" : "bg-white"}`}
         style={{ borderBottom: `1px solid ${RULE}` }}
       >

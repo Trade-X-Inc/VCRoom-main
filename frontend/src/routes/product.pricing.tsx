@@ -286,23 +286,23 @@ function Pricing() {
                     every line stays future-tense. */}
                 {(plan.roadmapFeatures?.length || plan.aiFeature) && (
                   <div className={`flex flex-col gap-1 flex-1 mb-8 border-t border-dashed pt-6 ${plan.primary ? "border-white/15" : "border-[#cbd5e1]"}`}>
-                    <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[10px] tracking-[1.5px] uppercase mb-2 ${plan.primary ? "text-white/40" : "text-[#94a3b8]"}`}>
+                    <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[10px] tracking-[1.5px] uppercase mb-2 ${plan.primary ? "text-white/40" : "text-[#64748b]"}`}>
                       Coming soon
                     </div>
                     {plan.roadmapFeatures?.map((f) => (
                       <div key={f} className="flex items-start gap-3">
-                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 mt-0.5 ${plan.primary ? "text-white/30" : "text-[#94a3b8]"}`} style={{ fontSize: 11 }}>
+                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 mt-0.5 ${plan.primary ? "text-white/30" : "text-[#64748b]"}`} style={{ fontSize: 11 }}>
                           →
                         </div>
-                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12.5px] leading-[1.5] ${plan.primary ? "text-white/45" : "text-[#94a3b8]"}`}>{f}</span>
+                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12.5px] leading-[1.5] ${plan.primary ? "text-white/45" : "text-[#64748b]"}`}>{f}</span>
                       </div>
                     ))}
                     {plan.aiFeature && (
                       <div className="flex items-start gap-3">
-                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 mt-0.5 ${plan.primary ? "text-white/30" : "text-[#94a3b8]"}`} style={{ fontSize: 11 }}>
+                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 mt-0.5 ${plan.primary ? "text-white/30" : "text-[#64748b]"}`} style={{ fontSize: 11 }}>
                           →
                         </div>
-                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12.5px] leading-[1.5] ${plan.primary ? "text-white/45" : "text-[#94a3b8]"}`}>{plan.aiFeature}</span>
+                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12.5px] leading-[1.5] ${plan.primary ? "text-white/45" : "text-[#64748b]"}`}>{plan.aiFeature}</span>
                       </div>
                     )}
                   </div>

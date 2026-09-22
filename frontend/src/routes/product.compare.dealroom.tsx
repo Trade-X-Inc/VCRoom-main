@@ -56,8 +56,8 @@ function CompareDealroom() {
             ].map((p, i) => (
               <div key={p.phase} className={`flex-1 p-8 ${i < 3 ? "border-r border-[#e6e9ef]" : ""} ${p.active ? "bg-[#0a2540]" : ""}`}>
                 <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12px] mb-2 ${p.active ? "text-white/50" : "text-[#64748b]"}`}>Phase {i + 1}</div>
-                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[22px] tracking-[-0.6px] mb-1 ${p.active ? "text-white" : "text-[#c9d0db]"}`}>{p.phase}</div>
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] ${p.active ? "text-white/60" : "text-[#c9d0db]"}`}>{p.tool}</div>
+                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[22px] tracking-[-0.6px] mb-1 ${p.active ? "text-white" : "text-[#64748b]"}`}>{p.phase}</div>
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[13px] ${p.active ? "text-white/60" : "text-[#64748b]"}`}>{p.tool}</div>
               </div>
             ))}
           </div>

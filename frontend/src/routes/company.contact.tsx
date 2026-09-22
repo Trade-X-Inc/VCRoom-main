@@ -150,14 +150,14 @@ function Contact() {
                       <input type="text" placeholder="Jane Thornton"
                         value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                         style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors" />
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
                     </div>
                     <div className="flex flex-col gap-1.5 flex-1">
                       <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Work email *</label>
                       <input type="email" placeholder="jane@firm.com"
                         value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                         style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors" />
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -165,7 +165,7 @@ function Contact() {
                     <input type="text" placeholder="ROM Capital Partners"
                       value={form.company} onChange={e => setForm(p => ({ ...p, company: e.target.value }))}
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors" />
+                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Reason for contact *</label>
@@ -187,7 +187,7 @@ function Contact() {
                     <textarea rows={4} placeholder="Tell us what you're working on..."
                       value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors resize-none" />
+                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors resize-none" />
                   </div>
                   {error && (
                     <div className="border border-red-200 bg-red-50 px-4 py-3">
