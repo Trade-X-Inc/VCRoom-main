@@ -25,12 +25,16 @@ import { PageHero } from "@/components/site/PageHero";
 // inspectable by both parties, nothing is exported or delivered).
 // "Transaction room(s)" also corrected to "deal room(s)" throughout.
 //
-// FLAGGED, NOT CHANGED: "Governing law" (below) still names England and
-// Wales courts/law — this is a legal-substance decision (jurisdiction
-// clause), not an entity-name mechanical swap, and was outside the
-// instruction's scope ("fix the entity mismatch"). Now inconsistent
-// with the corrected DIFC entity above. Needs counsel/founder input on
-// the actual intended governing law before this is edited.
+// RESOLVED 22 Sep 2026 (legal docs recon, checked directly against the
+// live file rather than assumed from an earlier instruction — this had
+// NOT actually been applied despite being discussed): "Governing law"
+// named England and Wales courts, inconsistent with the corrected DIFC
+// entity above since 31 Aug 2026. Fixed to DIFC Courts, using the
+// identical wording written the same session in legal.refunds.tsx's own
+// Governing law clause — both documents now state the same forum in the
+// same words, not two independently-worded versions of the same thing.
+// The consumer-rights carve-out sentence (unrelated to which forum is
+// chosen) is preserved unchanged.
 //
 // Corrected 22 Sep 2026 (auth/session recon): "Your account" told every
 // user "You must enable multi-factor authentication (MFA) — this is a
@@ -137,7 +141,7 @@ On termination, your access to the platform ceases. Records from Rooms you were 
   },
   {
     title: "Governing law",
-    content: `These Terms are governed by the law of England and Wales. Any dispute arising from these Terms or your use of the platform shall be subject to the exclusive jurisdiction of the courts of England and Wales.
+    content: `These Terms are governed by the laws applicable in the Dubai International Financial Centre (DIFC), and any dispute arising from these Terms or your use of the platform is subject to the exclusive jurisdiction of the DIFC Courts.
 
 If you are a consumer located in another jurisdiction, you may also have rights under the laws of that jurisdiction.`,
   },
