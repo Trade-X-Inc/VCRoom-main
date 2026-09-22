@@ -46,9 +46,6 @@ src/routes/app.users.tsx: error TS2339: Property 'name' does not exist on type '
 src/routes/app.users.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.users.tsx: error TS2352: Conversion of type '{ id: any; user_id: any; role: any; status: any; joined_at: any; display_name: any; avatar_url: any; team_member_profiles: { first_name: any; last_name: any; title: any; avatar_url: any; }[]; }[]' to type 'TeamAccountRow[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 src/routes/i.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.
-src/routes/join.team.$token.tsx: error TS18047: 'user' is possibly 'null'.
-src/routes/join.team.$token.tsx: error TS18047: 'user' is possibly 'null'.
-src/routes/join.team.$token.tsx: error TS18047: 'user' is possibly 'null'.
 src/routes/p.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.
 src/routes/p.$slug.tsx: error TS2352: Conversion of type 'undefined' to type '{ startup: PublicStartup | null; slug: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 src/routes/resources.blog.$slug.tsx: error TS2352: Conversion of type 'undefined' to type 'BlogPostWithContent | null' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
