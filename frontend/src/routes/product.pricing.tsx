@@ -66,6 +66,47 @@ import { PageHero } from "@/components/site/PageHero";
 // invented savings figure or discount comparison (the exact fabrication
 // class this project has spent four rewrite batches removing from
 // every other page). Approved wording, option C of 3 proposed.
+//
+// Beta rework, 22 Sep 2026 — direct instruction, keeping the real
+// current 4-tier structure (Direct/Standard/Deploying seat/
+// Institutional), NOT the separate 6-category plan_limits scheme
+// (founder_starter/pro/scale, investor_growth/pro/enterprise) —
+// that table is confirmed dead-enforcement/display-only elsewhere in
+// the app and this route never used its naming; introducing it here
+// would have been a new fabrication, not a fix. All $ figures
+// replaced with "—" (§14's "12 of 14 conditions satisfied, not 86%"
+// discipline extended to "no invented-looking number where there
+// isn't a real one yet"). Every CTA is "Join Waitlist." New H2 "Beta
+// — Free to Join" added above the plan grid.
+//
+// Forward-looking feature bullets sourced ONLY from
+// lengdon-product-roadmap.md (pasted directly by the founder — the
+// doc lives in their claude.ai Project, not this repo), mapped to
+// the 4 real tiers by maturity per direct instruction: Direct
+// (migration/structural-audit intake check, single-notice diligence
+// enforcement, evidence-ladder tagging, species-aware investor
+// onboarding + verification ladder), Standard (conditions register
+// for staged/milestone rounds), Deploying seat (champion package,
+// soft-circle momentum visibility), Institutional (monthly
+// money-report system of record, auto-assembled second-raise data
+// room, portfolio-company API access, execution-layer/third-party
+// API integration). Every one of these is written strictly
+// future-tense ("coming at launch" / "planned for [tier]") — never
+// "includes," never present tense — since none of it is built yet.
+//
+// AI Agentic/MCP-assisted workflow at the Direct tier is NOT in the
+// roadmap doc — checked the full pasted text twice, no mention
+// anywhere. Included anyway per explicit direct instruction, but
+// kept visually/textually separate from the roadmap-sourced bullets
+// rather than blended in or attributed to the doc — it's a founder
+// product claim, not something this source material backs.
+//
+// What stayed present-tense: the small set of bullets describing
+// mechanisms that are ALREADY real and live today (six-gate
+// sequence, per-person NDA enforcement, append-only record, team
+// invite/role management) — the future-tense rule applies to NEW
+// roadmap claims, not to retracting accurate statements about what
+// already exists.
 
 export const Route = createFileRoute("/product/pricing")({
   component: Pricing,
@@ -74,7 +115,7 @@ export const Route = createFileRoute("/product/pricing")({
 const PLANS = [
   {
     name: "Direct",
-    price: "$499",
+    price: "—",
     period: "once, at first close",
     desc: "One transaction. One room. Full six-gate sequence and append-only record, billed once the deal closes.",
     features: [
@@ -84,13 +125,20 @@ const PLANS = [
       "Append-only audit record",
       "Billed only on close — nothing due until then",
     ],
-    cta: "Join the waitlist",
+    roadmapFeatures: [
+      "Migration tooling with a structural audit, planned for launch — importing existing data runs a set of structural checks automatically",
+      "Single-notice diligence enforcement, coming at launch — one open diligence thread at a time, no drip-fed requests",
+      "Evidence-ladder document tagging, coming at launch — every document carries a visible confidence rung",
+      "Species-aware investor onboarding and a five-rung verification ladder, planned for launch",
+    ],
+    aiFeature: "AI Agentic / MCP-assisted workflow, planned for launch",
+    cta: "Join Waitlist",
     href: "/sign-up",
     primary: false,
   },
   {
     name: "Standard",
-    price: "$799",
+    price: "—",
     period: "per month, active raise only",
     desc: "For a founder running a live raise across multiple prospective investors and rooms at once.",
     features: [
@@ -99,13 +147,16 @@ const PLANS = [
       "Billed only while a raise is active",
       "Team access management",
     ],
-    cta: "Join the waitlist",
+    roadmapFeatures: [
+      "Conditions register for staged and milestone rounds, planned for this tier — conditions tracked with an owner and status, tranche release gated on completion",
+    ],
+    cta: "Join Waitlist",
     href: "/sign-up",
     primary: true,
   },
   {
     name: "Deploying seat",
-    price: "$3,999",
+    price: "—",
     period: "per seat, per year",
     desc: "For investors, funds, and firms actively deploying capital across multiple transactions.",
     features: [
@@ -114,13 +165,17 @@ const PLANS = [
       "Priority support",
       "Team invite and role management",
     ],
-    cta: "Book a demo",
+    roadmapFeatures: [
+      "Auto-generated champion package, planned for this tier — a forwardable one-click summary built for a partner to send to colleagues",
+      "Soft-circle momentum visibility, planned for this tier — a live, honest indicator of round-fill status",
+    ],
+    cta: "Join Waitlist",
     href: "/company/contact",
     primary: false,
   },
   {
     name: "Institutional",
-    price: "Scoped individually",
+    price: "—",
     period: "no published number",
     desc: "For large institutions with specific compliance and integration requirements.",
     features: [
@@ -129,7 +184,13 @@ const PLANS = [
       "Dedicated account manager",
       "Custom compliance requirements, discussed directly",
     ],
-    cta: "Contact us",
+    roadmapFeatures: [
+      "Monthly money-report system of record, planned for this tier — a standing report of cash, runway, burn, and gate status, visible to committed investors after close",
+      "Auto-assembled second-raise data room, planned for this tier — built from a founder's own reporting history",
+      "API access for portfolio companies, planned for this tier — pulling out cap table state, verification tier, and report history",
+      "Execution-layer API integration for third-party platforms, planned for this tier",
+    ],
+    cta: "Join Waitlist",
     href: "/company/contact",
     primary: false,
   },
@@ -138,23 +199,23 @@ const PLANS = [
 const FAQS = [
   {
     q: "Is there a free trial?",
-    a: "Yes — you can set up a room and complete the Counsel gate for free. You're charged only when you advance to the Agreement gate and both parties confirm intent to proceed.",
+    a: "During beta, everything is free — join the waitlist and use the platform at no cost. The Direct plan's own free step (setting up a room and completing the Counsel gate before anything is billed) is what carries forward once general availability opens.",
   },
   {
     q: "What happens to the room if the transaction falls through?",
     a: "The room and its append-only audit record are preserved. Both parties can still open the room and review exactly what happened and where the transaction ended.",
   },
   {
-    q: "When am I billed on the Direct plan?",
-    a: "Once — at first close. Nothing is due while the room is open. If the transaction doesn't close, you aren't charged.",
+    q: "When will I be billed on the Direct plan?",
+    a: "Not during beta — nothing is charged. Once general availability opens, Direct is billed once, at first close, and nothing is due while the room is open.",
   },
   {
     q: "What's the difference between Standard and Deploying seat?",
-    a: "Standard is for a founder running a live raise — billed monthly, only while the raise is active. Deploying seat is for an investor or firm actively deploying capital across multiple transactions — billed per seat, annually.",
+    a: "Standard is planned for a founder running a live raise — billed monthly, only while the raise is active, once general availability opens. Deploying seat is planned for an investor or firm actively deploying capital across multiple transactions — billed per seat, annually. Both are free to join during beta.",
   },
   {
-    q: "How is Institutional pricing determined?",
-    a: "Institutional pricing is scoped individually based on transaction volume, compliance requirements, and integration needs. There's no published number — contact us for a quote.",
+    q: "How will Institutional pricing be determined?",
+    a: "Institutional pricing will be scoped individually based on transaction volume, compliance requirements, and integration needs once general availability opens — there's no published number. During beta, join the waitlist and contact us directly.",
   },
 ];
 
@@ -167,10 +228,13 @@ function Pricing() {
           eyebrow="Product · Pricing"
           title="SIMPLE,"
           titleOutline="TRANSPARENT."
-          subtitle="Pay once when you close, monthly while you're raising, or per seat while you're deploying. No data volume charges, no surprise invoices."
+          subtitle="Free to join during beta. Eventually you'll pay once when you close, monthly while you're raising, or per seat while you're deploying — no data volume charges, no surprise invoices."
         />
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(24px,4vw,32px)] leading-[1.1] tracking-[-0.5px] mb-10">
+            Beta — Free to Join
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {PLANS.map((plan) => (
               <div
@@ -201,7 +265,7 @@ function Pricing() {
                   </p>
                 </div>
 
-                <div className={`flex flex-col gap-3 flex-1 mb-8 border-t pt-6 ${plan.primary ? "border-white/10" : "border-[#e6e9ef]"}`}>
+                <div className={`flex flex-col gap-3 mb-6 border-t pt-6 ${plan.primary ? "border-white/10" : "border-[#e6e9ef]"}`}>
                   {plan.features.map((f) => (
                     <div key={f} className="flex items-center gap-3">
                       <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${plan.primary ? "bg-white/10 border border-white/20" : "bg-emerald-50 border border-emerald-200"}`}>
@@ -213,6 +277,36 @@ function Pricing() {
                     </div>
                   ))}
                 </div>
+
+                {/* Forward-looking, not-yet-built capabilities — visually
+                    distinct from the live "features" list above (dashed
+                    marker, "Coming soon" label, muted tone) so a reader
+                    can never mistake a roadmap item for something they
+                    get today. Sourced only from lengdon-product-roadmap.md;
+                    every line stays future-tense. */}
+                {(plan.roadmapFeatures?.length || plan.aiFeature) && (
+                  <div className={`flex flex-col gap-1 flex-1 mb-8 border-t border-dashed pt-6 ${plan.primary ? "border-white/15" : "border-[#cbd5e1]"}`}>
+                    <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[10px] tracking-[1.5px] uppercase mb-2 ${plan.primary ? "text-white/40" : "text-[#94a3b8]"}`}>
+                      Coming soon
+                    </div>
+                    {plan.roadmapFeatures?.map((f) => (
+                      <div key={f} className="flex items-start gap-3">
+                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 mt-0.5 ${plan.primary ? "text-white/30" : "text-[#94a3b8]"}`} style={{ fontSize: 11 }}>
+                          →
+                        </div>
+                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12.5px] leading-[1.5] ${plan.primary ? "text-white/45" : "text-[#94a3b8]"}`}>{f}</span>
+                      </div>
+                    ))}
+                    {plan.aiFeature && (
+                      <div className="flex items-start gap-3">
+                        <div className={`w-4 h-4 flex items-center justify-center shrink-0 mt-0.5 ${plan.primary ? "text-white/30" : "text-[#94a3b8]"}`} style={{ fontSize: 11 }}>
+                          →
+                        </div>
+                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12.5px] leading-[1.5] ${plan.primary ? "text-white/45" : "text-[#94a3b8]"}`}>{plan.aiFeature}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <Link
                   to={plan.href as any}
@@ -250,7 +344,7 @@ function Pricing() {
               style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
               className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200"
             >
-              Join the waitlist
+              Join Waitlist
             </Link>
           </div>
         </section>
@@ -289,7 +383,7 @@ function Pricing() {
             </div>
             <div className="flex gap-3 shrink-0">
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
+                Join Waitlist
               </Link>
               <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#0a2540]/20 hover:border-[#0a2540]/40 text-[#0a2540] text-[14px] px-10 py-4 transition-all duration-200">
                 Book a call →
