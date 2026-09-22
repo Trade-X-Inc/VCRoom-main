@@ -320,8 +320,10 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
     setThesisProposing(true);
     try {
       const { proposeFounderThesis } = await import("@/lib/founder-thesis-fn");
+      const { data: { session } } = await supabase.auth.getSession();
       const proposed = await proposeFounderThesis({
         data: {
+          accessToken: session?.access_token ?? "",
           company_name: (form as any).company_name || startup.company_name || "",
           sector: (form as any).sector || "",
           stage: (form as any).stage || "",

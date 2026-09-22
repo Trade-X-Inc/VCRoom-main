@@ -322,7 +322,7 @@ function ProfileBuilder() {
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
         let text = "";
         if (ext === "pdf") {
-          const intakeResult = await extractForIntake(file);
+          const intakeResult = await extractForIntake(file, userAccessToken);
           text = intakeResult.status === "ok" ? (intakeResult.text ?? "") : "";
         }
         if (!text) {

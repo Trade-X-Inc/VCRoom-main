@@ -1,4 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getEnvVar } from "@/lib/env";
+
+// Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
+  if (!userId) return { allowed: true };
+  try {
+    const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
+    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) return { allowed: true };
+    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ p_user_id: userId, p_feature: feature }),
+    });
+    if (!resp.ok) return { allowed: true };
+    const result = await resp.json() as any;
+    return { allowed: result.allowed ?? true, message: result.message };
+  } catch {
+    return { allowed: true };
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Founder Roast — server functions.
@@ -1024,6 +1045,9 @@ async function generateRoastReportInternal(
   );
   const s = sessions?.[0];
   if (!s) throw new Error("session_not_found");
+
+  const usageCheck = await checkUsageCap(s.founder_id, "roast_report");
+  if (!usageCheck.allowed) throw new Error(usageCheck.message || "usage_limit");
 
   const [startups, questions]: [any[], any[]] = await Promise.all([
     sbFetch(
