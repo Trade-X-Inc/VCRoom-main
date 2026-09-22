@@ -60,8 +60,15 @@
 /app/investor/overview    /app/investor                            301
 /app/investor/startups    /app/investor/source#watchlist           301
 /app/investor/intake      /app/investor/source#intake              301
-/app/investor/deal-rooms  /app/investor/evaluate#deal-rooms        301
-/app/investor/diligence   /app/investor/evaluate#diligence         301
-/app/investor/analysis    /app/investor/evaluate#analysis          301
-/app/investor/decisions   /app/investor/decide#decisions           301
-/app/investor/portfolio   /app/investor/decide#portfolio           301
+# The 5 rules below (deal-rooms/diligence/analysis/decisions/portfolio)
+# were removed 22 Sep 2026 — stale since the July 2026 P5 nav restructure.
+# They redirected to #hash anchors on source.tsx/evaluate.tsx/decide.tsx
+# that those files have never actually read (confirmed: zero hash-reading
+# code in any of the three). Real, currently-live UI still links straight
+# at these paths — nav-structure.ts's sidebar (Deal Analysis, Decisions),
+# and evaluate.tsx/decide.tsx's own SectionLinkRows (Due diligence, AI
+# analysis, Deal rooms, Decisions, Portfolio) — so every one of those
+# real clicks was silently landing on a link-out page instead of the
+# intended screen. Live-verified broken (sidebar "Deal Rooms" -> Evaluate
+# page, not the real Deal Rooms list) before removing these rules, and
+# live-verified fixed after. See LCS_MIGRATION_PLAN.md Group 8.
