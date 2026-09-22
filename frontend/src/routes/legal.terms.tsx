@@ -31,6 +31,22 @@ import { PageHero } from "@/components/site/PageHero";
 // instruction's scope ("fix the entity mismatch"). Now inconsistent
 // with the corrected DIFC entity above. Needs counsel/founder input on
 // the actual intended governing law before this is edited.
+//
+// Corrected 22 Sep 2026 (auth/session recon): "Your account" told every
+// user "You must enable multi-factor authentication (MFA) — this is a
+// mandatory platform requirement, not optional." False, and worse here
+// than the near-identical product.security.tsx fabrication this
+// session already found and fixed — this is a binding legal document,
+// not marketing copy. Verified live: auth.mfa_factors holds zero
+// enrolled factors across every real user, and no MFA enrollment,
+// challenge, or verification code exists anywhere in src/. Rewritten
+// to state what's actually true and enforced (named individual
+// accounts, no credential sharing) and to drop the MFA obligation
+// rather than restate it as "planned" — a Terms of Service states
+// binding requirements, not a product roadmap; an unenforceable
+// "mandatory" clause has no place here even caveated. If MFA becomes a
+// real, enforced requirement, this clause should be added back then,
+// not before.
 
 export const Route = createFileRoute("/legal/terms")({
   component: Terms,
@@ -59,7 +75,7 @@ We do not provide investment advice, legal advice, or financial services. We pro
   },
   {
     title: "Your account",
-    content: `You are responsible for maintaining the security of your account credentials. You must enable multi-factor authentication (MFA) — this is a mandatory platform requirement, not optional.
+    content: `You are responsible for maintaining the security of your account credentials.
 
 You may not share your credentials with any other person. Each individual must have their own account.
 
