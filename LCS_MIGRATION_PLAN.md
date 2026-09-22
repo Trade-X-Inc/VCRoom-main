@@ -513,6 +513,8 @@ Alias routes retired for free: `app.investor.discover.{deal-flow,watchlist,index
 
 ## Group 10 — Founder Roast
 
+> **CARVED OUT OF THE STANDARD SEQUENCE, 22 Sep 2026 — do not build from this document.** `app.roast.index.tsx`, `app.roast.$id.live.tsx`, `app.roast.$id.answers.tsx`, and `components/app/PaymentConfirm.tsx` have a separate plan and will be handled in their own dedicated branch, not as part of the normal Group 5→10 progression. This section is left in place as a record of the original recon (file list, line counts, v1-hit counts below), not as live build scope — do not reach this group by default once Group 9 closes. Wait for explicit instruction before touching any of these four files.
+
 **Ordered last: fully isolated, zero shared dependents, read/write but no deal-critical state.**
 
 | File | Lines | v1 hits |
@@ -573,7 +575,7 @@ No routes were found unreachable — `lib/nav-structure.ts` references every non
 | 5 | Shared v1 primitives (`components/system` + `design-tokens`) | ~590 | Dependency — 26 routes import these | **CLOSED** |
 | 6 | Deal Room shell + all 9 tabs + 2 dependencies (4 v2 tabs pulled in) | ~7,350 | Risk + dependency — shell wraps 9 tabs; NDA/closing/stage transitions; avoids a shell/tab design-system seam | **CLOSED** |
 | 6.5 | `AIChat.tsx` — cross-cutting AI panel, explicitly excluded from Group 6 | 158 | Mounted app-wide, not deal-room-specific; LCS-hostile structure (chat bubbles, `prose` scale, shadows, gradients); own route-string bug | **Logged, not scheduled — see Group 6.5 above for the 3 open sub-questions** |
-| 7 | Founder Profile & Documents | ~8,470 (confirmed by read; `ProfileBuilder.tsx` kept in scope per decision 1) | Dependency — retires 11 confirmed alias routes (see recon); largest volume | **All 10 Phase-0 decisions resolved — building, Phase 1 in progress** |
+| 7 | Founder Profile & Documents | ~8,470 (confirmed by read; `ProfileBuilder.tsx` kept in scope per decision 1) | Dependency — retires 11 confirmed alias routes (see recon); largest volume | **CLOSED — all 5 phases built, verified, and closed (see Phase 1–5 entries above)** |
 | 8 | Investor Pipeline | ~8,960 | Risk (moderate) — write actions, no stage transitions | Not started |
 | 9 | Founder Home/Overview/Analytics | ~2,090 | Risk (low) — mostly read-only | Not started |
 | 10 | Founder Roast | ~1,710 | Risk (low), fully isolated | Not started |
