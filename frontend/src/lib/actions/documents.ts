@@ -168,6 +168,7 @@ const documentGrantReleaseDef: ActionDef<
 > = {
   name: "documents.grantRelease",
   class: "commit",
+  requiresStepUp: true, // password re-entry step-up (Gate C, 22 Sep 2026)
 
   validate: (raw): GrantReleaseInput => {
     const r = raw as { releaseId?: unknown };

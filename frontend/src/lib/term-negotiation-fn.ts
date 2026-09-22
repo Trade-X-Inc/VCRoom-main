@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { INSTRUMENT_TEMPLATES, type InstrumentType } from "@/lib/term-templates";
+import { consumeStepUpToken } from "@/lib/step-up-fn";
 
 // R15A — Term negotiation server functions.
 //
@@ -83,6 +84,19 @@ async function authorize(dealRoomId: string, accessToken: string): Promise<Ctx |
   const role = await verifyPrincipalMember(url, key, dealRoomId, uid);
   if (!role) return null;
   return { url, key, role, uid };
+}
+
+/**
+ * Password re-entry step-up (Gate C, 22 Sep 2026), shared by
+ * acceptTerm/proposeTerm/rejectTerm. Called AFTER authorize() succeeds, so
+ * a non-member never reaches this check — step-up proves "the person who
+ * already passed membership re-typed their password," not identity itself.
+ * Consumes the token in the same call that verifies it (single-use); a
+ * caller who fails a later step in the handler must obtain a fresh token.
+ */
+async function requireStepUp(ctx: Ctx, stepUpToken: string | undefined): Promise<boolean> {
+  const result = await consumeStepUpToken(ctx.uid, stepUpToken);
+  return result.ok;
 }
 
 async function getConfig(ctx: Ctx, dealRoomId: string) {
@@ -300,6 +314,7 @@ type ProposeInput = {
   value: string;
   isCounter?: boolean;
   suggestedAlternative?: string;
+  stepUpToken?: string;
 };
 
 export const proposeTerm = createServerFn({ method: "POST" })
@@ -307,6 +322,9 @@ export const proposeTerm = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const ctx = await authorize(data.dealRoomId, data.accessToken);
     if (!ctx) return { ok: false, error: "not_authorized" };
+    if (!(await requireStepUp(ctx, data.stepUpToken))) {
+      return { ok: false, error: "STEP_UP_REQUIRED" };
+    }
     const cfg = await getConfig(ctx, data.dealRoomId);
     if (cfg?.locked_at) return { ok: false, error: "term_set_locked" };
 
@@ -340,13 +358,16 @@ export const proposeTerm = createServerFn({ method: "POST" })
 // Sets ONLY the caller's own acceptance flag. If, after that, BOTH flags are
 // true against the same current_value, the term finalizes (status='locked').
 // Then re-check whether the whole set can auto-lock.
-type AcceptInput = { dealRoomId: string; accessToken: string; termId: string };
+type AcceptInput = { dealRoomId: string; accessToken: string; termId: string; stepUpToken?: string };
 
 export const acceptTerm = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as AcceptInput)
   .handler(async ({ data }) => {
     const ctx = await authorize(data.dealRoomId, data.accessToken);
     if (!ctx) return { ok: false, error: "not_authorized" };
+    if (!(await requireStepUp(ctx, data.stepUpToken))) {
+      return { ok: false, error: "STEP_UP_REQUIRED" };
+    }
     const cfg = await getConfig(ctx, data.dealRoomId);
     if (cfg?.locked_at) return { ok: false, error: "term_set_locked" };
 
@@ -388,6 +409,7 @@ export const acceptTerm = createServerFn({ method: "POST" })
 // ── rejectTerm — reject the current value with a suggested alternative ───────
 type RejectInput = {
   dealRoomId: string; accessToken: string; termId: string; suggestedAlternative?: string;
+  stepUpToken?: string;
 };
 
 export const rejectTerm = createServerFn({ method: "POST" })
@@ -395,6 +417,9 @@ export const rejectTerm = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const ctx = await authorize(data.dealRoomId, data.accessToken);
     if (!ctx) return { ok: false, error: "not_authorized" };
+    if (!(await requireStepUp(ctx, data.stepUpToken))) {
+      return { ok: false, error: "STEP_UP_REQUIRED" };
+    }
     const cfg = await getConfig(ctx, data.dealRoomId);
     if (cfg?.locked_at) return { ok: false, error: "term_set_locked" };
 

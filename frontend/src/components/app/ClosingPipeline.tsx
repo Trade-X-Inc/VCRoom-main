@@ -6,6 +6,8 @@ import { Loader2, Lock, Check, Upload, Download, AlertTriangle, FileText, Dollar
 import { supabase } from "@/lib/supabase";
 import { calculateFee, formatUsd, feeBasisLabel } from "@/lib/fee-schedule";
 import { StatusLabel } from "@/components/v2";
+import { StepUpModal } from "@/components/app/StepUpModal";
+import { useStepUpGate } from "@/hooks/useStepUpGate";
 import {
   setFee, confirmFeePayment, recordSignedAgreement,
   uploadPaymentProof, reviewPaymentProof, confirmDeliverable, downloadAgreement,
@@ -57,6 +59,7 @@ export function ClosingPipeline({
 }) {
   const qc = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
+  const stepUp = useStepUpGate();
 
   // ── queries: finalized agreement, fee, signed, payment proof, close, terms ──
   const { data: agreement } = useQuery({
@@ -185,11 +188,15 @@ export function ClosingPipeline({
   const doConfirmClose = async () => {
     setBusy("close");
     try {
-      const r = await confirmDeliverable({ data: { dealRoomId, accessToken: await token() } });
+      const r = await stepUp.wrapGated(async (stepUpToken) =>
+        confirmDeliverable({ data: { dealRoomId, accessToken: await token(), stepUpToken } }),
+      );
       if (!r.ok) { toast.error(r.error === "payment_not_confirmed" ? "Payment must be confirmed first" : "Could not confirm"); return; }
       if (r.closed) toast.success("Deal closed — invoices generated"); else toast.success("Your confirmation recorded — awaiting counterparty");
       refresh();
-    } catch { toast.error("Could not confirm"); } finally { setBusy(null); }
+    } catch (e) {
+      if (!(e instanceof Error && e.message === "STEP_UP_CANCELLED")) toast.error("Could not confirm");
+    } finally { setBusy(null); }
   };
 
   if (!agreement) {
@@ -406,6 +413,8 @@ export function ClosingPipeline({
       ), <Lock className="h-4 w-4" style={{ color: isClosed ? GREEN : INK3 }} />)}
 
       {/* Exit — see step 6 (ExitDeal) mounted by the route */}
+
+      <StepUpModal {...stepUp.modalProps} />
     </div>
   );
 }

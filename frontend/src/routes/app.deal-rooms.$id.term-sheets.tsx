@@ -15,6 +15,8 @@ import {
   requestInstrumentReset, resolveInstrumentReset,
 } from "@/lib/term-negotiation-fn";
 import { TermClosingPanel } from "@/components/app/TermClosingPanel";
+import { StepUpModal } from "@/components/app/StepUpModal";
+import { useStepUpGate } from "@/hooks/useStepUpGate";
 import { LcsButton, LcsPageHeader, LcsStatusPill, type LcsStatus } from "@/components/lcs";
 
 // R15A — Term negotiation engine. Sole content of /deal-rooms/:id/term-sheets
@@ -49,6 +51,7 @@ function TermNegotiationPage() {
   const { dealRoomId, isInvestor, userId, isClosed } = useDealRoom();
   const role: "founder" | "investor" = isInvestor ? "investor" : "founder";
   const qc = useQueryClient();
+  const stepUp = useStepUpGate();
 
   const [busy, setBusy] = useState<string | null>(null);
   const [proposeOpen, setProposeOpen] = useState<string | null>(null);
@@ -181,33 +184,45 @@ function TermNegotiationPage() {
     if (!proposeValue.trim()) return;
     setBusy(termId);
     try {
-      const r = await proposeTerm({ data: { dealRoomId, accessToken: await token(), termId, value: proposeValue.trim(), isCounter } });
+      const r = await stepUp.wrapGated(async (stepUpToken) =>
+        proposeTerm({ data: { dealRoomId, accessToken: await token(), termId, value: proposeValue.trim(), isCounter, stepUpToken } }),
+      );
       if (!r.ok) { toast.error("Could not submit"); return; }
       setProposeOpen(null); setProposeValue(""); setCounterMode(false);
       refresh();
-    } catch { toast.error("Could not submit"); }
+    } catch (e) {
+      if (!(e instanceof Error && e.message === "STEP_UP_CANCELLED")) toast.error("Could not submit");
+    }
     finally { setBusy(null); }
   };
 
   const doAccept = async (termId: string) => {
     setBusy(termId);
     try {
-      const r = await acceptTerm({ data: { dealRoomId, accessToken: await token(), termId } });
+      const r = await stepUp.wrapGated(async (stepUpToken) =>
+        acceptTerm({ data: { dealRoomId, accessToken: await token(), termId, stepUpToken } }),
+      );
       if (!r.ok) { toast.error("Could not accept"); return; }
       if (r.termLocked) toast.success("Term finalized — accepted by both sides");
       refresh();
-    } catch { toast.error("Could not accept"); }
+    } catch (e) {
+      if (!(e instanceof Error && e.message === "STEP_UP_CANCELLED")) toast.error("Could not accept");
+    }
     finally { setBusy(null); }
   };
 
   const doReject = async (termId: string) => {
     setBusy(termId);
     try {
-      const r = await rejectTerm({ data: { dealRoomId, accessToken: await token(), termId, suggestedAlternative: rejectText.trim() || undefined } });
+      const r = await stepUp.wrapGated(async (stepUpToken) =>
+        rejectTerm({ data: { dealRoomId, accessToken: await token(), termId, suggestedAlternative: rejectText.trim() || undefined, stepUpToken } }),
+      );
       if (!r.ok) { toast.error("Could not reject"); return; }
       setRejectOpen(null); setRejectText("");
       refresh();
-    } catch { toast.error("Could not reject"); }
+    } catch (e) {
+      if (!(e instanceof Error && e.message === "STEP_UP_CANCELLED")) toast.error("Could not reject");
+    }
     finally { setBusy(null); }
   };
 
@@ -505,6 +520,8 @@ function TermNegotiationPage() {
           </div>
         </div>
       )}
+
+      <StepUpModal {...stepUp.modalProps} />
     </div>
   );
 }

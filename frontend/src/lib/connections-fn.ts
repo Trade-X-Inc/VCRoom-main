@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireUser } from "@/lib/require-user-fn";
+import { consumeStepUpToken } from "@/lib/step-up-fn";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 type GenerateInviteLinkInput = {
   accessToken: string;
   label?: string;
+  stepUpToken?: string;
 };
 
 type JoinViaInviteLinkInput = {
@@ -53,7 +55,10 @@ export const generateInviteLink = createServerFn({ method: "POST" })
     const auth = await requireUser(data.accessToken);
     if (!auth.ok) return { ok: false, error: "not_authenticated" };
 
-    // Check if investor already has an active link
+    // Check if investor already has an active link — retrieving an
+    // EXISTING link is not gated: nothing new is minted here, so there is
+    // nothing more consequential than a normal authenticated read. Step-up
+    // applies only to the mint path below.
     const existing: any[] = await sbFetch(
       url, key,
       `investor_invite_links?investor_id=eq.${auth.uid}&active=eq.true&select=*`,
@@ -61,6 +66,13 @@ export const generateInviteLink = createServerFn({ method: "POST" })
     ).catch(() => []);
 
     if (existing?.length > 0) return { ok: true, link: existing[0] };
+
+    // Password re-entry step-up (Gate C, 22 Sep 2026), MINT PATH ONLY — a
+    // newly-generated link, once created, lets anyone holding it join as
+    // this investor's connection; that's the consequential act, not simply
+    // viewing a link that already exists.
+    const stepUp = await consumeStepUpToken(auth.uid, data.stepUpToken);
+    if (!stepUp.ok) return { ok: false, error: "STEP_UP_REQUIRED" };
 
     // Generate a new UUID token
     const token = crypto.randomUUID();

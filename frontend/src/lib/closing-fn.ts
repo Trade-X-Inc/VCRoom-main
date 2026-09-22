@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { calculateFee } from "@/lib/fee-schedule";
+import { consumeStepUpToken } from "@/lib/step-up-fn";
 
 // R15C — Closing pipeline server fns (Gates 4-7). All service-role, so they
 // enforce every rule themselves (RLS is bypassed by the service key):
@@ -230,12 +231,17 @@ export const reviewPaymentProof = createServerFn({ method: "POST" })
   });
 
 // ── GATE 7a: confirmDeliverable — each principal confirms their side of close ───
-type ConfirmCloseInput = { dealRoomId: string; accessToken: string };
+// Password re-entry step-up (Gate C, 22 Sep 2026): this is the real
+// finalize_deal_close() entry point (via finalizeClose below, once both
+// sides confirm) — the highest-consequence action in the six-gate list.
+type ConfirmCloseInput = { dealRoomId: string; accessToken: string; stepUpToken?: string };
 export const confirmDeliverable = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => d as ConfirmCloseInput)
   .handler(async ({ data }) => {
     const ctx = await authorizePrincipal(data.dealRoomId, data.accessToken);
     if (!ctx) return { ok: false, error: "not_authorized" };
+    const stepUp = await consumeStepUpToken(ctx.uid, data.stepUpToken);
+    if (!stepUp.ok) return { ok: false, error: "STEP_UP_REQUIRED" };
     if (await roomIsClosed(ctx, data.dealRoomId)) return { ok: false, error: "room_closed" };
     // Payment must be confirmed by the founder first (Gate 6 clear).
     const proof: any[] = await sb(ctx.url, ctx.key,
