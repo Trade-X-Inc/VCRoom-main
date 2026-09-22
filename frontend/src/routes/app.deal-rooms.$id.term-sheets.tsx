@@ -180,14 +180,28 @@ function TermNegotiationPage() {
     finally { setBusy(null); }
   };
 
-  const doPropose = async (termId: string, isCounter: boolean) => {
+  // termChangedNotice: on TERM_CHANGED, tell the user explicitly (not a
+  // generic "could not submit" — the point of the staleness check is that
+  // their click was NOT silently applied to state they never saw, so the
+  // message has to say that, not just fail quietly the same as any other
+  // error).
+  const onTermChanged = () => {
+    toast.error("This term changed while you were deciding — showing the latest version. Please review and try again.");
+    refresh();
+  };
+
+  const doPropose = async (term: any, isCounter: boolean) => {
     if (!proposeValue.trim()) return;
-    setBusy(termId);
+    setBusy(term.id);
     try {
       const r = await stepUp.wrapGated(async (stepUpToken) =>
-        proposeTerm({ data: { dealRoomId, accessToken: await token(), termId, value: proposeValue.trim(), isCounter, stepUpToken } }),
+        proposeTerm({ data: { dealRoomId, accessToken: await token(), termId: term.id, value: proposeValue.trim(), isCounter, stepUpToken, expectedStatus: term.status } }),
       );
-      if (!r.ok) { toast.error("Could not submit"); return; }
+      if (!r.ok) {
+        if (r.error === "TERM_CHANGED") { onTermChanged(); return; }
+        toast.error("Could not submit");
+        return;
+      }
       setProposeOpen(null); setProposeValue(""); setCounterMode(false);
       refresh();
     } catch (e) {
@@ -196,13 +210,17 @@ function TermNegotiationPage() {
     finally { setBusy(null); }
   };
 
-  const doAccept = async (termId: string) => {
-    setBusy(termId);
+  const doAccept = async (term: any) => {
+    setBusy(term.id);
     try {
       const r = await stepUp.wrapGated(async (stepUpToken) =>
-        acceptTerm({ data: { dealRoomId, accessToken: await token(), termId, stepUpToken } }),
+        acceptTerm({ data: { dealRoomId, accessToken: await token(), termId: term.id, stepUpToken, expectedValue: term.current_value } }),
       );
-      if (!r.ok) { toast.error("Could not accept"); return; }
+      if (!r.ok) {
+        if (r.error === "TERM_CHANGED") { onTermChanged(); return; }
+        toast.error("Could not accept");
+        return;
+      }
       if (r.termLocked) toast.success("Term finalized — accepted by both sides");
       refresh();
     } catch (e) {
@@ -211,13 +229,17 @@ function TermNegotiationPage() {
     finally { setBusy(null); }
   };
 
-  const doReject = async (termId: string) => {
-    setBusy(termId);
+  const doReject = async (term: any) => {
+    setBusy(term.id);
     try {
       const r = await stepUp.wrapGated(async (stepUpToken) =>
-        rejectTerm({ data: { dealRoomId, accessToken: await token(), termId, suggestedAlternative: rejectText.trim() || undefined, stepUpToken } }),
+        rejectTerm({ data: { dealRoomId, accessToken: await token(), termId: term.id, suggestedAlternative: rejectText.trim() || undefined, stepUpToken, expectedStatus: term.status } }),
       );
-      if (!r.ok) { toast.error("Could not reject"); return; }
+      if (!r.ok) {
+        if (r.error === "TERM_CHANGED") { onTermChanged(); return; }
+        toast.error("Could not reject");
+        return;
+      }
       setRejectOpen(null); setRejectText("");
       refresh();
     } catch (e) {
@@ -378,7 +400,7 @@ function TermNegotiationPage() {
                     <>
                       {/* Accept — only when the OTHER side proposed a value awaiting me */}
                       {term.current_value && term.awaiting_role === role && !mineAccepted && (
-                        <LcsButton variant="primary" onClick={() => doAccept(term.id)} disabled={busy === term.id}>
+                        <LcsButton variant="primary" onClick={() => doAccept(term)} disabled={busy === term.id}>
                           {busy === term.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Accept
                         </LcsButton>
                       )}
@@ -425,7 +447,7 @@ function TermNegotiationPage() {
                       placeholder={term.value_type === "boolean" ? "true or false" : `Enter ${term.term_label.toLowerCase()}`}
                       className="min-w-[220px] flex-1 border px-3 text-sm outline-none"
                       style={{ height: 36, borderRadius: "var(--radius-lcs-control)", borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }} />
-                    <LcsButton variant="primary" onClick={() => doPropose(term.id, counterMode)} disabled={!proposeValue.trim() || busy === term.id}>
+                    <LcsButton variant="primary" onClick={() => doPropose(term, counterMode)} disabled={!proposeValue.trim() || busy === term.id}>
                       {busy === term.id ? <Loader2 className="h-3 w-3 animate-spin" /> : counterMode ? "Send counter" : "Send proposal"}
                     </LcsButton>
                     <LcsButton variant="secondary" onClick={() => { setProposeOpen(null); setProposeValue(""); }}>Cancel</LcsButton>
@@ -442,7 +464,7 @@ function TermNegotiationPage() {
                       placeholder="What would you accept instead?"
                       className="min-w-[220px] flex-1 border px-3 text-sm outline-none"
                       style={{ height: 36, borderRadius: "var(--radius-lcs-control)", borderColor: "var(--lcs-line)", background: "var(--lcs-white)", color: "var(--lcs-ink)" }} />
-                    <LcsButton variant="destructive" onClick={() => doReject(term.id)} disabled={busy === term.id}>
+                    <LcsButton variant="destructive" onClick={() => doReject(term)} disabled={busy === term.id}>
                       Reject term
                     </LcsButton>
                     <LcsButton variant="secondary" onClick={() => { setRejectOpen(null); setRejectText(""); }}>Cancel</LcsButton>
