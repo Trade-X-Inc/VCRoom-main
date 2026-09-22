@@ -96,6 +96,18 @@ import { PageHero } from "@/components/site/PageHero";
 // user audit entries), with MFA's absence stated plainly as planned-
 // not-built. Pillar count unchanged at eight, so the section heading
 // still holds.
+//
+// Follow-up, 22 Sep 2026 (session/auth recon): the unused input-otp UI
+// primitive named above (src/components/ui/input-otp.tsx) was deleted —
+// confirmed zero real consumers (grep found only this comment). The
+// same fabricated-MFA claim was also found live in legal.terms.tsx
+// ("You must enable multi-factor authentication (MFA) — this is a
+// mandatory platform requirement, not optional") and fixed there;
+// see that file's own header. status.tsx's "Authentication & MFA"
+// line was checked and left alone — it names a future monitored
+// service on a page whose own subtitle already states monitoring
+// isn't connected yet, so it doesn't assert a live capability the way
+// this page's and legal.terms.tsx's claims did.
 
 export const Route = createFileRoute("/product/security")({
   component: Security,
