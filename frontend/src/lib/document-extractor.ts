@@ -45,7 +45,7 @@ export type IntakeFileResult = {
   reason?: string;
 };
 
-export async function extractForIntake(file: File): Promise<IntakeFileResult> {
+export async function extractForIntake(file: File, accessToken?: string): Promise<IntakeFileResult> {
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
 
   if (!INTAKE_ALLOWED_EXTS.includes(ext)) {
@@ -61,7 +61,7 @@ export async function extractForIntake(file: File): Promise<IntakeFileResult> {
     const buf = (await file.arrayBuffer()).slice(0);
 
     if (ext === "pdf") {
-      const text = await extractPDFForIntake(buf, file.name);
+      const text = await extractPDFForIntake(buf, file.name, accessToken);
       if (!text) {
         return {
           file: file.name,
@@ -169,7 +169,7 @@ async function extractPDF(buf: ArrayBuffer, fileName: string): Promise<string> {
 }
 
 // ── PDF (intake — with image-based PDF fallback via GPT-4o vision) ─────────────
-async function extractPDFForIntake(buf: ArrayBuffer, fileName: string): Promise<string | null> {
+async function extractPDFForIntake(buf: ArrayBuffer, fileName: string, accessToken?: string): Promise<string | null> {
   let text = "";
 
   // 1. Try text extraction first
@@ -207,7 +207,7 @@ async function extractPDFForIntake(buf: ArrayBuffer, fileName: string): Promise<
 
     // 2. Text too short — image-based PDF, fall back to vision
     console.log(`[PDF intake] sparse text (${text.length} chars), attempting vision fallback — ${fileName}`);
-    const visionText = await extractPDFViaVision(buf, pdf, fileName);
+    const visionText = await extractPDFViaVision(buf, pdf, fileName, accessToken);
     return visionText || text || null;
   } catch (err) {
     console.warn("[PDF intake] pdfjs failed:", err);
@@ -226,7 +226,8 @@ async function extractPDFForIntake(buf: ArrayBuffer, fileName: string): Promise<
 async function extractPDFViaVision(
   buf: ArrayBuffer,
   pdf: any,
-  fileName: string
+  fileName: string,
+  accessToken?: string
 ): Promise<string | null> {
   try {
     // Determine which pages to process: pages 1, 2, 3, last-1, last (max 5, deduplicated)
@@ -257,7 +258,7 @@ async function extractPDFViaVision(
         const base64 = dataUrl.split(",")[1];
         if (!base64) continue;
 
-        const result = await callVisionAPI(base64, pageNum);
+        const result = await callVisionAPI(base64, pageNum, accessToken);
         if (result && result !== "NOT_STARTUP") {
           extractedParts.push(`[Page ${pageNum}] ${result}`);
         }
@@ -278,14 +279,14 @@ async function extractPDFViaVision(
   }
 }
 
-async function callVisionAPI(base64Image: string, pageNum: number): Promise<string | null> {
+async function callVisionAPI(base64Image: string, pageNum: number, accessToken?: string): Promise<string | null> {
   // Read API key from meta tag injected at build time (safe — not a secret, just the Supabase anon key pattern)
   // For vision we need the OpenAI key — but that's a server secret.
   // Strategy: POST to our own server function endpoint that proxies vision calls.
   // This keeps the key server-side and avoids exposing it in the browser bundle.
   try {
     const { visionExtractPage } = await import("@/lib/vision-extract-fn");
-    const result = await visionExtractPage({ data: { base64Image, pageNum } });
+    const result = await visionExtractPage({ data: { base64Image, pageNum, userAccessToken: accessToken ?? "" } });
     return result.text ?? null;
   } catch (err) {
     console.warn(`[vision API] page ${pageNum} error:`, err);

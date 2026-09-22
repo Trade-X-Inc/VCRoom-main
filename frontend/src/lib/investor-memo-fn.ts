@@ -8,6 +8,26 @@ type MemoInput = {
   supabaseUrl?: string;
 };
 
+// Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
+  if (!userId) return { allowed: true };
+  try {
+    const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
+    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) return { allowed: true };
+    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ p_user_id: userId, p_feature: feature }),
+    });
+    if (!resp.ok) return { allowed: true };
+    const result = await resp.json() as any;
+    return { allowed: result.allowed ?? true, message: result.message };
+  } catch {
+    return { allowed: true };
+  }
+}
+
 export const generateInvestorMemo = createServerFn({ method: "POST" })
   .inputValidator((data: unknown): MemoInput => data as MemoInput)
   .handler(async ({ data }: { data: MemoInput }): Promise<{ memo: string }> => {
@@ -46,6 +66,9 @@ export const generateInvestorMemo = createServerFn({ method: "POST" })
       .eq("user_id", uid)
       .maybeSingle();
     if (!member) throw new Error('not_authorized');
+
+    const usageCheck = await checkUsageCap(uid, "investor_memo");
+    if (!usageCheck.allowed) throw new Error(usageCheck.message || 'Daily AI limit reached.');
 
     // 1. Fetch deal room + startup
     const { data: room } = await client

@@ -10,13 +10,6 @@ function getEnvVar(key: string): string {
 }
 
 // ── Types ──
-type ThesisInput = {
-  userAccessToken: string;
-  investorThesis: string;
-  documentContext: string;
-  fileName: string;
-};
-
 type SummaryInput = {
   userAccessToken: string;
   documentContent: string;
@@ -112,32 +105,6 @@ async function callOpenAI(
   if (!content) throw new Error("AI returned empty response");
   return content;
 }
-
-// ── Thesis Alignment — replaces direct browser call in DDWorkstation ──
-export const analyzeThesisAlignment = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown): ThesisInput => data as ThesisInput)
-  .handler(async ({ data }): Promise<AIResult> => {
-    const auth = await requireUser(data.userAccessToken);
-    if (!auth.ok) return { reply: "Please sign in again to use this feature.", error: "not_authenticated" };
-    const usageCheck = await checkUsageCap(auth.uid, "thesis");
-    if (!usageCheck.allowed) {
-      return { reply: usageCheck.message || "Daily AI limit reached.", error: "usage_limit" };
-    }
-    try {
-      const systemPrompt = `You are a senior VC analyst. Analyze how a startup document aligns with an investor's thesis.
-CRITICAL RULES:
-- Quote SPECIFIC numbers from the document (e.g. "$0.6M pre-seed", "$20T market", "8% CAGR")
-- Do NOT confuse example use-cases with the company sector (a trade-tech platform using rice as an example is NOT agriculture)
-- If round stage mismatches investor preference, flag it as a hard ❌
-- Use ✅ strong match, ⚠️ concern, ❌ red flag. Max 5 bullets.
-- End with: **Overall Verdict**: one sentence`;
-      const userMessage = `INVESTOR THESIS:\n${data.investorThesis}\n\n${data.documentContext}`;
-      const reply = await callOpenAI(systemPrompt, userMessage, [], 400);
-      return { reply, error: null };
-    } catch (err: any) {
-      return { reply: `Analysis failed: ${err.message}`, error: err.message };
-    }
-  });
 
 // ── Document AI Summary — replaces direct browser call in deal-room ──
 export const generateDocSummary = createServerFn({ method: "POST" })

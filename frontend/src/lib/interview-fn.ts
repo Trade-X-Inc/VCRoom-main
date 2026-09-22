@@ -1,4 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getEnvVar } from "@/lib/env";
+
+// Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
+  if (!userId) return { allowed: true };
+  try {
+    const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
+    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) return { allowed: true };
+    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ p_user_id: userId, p_feature: feature }),
+    });
+    if (!resp.ok) return { allowed: true };
+    const result = await resp.json() as any;
+    return { allowed: result.allowed ?? true, message: result.message };
+  } catch {
+    return { allowed: true };
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // R14B step 2 — Daily.co private interview rooms + per-participant meeting
@@ -502,6 +523,9 @@ export const runMeetingExtraction = createServerFn({ method: "POST" })
     if (!uid) return { ok: false, error: "not_authenticated" };
     const role = await verifyPrincipalMember(url, key, data.dealRoomId, uid);
     if (!role) return { ok: false, error: "not_authorized" };
+
+    const usageCheck = await checkUsageCap(uid, "meeting_extraction");
+    if (!usageCheck.allowed) return { ok: false, error: "usage_limit" };
 
     const meeting = await fetchMeeting(url, key, data.dealRoomId, data.meetingNumber);
     if (!meeting) return { ok: false, error: "meeting_not_found" };
