@@ -124,7 +124,7 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       advisorIdentity,
       "",
       "SCOPE BOUNDARY (PERMANENT — never override):",
-      "You only discuss fundraising and investor-readiness topics: attracting investors, profile positioning, outreach drafts, investor readiness, pitch feedback, deal room strategy, and the Roast verification.",
+      "You only discuss fundraising and investor-readiness topics: attracting investors, profile positioning, outreach drafts, investor readiness, pitch feedback, and deal room strategy.",
       "ALWAYS IN SCOPE (never decline these):",
       "- Any question about what you can do, what features Lengdon has, or how to use the platform",
       "- Any request to help build, complete, edit, or improve the user's profile or pitch",

@@ -133,7 +133,6 @@ const TOOL_REQUEST_PATTERNS = [
   /send\s+(an?\s+)?(invite|invitation)/i,
   /schedule\s+(a\s+)?meeting/i,
   /submit\s+(a\s+)?(decision|vote)/i,
-  /start\s+(a\s+)?roast/i,
   /add\s+(an?\s+)?investor/i,
   /track\s+(this\s+)?lead/i,
   /what\s+deals?\s+do\s+i\s+have/i,

@@ -200,65 +200,9 @@ function InformationPage() {
     await refetchNotes();
   };
 
-  // ── Roast record ──
-  const { data: roastRecord = [] } = useQuery({
-    queryKey: ["deal-room-roast-record", startupId],
-    enabled: !!startupId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("roast_sessions")
-        .select("id, level, status, badge_awarded, scheduled_at")
-        .eq("startup_id", startupId!)
-        .in("status", ["completed", "expired"])
-        .order("scheduled_at", { ascending: false });
-      if (error) { console.error("[information] roast record fetch failed:", error); return []; }
-      return data ?? [];
-    },
-  });
-
   return (
     <div className="mx-auto max-w-[1360px] px-8 py-8 space-y-6" style={{ fontFamily: "var(--font-lcs-ui)" }}>
       <MutualDisclosure />
-
-      {roastRecord.length > 0 && (
-        <div className="border p-5" style={{ borderColor: "var(--lcs-line)", background: "var(--lcs-white)" }}>
-          <div className="text-sm font-semibold mb-2" style={{ color: "var(--lcs-ink)" }}>
-            Roast record
-          </div>
-          <div className="space-y-2">
-            {roastRecord.map((r: any) => {
-              // Genuine 2-state signal (completed = good, expired = bad) —
-              // mapped onto satisfied/attention, no forced adverse tone, per
-              // Group 6 Phase-0 decision 5's palette-collapse rule.
-              const isDone = r.status === "completed";
-              return (
-                <a
-                  key={r.id}
-                  href={`/roast/${r.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between gap-3 px-4 py-3 text-sm border transition-opacity hover:opacity-80"
-                  style={{ borderRadius: "var(--radius-lcs-control)", background: isDone ? "var(--lcs-satisfied-wash)" : "var(--lcs-attention-wash)", borderColor: isDone ? "var(--lcs-satisfied)" : "var(--lcs-attention)" }}
-                >
-                  <span style={{ color: "var(--lcs-ink)" }}>
-                    {isDone
-                      ? `Completed a Level ${r.level} Roast — every public question answered on the record`
-                      : `Level ${r.level} Roast expired incomplete — public questions left unanswered`}
-                  </span>
-                  <span className="text-xs shrink-0" style={{ color: "var(--lcs-ink-muted)" }}>
-                    {new Date(r.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · view →
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-          {isInvestor && (
-            <p className="text-xs mt-2" style={{ color: "var(--lcs-ink-muted)" }}>
-              The Roast report's credibility flags feed the confrontational DD analysis automatically.
-            </p>
-          )}
-        </div>
-      )}
 
       {/* NDA panel removed 13 Aug 2026 — it duplicated the room overview's
           NDA & confidentiality panel exactly (same fetchNdaDocument call,

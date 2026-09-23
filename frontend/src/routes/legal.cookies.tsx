@@ -70,7 +70,7 @@ We disclose this here because it serves the same practical purpose as a session 
   },
   {
     title: "Third-party cookies",
-    content: `Where a deal room or Roast session includes a live video call, that call is hosted by Daily.co (see our Sub-processors page) inside an embedded frame on that page. Daily.co's frame may set its own cookies to operate the call. We do not control what Daily.co sets; its own privacy and cookie practices govern those cookies, not this policy.
+    content: `Where a deal room includes a live video call, that call is hosted by Daily.co (see our Sub-processors page) inside an embedded frame on that page. Daily.co's frame may set its own cookies to operate the call. We do not control what Daily.co sets; its own privacy and cookie practices govern those cookies, not this policy.
 
 This only happens on pages where you have actively joined a video call. It does not happen on the public Lengdon website or on any page where no call is in progress.
 

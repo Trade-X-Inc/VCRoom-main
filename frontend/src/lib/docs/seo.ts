@@ -60,7 +60,7 @@ const DOC_FAQS: Record<string, Array<{ q: string; a: string }>> = {
     },
     {
       q: "How does founder verification work?",
-      a: "There's no automated verification tier today. You can build a Founder Roast — a live, public Q&A with investors and other founders — which earns a Roast Survivor badge on your profile once completed.",
+      a: "There's no automated verification tier today. Investors assess a founder's profile, documents, and deal-room record directly — Lengdon records assertions and evidence, it does not issue verification claims or badges.",
     },
     {
       q: "Is Lengdon suitable for family offices?",

@@ -16,7 +16,6 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
         { id: "map", label: "Feature map" },
         { id: "flow", label: "The founder flow" },
         { id: "onboarding", label: "Onboarding flow" },
-        { id: "badges", label: "Roast Survivor badge" },
       ],
     },
     Body: () => (
@@ -60,14 +59,6 @@ export const FOUNDER_PAGES: Record<string, DocPage> = {
           signup to a live, discoverable profile is designed to take under ten minutes.
         </P>
 
-        <H2 id="badges">Roast Survivor badge</H2>
-        <P>
-          Completing a Founder Roast — a live, public Q&A where investors and other founders
-          challenge your pitch on the record — earns a Roast Survivor badge on your profile.
-          It is the platform's only automatically-awarded badge today: earned by completing
-          the session, not by paying the entry fee, and it can't be gamed because the whole
-          exchange happens in public.
-        </P>
       </>
     ),
   },

@@ -25,58 +25,6 @@ const FONT_MEDIUM = "'Inter:Medium', sans-serif";
 const FONT_REGULAR = "'Inter:Regular', sans-serif";
 const cardStyle: React.CSSProperties = { border: `1px solid ${RULE}`, background: "#fff", padding: 24 };
 
-/** Roast record: the receipts behind the badge. Public sessions only. */
-function RoastRecordLink({ startupId }: { startupId: string }) {
-  const { data: sessions = [] } = useQuery({
-    queryKey: ["public-roast-record", startupId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("roast_sessions")
-        .select("id, level, status, scheduled_at, badge_awarded")
-        .eq("startup_id", startupId)
-        .eq("is_public", true)
-        .in("status", ["scheduled", "lobby", "completed", "expired"])
-        .order("scheduled_at", { ascending: false })
-        .limit(3);
-      if (error) {
-        console.error("[roast] public record fetch failed:", error);
-        return [];
-      }
-      return data ?? [];
-    },
-  });
-  if (!sessions.length) return null;
-  return (
-    <div className="mt-4 space-y-2">
-      {sessions.map((s) => {
-        const upcoming = s.status === "scheduled" || s.status === "lobby";
-        const label = upcoming
-          ? `Live Roast ${new Date(s.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} — join as a challenger`
-          : s.status === "completed"
-            ? `Survived a Level ${s.level} Roast — read the public Q&A record`
-            : `Level ${s.level} Roast expired incomplete — see the record`;
-        return (
-          <a
-            key={s.id}
-            href={`/roast/${s.id}`}
-            style={{
-              fontFamily: FONT_MEDIUM,
-              display: "inline-flex", alignItems: "center", gap: 8,
-              border: "1px solid", padding: "10px 16px", fontSize: 13,
-              transition: "opacity 150ms",
-              ...(s.status === "expired"
-                ? { background: "#FEF2F2", borderColor: "#FECACA", color: "#DC2626" }
-                : { background: "#FFF7ED", borderColor: "#FED7AA", color: "#C2410C" }),
-            }}
-          >
-            {label} <span aria-hidden>→</span>
-          </a>
-        );
-      })}
-    </div>
-  );
-}
-
 // Field set matches get_public_founder_profile()'s actual output exactly
 // (supabase/migrations/20260823000000_public_founder_profile_whitelist.sql)
 // -- not the old 77-column startups row. website and registry_verified
@@ -824,7 +772,6 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               {startup.company_name || "Unnamed startup"}
             </h1>
             {startup.tagline && <p style={{ fontFamily: FONT_REGULAR, marginTop: 16, maxWidth: 720, fontSize: 18, color: INK_MUTED }}>{startup.tagline}</p>}
-            {startup?.id && <RoastRecordLink startupId={startup.id} />}
             {(startup.social_links ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {(startup.social_links ?? []).map((link, i) => (
