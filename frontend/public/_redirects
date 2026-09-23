@@ -57,11 +57,34 @@
 /app/claims       /app/prepare#claims         301
 /app/badges       /app/prepare#badges         301
 /app/overview     /app                        301
-/app/investor/overview    /app/investor                            301
 /app/investor/startups    /app/investor/source#watchlist           301
 /app/investor/intake      /app/investor/source#intake              301
-/app/investor/deal-rooms  /app/investor/evaluate#deal-rooms        301
-/app/investor/diligence   /app/investor/evaluate#diligence         301
-/app/investor/analysis    /app/investor/evaluate#analysis          301
-/app/investor/decisions   /app/investor/decide#decisions           301
-/app/investor/portfolio   /app/investor/decide#portfolio           301
+# The 6 rules below (overview/deal-rooms/diligence/analysis/decisions/
+# portfolio) were removed 22 Sep 2026 — stale since the July 2026 P5 nav
+# restructure. The 5 named in the original pass (deal-rooms/diligence/
+# analysis/decisions/portfolio) redirected to #hash anchors on
+# source.tsx/evaluate.tsx/decide.tsx that those files have never actually
+# read (confirmed: zero hash-reading code in any of the three). Real,
+# currently-live UI still links straight at these paths —
+# nav-structure.ts's sidebar (Deal Analysis, Decisions), and
+# evaluate.tsx/decide.tsx's own SectionLinkRows (Due diligence, AI
+# analysis, Deal rooms, Decisions, Portfolio) — so every one of those
+# real clicks was silently landing on a link-out page instead of the
+# intended screen. Live-verified broken (sidebar "Deal Rooms" -> Evaluate
+# page, not the real Deal Rooms list) before removing these rules, and
+# live-verified fixed after.
+#
+# /app/investor/overview was found as a 6th instance in the same pass,
+# added right after: it redirected to /app/investor (DealFlowHome, a
+# genuinely different screen with none of InvestorOverview's content —
+# confirmed by grep), and 3 real entry points still point at it
+# (nav-structure.ts's sidebar "Overview" link, analytics.tsx's own
+# header link, and app.support_.feedback.tsx's post-submit redirect).
+# Narrower in
+# practice than the other 5 — TanStack's client-side router resolves an
+# in-app <Link> click to /app/investor/overview correctly without ever
+# hitting this rule, so users already inside the SPA were unaffected —
+# but a hard reload, bookmark, or direct URL entry hit the stale 301
+# exactly like the other 5. Removed for the same reason: nothing reads
+# the redirect target as a substitute for the real page.
+# See LCS_MIGRATION_PLAN.md Group 8.

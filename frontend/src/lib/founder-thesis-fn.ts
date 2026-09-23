@@ -169,6 +169,7 @@ export const upsertFounderThesis = createServerFn({ method: "POST" })
 
 // AI-propose thesis defaults from founder profile context
 type ProposeInput = {
+  accessToken: string;
   sector: string;
   stage: string;
   problem: string;
@@ -178,6 +179,26 @@ type ProposeInput = {
   country: string;
   company_name: string;
 };
+
+// Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
+  if (!userId) return { allowed: true };
+  try {
+    const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
+    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !supabaseKey) return { allowed: true };
+    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ p_user_id: userId, p_feature: feature }),
+    });
+    if (!resp.ok) return { allowed: true };
+    const result = await resp.json() as any;
+    return { allowed: result.allowed ?? true, message: result.message };
+  } catch {
+    return { allowed: true };
+  }
+}
 
 type ThesisProposal = {
   ok: boolean;
@@ -195,9 +216,6 @@ type ThesisProposal = {
 export const proposeFounderThesis = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): ProposeInput => d as ProposeInput)
   .handler(async ({ data }): Promise<ThesisProposal> => {
-    const cfEnv = (globalThis as any).__cf_env || {};
-    const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
-
     const blank: ThesisProposal = {
       ok: false,
       preferred_check_size_min: "", preferred_check_size_max: "",
@@ -205,6 +223,16 @@ export const proposeFounderThesis = createServerFn({ method: "POST" })
       sector_expertise_wanted: "", geography_preference: "",
       exclusions: "", what_good_fit_looks_like: "",
     };
+
+    // Identity is derived from the caller's own session token, never a
+    // client-supplied id — see CLAUDE.md §51.
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ...blank, error: "not_authenticated" };
+    const usageCheck = await checkUsageCap(auth.uid, "thesis_propose");
+    if (!usageCheck.allowed) return { ...blank, error: usageCheck.message || "Daily AI limit reached." };
+
+    const cfEnv = (globalThis as any).__cf_env || {};
+    const openaiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
 
     if (!openaiKey) return { ...blank, error: "AI unavailable" };
 

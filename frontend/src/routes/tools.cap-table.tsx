@@ -77,7 +77,7 @@ function CapTable() {
                 <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-4 text-[#425466] text-[14px] text-right border-l border-[#e6e9ef]">{fmt(h.shares)}</div>
                 <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-4 font-semibold text-[#0a2540] text-[14px] text-right border-l border-[#e6e9ef]">{pct(h.shares, total)}</div>
                 <div className="flex items-center justify-center border-l border-[#e6e9ef]">
-                  <button onClick={() => remove(i)} className="w-full h-full flex items-center justify-center text-[#c9d0db] hover:text-red-400 transition-colors text-[16px]">×</button>
+                  <button onClick={() => remove(i)} className="w-full h-full flex items-center justify-center text-[#64748b] hover:text-red-400 transition-colors text-[16px]">×</button>
                 </div>
               </div>
             ))}
@@ -92,11 +92,11 @@ function CapTable() {
           <div className="flex gap-3 items-end">
             <div className="flex-1 flex flex-col gap-1.5">
               <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Name</label>
-              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="New Series A investor" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors" />
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="New Series A investor" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
             </div>
             <div className="w-40 flex flex-col gap-1.5">
               <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Shares</label>
-              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="1,000,000" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors" />
+              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="1,000,000" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
             </div>
             <button onClick={addHolder} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-6 py-3 transition-colors duration-200">
               Add

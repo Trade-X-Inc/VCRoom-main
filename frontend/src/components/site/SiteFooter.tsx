@@ -34,7 +34,7 @@ const FONT_INTER_REG = "'Inter:Regular', sans-serif";
 
 const INK = "#0a2540";
 const INK_MUTED = "#425466";
-const INK_FAINT = "#94a3b8";
+const INK_FAINT = "#64748b";
 const RULE = "#e6e9ef";
 const SATISFIED = "#16794f";
 const ADVERSE = "#b3261e";
@@ -95,6 +95,8 @@ const COLS: { heading: string; items: FooterLink[] }[] = [
       { label: "Legal overview", to: "/legal" },
       { label: "Privacy Policy", to: "/legal/privacy" },
       { label: "Terms of Service", to: "/legal/terms" },
+      { label: "Cookie Policy", to: "/legal/cookies" },
+      { label: "Refund Terms", to: "/legal/refunds" },
       { label: "DPA", to: "/legal/dpa" },
       { label: "Sub-processors", to: "/legal/sub-processors" },
       { label: "Acceptable Use", to: "/legal/acceptable-use" },

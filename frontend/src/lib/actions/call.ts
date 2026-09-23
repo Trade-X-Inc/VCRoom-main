@@ -24,14 +24,20 @@ type ServerAction = (opts: {
     accessToken: string;
     scopeId: string;
     isAgent?: boolean;
+    stepUpToken?: string;
     input: unknown;
   };
 }) => Promise<ActionResult<JsonValue>>;
 
+// stepUpToken: pass the single-use token obtained from verifyStepUp() when
+// resubmitting an action that previously failed with "STEP_UP_REQUIRED".
+// Ignored by every action that doesn't declare requiresStepUp — safe to
+// omit for the overwhelming majority of callAction call sites.
 export async function callAction<T = JsonValue>(
   action: ServerAction,
   scopeId: string,
   input: unknown,
+  stepUpToken?: string,
 ): Promise<T> {
   const {
     data: { session },
@@ -41,6 +47,7 @@ export async function callAction<T = JsonValue>(
       accessToken: session?.access_token ?? "",
       scopeId,
       isAgent: false,
+      stepUpToken,
       input,
     },
   });

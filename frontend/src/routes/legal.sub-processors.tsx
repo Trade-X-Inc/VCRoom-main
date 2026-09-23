@@ -28,6 +28,23 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // routes/auth.callback.tsx). A processor that receives real personal
 // data and isn't disclosed is a bigger gap than a disclosed vendor that
 // doesn't exist — this direction of error was previously unchecked.
+//
+// Corrected 20 Sep 2026 (compliance audit): two more undisclosed live
+// processors added, same direction-of-error as the HubSpot fix above.
+// OpenAI receives real deal-room Q&A and diligence document content via
+// the ai-router edge function — the absence of a DPA with them is
+// already tracked internally as an open counsel question, but had never
+// been surfaced on the customer-facing page the DPA's own §6 points at.
+// Its training/retention wording was verified against OpenAI's own
+// published API data policy, not asserted from memory. Daily.co was
+// confirmed a real live integration (src/lib/interview-fn.ts and
+// roast-fn.ts call api.daily.co to create rooms and meeting tokens) and
+// processes participant audio/video — unambiguously personal data.
+//
+// Notion was deliberately NOT added: it backs the public blog/CMS only
+// (src/lib/notion-blog.ts), handling published marketing content, not
+// customer personal data. Listing it would overstate the processing
+// surface in the other direction.
 
 export const Route = createFileRoute("/legal/sub-processors")({
   component: SubProcessors,
@@ -40,6 +57,8 @@ const PROCESSORS = [
   { name: "Resend", category: "Transactional email", location: "United States", purpose: "Delivery of system notifications, gate confirmation emails, and account verification messages." },
   { name: "Supabase", category: "Database & authentication", location: "United States / EU", purpose: "PostgreSQL database hosting, authentication, and file storage for deal room data, audit logs, and user accounts." },
   { name: "HubSpot", category: "CRM & contact management", location: "United States / EU", purpose: "Stores contact records (name, email, account role) created on signup, waitlist join, or contact form submission. Used for account communications and support — not for advertising." },
+  { name: "OpenAI", category: "AI processing", location: "United States", purpose: "Processes document and deal room content submitted to AI features — document review, diligence analysis, and Q&A summarisation. Per OpenAI's published API policy, content sent via the API is not used to train their models, and abuse-monitoring logs are retained for up to 30 days. A data processing agreement with this provider is not yet in place; until it is, do not submit content to AI features that you would not accept being processed under those terms." },
+  { name: "Daily.co", category: "Video meetings", location: "United States", purpose: "Hosts live audio and video for in-room meetings and interview sessions. Processes participant audio, video, and display names for the duration of a call." },
 ];
 
 function SubProcessors() {

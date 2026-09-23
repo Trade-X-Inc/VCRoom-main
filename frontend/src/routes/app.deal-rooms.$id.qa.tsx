@@ -203,8 +203,10 @@ function QAPage() {
     try {
       const sector = room?.startups?.sector ?? "technology";
       const prevQs = questions.map((q) => q.content);
+      const { data: { session } } = await supabase.auth.getSession();
       const result = await getQASuggestions({
         data: {
+          userAccessToken: session?.access_token ?? "",
           question: `Suggest 3 due diligence questions for ${companyName}`,
           startupName: companyName,
           sector,

@@ -414,6 +414,7 @@ const docRequestSetStatusDef: ActionDef<
 > = {
   name: "documentRequests.setStatus",
   class: "commit", // fulfilling/closing a request is a consequential state change
+  requiresStepUp: true, // password re-entry step-up (Gate C, 22 Sep 2026)
   validate: (raw) => {
     const r = raw as { requestId?: unknown; status?: unknown };
     if (!isUuid(r?.requestId)) throw new Error("requestId must be a uuid");
@@ -451,6 +452,7 @@ export const docRequestSetStatus = createServerFn({ method: "POST" })
 const docRequestDeleteDef: ActionDef<{ requestId: string }, Obj> = {
   name: "documentRequests.delete",
   class: "commit",
+  requiresStepUp: true, // password re-entry step-up (Gate C, 22 Sep 2026)
   validate: (raw) => {
     const r = raw as { requestId?: unknown };
     if (!isUuid(r?.requestId)) throw new Error("requestId must be a uuid");

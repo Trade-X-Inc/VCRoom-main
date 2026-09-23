@@ -130,6 +130,59 @@ jobs:
           echo "The remaining 2 (landing-page.spec.ts, landing-v2.spec.ts) hardcode https://lengdon.com with no override, and assert stale content."
           echo "This step is intentionally a no-op — it does not run, skip silently, or fake a pass. See CLAUDE.md for the tracked rework item."
 
+  accessibility:
+    name: Accessibility scan (axe-core, report-only)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # Chromium only — the existing playwright.config.ts already scopes
+      # to a single "chromium" project, so this matches what's already
+      # the real target rather than installing all three engines.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      # Serve THIS build locally — wrangler pages dev, never `vite dev`
+      # (see CLAUDE.md's standing rule: dev-server behavior and the real
+      # worker's behavior have been found to differ before). Same
+      # pattern this project already uses for every manual live-build
+      # check all session: build, clear stale local wrangler state,
+      # serve, poll for a real 200 before running anything against it —
+      # rather than a fixed sleep, which is exactly what caused a
+      # connection-refused flake earlier in this same session.
+      - name: Start local preview server (wrangler pages dev)
+        run: |
+          rm -rf .wrangler dist/.wrangler
+          npx wrangler pages dev dist/client --port 8788 --compatibility-date=2024-09-23 \
+            > /tmp/wrangler-a11y.log 2>&1 &
+          for i in $(seq 1 30); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8788/ || echo "000")
+            if [ "$CODE" = "200" ]; then
+              echo "Server up after ${i}s (HTTP 200)."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::wrangler pages dev never returned 200 within 30s."
+          cat /tmp/wrangler-a11y.log
+          exit 1
+      # tests/a11y-scan.spec.ts scopes itself to 5 unauthenticated routes
+      # and NEVER asserts on violations — see that file's own header.
+      # This step prints the full report to the job log; it does not
+      # gate the build. A11Y_SCAN_BASE_URL overrides the spec's default
+      # localhost target, matching where this job's own server listens
+      # (playwright.config.ts's baseURL is hardcoded to production and
+      # is deliberately not used here — see the spec file header).
+      - name: Run axe-core scan (report-only — never fails this job)
+        env:
+          A11Y_SCAN_BASE_URL: "http://localhost:8788"
+        run: npx playwright test tests/a11y-scan.spec.ts --reporter=list
+
   dependency-audit:
     name: Dependency vulnerability scan
     runs-on: ubuntu-latest

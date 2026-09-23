@@ -1,12 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Globe, Users, Video, Sparkles, Lock, EyeOff } from "lucide-react";
+import { ArrowLeft, Globe, Users, Video, Lock, EyeOff } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+// Restyled onto the public site's real navy/gold convention (23 Sep 2026
+// public-site restyle pass) — this file previously used the internal-app
+// v1 theme's --brand/--card/--border/--muted-foreground/--foreground CSS
+// vars (all still live and purple, see styles.css), not the navy/gold
+// hex convention SiteHeader.tsx/PageHero.tsx and the rest of the public
+// site use. Inline styles/constants only; every data binding, query, and
+// handler below is unchanged.
+const INK = "#0a2540";
+const INK_MUTED = "#425466";
+const INK_FAINT = "#64748b";
+const RULE = "#e6e9ef";
+const SURFACE = "#f8f9fb";
+const FONT_SEMIBOLD = "'Geist:SemiBold', sans-serif";
+const FONT_MEDIUM = "'Inter:Medium', sans-serif";
+const FONT_REGULAR = "'Inter:Regular', sans-serif";
+const cardStyle: React.CSSProperties = { border: `1px solid ${RULE}`, background: "#fff", padding: 24 };
 
 /** Roast record: the receipts behind the badge. Public sessions only. */
 function RoastRecordLink({ startupId }: { startupId: string }) {
@@ -42,22 +59,17 @@ function RoastRecordLink({ startupId }: { startupId: string }) {
           <a
             key={s.id}
             href={`/roast/${s.id}`}
-            className="inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
-            style={
-              s.status === "expired"
-                ? {
-                    background: "rgba(239,68,68,0.12)",
-                    borderColor: "rgba(239,68,68,0.3)",
-                    color: "#F87171",
-                  }
-                : {
-                    background: "rgba(249,115,22,0.12)",
-                    borderColor: "rgba(249,115,22,0.3)",
-                    color: "#FB923C",
-                  }
-            }
+            style={{
+              fontFamily: FONT_MEDIUM,
+              display: "inline-flex", alignItems: "center", gap: 8,
+              border: "1px solid", padding: "10px 16px", fontSize: 13,
+              transition: "opacity 150ms",
+              ...(s.status === "expired"
+                ? { background: "#FEF2F2", borderColor: "#FECACA", color: "#DC2626" }
+                : { background: "#FFF7ED", borderColor: "#FED7AA", color: "#C2410C" }),
+            }}
           >
-            <span aria-hidden>🔥</span> {label} <span aria-hidden>→</span>
+            {label} <span aria-hidden>→</span>
           </a>
         );
       })}
@@ -206,7 +218,7 @@ function YouTubeEmbed({ url, label }: { url: string; label: string }) {
   if (!videoId) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer"
-        className="flex items-center gap-2 text-sm text-brand hover:opacity-80">
+        style={{ fontFamily: FONT_MEDIUM, display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: INK }}>
         Watch {label} →
       </a>
     );
@@ -306,43 +318,40 @@ function LockedSectionCard({
 
   return (
     <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
+      background: '#fff',
+      border: `1px solid ${RULE}`,
       padding: '32px 24px',
       textAlign: 'center',
       marginBottom: 24,
     }}>
       <div style={{
         width: 40, height: 40,
-        background: 'rgba(124,58,237,0.1)',
-        borderRadius: 8,
+        background: SURFACE,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         margin: '0 auto 16px',
       }}>
-        <Lock size={18} style={{ color: 'var(--brand)' }} />
+        <Lock size={18} style={{ color: INK }} />
       </div>
-      <p style={{ color: '#ffffff', fontSize: 15, fontWeight: 600, marginBottom: 8 }}>
+      <p style={{ fontFamily: FONT_MEDIUM, color: INK, fontSize: 15, marginBottom: 8 }}>
         {sectionLabel}
       </p>
       {isDealRoom ? (
         <>
-          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 20 }}>
+          <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginBottom: 20 }}>
             This section is available inside the deal room. Founders share financials with investors they have approved.
           </p>
           <a
             href="/sign-up?role=investor"
             style={{
+              fontFamily: FONT_SEMIBOLD,
               display: 'inline-block',
-              background: '#7C3AED',
+              background: INK,
               color: '#fff',
               border: 'none',
               padding: '10px 20px',
-              borderRadius: 8,
               fontSize: 14,
-              fontWeight: 500,
               textDecoration: 'none',
             }}
           >
@@ -351,52 +360,50 @@ function LockedSectionCard({
         </>
       ) : requestStatus === "pending" ? (
         <>
-          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 16 }}>
+          <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginBottom: 16 }}>
             This section is available to verified investors with an approved access request.
           </p>
           <div style={{
+            fontFamily: FONT_MEDIUM,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            background: 'rgba(16,185,129,0.12)',
-            border: '1px solid rgba(16,185,129,0.3)',
-            color: '#10B981',
+            background: '#ECFDF5',
+            border: '1px solid #A7F3D0',
+            color: '#059669',
             padding: '8px 16px',
-            borderRadius: 8,
             fontSize: 13,
-            fontWeight: 500,
           }}>
-            ✓ Access requested — pending founder approval
+            Access requested — pending founder approval
           </div>
         </>
       ) : requestStatus === "approved" ? (
-        <p style={{ color: '#10B981', fontSize: 13 }}>Access approved — content should be visible.</p>
+        <p style={{ fontFamily: FONT_REGULAR, color: '#059669', fontSize: 13 }}>Access approved — content should be visible.</p>
       ) : requestStatus === "rejected" ? (
         <>
-          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 16 }}>
+          <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginBottom: 16 }}>
             This section is available to verified investors with an approved access request.
           </p>
-          <p style={{ color: 'rgba(239,68,68,0.7)', fontSize: 12 }}>
+          <p style={{ fontFamily: FONT_REGULAR, color: '#DC2626', fontSize: 12 }}>
             Your previous request was not approved.
           </p>
         </>
       ) : (
         <>
-          <p style={{ color: 'var(--muted-foreground)', fontSize: 13, marginBottom: 20 }}>
+          <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginBottom: 20 }}>
             This section is available to verified investors with an approved access request.
           </p>
           <button
             onClick={onRequestAccess}
             disabled={requestStatus === "submitting"}
             style={{
-              background: '#7C3AED',
+              fontFamily: FONT_SEMIBOLD,
+              background: INK,
               color: '#fff',
               border: 'none',
               padding: '10px 20px',
-              borderRadius: 8,
               cursor: requestStatus === "submitting" ? 'wait' : 'pointer',
               fontSize: 14,
-              fontWeight: 500,
               opacity: requestStatus === "submitting" ? 0.7 : 1,
             }}
           >
@@ -462,8 +469,8 @@ function FounderPublicProfileWrapper() {
   // Still resolving session
   if (ownerState.loading) {
     return (
-      <div style={{ background: "var(--background)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 32, height: 32, border: "2px solid rgba(124,58,237,0.3)", borderTopColor: "var(--brand)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ background: "#fff", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 32, height: 32, border: `2px solid ${RULE}`, borderTopColor: INK, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -476,11 +483,11 @@ function FounderPublicProfileWrapper() {
 
   // Not published / not owner
   return (
-    <div style={{ background: "var(--background)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center", color: "#FAFAFA" }}>
-        <h1 style={{ fontSize: 32, fontFamily: "Syne, sans-serif", fontWeight: 800, marginBottom: 12 }}>Profile private</h1>
-        <p style={{ color: "var(--muted-foreground)", fontSize: 15 }}>This founder profile hasn't been published yet.</p>
-        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "var(--brand)", textDecoration: "underline", fontSize: 14 }}>Back to Lengdon</a>
+    <div style={{ background: "#fff", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center" }}>
+        <h1 style={{ fontFamily: FONT_SEMIBOLD, fontSize: 32, color: INK, marginBottom: 12 }}>Profile private</h1>
+        <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 15 }}>This founder profile hasn't been published yet.</p>
+        <a href="/" style={{ fontFamily: FONT_REGULAR, display: "inline-block", marginTop: 24, color: INK, textDecoration: "underline", fontSize: 14 }}>Back to Lengdon</a>
       </div>
     </div>
   );
@@ -733,7 +740,7 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-white" style={{ color: INK }}>
       <SiteHeader />
 
       {/* Connection request modal — optional message, max 200 chars */}
@@ -743,16 +750,17 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
           onClick={() => !connectSending && setShowConnectModal(false)}
         >
           <div
-            className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6"
+            className="w-full max-w-md bg-white p-6"
+            style={{ border: `1px solid ${RULE}` }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: "Syne, sans-serif" }}>
+            <h3 style={{ fontFamily: FONT_SEMIBOLD, fontSize: 18, color: INK }}>
               Request access to {startup.company_name}
             </h3>
-            <p className="mt-1 text-sm text-gray-600">
+            <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 14, marginTop: 4 }}>
               The founder reviews every request. If approved, a private deal room opens for both of you.
             </p>
-            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <label style={{ fontFamily: FONT_MEDIUM, display: "block", marginTop: 16, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em", color: INK_FAINT }}>
               Add a message (optional)
             </label>
             <textarea
@@ -761,21 +769,21 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               rows={3}
               maxLength={200}
               placeholder="Why you're interested, your fund's thesis fit…"
-              className="mt-1.5 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none resize-none"
+              style={{ fontFamily: FONT_REGULAR, marginTop: 6, width: "100%", border: `1px solid ${RULE}`, padding: "8px 12px", fontSize: 14, color: INK, outline: "none", resize: "none" }}
             />
-            <div className="mt-1 text-right text-[11px] text-[#71717A]">{connectMessage.length}/200</div>
-            <div className="mt-4 flex gap-3">
+            <div style={{ fontFamily: FONT_REGULAR, marginTop: 4, textAlign: "right", fontSize: 11, color: INK_FAINT }}>{connectMessage.length}/200</div>
+            <div style={{ marginTop: 16, display: "flex", gap: 12 }}>
               <button
                 onClick={submitConnectRequest}
                 disabled={connectSending}
-                className="flex-1 rounded-lg hs-gradient px-4 py-2.5 text-sm font-semibold text-white hover:hs-gradient disabled:opacity-60"
+                style={{ fontFamily: FONT_SEMIBOLD, flex: 1, background: INK, padding: "10px 16px", fontSize: 14, color: "#fff", border: "none", cursor: connectSending ? "not-allowed" : "pointer", opacity: connectSending ? 0.6 : 1 }}
               >
                 {connectSending ? "Sending…" : "Send request"}
               </button>
               <button
                 onClick={() => setShowConnectModal(false)}
                 disabled={connectSending}
-                className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900"
+                style={{ fontFamily: FONT_MEDIUM, border: `1px solid ${RULE}`, padding: "10px 16px", fontSize: 14, color: INK_MUTED, background: "#fff", cursor: "pointer" }}
               >
                 Cancel
               </button>
@@ -787,8 +795,8 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       {/* Owner preview banner — amber, same style as /i/$slug */}
       {isOwnerPreview && (
         <div style={{
-          background: "rgba(245,158,11,0.12)",
-          borderBottom: "1px solid rgba(245,158,11,0.25)",
+          background: "#FFFBEB",
+          borderBottom: "1px solid #FDE68A",
           padding: "10px 24px",
           display: "flex",
           alignItems: "center",
@@ -797,12 +805,12 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
           flexWrap: "wrap",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <EyeOff style={{ height: 14, width: 14, color: "#F59E0B", flexShrink: 0 }} />
-            <span style={{ fontSize: 13, color: "#F59E0B", fontWeight: 500 }}>
+            <EyeOff style={{ height: 14, width: 14, color: "#92400E", flexShrink: 0 }} />
+            <span style={{ fontFamily: FONT_MEDIUM, fontSize: 13, color: "#92400E" }}>
               Preview mode — this is how your profile will look to others. Not published yet.
             </span>
           </div>
-          <a href="/app/profile" style={{ fontSize: 12, color: "#F59E0B", textDecoration: "underline", whiteSpace: "nowrap" }}>
+          <a href="/app/profile" style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: "#92400E", textDecoration: "underline", whiteSpace: "nowrap" }}>
             Back to profile settings
           </a>
         </div>
@@ -811,72 +819,72 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
         {/* Header — always public */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Founder profile</p>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight" style={{ fontFamily: "Syne, sans-serif" }}>
+            <p style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.2em", color: INK_FAINT }}>Founder profile</p>
+            <h1 style={{ fontFamily: FONT_SEMIBOLD, marginTop: 12, fontSize: 36, letterSpacing: "-0.02em", color: INK }}>
               {startup.company_name || "Unnamed startup"}
             </h1>
-            {startup.tagline && <p className="mt-4 max-w-3xl text-lg text-muted-foreground">{startup.tagline}</p>}
+            {startup.tagline && <p style={{ fontFamily: FONT_REGULAR, marginTop: 16, maxWidth: 720, fontSize: 18, color: INK_MUTED }}>{startup.tagline}</p>}
             {startup?.id && <RoastRecordLink startupId={startup.id} />}
             {(startup.social_links ?? []).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {(startup.social_links ?? []).map((link, i) => (
                   <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-md text-xs bg-accent border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                    style={{ fontFamily: FONT_MEDIUM, padding: "6px 12px", fontSize: 12, background: SURFACE, border: `1px solid ${RULE}`, color: INK_MUTED, transition: "color 150ms" }}>
                     {link.platform} →
                   </a>
                 ))}
               </div>
             )}
           </div>
-          <Link to="/" className="inline-flex items-center gap-2 text-sm font-medium text-brand hover:text-brand/80">
+          <Link to="/" style={{ fontFamily: FONT_MEDIUM, display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, color: INK }}>
             <ArrowLeft className="h-4 w-4" /> Back to home
           </Link>
         </div>
 
         {/* Intro video — identity section */}
         {startup.intro_video_url && (
-          <div className="mb-8 rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-            <div className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4">Meet the founder</div>
+          <div style={{ ...cardStyle, marginBottom: 32 }}>
+            <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.2em", color: INK_FAINT, marginBottom: 16 }}>Meet the founder</div>
             <YouTubeEmbed url={startup.intro_video_url} label="founder intro" />
-            <a href={startup.intro_video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-1 inline-block">Open video link →</a>
+            <a href={startup.intro_video_url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT, marginTop: 4, display: "inline-block" }}>Open video link →</a>
           </div>
         )}
 
         {/* Identity cards — always public */}
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
+          <div style={cardStyle}>
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-3xl bg-purple-950 text-white grid place-items-center text-xl font-semibold overflow-hidden">
+              <div style={{ height: 64, width: 64, background: INK, color: "#fff", display: "grid", placeItems: "center", fontFamily: FONT_SEMIBOLD, fontSize: 20, overflow: "hidden", flexShrink: 0 }}>
                 {startup.logo_url
                   ? <img src={startup.logo_url} alt={startup.company_name ?? "Logo"} className="h-full w-full object-cover" />
                   : (startup.company_name || "?")[0]}
               </div>
               <div>
-                <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Stage</div>
-                <div className="mt-2 text-lg font-semibold text-foreground">{startup.stage || "N/A"}</div>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.2em", color: INK_FAINT }}>Stage</div>
+                <div style={{ fontFamily: FONT_MEDIUM, marginTop: 8, fontSize: 17, color: INK }}>{startup.stage || "N/A"}</div>
               </div>
             </div>
-            <div className="mt-6 space-y-3 text-sm text-muted-foreground">
-              {startup.sector && <div><span className="font-semibold text-foreground">Sector:</span> {startup.sector}</div>}
-              {startup.country && <div><span className="font-semibold text-foreground">HQ:</span> {startup.country}</div>}
-              {startup.founder_name && <div><span className="font-semibold text-foreground">Founder:</span> {startup.founder_name}</div>}
+            <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12, fontSize: 14, color: INK_MUTED, fontFamily: FONT_REGULAR }}>
+              {startup.sector && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Sector:</span> {startup.sector}</div>}
+              {startup.country && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>HQ:</span> {startup.country}</div>}
+              {startup.founder_name && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Founder:</span> {startup.founder_name}</div>}
             </div>
           </div>
 
           <div className="lg:col-span-2 space-y-4">
-            <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-              <div className="text-sm uppercase tracking-[0.3em] text-muted-foreground mb-4">Summary</div>
-              <p className="text-sm leading-relaxed text-muted-foreground">{startup.description || startup.solution || "No summary provided yet."}</p>
+            <div style={cardStyle}>
+              <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.2em", color: INK_FAINT, marginBottom: 16 }}>Summary</div>
+              <p style={{ fontFamily: FONT_REGULAR, fontSize: 14, lineHeight: 1.6, color: INK_MUTED }}>{startup.description || startup.solution || "No summary provided yet."}</p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Raising</div>
-                <div className="mt-2 text-lg font-semibold text-foreground">{formatCurrency(startup.funding_target)}</div>
+              <div style={cardStyle}>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT }}>Raising</div>
+                <div style={{ fontFamily: FONT_MEDIUM, marginTop: 8, fontSize: 17, color: INK }}>{formatCurrency(startup.funding_target)}</div>
               </div>
-              <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Team size</div>
-                <div className="mt-2 text-lg font-semibold text-foreground">{startup.team_size ?? "—"}</div>
+              <div style={cardStyle}>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT }}>Team size</div>
+                <div style={{ fontFamily: FONT_MEDIUM, marginTop: 8, fontSize: 17, color: INK }}>{startup.team_size ?? "—"}</div>
               </div>
             </div>
           </div>
@@ -894,20 +902,20 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
             <SectionGate sectionKey="business_model">
               <ProfileSection label="Business model" value={startup.business_model} fallback="Business model details not available." />
               {(startup.revenue_model || startup.pricing || startup.use_of_funds) && (
-                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                  <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">Revenue model & pricing</div>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    {startup.revenue_model && <div><span className="font-semibold text-foreground">Revenue:</span> {startup.revenue_model}</div>}
-                    {startup.pricing && <div><span className="font-semibold text-foreground">Pricing:</span> {startup.pricing}</div>}
-                    {startup.target_customer && <div><span className="font-semibold text-foreground">Target customer:</span> {startup.target_customer}</div>}
-                    {startup.use_of_funds && <div><span className="font-semibold text-foreground">Use of funds:</span> {startup.use_of_funds}</div>}
+                <div style={cardStyle}>
+                  <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT, marginBottom: 12 }}>Revenue model & pricing</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14, color: INK_MUTED, fontFamily: FONT_REGULAR }}>
+                    {startup.revenue_model && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Revenue:</span> {startup.revenue_model}</div>}
+                    {startup.pricing && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Pricing:</span> {startup.pricing}</div>}
+                    {startup.target_customer && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Target customer:</span> {startup.target_customer}</div>}
+                    {startup.use_of_funds && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Use of funds:</span> {startup.use_of_funds}</div>}
                   </div>
                 </div>
               )}
               {startup.revenue && (
-                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                  <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Revenue</div>
-                  <div className="mt-2 text-lg font-semibold text-foreground">{formatCurrency(startup.revenue)}</div>
+                <div style={cardStyle}>
+                  <div style={{ fontFamily: FONT_MEDIUM, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT }}>Revenue</div>
+                  <div style={{ fontFamily: FONT_MEDIUM, marginTop: 8, fontSize: 17, color: INK }}>{formatCurrency(startup.revenue)}</div>
                 </div>
               )}
             </SectionGate>
@@ -922,12 +930,12 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
                 fallback="Market opportunity details not provided."
               />
               {(startup.competitive_advantage || startup.why_now || startup.moat) && (
-                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                  <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">Competitive position</div>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    {startup.competitive_advantage && <div><span className="font-semibold text-foreground">Advantage:</span> {startup.competitive_advantage}</div>}
-                    {startup.moat && <div><span className="font-semibold text-foreground">Moat:</span> {startup.moat}</div>}
-                    {startup.competitors && <div><span className="font-semibold text-foreground">Competitors:</span> {startup.competitors}</div>}
+                <div style={cardStyle}>
+                  <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT, marginBottom: 12 }}>Competitive position</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14, color: INK_MUTED, fontFamily: FONT_REGULAR }}>
+                    {startup.competitive_advantage && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Advantage:</span> {startup.competitive_advantage}</div>}
+                    {startup.moat && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Moat:</span> {startup.moat}</div>}
+                    {startup.competitors && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Competitors:</span> {startup.competitors}</div>}
                   </div>
                 </div>
               )}
@@ -937,25 +945,25 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
             <SectionGate sectionKey="traction">
               <ProfileSection label="Traction" value={startup.traction} fallback="Traction data not available." />
               {(startup.key_metric || startup.growth_rate || startup.customer_count || startup.milestones) && (
-                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                  <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">Key metrics</div>
-                  <div className="space-y-2 text-sm text-muted-foreground">
+                <div style={cardStyle}>
+                  <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT, marginBottom: 12 }}>Key metrics</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14, color: INK_MUTED, fontFamily: FONT_REGULAR }}>
                     {startup.key_metric && (
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span><span className="font-semibold text-foreground">Key metric:</span> {startup.key_metric}</span>
+                        <span><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Key metric:</span> {startup.key_metric}</span>
                       </div>
                     )}
                     {startup.growth_rate && (
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span><span className="font-semibold text-foreground">Growth:</span> {startup.growth_rate}</span>
+                        <span><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Growth:</span> {startup.growth_rate}</span>
                       </div>
                     )}
                     {startup.customer_count && (
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span><span className="font-semibold text-foreground">Customers:</span> {startup.customer_count}</span>
+                        <span><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Customers:</span> {startup.customer_count}</span>
                       </div>
                     )}
-                    {startup.milestones && <div><span className="font-semibold text-foreground">Milestones:</span> {startup.milestones}</div>}
+                    {startup.milestones && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Milestones:</span> {startup.milestones}</div>}
                   </div>
                 </div>
               )}
@@ -963,52 +971,52 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
 
             {/* Product video */}
             {startup.product_video_url && (
-              <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">PRODUCT DEMO</div>
+              <div style={cardStyle}>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT, marginBottom: 12 }}>Product demo</div>
                 <YouTubeEmbed url={startup.product_video_url} label="product demo" />
-                <a href={startup.product_video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-1 inline-block">Open video link →</a>
+                <a href={startup.product_video_url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT, marginTop: 4, display: "inline-block" }}>Open video link →</a>
               </div>
             )}
 
             {/* Financials section */}
             <SectionGate sectionKey="financials">
-              <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">Financials</div>
+              <div style={cardStyle}>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT, marginBottom: 12 }}>Financials</div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {startup.valuation && (
                     <div>
-                      <div className="text-xs text-muted-foreground">Valuation</div>
-                      <div className="mt-1 font-semibold">{formatCurrency(startup.valuation)}</div>
+                      <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT }}>Valuation</div>
+                      <div style={{ fontFamily: FONT_MEDIUM, marginTop: 4, color: INK }}>{formatCurrency(startup.valuation)}</div>
                     </div>
                   )}
                   {startup.burn_rate && (
                     <div>
-                      <div className="text-xs text-muted-foreground">Burn rate</div>
-                      <div className="mt-1 font-semibold">{startup.burn_rate}</div>
+                      <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT }}>Burn rate</div>
+                      <div style={{ fontFamily: FONT_MEDIUM, marginTop: 4, color: INK }}>{startup.burn_rate}</div>
                     </div>
                   )}
                   {startup.runway_months && (
                     <div>
-                      <div className="text-xs text-muted-foreground">Runway</div>
-                      <div className="mt-1 font-semibold">{startup.runway_months} months</div>
+                      <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT }}>Runway</div>
+                      <div style={{ fontFamily: FONT_MEDIUM, marginTop: 4, color: INK }}>{startup.runway_months} months</div>
                     </div>
                   )}
                   {startup.previous_funding && (
                     <div>
-                      <div className="text-xs text-muted-foreground">Previous funding</div>
-                      <div className="mt-1 font-semibold">{startup.previous_funding}</div>
+                      <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT }}>Previous funding</div>
+                      <div style={{ fontFamily: FONT_MEDIUM, marginTop: 4, color: INK }}>{startup.previous_funding}</div>
                     </div>
                   )}
                   {startup.current_investors && (
                     <div className="sm:col-span-2">
-                      <div className="text-xs text-muted-foreground">Current investors</div>
-                      <div className="mt-1 text-sm">{startup.current_investors}</div>
+                      <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT }}>Current investors</div>
+                      <div style={{ fontFamily: FONT_REGULAR, marginTop: 4, fontSize: 14, color: INK_MUTED }}>{startup.current_investors}</div>
                     </div>
                   )}
                   {startup.unit_economics && (
                     <div className="sm:col-span-2">
-                      <div className="text-xs text-muted-foreground">Unit economics</div>
-                      <div className="mt-1 text-sm">{startup.unit_economics}</div>
+                      <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT }}>Unit economics</div>
+                      <div style={{ fontFamily: FONT_REGULAR, marginTop: 4, fontSize: 14, color: INK_MUTED }}>{startup.unit_economics}</div>
                     </div>
                   )}
                 </div>
@@ -1019,30 +1027,30 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
           {/* Right sidebar */}
           <div className="space-y-6">
             {startup.logo_url && (
-              <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                <div className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Logo</div>
-                <img src={startup.logo_url} alt={startup.company_name ?? "Logo"} loading="lazy" className="mt-4 w-full rounded-3xl object-cover" />
+              <div style={cardStyle}>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT }}>Logo</div>
+                <img src={startup.logo_url} alt={startup.company_name ?? "Logo"} loading="lazy" style={{ marginTop: 16, width: "100%", objectFit: "cover" }} />
               </div>
             )}
 
             {/* Team section */}
             <SectionGate sectionKey="team">
-              <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-                <div className="text-sm font-semibold mb-3">Team</div>
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  {startup.founder_name && <div><span className="font-semibold text-foreground">Founder:</span> {startup.founder_name}</div>}
+              <div style={cardStyle}>
+                <div style={{ fontFamily: FONT_MEDIUM, fontSize: 14, color: INK, marginBottom: 12 }}>Team</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 14, color: INK_MUTED, fontFamily: FONT_REGULAR }}>
+                  {startup.founder_name && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Founder:</span> {startup.founder_name}</div>}
                   {startup.founder_linkedin && (
-                    <div><span className="font-semibold text-foreground">LinkedIn:</span>{" "}
-                      <a href={startup.founder_linkedin} target="_blank" rel="noreferrer" className="text-brand hover:underline">View profile</a>
+                    <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>LinkedIn:</span>{" "}
+                      <a href={startup.founder_linkedin} target="_blank" rel="noreferrer" style={{ color: INK, textDecoration: "underline" }}>View profile</a>
                     </div>
                   )}
-                  {startup.cofounder_name && <div><span className="font-semibold text-foreground">Co-founder:</span> {startup.cofounder_name}</div>}
+                  {startup.cofounder_name && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Co-founder:</span> {startup.cofounder_name}</div>}
                   {startup.cofounder_linkedin && (
-                    <div><span className="font-semibold text-foreground">Co-founder LinkedIn:</span>{" "}
-                      <a href={startup.cofounder_linkedin} target="_blank" rel="noreferrer" className="text-brand hover:underline">View profile</a>
+                    <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Co-founder LinkedIn:</span>{" "}
+                      <a href={startup.cofounder_linkedin} target="_blank" rel="noreferrer" style={{ color: INK, textDecoration: "underline" }}>View profile</a>
                     </div>
                   )}
-                  {startup.advisors && <div><span className="font-semibold text-foreground">Advisors:</span> {startup.advisors}</div>}
+                  {startup.advisors && <div><span style={{ fontFamily: FONT_MEDIUM, color: INK }}>Advisors:</span> {startup.advisors}</div>}
                 </div>
               </div>
             </SectionGate>
@@ -1050,9 +1058,8 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
         </div>
       </main>
 
-      <div className="border-t border-gray-100 py-6 text-center">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-          <Sparkles className="h-3.5 w-3.5 text-brand" />
+      <div style={{ borderTop: `1px solid ${RULE}`, padding: "24px 0", textAlign: "center" }}>
+        <Link to="/" style={{ fontFamily: FONT_REGULAR, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: INK_FAINT }}>
           Powered by Lengdon
         </Link>
       </div>
@@ -1063,16 +1070,16 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
       {startup && viewerId !== startup.founder_id && (
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: 'var(--background)', borderTop: '1px solid var(--border)',
-          backdropFilter: 'blur(12px)', padding: '16px 24px',
+          background: '#fff', borderTop: `1px solid ${RULE}`,
+          padding: '16px 24px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          zIndex: 50, fontFamily: 'DM Sans, sans-serif',
+          zIndex: 50,
         }}>
           <div>
-            <p style={{ color: '#ffffff', fontSize: 14, fontWeight: 600, margin: 0 }}>
+            <p style={{ fontFamily: FONT_MEDIUM, color: INK, fontSize: 14, margin: 0 }}>
               Interested in {startup.company_name}?
             </p>
-            <p style={{ color: 'var(--muted-foreground)', fontSize: 12, margin: 0 }}>
+            <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 12, margin: 0 }}>
               Request access to their full data room on Lengdon
             </p>
           </div>
@@ -1081,8 +1088,9 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
               ? "/app/investor/deal-flow"
               : `/sign-up?role=investor&interest=${startup.profile_slug}`}
             style={{
-              background: '#7C3AED', color: '#ffffff', padding: '10px 20px',
-              borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 500, whiteSpace: 'nowrap',
+              fontFamily: FONT_SEMIBOLD,
+              background: INK, color: '#fff', padding: '10px 20px',
+              textDecoration: 'none', fontSize: 14, whiteSpace: 'nowrap',
             }}>
             {viewerRole === "investor" ? "View in deal flow →" : "Request access →"}
           </a>
@@ -1104,9 +1112,9 @@ function getVisibility(startup: PublicStartup): Record<string, string> {
 function ProfileSection({ label, value, fallback }: { label: string; value: string | null | undefined; fallback?: string }) {
   const content = value?.trim().length ? value : fallback;
   return (
-    <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-card">
-      <div className="text-sm uppercase tracking-[0.24em] text-muted-foreground mb-3">{label}</div>
-      <p className="text-sm leading-relaxed text-muted-foreground">{content}</p>
+    <div style={cardStyle}>
+      <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.18em", color: INK_FAINT, marginBottom: 12 }}>{label}</div>
+      <p style={{ fontFamily: FONT_REGULAR, fontSize: 14, lineHeight: 1.6, color: INK_MUTED }}>{content}</p>
     </div>
   );
 }

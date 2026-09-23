@@ -98,7 +98,7 @@ function Glossary() {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setActive(""); }}
             style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-            className="flex-1 border border-[#e6e9ef] px-5 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors max-w-[400px]"
+            className="flex-1 border border-[#e6e9ef] px-5 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors max-w-[400px]"
           />
           <div className="flex flex-wrap gap-1">
             {ALPHABET.map((l) => (

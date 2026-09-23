@@ -182,7 +182,7 @@ function ProfileBuilder() {
     team?: NonNullable<TypedExtraction["team"]>;
   }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLButtonElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
   // Path B state
@@ -322,7 +322,7 @@ function ProfileBuilder() {
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
         let text = "";
         if (ext === "pdf") {
-          const intakeResult = await extractForIntake(file);
+          const intakeResult = await extractForIntake(file, userAccessToken);
           text = intakeResult.status === "ok" ? (intakeResult.text ?? "") : "";
         }
         if (!text) {
@@ -891,10 +891,14 @@ function PathCard({ icon, title, description, time, cta, onClick }: {
 }) {
   const [hover, setHover] = useState(false);
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      aria-label={`${title}. ${description} ${time}. ${cta}`}
       style={{
         background: "var(--lcs-white)",
         border: `1px solid ${hover ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
@@ -905,6 +909,8 @@ function PathCard({ icon, title, description, time, cta, onClick }: {
         display: "flex",
         flexDirection: "column",
         gap: 14,
+        textAlign: "left",
+        width: "100%",
       }}
     >
       <div style={{ width: 48, height: 48, background: "var(--lcs-surface)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -920,7 +926,7 @@ function PathCard({ icon, title, description, time, cta, onClick }: {
           {cta} <ChevronRight size={14} />
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -931,7 +937,7 @@ function UploadScreen({
   onDrop, onDragOver, onDragLeave, onFiles, onRemove, onSubmit,
 }: {
   files: File[]; dragOver: boolean;
-  dropRef: React.RefObject<HTMLDivElement>;
+  dropRef: React.RefObject<HTMLButtonElement>;
   fileInputRef: React.RefObject<HTMLInputElement>;
   uploading: boolean;
   onDrop: (e: React.DragEvent) => void;
@@ -955,13 +961,17 @@ function UploadScreen({
         </p>
 
         {/* Drop zone */}
-        <div
+        <button
+          type="button"
           ref={dropRef}
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onClick={() => fileInputRef.current?.click()}
+          aria-label="Drop files here or click to browse. Pitch deck, financials, or any document you have."
           style={{
+            display: "block",
+            width: "100%",
             border: `1px dashed ${dragOver ? "var(--lcs-accent)" : "var(--lcs-line)"}`,
             padding: "40px 24px",
             textAlign: "center",
@@ -978,13 +988,15 @@ function UploadScreen({
           <div style={{ fontSize: 12, color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>
             Pitch deck · Financials · Any document you have
           </div>
-        </div>
+        </button>
         <input
           ref={fileInputRef}
           type="file"
           multiple
           accept=".pdf,.pptx,.ppt,.docx,.doc,.csv"
           style={{ display: "none" }}
+          tabIndex={-1}
+          aria-hidden="true"
           onChange={(e) => { if (e.target.files) onFiles(e.target.files); e.target.value = ""; }}
         />
 

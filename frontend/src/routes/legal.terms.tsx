@@ -25,12 +25,32 @@ import { PageHero } from "@/components/site/PageHero";
 // inspectable by both parties, nothing is exported or delivered).
 // "Transaction room(s)" also corrected to "deal room(s)" throughout.
 //
-// FLAGGED, NOT CHANGED: "Governing law" (below) still names England and
-// Wales courts/law — this is a legal-substance decision (jurisdiction
-// clause), not an entity-name mechanical swap, and was outside the
-// instruction's scope ("fix the entity mismatch"). Now inconsistent
-// with the corrected DIFC entity above. Needs counsel/founder input on
-// the actual intended governing law before this is edited.
+// RESOLVED 22 Sep 2026 (legal docs recon, checked directly against the
+// live file rather than assumed from an earlier instruction — this had
+// NOT actually been applied despite being discussed): "Governing law"
+// named England and Wales courts, inconsistent with the corrected DIFC
+// entity above since 31 Aug 2026. Fixed to DIFC Courts, using the
+// identical wording written the same session in legal.refunds.tsx's own
+// Governing law clause — both documents now state the same forum in the
+// same words, not two independently-worded versions of the same thing.
+// The consumer-rights carve-out sentence (unrelated to which forum is
+// chosen) is preserved unchanged.
+//
+// Corrected 22 Sep 2026 (auth/session recon): "Your account" told every
+// user "You must enable multi-factor authentication (MFA) — this is a
+// mandatory platform requirement, not optional." False, and worse here
+// than the near-identical product.security.tsx fabrication this
+// session already found and fixed — this is a binding legal document,
+// not marketing copy. Verified live: auth.mfa_factors holds zero
+// enrolled factors across every real user, and no MFA enrollment,
+// challenge, or verification code exists anywhere in src/. Rewritten
+// to state what's actually true and enforced (named individual
+// accounts, no credential sharing) and to drop the MFA obligation
+// rather than restate it as "planned" — a Terms of Service states
+// binding requirements, not a product roadmap; an unenforceable
+// "mandatory" clause has no place here even caveated. If MFA becomes a
+// real, enforced requirement, this clause should be added back then,
+// not before.
 
 export const Route = createFileRoute("/legal/terms")({
   component: Terms,
@@ -59,7 +79,7 @@ We do not provide investment advice, legal advice, or financial services. We pro
   },
   {
     title: "Your account",
-    content: `You are responsible for maintaining the security of your account credentials. You must enable multi-factor authentication (MFA) — this is a mandatory platform requirement, not optional.
+    content: `You are responsible for maintaining the security of your account credentials.
 
 You may not share your credentials with any other person. Each individual must have their own account.
 
@@ -121,7 +141,7 @@ On termination, your access to the platform ceases. Records from Rooms you were 
   },
   {
     title: "Governing law",
-    content: `These Terms are governed by the law of England and Wales. Any dispute arising from these Terms or your use of the platform shall be subject to the exclusive jurisdiction of the courts of England and Wales.
+    content: `These Terms are governed by the laws applicable in the Dubai International Financial Centre (DIFC), and any dispute arising from these Terms or your use of the platform is subject to the exclusive jurisdiction of the DIFC Courts.
 
 If you are a consumer located in another jurisdiction, you may also have rights under the laws of that jurisdiction.`,
   },
@@ -150,7 +170,7 @@ function Terms() {
             <div className="lg:w-[280px] shrink-0">
               <div className="sticky top-24">
                 <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-4">Contents</div>
-                <nav className="flex flex-col gap-2">
+                <nav aria-label="On this page" className="flex flex-col gap-2">
                   {SECTIONS.map((s, i) => (
                     <a key={i} href={`#term-${i}`}
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}

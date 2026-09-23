@@ -15,14 +15,12 @@ import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus } from "@/compo
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-// Upload-security gate — must run after every insert into founder_documents
-// (and documents, in the deal-room upload route) before scan_status flips
-// from its 'pending' default. Fire-and-forget from the caller's
-// perspective is NOT acceptable here: the row must not be treated as
-// usable until this resolves, per the gate's own design (a client that
-// never calls it leaves scan_status stuck at 'pending' forever, and every
-// display query filters on scan_status='clean' — see the read-side
-// changes in this same commit).
+// Upload-security gate — must run after every insert/upsert into
+// founder_documents, before the row's scan_status default of 'pending'
+// is treated as usable. Awaited, never fire-and-forget: a client that
+// doesn't call this leaves scan_status stuck at 'pending' forever, and
+// the read query below filters on scan_status='clean' — a row this gate
+// never resolves simply never appears, by design, not by omission.
 async function runUploadSecurityGate(documentId: string, table: "founder_documents" | "documents") {
   const { data, error } = await supabase.functions.invoke("upload-security-gate", {
     body: { documentId, table },
@@ -331,8 +329,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
     queryKey: ["founder-documents", startup?.id],
     enabled: !!startup?.id,
     queryFn: async () => {
-      // scan_status='clean' — a row still 'pending' (gate hasn't resolved
-      // yet) or 'quarantined' (failed and removed) must never surface here.
+      // scan_status='clean' only — a row still 'pending' (gate hasn't
+      // resolved yet) or 'quarantined' (failed and removed) must never
+      // surface here as though it were a usable document.
       const { data } = await supabase
         .from("founder_documents")
         .select("*")
@@ -432,7 +431,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         .from("documents")
         .upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
-      const { error: upsertError } = await supabase.from("founder_documents").upsert({
+      const { data: upsertedDoc, error: upsertError } = await supabase.from("founder_documents").upsert({
         startup_id: startup.id,
         template_id: templateId,
         template_slug: templateSlug,
@@ -444,9 +443,25 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         content: {},
         completeness_score: 100,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "startup_id,template_slug" });
+      }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
-      toast.success(`${templateName} uploaded`);
+
+      // Upload-security gate — scan_status stays 'pending' (not surfaced,
+      // not usable) until this resolves. Awaited before any success
+      // messaging so the toast reflects what actually happened to the file.
+      const gateResult = upsertedDoc?.id
+        ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
+        : { ok: false as const };
+
+      if (gateResult.verdict === "quarantined") {
+        toast.error(
+          gateResult.reason === "malware"
+            ? "This file failed our security scan and was removed."
+            : `This file isn't a valid ${ext.toUpperCase()}.`,
+        );
+      } else {
+        toast.success(`${templateName} uploaded`);
+      }
       // Readiness-checklist refresh removed 18 Aug 2026 — Foundation §15/§25.
       // This fired generateFounderChecklist on every document upload, writing
       // an AI-generated 0-100 readiness score. Fire-and-forget with its own
@@ -558,7 +573,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         target_label: customTitle.trim(),
         detail: `Uploaded ${file.name}`,
       });
-      if (extractionSucceeded) {
+      if (extractionSucceeded && gateResult.verdict !== "quarantined") {
         setShowCustomUpload(false);
         setCustomTitle("");
         setCustomFile(null);
@@ -624,6 +639,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       }, { onConflict: "startup_id,template_slug" }).select("id").single();
       if (upsertError) throw upsertError;
 
+      // Upload-security gate — scan_status stays 'pending' (not surfaced,
+      // not usable) until this resolves. Awaited before any success
+      // messaging so the toast reflects what actually happened to the file.
       const gateResult = upsertedDoc?.id
         ? await runUploadSecurityGate(upsertedDoc.id, "founder_documents")
         : { ok: false as const };
@@ -653,7 +671,7 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
         target_label: title,
         detail: `Uploaded ${file.name}`,
       });
-      if (extractionSucceeded) {
+      if (extractionSucceeded && gateResult.verdict !== "quarantined") {
         setShowEmployeeUpload(false);
         setEmployeeFile(null);
       }
@@ -837,15 +855,17 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
       <>
       {/* How it works — collapsible */}
       <div className="mb-6 p-5" style={{ border: "1px solid var(--lcs-line)" }}>
-        <div
-          className="flex items-center justify-between cursor-pointer"
+        <button
+          type="button"
+          className="flex items-center justify-between cursor-pointer w-full text-left"
           onClick={() => setShowInstructions(prev => !prev)}
+          aria-expanded={showInstructions}
         >
           <div className="flex items-center gap-2">
             <span className="text-[13px] font-medium" style={{ color: "var(--lcs-ink)", fontFamily: "var(--font-lcs-ui)" }}>How your document workspace works</span>
           </div>
           <span className="text-[12px]" style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}>{showInstructions ? "Hide" : "Show"}</span>
-        </div>
+        </button>
         {showInstructions && (
           <div className="mt-4 grid sm:grid-cols-3 gap-4">
             {[

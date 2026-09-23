@@ -141,6 +141,16 @@
     <changefreq>yearly</changefreq>
   </url>
   <url>
+    <loc>https://lengdon.com/legal/cookies</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://lengdon.com/legal/refunds</loc>
+    <priority>0.3</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
     <loc>https://lengdon.com/legal/acceptable-use</loc>
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>

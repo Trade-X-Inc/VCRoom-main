@@ -35,6 +35,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getEnvVar } from "@/lib/env";
 import { requireUser } from "@/lib/require-user-fn";
+import { consumeStepUpToken } from "@/lib/step-up-fn";
 
 // ── Tool classes (Foundation §15.2) ─────────────────────────────────────────
 export type ActionClass = "read" | "prepare" | "commit";
@@ -62,11 +63,18 @@ export type JsonValue =
 //   It is NOT an authorization input — authorization lives in the pack_api
 //   functions on the real object ids. scopeId only keys the append-only record.
 // isAgent: agent vs human caller (§15.3 gate input for Commit actions).
+// stepUpToken: single-use, 5-min, uid-bound password-reentry token (see
+//   step-up-fn.ts). Only consulted when def.requiresStepUp is true — every
+//   other action ignores this field entirely. Not an authorization input on
+//   its own: it proves the caller re-typed their password recently, it does
+//   not replace def.authorize's real ownership/membership check, which still
+//   runs after it.
 // input: the action-specific payload, validated by def.input.
 export type ActionEnvelope<Input> = {
   accessToken: string;
   scopeId: string;
   isAgent?: boolean;
+  stepUpToken?: string;
   input: Input;
 };
 
@@ -84,6 +92,12 @@ export type ActionResult<O> =
 export type ActionDef<Input, Output extends JsonValue> = {
   name: string; // stable id; also the record-entry action name
   class: ActionClass;
+  // Password re-entry step-up (Gate C, 22 Sep 2026). When true, runAction
+  // requires a valid, unconsumed stepUpToken bound to the caller's own uid
+  // before authorize()/handle() ever run — see the block below. Defaults to
+  // false/absent for every other action; nothing else in this codebase is
+  // affected by adding this field.
+  requiresStepUp?: boolean;
   validate: (raw: unknown) => Input; // narrow the untyped input payload
   authorize: (ctx: ActionCtx, input: Input) => Promise<boolean>;
   handle: (ctx: ActionCtx, input: Input) => Promise<Output>;
@@ -138,6 +152,20 @@ export async function runAction<Input, Output extends JsonValue>(
   // 1. identity — from the token in the body, never a userId field
   const auth = await requireUser(data.accessToken);
   if (!auth.ok) return { ok: false, error: auth.error, status: 401 };
+
+  // 1b. step-up (Gate C) — only for actions that declare requiresStepUp.
+  // Consumed here, before authorize()/handle() ever run, so a missing or
+  // already-used token blocks the action before any real work happens. The
+  // token is single-use: this call consumes it in the same step it verifies
+  // it (pack_api.verify_and_consume_step_up_token), so a caller who fails
+  // authorize() or handle() after this point must go back through
+  // verifyStepUp(password) again for a retry — it cannot be replayed.
+  if (def.requiresStepUp) {
+    const stepUp = await consumeStepUpToken(auth.uid, data.stepUpToken);
+    if (!stepUp.ok) {
+      return { ok: false, error: "STEP_UP_REQUIRED", status: 401 };
+    }
+  }
 
   // 2. typed contract
   let input: Input;

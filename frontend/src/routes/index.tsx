@@ -136,7 +136,7 @@ function ProductCard() {
                 i < GATE_ROWS.length - 1 ? "border-b border-[#f0f2f5]" : ""
               }`}>
               <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#c9d0db] w-4">{g.num}</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#64748b] w-4">{g.num}</span>
                 <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[13px] ${
                   g.done ? "text-[#0a2540]" : "text-[#0a2540] font-semibold"
                 }`}>{g.name}</span>
@@ -475,9 +475,12 @@ function DemoSection() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <Reveal className="flex-1">
-            <div
-              className="relative bg-[#0a2540] overflow-hidden cursor-pointer group h-full min-h-[420px]"
+            <button
+              type="button"
+              className="relative bg-[#0a2540] overflow-hidden cursor-pointer group h-full min-h-[420px] w-full text-left block"
               onClick={() => setPlaying(!playing)}
+              aria-label={playing ? "Pause product walkthrough video" : "Play product walkthrough video"}
+              aria-pressed={playing}
             >
               <img
                 src="/images/homepage/demo-video-poster.jpg"
@@ -529,7 +532,7 @@ function DemoSection() {
                   </div>
                 ))}
               </div>
-            </div>
+            </button>
           </Reveal>
 
           <Reveal delay={150} className="flex-1 max-w-[480px]">
@@ -568,7 +571,7 @@ function DemoSection() {
                         value={formData.name}
                         onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
                         style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors"
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -578,7 +581,7 @@ function DemoSection() {
                         value={formData.email}
                         onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
                         style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors"
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -588,7 +591,7 @@ function DemoSection() {
                         value={formData.company}
                         onChange={e => setFormData(p => ({ ...p, company: e.target.value }))}
                         style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors"
+                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -729,7 +732,7 @@ function ProcessSection() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[#c9d0db] text-[11px] tracking-[1px]" style={{ fontFamily: "'Inter:Regular', sans-serif" }}>
+          <div className="flex items-center gap-2 text-[#64748b] text-[11px] tracking-[1px]" style={{ fontFamily: "'Inter:Regular', sans-serif" }}>
             <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
               <path d="M1 4H15M15 4L12 1M15 4L12 7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -748,9 +751,14 @@ function ProcessSection() {
                 className={`group overflow-hidden cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isLast ? "border-b border-[#e6e9ef]" : ""}`}
                 style={{ height: isOpen ? 540 : 90 }}
                 onClick={() => toggle(phase.num)}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isOpen}
+                aria-label={`Gate ${phase.num}: ${phase.title}`}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(phase.num); } }}
               >
                 <div className="h-[90px] flex items-center px-8 lg:px-12 gap-6 select-none relative overflow-hidden">
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#c9d0db] text-[10px] tracking-[2px] w-5 shrink-0">
+                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] w-5 shrink-0">
                     {phase.num}
                   </span>
 
@@ -996,7 +1004,7 @@ function AudienceSection() {
               }`}
             >
               <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[#c9d0db]"}`}>
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[#64748b]"}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[15px] tracking-[-0.2px] transition-colors ${active === i ? "text-white" : "text-[#0a2540] group-hover:text-[#0a2540]"}`}>
@@ -1040,11 +1048,12 @@ function AudienceSection() {
               </div>
             </div>
             <div className="flex items-center gap-2 pt-8">
-              {AUDIENCES.map((_, i) => (
+              {AUDIENCES.map((a, i) => (
                 <button key={i} onClick={() => setActive(i)}
+                  aria-label={`View ${a.role}`} aria-current={i === active ? "true" : undefined}
                   className={`transition-all duration-300 ${i === active ? "w-5 h-1.5 bg-[#0a2540]" : "w-1.5 h-1.5 rounded-full bg-[#e6e9ef] hover:bg-[#c9d0db]"}`} />
               ))}
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="ml-auto text-[#c9d0db] text-[11px] tracking-[0.5px]">
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="ml-auto text-[#64748b] text-[11px] tracking-[0.5px]">
                 {String(active + 1).padStart(2, "0")} / {String(AUDIENCES.length).padStart(2, "0")}
               </span>
             </div>
@@ -1061,7 +1070,7 @@ function AudienceSection() {
               <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(36px,7vw,56px)] leading-none tracking-[-2px]">
                 {String(active + 1).padStart(2, "0")}
               </span>
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>
+              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>
             </div>
           </div>
         </div>

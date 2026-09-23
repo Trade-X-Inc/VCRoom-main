@@ -68,7 +68,7 @@ function ValuationCalculator() {
                   />
                 </div>
                 <input type="range" min={500_000} max={100_000_000} step={500_000} value={preMoney} onChange={(e) => setPreMoney(Number(e.target.value))} className="w-full accent-[#0a2540]" />
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex justify-between text-[#c9d0db] text-[11px]">
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex justify-between text-[#64748b] text-[11px]">
                   <span>$500K</span><span>$100M</span>
                 </div>
               </div>
@@ -86,7 +86,7 @@ function ValuationCalculator() {
                   />
                 </div>
                 <input type="range" min={100_000} max={20_000_000} step={100_000} value={raise} onChange={(e) => setRaise(Number(e.target.value))} className="w-full accent-[#0a2540]" />
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex justify-between text-[#c9d0db] text-[11px]">
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex justify-between text-[#64748b] text-[11px]">
                   <span>$100K</span><span>$20M</span>
                 </div>
               </div>

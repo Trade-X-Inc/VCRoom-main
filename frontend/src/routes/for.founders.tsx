@@ -74,7 +74,7 @@ function Founders() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-[#e6e9ef]">
             {STEPS.map((step, i) => (
               <div key={step.num} className={`p-8 flex flex-col gap-4 ${i < STEPS.length - 1 ? "border-b lg:border-b-0 lg:border-r border-[#e6e9ef]" : ""}`}>
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#c9d0db] text-[11px] tracking-[2px]">{step.num}</span>
+                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px]">{step.num}</span>
                 <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.3px]">{step.title}</h3>
                 <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65]">{step.desc}</p>
               </div>

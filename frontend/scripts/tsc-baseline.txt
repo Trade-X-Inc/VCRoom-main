@@ -36,7 +36,7 @@ src/routes/app.member-profile.tsx: error TS2554: Expected 1 arguments, but got 0
 src/routes/app.member.index.tsx: error TS2352: Conversion of type '{ deal_room_id: any; deal_rooms: { id: any; startups: { company_name: any; }[]; }[]; }[]' to type '{ deal_room_id: string; deal_rooms: { id: string; startups: { company_name: string | null; } | null; } | null; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 src/routes/app.member.index.tsx: error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ParamsReducerFn<RouterCore<Route<Register, any, "/", "/", string, "__root__", undefined, {}, {}, AnyContext, AnyContext, {}, undefined, RootRouteChildren, FileRouteTypes, unknown, unknown, undefined>, "never", false, RouterHistory, Record<...>>, "PATH", string, any>'.
 src/routes/app.messages.tsx: error TS2554: Expected 1 arguments, but got 0.
-src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLButtonElement | null>' is not assignable to type 'RefObject<HTMLButtonElement>'.
 src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
 src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
 src/routes/app.profile-builder.tsx: error TS2322: Type 'unknown' is not assignable to type 'TypedExtraction'.

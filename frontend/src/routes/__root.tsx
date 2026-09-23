@@ -23,20 +23,30 @@ const queryClient = new QueryClient({
 
 import appCss from "../styles.css?url";
 
+// Public-site navy/gold convention (SiteHeader.tsx's own constants) —
+// this is the site-wide fallback shell, not an LCS surface (LCS is
+// internal-app-only per CLAUDE.md §9).
+const INK = "#0a2540";
+const INK_MUTED = "#425466";
+const INK_FAINT = "#64748b";
+const RULE = "#e6e9ef";
+const FONT_SEMIBOLD = "'Geist:SemiBold', sans-serif";
+const FONT_REGULAR = "'Geist:Regular', sans-serif";
+
 function NotFoundComponent() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'var(--background)',
+      background: '#fff',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '24px',
-      fontFamily: 'DM Sans, sans-serif',
+      fontFamily: FONT_REGULAR,
     }}>
       <p style={{
-        color: 'var(--brand)',
+        color: INK_FAINT,
         fontSize: 12,
         fontWeight: 600,
         letterSpacing: '0.1em',
@@ -46,17 +56,17 @@ function NotFoundComponent() {
         404
       </p>
       <h1 style={{
-        color: '#ffffff',
+        color: INK,
         fontSize: 32,
-        fontWeight: 800,
-        fontFamily: 'Syne, sans-serif',
+        fontWeight: 600,
+        fontFamily: FONT_SEMIBOLD,
         marginBottom: 12,
         textAlign: 'center',
       }}>
         This page doesn't exist
       </h1>
       <p style={{
-        color: 'var(--muted-foreground)',
+        color: INK_MUTED,
         fontSize: 16,
         marginBottom: 32,
         textAlign: 'center',
@@ -66,24 +76,25 @@ function NotFoundComponent() {
       </p>
       <div style={{ display: 'flex', gap: 12 }}>
         <a href="/" style={{
-          background: '#7C3AED',
-          color: '#ffffff',
+          fontFamily: FONT_SEMIBOLD,
+          fontWeight: 600,
+          background: INK,
+          color: '#fff',
           padding: '10px 24px',
-          borderRadius: 8,
           textDecoration: 'none',
           fontSize: 14,
-          fontWeight: 500,
         }}>
           Go home
         </a>
         <a href="/tools" style={{
-          background: 'var(--accent)',
-          color: '#ffffff',
+          fontFamily: FONT_SEMIBOLD,
+          fontWeight: 600,
+          background: '#fff',
+          color: INK,
+          border: `1px solid ${RULE}`,
           padding: '10px 24px',
-          borderRadius: 8,
           textDecoration: 'none',
           fontSize: 14,
-          fontWeight: 500,
         }}>
           View tools
         </a>

@@ -3,23 +3,25 @@ import { useEffect, useState } from "react";
 import { Globe, Linkedin, CheckCircle2, Trophy, Briefcase, Users, Sparkles, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-// Inlined from the retired lib/design-tokens.ts (deleted as part of the
-// internal-app LCS migration's Group 5 — that file's tokens were purely
-// internal-app v1 design system, this route is the one public-facing
-// exception that used it). Same values, unchanged, so this public page's
-// rendered output is byte-identical to before.
+// Restyled onto the public site's real navy/gold convention (the same
+// #0a2540/Geist/Inter palette used by SiteHeader.tsx and the rest of the
+// public site, per the 23 Sep 2026 public-site restyle pass) — this was
+// the one public-facing route still carrying the retired internal-app v1
+// design-tokens values (Syne, dark #0A0A0B ink, purple #7C3AED accent)
+// after lib/design-tokens.ts itself was deleted in the LCS migration's
+// Group 5. Values only; every data binding below is unchanged.
 const color = {
-  canvas: "#FAFAFA",
+  canvas: "#f8f9fb",
   white: "#FFFFFF",
-  ink: "#0A0A0B",
-  inkSecondary: "#52525B",
-  inkTertiary: "#71717A",
-  border: "#E4E4E7",
+  ink: "#0a2540",
+  inkSecondary: "#425466",
+  inkTertiary: "#64748b",
+  border: "#e6e9ef",
 } as const;
 
 const font = {
-  display: "'Syne', sans-serif",
-  body: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
+  display: "'Geist:SemiBold', sans-serif",
+  body: "'Inter:Regular', ui-sans-serif, system-ui, sans-serif",
 } as const;
 
 export const Route = createFileRoute("/i/$slug")({
@@ -127,7 +129,7 @@ function InvestorPublicProfileWrapper() {
   if (ownerState.loading) {
     return (
       <div style={{ background: color.canvas, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 28, height: 28, border: `2px solid ${color.border}`, borderTopColor: "#7C3AED", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: 28, height: 28, border: `2px solid ${color.border}`, borderTopColor: "#0a2540", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -142,7 +144,7 @@ function InvestorPublicProfileWrapper() {
       <div style={{ textAlign: "center" }}>
         <h1 style={{ fontSize: 28, fontFamily: font.display, fontWeight: 700, color: color.ink, marginBottom: 12 }}>Profile not found</h1>
         <p style={{ color: color.inkSecondary, fontSize: 14 }}>This investor profile is private or doesn't exist.</p>
-        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "#7C3AED", textDecoration: "underline", fontSize: 13 }}>Back to Lengdon</a>
+        <a href="/" style={{ display: "inline-block", marginTop: 24, color: "#0a2540", textDecoration: "underline", fontSize: 13 }}>Back to Lengdon</a>
       </div>
     </div>
   );
@@ -200,7 +202,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
 
         <div style={{ background: color.white, border: `1px solid ${color.border}`, padding: "32px 36px", marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
-            <div style={{ height: 72, width: 72, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 26, fontWeight: 700, fontFamily: font.display, flexShrink: 0 }}>
+            <div style={{ height: 72, width: 72, borderRadius: "50%", overflow: "hidden", background: "#0a2540", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 26, fontWeight: 700, fontFamily: font.display, flexShrink: 0 }}>
               {profile.avatar_url
                 ? <img src={profile.avatar_url} alt={profile.your_name || ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 : <span>{(profile.your_name || profile.fund_name || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}</span>}
@@ -218,7 +220,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
                   </span>
                 )}
                 {profile.stages && (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, background: "rgba(124,58,237,0.06)", color: "#7C3AED", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 2, padding: "3px 8px" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, background: "#f8f9fb", color: "#0a2540", border: "1px solid #e6e9ef", borderRadius: 2, padding: "3px 8px" }}>
                     {profile.stages}
                   </span>
                 )}
@@ -250,15 +252,15 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
               <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
                 {tBullets.map((b, i) => b.trim() && (
                   <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span style={{ marginTop: 7, height: 4, width: 4, borderRadius: "50%", background: "#7C3AED", flexShrink: 0, display: "block" }} />
+                    <span style={{ marginTop: 7, height: 4, width: 4, borderRadius: "50%", background: "#0a2540", flexShrink: 0, display: "block" }} />
                     <span style={{ fontSize: 13, color: color.inkSecondary, lineHeight: 1.5 }}>{b}</span>
                   </li>
                 ))}
               </ul>
             )}
             {profile.secret_sauce && (
-              <div style={{ marginTop: 16, padding: "12px 16px", background: "rgba(124,58,237,0.04)", border: "1px solid rgba(124,58,237,0.15)" }}>
-                <div style={{ fontSize: 11, color: "#7C3AED", fontWeight: 600, marginBottom: 6, letterSpacing: "0.04em", textTransform: "uppercase" }}>Edge</div>
+              <div style={{ marginTop: 16, padding: "12px 16px", background: "#f8f9fb", border: "1px solid #e6e9ef" }}>
+                <div style={{ fontSize: 11, color: "#0a2540", fontWeight: 600, marginBottom: 6, letterSpacing: "0.04em", textTransform: "uppercase" }}>Edge</div>
                 <p style={{ margin: 0, fontSize: 13, color: color.inkSecondary, lineHeight: 1.55 }}>{profile.secret_sauce}</p>
               </div>
             )}
@@ -305,7 +307,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
               {teamMembers.map((m: any) => (
                 <div key={m.id} style={{ background: color.canvas, border: `1px solid ${color.border}`, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ height: 36, width: 36, borderRadius: "50%", overflow: "hidden", background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                    <div style={{ height: 36, width: 36, borderRadius: "50%", overflow: "hidden", background: "#0a2540", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
                       {m.avatar_url
                         ? <img src={m.avatar_url} alt={m.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         : <span>{m.name.charAt(0).toUpperCase()}</span>}
@@ -318,7 +320,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
                   {m.bio && <p style={{ margin: 0, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5 }}>{m.bio}</p>}
                   {m.linkedin_url && (
                     <a href={m.linkedin_url.startsWith("http") ? m.linkedin_url : `https://${m.linkedin_url}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", textDecoration: "none" }}>
+                      style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#0a2540", textDecoration: "none" }}>
                       <Linkedin style={{ height: 11, width: 11 }} /> LinkedIn
                     </a>
                   )}
@@ -334,7 +336,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
               {portfolio.map((p: any) => (
                 <div key={p.id} style={{ background: color.canvas, border: `1px solid ${color.border}`, padding: "14px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                    <div style={{ height: 32, width: 32, overflow: "hidden", background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                    <div style={{ height: 32, width: 32, overflow: "hidden", background: "#0a2540", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
                       {p.logo_url
                         ? <img src={p.logo_url} alt={p.company_name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         : <span>{p.company_name.charAt(0).toUpperCase()}</span>}
@@ -344,7 +346,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
                   {p.description && <p style={{ margin: 0, fontSize: 12, color: color.inkTertiary, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.description}</p>}
                   {p.website_url && (
                     <a href={p.website_url.startsWith("http") ? p.website_url : `https://${p.website_url}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", textDecoration: "none", marginTop: 8 }}>
+                      style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#0a2540", textDecoration: "none", marginTop: 8 }}>
                       <Globe style={{ height: 10, width: 10 }} /> Website
                     </a>
                   )}
@@ -355,11 +357,11 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
         )}
 
         {!isOwnerPreview && (
-          <div style={{ background: "rgba(124,58,237,0.04)", border: "1px solid rgba(124,58,237,0.2)", padding: "28px 32px", textAlign: "center", marginTop: 32 }}>
+          <div style={{ background: "#f8f9fb", border: "1px solid #e6e9ef", padding: "28px 32px", textAlign: "center", marginTop: 32 }}>
             <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 17, marginBottom: 8, color: color.ink }}>Connect with {profile.fund_name || profile.your_name}</div>
             <p style={{ color: color.inkSecondary, fontSize: 13, margin: "0 0 20px" }}>Request a connection on Lengdon — the agentic VC deal flow platform.</p>
             <a href="https://lengdon.com"
-              style={{ display: "inline-block", background: "#7C3AED", color: "#fff", textDecoration: "none", borderRadius: 2, padding: "10px 24px", fontSize: 13, fontWeight: 500, fontFamily: font.body }}>
+              style={{ display: "inline-block", background: "#0a2540", color: "#fff", textDecoration: "none", borderRadius: 2, padding: "10px 24px", fontSize: 13, fontWeight: 500, fontFamily: font.body }}>
               Request connection
             </a>
           </div>
@@ -378,7 +380,7 @@ function InvestorPublicProfile({ profile, teamMembers, portfolio, isOwnerPreview
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div style={{ background: color.white, border: `1px solid ${color.border}`, padding: "24px 28px", marginBottom: 16 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, color: "#7C3AED" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, color: "#0a2540" }}>
         {icon}
         <h2 style={{ margin: 0, fontFamily: font.display, fontWeight: 700, fontSize: 14, color: color.ink }}>{title}</h2>
       </div>

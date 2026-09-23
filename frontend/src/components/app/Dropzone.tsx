@@ -110,15 +110,39 @@ export function Dropzone({
     storagePath: string,
     category: string,
   ) => {
-    const { error: insertError } = await supabase.from("documents").insert({
+    const { data: inserted, error: insertError } = await supabase.from("documents").insert({
       deal_room_id: dealRoomId,
       uploader_id: user!.id,
       storage_path: storagePath,
       category,
       status: "uploaded",
       ...(uploadedByRole ? { uploaded_by_role: uploadedByRole } : {}),
-    });
+    }).select("id").single();
     if (insertError) throw insertError;
+
+    // Upload-security gate — scan_status stays 'pending' (not surfaced by
+    // doc_list_room/library/investor, all of which filter scan_status='clean'
+    // server-side) until this resolves. Awaited before any success messaging.
+    const gateResult = inserted?.id
+      ? await (async () => {
+          const { data, error } = await supabase.functions.invoke("upload-security-gate", {
+            body: { documentId: inserted.id, table: "documents" as const },
+          });
+          if (error) { console.error("[upload-security-gate]", error); return { ok: false as const }; }
+          return data as { ok: boolean; verdict?: string; reason?: string };
+        })()
+      : { ok: false as const };
+
+    if (gateResult.verdict === "quarantined") {
+      const ext = nf.name.split(".").pop()?.toLowerCase() ?? "";
+      toast.error(
+        gateResult.reason === "malware"
+          ? "This file failed our security scan and was removed."
+          : `This file isn't a valid ${ext.toUpperCase()}.`,
+      );
+      setFiles((xs) => xs.filter((x) => x.id !== nf.id));
+      return;
+    }
 
     await logActivity(dealRoomId!, user!.id, "Uploaded a document", { filename: nf.name });
     setFiles((xs) => xs.map((x) => x.id === nf.id ? { ...x, progress: 100 } : x));
@@ -212,12 +236,14 @@ export function Dropzone({
   return (
     <>
       <div className="space-y-3">
-        <div
+        <button
+          type="button"
           onDragOver={(e) => { e.preventDefault(); setIsOver(true); }}
           onDragLeave={() => setIsOver(false)}
           onDrop={onDrop}
           onClick={() => inputRef.current?.click()}
-          className="relative border border-dashed p-8 text-center cursor-pointer transition-colors"
+          aria-label={`${title}. ${hint}`}
+          className="relative w-full border border-dashed p-8 text-center cursor-pointer transition-colors"
           style={{
             borderColor: isOver ? "var(--lcs-accent)" : "var(--lcs-line)",
             background: isOver ? "var(--lcs-progress-wash)" : "var(--lcs-surface)",
@@ -240,10 +266,12 @@ export function Dropzone({
             type="file"
             multiple
             className="hidden"
+            tabIndex={-1}
+            aria-hidden="true"
             accept=".pdf,.docx,.pptx,.png,.jpg,.jpeg,.txt,.csv,.mp4"
             onChange={(e) => handleFiles(e.target.files)}
           />
-        </div>
+        </button>
 
         {files.length > 0 && (
           <div style={{ border: "1px solid var(--lcs-line)", background: "var(--lcs-white)" }}>

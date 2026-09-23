@@ -11,6 +11,8 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { logActivity } from "@/lib/activity-log-fn";
+import { StepUpModal } from "@/components/app/StepUpModal";
+import { useStepUpGate } from "@/hooks/useStepUpGate";
 
 export const Route = createFileRoute("/app/investor/connections")({
   component: ConnectionsPage,
@@ -79,11 +81,12 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
   const isNew = row.auto_added && !row.seen_by_investor;
   const statusStyle = STATUS_COLORS[row.status] ?? STATUS_COLORS.Watching;
 
+  const RowTag = isNew ? "button" : "div";
   return (
-    <div
+    <RowTag
+      {...(isNew ? { type: "button" as const, onClick: () => onMarkSeen(row.id), "aria-label": `${row.company_name} — mark as seen` } : {})}
       style={{ background: "var(--hs-bg-secondary)", border: `1px solid ${isNew ? "rgba(124,58,237,0.35)" : "var(--hs-border)"}`, borderRadius: 10, padding: "12px 16px", cursor: isNew ? "pointer" : "default" }}
-      onClick={() => { if (isNew) onMarkSeen(row.id); }}
-      className="flex items-center gap-3 transition-colors"
+      className="flex items-center gap-3 transition-colors w-full text-left"
     >
       {/* New dot */}
       {isNew && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--gradient-brand)", flexShrink: 0 }} title="New — auto-added via invite link" />}
@@ -127,7 +130,7 @@ function PipelineRow({ row, onMarkSeen, onDecide }: {
       )}
 
       {!isNew && <ChevronRight className="h-4 w-4 text-faint flex-shrink-0" />}
-    </div>
+    </RowTag>
   );
 }
 
@@ -137,6 +140,7 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const qc = useQueryClient();
+  const stepUp = useStepUpGate();
 
   const { data: link, isLoading } = useQuery<InviteLink | null>({
     queryKey: ["investor-invite-link", investorId],
@@ -159,14 +163,16 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
     setGenerating(true);
     try {
       const { generateInviteLink } = await import("@/lib/connections-fn");
-      const { data: { session } } = await supabase.auth.getSession();
-      const result = await generateInviteLink({ data: { accessToken: session?.access_token ?? "" } });
+      const result = await stepUp.wrapGated(async (stepUpToken) => {
+        const { data: { session } } = await supabase.auth.getSession();
+        return generateInviteLink({ data: { accessToken: session?.access_token ?? "", stepUpToken } });
+      });
       if (result.ok) {
         qc.invalidateQueries({ queryKey: ["investor-invite-link", investorId] });
         toast.success("Invite link created");
       }
-    } catch {
-      toast.error("Failed to generate link");
+    } catch (e) {
+      if (!(e instanceof Error && e.message === "STEP_UP_CANCELLED")) toast.error("Failed to generate link");
     } finally {
       setGenerating(false);
     }
@@ -210,6 +216,8 @@ function InviteLinkPanel({ investorId }: { investorId: string }) {
           {generating ? <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</> : <><Plus className="h-3 w-3" /> Generate invite link</>}
         </button>
       )}
+
+      <StepUpModal {...stepUp.modalProps} />
     </div>
   );
 }

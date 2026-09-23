@@ -108,7 +108,7 @@ function SignUp() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <main className="min-h-screen flex">
       {/* Left panel — brand */}
       <div className="hidden lg:flex flex-col w-[480px] xl:w-[540px] shrink-0 bg-[#0a2540] relative overflow-hidden px-14 py-12">
         <div
@@ -204,7 +204,7 @@ function SignUp() {
                     </svg>
                   ) : s}
                 </div>
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12px] ${step === s ? "text-[#0a2540]" : "text-[#c9d0db]"}`}>
+                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[12px] ${step === s ? "text-[#0a2540]" : "text-[#64748b]"}`}>
                   {s === 1 ? "Your role" : "Your details"}
                 </span>
                 {s < 2 && <div className="w-6 h-px bg-[#e6e9ef] mx-1" />}
@@ -344,7 +344,7 @@ function SignUp() {
                       onChange={e => setName(e.target.value)}
                       required
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
+                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
                     />
                   </div>
 
@@ -361,7 +361,7 @@ function SignUp() {
                       onChange={e => setEmail(e.target.value)}
                       required
                       style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#c9d0db] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
+                      className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
                     />
                   </div>
 
@@ -390,7 +390,7 @@ function SignUp() {
                     )}
                   </button>
 
-                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#c9d0db] text-[12px] leading-[1.6] text-center">
+                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] leading-[1.6] text-center">
                     By joining the waitlist, you agree to our{" "}
                     <Link to="/legal/terms" className="text-[#64748b] hover:text-[#0a2540] transition-colors">Terms</Link>
                     {" "}and{" "}
@@ -402,6 +402,6 @@ function SignUp() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

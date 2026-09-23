@@ -19,6 +19,7 @@ import { Loader2, Link as LinkIcon, AlertTriangle, Check, Building2 } from "luci
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { Logo } from "@/components/brand/Logo";
 
 // Legal/compliance audit, 13 Sep 2026: replaced the bare, unlinked
 // "By joining, you agree to Lengdon's terms of service." sentence at
@@ -44,16 +45,25 @@ interface LinkInfo {
 
 type PageState = "loading" | "invalid" | "valid" | "authed";
 
-const dark = "var(--background)";
-const card = { background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16 };
+const INK = "#0a2540";
+const INK_MUTED = "#425466";
+const INK_FAINT = "#64748b";
+const RULE = "#e6e9ef";
+const FONT_SEMIBOLD = "'Geist:SemiBold', sans-serif";
+const FONT_MEDIUM = "'Inter:Medium', sans-serif";
+const FONT_REGULAR = "'Inter:Regular', sans-serif";
+
+const card = { background: "#fff", border: `1px solid ${RULE}` };
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "var(--accent)", border: "1px solid var(--border)",
-  borderRadius: 8, padding: "10px 14px", fontSize: 14, color: "#FAFAFA",
+  fontFamily: FONT_REGULAR,
+  width: "100%", background: "#fff", border: `1px solid ${RULE}`,
+  padding: "10px 14px", fontSize: 14, color: INK,
   outline: "none", boxSizing: "border-box",
 };
 const btnPrimary: React.CSSProperties = {
-  width: "100%", background: "#7C3AED", color: "#fff", border: "none",
-  borderRadius: 8, padding: "11px 0", fontSize: 14, fontWeight: 600, cursor: "pointer",
+  fontFamily: FONT_SEMIBOLD,
+  width: "100%", background: INK, color: "#fff", border: "none",
+  padding: "11px 0", fontSize: 14, cursor: "pointer",
 };
 
 function JoinViaInviteLinkPage() {
@@ -150,28 +160,26 @@ function JoinViaInviteLinkPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: dark, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
       {/* Logo */}
-      <div style={{ marginBottom: 32, textAlign: "center" }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: "var(--foreground)", fontFamily: "Syne, sans-serif", letterSpacing: "-0.5px" }}>
-          Len<span style={{ color: "var(--brand)" }}>gdon</span>
-        </div>
-        <div style={{ fontSize: 12, color: "var(--faint)", marginTop: 4 }}>Where deals get done</div>
+      <div style={{ marginBottom: 32, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Logo withWordmark size="lg" />
+        <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_FAINT, marginTop: 8 }}>Where deals get done</div>
       </div>
 
       <div style={{ ...card, padding: 32, width: "100%", maxWidth: 420 }}>
         {pageState === "loading" && (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
-            <Loader2 className="h-6 w-6 animate-spin mx-auto" style={{ color: "var(--brand)" }} />
-            <p style={{ color: "var(--muted-foreground)", fontSize: 13, marginTop: 12 }}>Verifying invite link…</p>
+            <Loader2 className="h-6 w-6 animate-spin mx-auto" style={{ color: INK }} />
+            <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginTop: 12 }}>Verifying invite link…</p>
           </div>
         )}
 
         {pageState === "invalid" && (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
-            <AlertTriangle className="h-8 w-8 mx-auto" style={{ color: "#F59E0B" }} />
-            <div style={{ color: "var(--foreground)", fontWeight: 600, marginTop: 12, fontFamily: "Syne, sans-serif" }}>Link not valid</div>
-            <p style={{ color: "var(--muted-foreground)", fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
+            <AlertTriangle className="h-8 w-8 mx-auto" style={{ color: "#B45309" }} />
+            <div style={{ fontFamily: FONT_SEMIBOLD, color: INK, marginTop: 12 }}>Link not valid</div>
+            <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
               This invite link may have expired or already been used. Ask your contact to send a fresh link.
             </p>
           </div>
@@ -179,9 +187,9 @@ function JoinViaInviteLinkPage() {
 
         {pageState === "authed" && (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
-            <Check className="h-8 w-8 mx-auto" style={{ color: "#10B981" }} />
-            <div style={{ color: "var(--foreground)", fontWeight: 600, marginTop: 12, fontFamily: "Syne, sans-serif" }}>Connected</div>
-            <p style={{ color: "var(--muted-foreground)", fontSize: 13, marginTop: 8 }}>Redirecting to your dashboard…</p>
+            <Check className="h-8 w-8 mx-auto" style={{ color: "#059669" }} />
+            <div style={{ fontFamily: FONT_SEMIBOLD, color: INK, marginTop: 12 }}>Connected</div>
+            <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 13, marginTop: 8 }}>Redirecting to your dashboard…</p>
           </div>
         )}
 
@@ -189,13 +197,13 @@ function JoinViaInviteLinkPage() {
           <>
             {/* Investor context banner */}
             {linkInfo && (
-              <div style={{ background: "rgba(124,58,237,0.07)", border: "1px solid rgba(124,58,237,0.18)", borderRadius: 10, padding: "12px 14px", marginBottom: 24, display: "flex", gap: 10 }}>
-                <Building2 className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "#A855F7" }} />
+              <div style={{ background: "#f8f9fb", border: `1px solid ${RULE}`, padding: "12px 14px", marginBottom: 24, display: "flex", gap: 10 }}>
+                <Building2 className="h-4 w-4 mt-0.5 shrink-0" style={{ color: INK }} />
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>
+                  <div style={{ fontFamily: FONT_MEDIUM, fontSize: 13, color: INK }}>
                     {linkInfo.fund_name ?? "An investor"} invited you
                   </div>
-                  <div style={{ fontSize: 12, color: "var(--muted-foreground)", marginTop: 2, lineHeight: 1.5 }}>
+                  <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_MUTED, marginTop: 2, lineHeight: 1.5 }}>
                     Create your founder profile to connect and manage your fundraising in one place.
                   </div>
                 </div>
@@ -205,9 +213,9 @@ function JoinViaInviteLinkPage() {
             <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
               {(["signup", "signin"] as const).map((mode) => (
                 <button key={mode} onClick={() => setAuthMode(mode)}
-                  style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                    background: authMode === mode ? "#7C3AED" : "var(--accent)",
-                    color: authMode === mode ? "#fff" : "var(--muted-foreground)" }}>
+                  style={{ fontFamily: FONT_MEDIUM, flex: 1, padding: "8px 0", border: "none", fontSize: 13, cursor: "pointer",
+                    background: authMode === mode ? INK : "#f8f9fb",
+                    color: authMode === mode ? "#fff" : INK_MUTED }}>
                   {mode === "signup" ? "Create account" : "Sign in"}
                 </button>
               ))}
@@ -221,7 +229,7 @@ function JoinViaInviteLinkPage() {
               <input style={inputStyle} type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
 
               {authError && (
-                <div style={{ fontSize: 12, color: "#EF4444", padding: "8px 12px", background: "rgba(239,68,68,0.08)", borderRadius: 6 }}>{authError}</div>
+                <div style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: "#DC2626", padding: "8px 12px", background: "#FEF2F2", border: "1px solid #FECACA" }}>{authError}</div>
               )}
 
               {authMode === "signup" && (
@@ -232,11 +240,11 @@ function JoinViaInviteLinkPage() {
                     onChange={(e) => { setTermsAccepted(e.target.checked); setAuthError(""); }}
                     style={{ marginTop: 2, width: 14, height: 14, cursor: "pointer", flexShrink: 0 }}
                   />
-                  <span style={{ fontSize: 12, color: "var(--muted-foreground)", lineHeight: 1.5 }}>
+                  <span style={{ fontFamily: FONT_REGULAR, fontSize: 12, color: INK_MUTED, lineHeight: 1.5 }}>
                     I agree to Lengdon's{" "}
-                    <Link to="/legal/terms" target="_blank" style={{ color: "var(--brand)" }}>Terms of Service</Link>
+                    <Link to="/legal/terms" target="_blank" style={{ color: INK }}>Terms of Service</Link>
                     {" "}and{" "}
-                    <Link to="/legal/privacy" target="_blank" style={{ color: "var(--brand)" }}>Privacy Policy</Link>.
+                    <Link to="/legal/privacy" target="_blank" style={{ color: INK }}>Privacy Policy</Link>.
                   </span>
                 </label>
               )}
@@ -254,7 +262,7 @@ function JoinViaInviteLinkPage() {
             </form>
 
             <div style={{ marginTop: 16, textAlign: "center" }}>
-              <a href="/auth/google" style={{ color: "var(--muted-foreground)", fontSize: 12, textDecoration: "none" }}>
+              <a href="/auth/google" style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: 12, textDecoration: "none" }}>
                 Or continue with Google →
               </a>
             </div>
@@ -262,10 +270,10 @@ function JoinViaInviteLinkPage() {
         )}
       </div>
 
-      <p style={{ color: "var(--faint)", fontSize: 11, marginTop: 20, textAlign: "center" }}>
-        <Link to="/legal/terms" style={{ color: "var(--faint)" }}>Terms of Service</Link>
+      <p style={{ fontFamily: FONT_REGULAR, color: INK_FAINT, fontSize: 11, marginTop: 20, textAlign: "center" }}>
+        <Link to="/legal/terms" style={{ color: INK_FAINT }}>Terms of Service</Link>
         {" "}·{" "}
-        <Link to="/legal/privacy" style={{ color: "var(--faint)" }}>Privacy Policy</Link>
+        <Link to="/legal/privacy" style={{ color: INK_FAINT }}>Privacy Policy</Link>
       </p>
     </div>
   );
