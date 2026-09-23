@@ -5,12 +5,13 @@ import { type ReactNode, useState, useEffect } from "react";
  * hover-expand; icons appear only when collapsed). 48px top bar, search
  * left-aligned to the content region (not centred), notification dot uses
  * the attention tone with no baked-in count, user menu is initials in a
- * plain circle. Content: white, 24px padding, single scroll container,
- * max-width 1120px. RTL: sidebar sits at the inline-start edge via CSS
- * logical properties (order in the flex row follows document direction
- * automatically — no hardcoded left/right), collapse toggle and all
- * disclosure carets use text arrows that the caller must mirror per
- * direction, not baked into this shell.
+ * plain circle. Content: white, 24px padding, single scroll container, NO
+ * width cap here — see the note above the <main> render below and
+ * LcsPageContainer for how individual pages opt into a width tier. RTL:
+ * sidebar sits at the inline-start edge via CSS logical properties (order
+ * in the flex row follows document direction automatically — no hardcoded
+ * left/right), collapse toggle and all disclosure carets use text arrows
+ * that the caller must mirror per direction, not baked into this shell.
  *
  * Responsive, added 1 Sep 2026 (see PRIMITIVES.md's "Responsive" section
  * for the full rationale — a real spec, confirmed before building, not
@@ -245,16 +246,22 @@ export function LcsPageShell({
         </header>
 
         <main className="flex-1 overflow-auto">
-          {/* No max-width cap — fills available width. The PDF's page-2
+          {/* No max-width cap here — fills available width. The PDF's page-2
               caption ("content region — 24px padding, max-width 1120px")
               describes that one example screenshot's rendered dimensions
               in the design tool; the primitive's own written spec text
-              names no max-width at all. A hardcoded 1120px cap here left
-              280px of dead space on a 1600px viewport (growing on wider
-              screens) while the table inside it was already using its
+              names no max-width at all. A hardcoded 1120px cap here once
+              left 280px of dead space on a 1600px viewport (growing on
+              wider screens) while the table inside it was already using its
               full available width correctly — a real, structural defect
               found live, not a per-screen styling nitpick, since every
-              screen built on this shell inherited it. */}
+              screen built on this shell inherited it.
+
+              Removing the cap here did NOT fix width consistency — it just
+              moved the decision to each page, and ~50 pages each answered
+              it independently (Step A dashboard IA recon, Sep 2026). Pages
+              opt into a real width tier via LcsPageContainer, not by
+              hand-rolling their own max-width/mx-auto. See PAGE_PATTERNS.md. */}
           <div className="p-6">{children}</div>
         </main>
       </div>

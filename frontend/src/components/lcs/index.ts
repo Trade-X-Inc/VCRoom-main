@@ -1,4 +1,5 @@
 export { LcsPageShell } from "./PageShell";
+export { LcsPageContainer } from "./PageContainer";
 export { LcsNavItem, LcsNavGroup, LcsNavSubItem } from "./NavItem";
 export { PageHeader as LcsPageHeader } from "./PageHeader";
 export {
