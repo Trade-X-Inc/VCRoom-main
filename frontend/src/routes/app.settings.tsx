@@ -1,12 +1,12 @@
 import { createFileRoute, Link, Outlet, useRouterState, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info, CreditCard, Activity } from "lucide-react";
+import { Settings, Bell, Shield, User, Loader2, Camera, HelpCircle, Info, CreditCard, Activity, Globe } from "lucide-react";
 import { FounderHelpGuide, AboutSection } from "@/components/app/HelpGuide";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { LcsButton, LcsTextField, LcsSelectField } from "@/components/lcs";
+import { LcsButton, LcsTextField, LcsSelectField, LcsPageContainer } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/settings")({
   component: SettingsLayout,
@@ -18,6 +18,11 @@ const routeTabs = [
   { to: "/app/settings/notifications", label: "Notifications", icon: Bell },
   { to: "/app/settings/security", label: "Security", icon: Shield },
   { to: "/app/settings/activity", label: "Activity", icon: Activity },
+  // Go Live nav re-homing (Sep 2026) — was
+  // /app/go-live/digital-profile/privacy-settings. Company-profile
+  // section-visibility (public/deal-room/on-request), distinct from the
+  // "Profile" tab above (this founder's own account fields).
+  { to: "/app/settings/profile-privacy", label: "Profile privacy", icon: Globe },
 ];
 
 const inlineTabs = [
@@ -40,6 +45,7 @@ function SettingsLayout() {
   );
 
   return (
+    <LcsPageContainer width="standard">
     <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-2 mb-6">
         <Settings className="h-5 w-5" style={{ color: "var(--lcs-accent)" }} />
@@ -104,6 +110,7 @@ function SettingsLayout() {
         </div>
       </div>
     </div>
+    </LcsPageContainer>
   );
 }
 

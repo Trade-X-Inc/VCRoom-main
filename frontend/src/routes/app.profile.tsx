@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { LcsEmptyState, LcsButton, LcsStatusPill, type LcsStatus, LcsModal, LcsSkeleton } from "@/components/lcs";
+import { LcsEmptyState, LcsButton, LcsStatusPill, type LcsStatus, LcsModal, LcsSkeleton, LcsPageContainer } from "@/components/lcs";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
 import { getFounderProfileCompleteness } from "@/lib/profileCompleteness";
@@ -220,6 +220,13 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
   const [tab, setTab] = useState<"quick" | "full" | "privacy" | "preview" | "analytics">(
     view && view !== "team-cards" && view !== "fundraising-thesis" ? view : "quick",
   );
+  // Set only when the founder enters preview via the "View live profile"
+  // button below (route-controlled view="full" context, where the R9
+  // tab-switcher bar is hidden) — drives the "Back to editing" return
+  // link so they aren't stranded once tab flips to "preview". Unrelated
+  // to the removed /app/go-live/* routes' own preview page, which this
+  // button replaces (Sep 2026 Go Live nav re-homing).
+  const [enteredPreviewFromFull, setEnteredPreviewFromFull] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [profilePublishing, setProfilePublishing] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -820,11 +827,13 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-4">
+      <LcsPageContainer width="standard">
+      <div className="p-6 lg:p-8 space-y-4">
         <LcsSkeleton className="h-8 w-64" />
         <LcsSkeleton className="h-4 w-96" />
         <LcsSkeleton className="h-64" />
       </div>
+      </LcsPageContainer>
     );
   }
 
@@ -1009,6 +1018,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
   );
 
   return (
+    <LcsPageContainer width="standard">
     <div className="p-6 lg:p-8">
       <div
         className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
@@ -1241,6 +1251,43 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
           <BarChart3 className="h-3.5 w-3.5" /> Analytics{totalViews > 0 ? ` (${totalViews})` : ""}
         </button>
       </div>
+      )}
+
+      {/* "View live profile" — replaces the removed /app/go-live/digital-
+          profile/profile-view route (Sep 2026). That route just rendered
+          this same component with view="preview"; a button that flips
+          local tab state does the identical thing without a nav destination,
+          since it's a preview action taken mid-edit, not a place a founder
+          navigates to and stays (per the Go Live nav re-homing decision).
+          Only shown in the route-controlled full-profile context, where the
+          tab-switcher bar above is hidden. */}
+      {view === "full" && tab !== "preview" && (
+        <button
+          onClick={() => { setTab("preview"); setEnteredPreviewFromFull(true); }}
+          className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            border: "1px solid var(--lcs-line)",
+            color: "var(--lcs-ink)",
+            background: "var(--lcs-surface)",
+          }}
+        >
+          <Eye className="h-3.5 w-3.5" /> View live profile
+        </button>
+      )}
+      {view === "full" && tab === "preview" && enteredPreviewFromFull && (
+        <button
+          onClick={() => { setTab("full"); setEnteredPreviewFromFull(false); }}
+          className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors"
+          style={{
+            borderRadius: "var(--radius-lcs-control)",
+            border: "1px solid var(--lcs-line)",
+            color: "var(--lcs-ink-muted)",
+            background: "transparent",
+          }}
+        >
+          <Edit3 className="h-3.5 w-3.5" /> Back to editing
+        </button>
       )}
 
       {extractionError && (
@@ -2069,6 +2116,7 @@ export function Profile({ view }: { view?: ProfileView } = {}) {
       )}
 
     </div>
+    </LcsPageContainer>
   );
 }
 

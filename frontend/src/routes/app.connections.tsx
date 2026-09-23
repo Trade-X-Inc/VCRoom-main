@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
-import { LcsEmptyState } from "@/components/lcs";
+import { LcsEmptyState, LcsPageContainer } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/connections")({
   component: ConnectionRequestsPage,
@@ -108,6 +108,7 @@ export function ConnectionRequestsPage() {
   };
 
   return (
+    <LcsPageContainer width="standard">
     <div className="p-6 lg:p-8">
       <div className="flex items-center gap-2 mb-6">
         <Users className="h-5 w-5 text-brand" />
@@ -197,5 +198,6 @@ export function ConnectionRequestsPage() {
         </div>
       )}
     </div>
+    </LcsPageContainer>
   );
 }

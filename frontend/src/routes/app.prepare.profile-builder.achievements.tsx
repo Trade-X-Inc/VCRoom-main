@@ -5,7 +5,7 @@ import { Plus, Trash2, Loader2, Trophy, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
+import { LcsPageHeader, LcsEmptyState, LcsButton, LcsPageContainer } from "@/components/lcs";
 import { PermissionGate } from "@/components/app/PermissionGate";
 
 // R9 (c) — Prepare › Profile Builder › Achievements. Per user decision: an
@@ -141,7 +141,8 @@ function AchievementsEditor() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+    <LcsPageContainer width="standard">
+    <div className="p-6 lg:p-8">
       <div
         className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
         style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
@@ -258,5 +259,6 @@ function AchievementsEditor() {
         </div>
       )}
     </div>
+    </LcsPageContainer>
   );
 }

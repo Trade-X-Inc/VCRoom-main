@@ -7,8 +7,10 @@ import { getProfileViews, getSandboxCompany, type LcsProfileView, type LcsViewer
 
 // Profile Analytics — real screen extraction (3 Sep 2026). Source:
 // app.profile.tsx's "analytics" tab (query/aggregation lines 353-393,
-// render lines 1507-1636), reached via the real app.go-live.profile-
-// analytics.tsx thin wrapper. Confirmed clean of scoring/discovery-layer
+// render lines 1507-1636), reached via the real
+// app.prepare.profile-builder.analytics.tsx thin wrapper (moved here
+// from app.go-live.profile-analytics.tsx during the Sep 2026 Go Live nav
+// re-homing). Confirmed clean of scoring/discovery-layer
 // residue by reading the full slice before building, per the standing
 // instruction to check specifically given the pattern already found
 // twice elsewhere (§19a Deal Intake, §19b review-document/generate-deal-

@@ -5,7 +5,7 @@ import { StickyNote, Plus, Pin, Trash2, Loader2, Sparkles, ChevronRight } from "
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { LcsPageHeader, LcsEmptyState, LcsButton } from "@/components/lcs";
+import { LcsPageHeader, LcsEmptyState, LcsButton, LcsPageContainer } from "@/components/lcs";
 import { cn } from "@/lib/utils";
 
 // R9 (c) — Deal Rooms › Deal Prep Notes. Team-authored notes for tracking
@@ -189,7 +189,8 @@ export function PrepNotesBase({
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+    <LcsPageContainer width="standard">
+    <div className="p-6 lg:p-8">
       <div
         className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
         style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
@@ -300,5 +301,6 @@ export function PrepNotesBase({
         </div>
       )}
     </div>
+    </LcsPageContainer>
   );
 }

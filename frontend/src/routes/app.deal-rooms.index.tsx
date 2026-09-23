@@ -11,6 +11,7 @@ import { roomListByStartup } from "@/lib/actions/deal-room-core";
 import { useAuth } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { LcsPageContainer } from "@/components/lcs";
 import {
   V2Button, V2PageHeader, V2EmptyState, V2SkeletonRows,
   LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel, ReferenceLine,
@@ -198,27 +199,32 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
   // fired, only that this is a real failure, not "no deal rooms exist."
   if (loadError || roomsError) {
     return (
-      <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+      <LcsPageContainer width="standard">
+      <div className="p-8 font-v2-ui text-v2-ink">
         <p className="text-v2-ink" style={{ fontSize: "13.5px", marginBottom: "8px" }}>Deal rooms could not load</p>
         <p className="text-v2-ink-secondary" style={{ fontSize: "12.5px", marginBottom: "20px" }}>
           There was a problem connecting. Refresh the page to try again.
         </p>
         <V2Button variant="secondary" onClick={() => window.location.reload()}>Refresh page</V2Button>
       </div>
+      </LcsPageContainer>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+      <LcsPageContainer width="standard">
+      <div className="p-8 font-v2-ui text-v2-ink">
         <V2SkeletonRows rows={4} columns={4} />
       </div>
+      </LcsPageContainer>
     );
   }
 
   if (view === "team-assignments") {
     return (
-      <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+      <LcsPageContainer width="standard">
+      <div className="p-8 font-v2-ui text-v2-ink">
         <V2PageHeader
           title="Team assignments"
           description="Who on your team is assigned to each deal room."
@@ -266,11 +272,13 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
           </LedgerTable>
         )}
       </div>
+      </LcsPageContainer>
     );
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+    <LcsPageContainer width="standard">
+    <div className="p-8 font-v2-ui text-v2-ink">
       <V2PageHeader
         title="Deal rooms"
         description={`${rooms.length} room${rooms.length !== 1 ? "s" : ""}`}
@@ -552,6 +560,7 @@ export function DealRooms({ view }: { view?: "team-assignments" } = {}) {
         </div>
       )}
     </div>
+    </LcsPageContainer>
   );
 }
 

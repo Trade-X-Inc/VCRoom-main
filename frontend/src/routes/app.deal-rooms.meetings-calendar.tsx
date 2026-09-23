@@ -7,6 +7,7 @@ import {
   V2PageHeader, V2EmptyState, V2SkeletonRows,
   LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td, StatusLabel,
 } from "@/components/v2";
+import { LcsPageContainer } from "@/components/lcs";
 
 // R9 (c) — Deal Rooms › Meetings Calendar. Minimal cross-room view: for each
 // room, the scheduled/completed meeting dates only — reusing the existing
@@ -70,7 +71,8 @@ function FounderMeetingsCalendar() {
   const sorted = [...rows].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
   return (
-    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+    <LcsPageContainer width="standard">
+    <div className="p-8 font-v2-ui text-v2-ink">
       <V2PageHeader
         breadcrumb={[{ label: "Deal rooms" }, { label: "Meetings calendar" }]}
         title="Meetings calendar"
@@ -116,5 +118,6 @@ function FounderMeetingsCalendar() {
         </LedgerTable>
       )}
     </div>
+    </LcsPageContainer>
   );
 }

@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus } from "@/components/lcs";
+import { LcsEmptyState, LcsStatusPill, LcsButton, type LcsStatus, LcsPageContainer } from "@/components/lcs";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf","pptx","ppt","docx","doc","csv","png","jpg","jpeg"]);
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -780,7 +780,9 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-    <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+    <div className="flex-1 overflow-y-auto">
+    <LcsPageContainer width="standard">
+    <div className="p-6 lg:p-8">
       {/* Header */}
       <div
         className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
@@ -1570,6 +1572,8 @@ export function Documents({ view }: { view?: DocumentsView } = {}) {
           </div>
         </div>
       )}
+    </div>
+    </LcsPageContainer>
     </div>
     </div>
   );

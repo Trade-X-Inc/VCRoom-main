@@ -10,7 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { useAccountContext } from "@/hooks/useAccountContext";
 import { formatDistanceToNow } from "date-fns";
-import { LcsButton, LcsEmptyState } from "@/components/lcs";
+import { LcsButton, LcsEmptyState, LcsPageContainer } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/audit")({
   // R9: folded into Settings as the Activity tab — old URL redirects there.
@@ -103,7 +103,8 @@ function AuditPage() {
   }, [logs, category, actorFilter]);
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto flex flex-col gap-6">
+    <LcsPageContainer width="standard">
+    <div className="p-6 lg:p-8 flex flex-col gap-6">
 
       {/* Header */}
       <div className="flex items-end justify-between gap-4">
@@ -240,5 +241,6 @@ function AuditPage() {
         </p>
       )}
     </div>
+    </LcsPageContainer>
   );
 }

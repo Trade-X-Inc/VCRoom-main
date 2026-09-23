@@ -7,6 +7,7 @@ import {
   V2PageHeader, V2EmptyState, V2SkeletonRows,
   LedgerTable, LedgerHead, LedgerBody, Th, Tr, Td,
 } from "@/components/v2";
+import { LcsPageContainer } from "@/components/lcs";
 
 // R9 (c) — Deal Rooms › Reports Vault. Record box of closure reports for
 // CLOSED deal rooms only, per §9.6's /reports rule. deal_room_closure_reports
@@ -53,7 +54,8 @@ function FounderReportsVault() {
   });
 
   return (
-    <div className="p-8 max-w-5xl mx-auto font-v2-ui text-v2-ink">
+    <LcsPageContainer width="standard">
+    <div className="p-8 font-v2-ui text-v2-ink">
       <V2PageHeader
         breadcrumb={[{ label: "Deal rooms" }, { label: "Reports vault" }]}
         title="Reports vault"
@@ -97,5 +99,6 @@ function FounderReportsVault() {
         </LedgerTable>
       )}
     </div>
+    </LcsPageContainer>
   );
 }

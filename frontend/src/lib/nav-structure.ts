@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, ClipboardCheck, Globe, UserCircle2, Briefcase,
+  LayoutDashboard, ClipboardCheck, UserCircle2, Briefcase,
   PieChart, MessageSquare, Settings, Brain, FileInput,
 } from "lucide-react";
 
@@ -65,6 +65,9 @@ export const founderSections: L2Section[] = [
           { to: "/app/prepare/profile-builder/team-cards", label: "Team Cards" },
           { to: "/app/prepare/profile-builder/achievements", label: "Achievements" },
           { to: "/app/prepare/profile-builder/fundraising-thesis", label: "Fundraising Thesis" },
+          // Go Live nav re-homing (Sep 2026) — was /app/go-live/profile-analytics,
+          // under its own now-deleted "Go Live" L2 section.
+          { to: "/app/prepare/profile-builder/analytics", label: "Profile Analytics" },
         ],
       },
       {
@@ -76,27 +79,6 @@ export const founderSections: L2Section[] = [
           { to: "/app/prepare/ip-vault/privacy-settings", label: "Document Privacy Settings" },
         ],
       },
-      {
-        label: "Roast",
-        children: [
-          { to: "/app/prepare/badges/founder-roast", label: "Founder Roast" },
-          { to: "/app/prepare/badges/roast-reports", label: "Founder Roast Reports" },
-        ],
-      },
-    ],
-  },
-  {
-    key: "go-live", label: "Go Live", icon: Globe,
-    matchPrefixes: ["/app/go-live"],
-    children: [
-      {
-        label: "Digital Profile",
-        children: [
-          { to: "/app/go-live/digital-profile/profile-view", label: "Full Digital Profile View" },
-          { to: "/app/go-live/digital-profile/privacy-settings", label: "Profile Privacy Settings" },
-        ],
-      },
-      { to: "/app/go-live/profile-analytics", label: "Profile View Analytics" },
     ],
   },
   {

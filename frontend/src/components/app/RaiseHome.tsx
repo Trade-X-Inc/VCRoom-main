@@ -65,7 +65,11 @@ export function RaiseHome() {
   const primaryAction = !hasStartup || !prepareComplete
     ? { to: "/app/prepare" as const, label: "Start building your pack" }
     : !p?.goLiveDone
-      ? { to: "/app/go-live" as const, label: "Go live" }
+      // Go Live nav re-homing (Sep 2026) — /app/go-live no longer exists;
+      // Full Profile is where publishing (the real goLiveDone gate,
+      // startup.profile_published) and the "View live profile" preview
+      // action both live now.
+      ? { to: "/app/prepare/profile-builder/full-profile" as const, label: "Go live" }
       : { to: "/app/deal-rooms" as const, label: "View deal rooms" };
 
   // "Waiting on you" — real, on-you pack items not yet complete. Carried

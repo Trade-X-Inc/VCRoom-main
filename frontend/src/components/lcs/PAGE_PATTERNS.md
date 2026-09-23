@@ -168,7 +168,44 @@ tab's actual data dependencies before splitting) — see CLAUDE.md §1.
 
 ---
 
-## 5. What this file does NOT cover
+## 5. Founder nav — Go Live section retired, Sep 2026
+
+The "Go Live" L2 nav section (`/app/go-live/*`) was deleted — it was three
+alias routes wrapping `Profile`'s own internal tab views (`preview` /
+`privacy` / `analytics`) under a separate, redundant nav path. Re-homed:
+
+| Old route | New location | Why |
+|---|---|---|
+| `/app/go-live/digital-profile/profile-view` (`view="preview"`) | **Not a nav destination.** A "View live profile" button inside Full Profile (`/app/prepare/profile-builder/full-profile`) that flips `Profile`'s local `tab` state to `"preview"`, plus a "Back to editing" return. | It's a preview action taken mid-edit, not a place a founder navigates to and stays. |
+| `/app/go-live/digital-profile/privacy-settings` (`view="privacy"`) | `/app/settings/profile-privacy`, a 6th real route-tab in `app.settings.tsx`'s `routeTabs`, alongside Billing/Notifications/Security/Activity. | Real sibling route in an already-tabbed layout, not an alias needing its own L2 section. Distinct from Settings' own "Profile" tab (account fields, not company-profile visibility). |
+| `/app/go-live/profile-analytics` (`view="analytics"`) | `/app/prepare/profile-builder/analytics`, a 6th L4 leaf under Prepare → Profile Builder. | Real content a founder returns to, same class as Profile Builder's other 5 sub-pages. |
+
+`RaiseHome.tsx`'s "Go live" CTA (shown when `!p.goLiveDone`, i.e.
+`startup.profile_published !== true`) now points at
+`/app/prepare/profile-builder/full-profile` — where both the publish
+control and the new "View live profile" button live. No redirect shims;
+the four deleted route files (`app.go-live.*.tsx`) are gone, not stubbed.
+
+## 6. Width-primitive rollout — Sep 2026, founder routes
+
+`LcsPageContainer` applied across every founder-nav-reachable route.
+Existing `max-w-[1360px]` values mapped directly to `standard`.
+`max-w-5xl` (1024px, no tier matches exactly) mapped to `standard` by
+decision — these are list/table/profile surfaces, the exact pages the
+"too narrow" complaint was about; `narrow` would have tightened them
+further. One deliberate non-wrap: `app.messages.tsx`'s `WorkspacePage`
+(Team Chat) is a fixed-rail + flex-fill chat workspace with no `max-w-*`
+by design — the `full` tier's reference case, per §1's table. Wrapping it
+would break the split-pane layout.
+
+Mega-pages (`app.documents.tsx`, `app.profile.tsx`) got the container
+around their outer render only — no internal hub/tab restructuring in
+this pass, per §4's "don't build as a side effect" rule. The container
+survives that future refactor; it is not a double-touch.
+
+---
+
+## 7. What this file does NOT cover
 
 - Visual design (colors, spacing, radii) — that's `PRIMITIVES.md`.
 - Nav structure / sidebar ordering — that's `src/lib/nav-structure.ts`, a

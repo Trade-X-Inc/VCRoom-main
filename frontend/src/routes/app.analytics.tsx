@@ -5,7 +5,7 @@ import { LazyChart } from "@/components/shared/LazyChart";
 import { ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { LcsPageHeader, LcsEmptyState } from "@/components/lcs";
+import { LcsPageHeader, LcsEmptyState, LcsPageContainer } from "@/components/lcs";
 
 export const Route = createFileRoute("/app/analytics")({
   component: FounderAnalytics,
@@ -162,7 +162,8 @@ function FounderAnalytics() {
   const sourceRows = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1360px] mx-auto">
+    <LcsPageContainer width="standard">
+    <div className="p-6 lg:p-8">
       <div
         className="flex items-center gap-1.5 text-[12px] font-medium mb-3"
         style={{ color: "var(--lcs-ink-muted)", fontFamily: "var(--font-lcs-ui)" }}
@@ -288,5 +289,6 @@ function FounderAnalytics() {
         </div>
       </div>
     </div>
+    </LcsPageContainer>
   );
 }
