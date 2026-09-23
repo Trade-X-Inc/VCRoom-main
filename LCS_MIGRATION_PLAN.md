@@ -534,6 +534,8 @@ Alias routes retired for free: `app.investor.discover.{deal-flow,watchlist,index
 
 > **CARVED OUT OF THE STANDARD SEQUENCE, 22 Sep 2026 — do not build from this document.** `app.roast.index.tsx`, `app.roast.$id.live.tsx`, `app.roast.$id.answers.tsx`, and `components/app/PaymentConfirm.tsx` have a separate plan and will be handled in their own dedicated branch, not as part of the normal Group 5→10 progression. This section is left in place as a record of the original recon (file list, line counts, v1-hit counts below), not as live build scope — do not reach this group by default once Group 9 closes. Wait for explicit instruction before touching any of these four files.
 
+> **Added, 23 Sep 2026 — `routes/roast.$id.tsx` (760 lines, public/unauthenticated) belongs in this same deferred bucket, confirmed by direct code trace rather than assumed from the shared name.** Found during a fresh public-site restyle-scoping audit that initially treated it as an ordinary v1-purple public page. Before restyling, checked whether it's the same feature as this group's authenticated files under a different route pattern, or a coincidental naming collision — it's the former: `app.roast.index.tsx:211,519,524` and `app.roast.$id.answers.tsx:351` link directly to `/roast/${id}`, i.e. this exact route is the public, spectator-facing page a founder shares once they start a Roast session from the authenticated management screen. Both sides share `lib/roast-fn.ts` (`getRoastPublicState`, `ROAST_LEVELS`, etc.) as backing logic. Per the standing "leave Founder Roast untouched, wait for explicit instruction" scope on this group, `roast.$id.tsx` is pulled into it and excluded from any other restyle pass, regardless of which file list or repo location it technically sits in.
+
 **Ordered last: fully isolated, zero shared dependents, read/write but no deal-critical state.**
 
 | File | Lines | v1 hits |
@@ -542,8 +544,9 @@ Alias routes retired for free: `app.investor.discover.{deal-flow,watchlist,index
 | `routes/app.roast.$id.live.tsx` | 579 | 31 |
 | `routes/app.roast.$id.answers.tsx` | 444 | 35 |
 | `components/app/PaymentConfirm.tsx` | 139 | 0 hits, but imports `lib/design-tokens` |
+| `routes/roast.$id.tsx` (public, added 23 Sep 2026) | 760 | v1 purple — `hs-gradient`/`7C3AED`/`Syne` markers, confirmed live |
 
-**~1,709 lines.** Reached only via the thin aliases `app.prepare.badges.founder-roast.tsx` and `app.prepare.badges.roast-reports.tsx`. `app.roast.index.tsx` has its own internal `view` prop switcher (list vs. reports).
+**~2,469 lines total (was ~1,709 before `roast.$id.tsx` was added).** The first four are reached only via the thin aliases `app.prepare.badges.founder-roast.tsx` and `app.prepare.badges.roast-reports.tsx`; `roast.$id.tsx` is reached directly by URL, shared publicly by a founder once a Roast session starts. `app.roast.index.tsx` has its own internal `view` prop switcher (list vs. reports).
 
 ---
 
