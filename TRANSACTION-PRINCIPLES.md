@@ -115,3 +115,106 @@ the record chain (`CLAUDE.md §8.3`) captures it, or it isn't done. A
 commit-class event that bypasses the gateway is not a shortcut; it's a hole
 in the one property (`what happened, when, by whom`) the whole system exists
 to guarantee.
+
+---
+
+## E. Qualification Gate ("Alignment Check"; working fallback "Fit Check")
+
+**LOCKED SPEC — build criteria only. Not built yet; see build sequence
+below.** Recorded here under this file's own standing rule (see the header
+note at the top of this document): never surfaces in public changelog, docs,
+marketing copy, or any public-facing surface. Internal build target only.
+
+**Position.** The earliest deal-room stage; **precedes** the `deal_rooms`
+row itself. Mutual Proceed triggers creation of a new deal room via the
+existing room-creation path (`prep_status`). The append-only record chain
+(`CLAUDE.md §8.3`) **starts here** — the gate needs its own recordable
+object that links to the `deal_room` on Proceed, so the audit trail is
+continuous from first contact through close, not just from room creation
+onward.
+
+**Purpose.** Two-sided, self-run mutual qualification before serious data is
+shared. Reduces misunderstanding, mismatch, and premature decisions.
+
+**HARD RULE (Foundation §15/§25).** Never platform matching, scoring,
+ranking, recommendation, or fit-verdict. Each side checks the other against
+**their own** criteria; the system only structures the exchange and echoes
+facts; the human decides. This is the same boundary already enforced
+elsewhere in this codebase — see `CLAUDE.md §19a`/`§19h`/`§19i` for the
+pattern of violations this rule exists to prevent from recurring here.
+
+**Object.** A Criteria Card per party. Each criterion is typed
+(numeric-threshold / enum / boolean / short-text / evidence-required) and
+tagged **Must** or **Prefer**.
+
+**Authoring modes.** Pre-designed (a reusable card saved on the party's
+profile) OR on-spot (built/tweaked ad hoc inside the connection). Same
+object either way — the authoring mode is metadata on the card, not a
+different schema.
+
+**Reveal model.** Open and symmetric — both parties exchange criteria, then
+each discloses against the other's criteria, and disclosures are visible to
+the counterparty.
+
+**AI role — permitted, narrowly:**
+- Draft criteria from plain-English input (Prepare-class, per `CLAUDE.md
+  §8.2`'s tool-class table).
+- Normalise a disclosure into the criterion's declared unit, plus a
+  completeness-flag.
+- Discrepancy-flag a disclosure against the party's own profile or
+  already-shared documents.
+- Neutral threshold echo — a factual restatement ("your bar X vs. their
+  disclosure Y"), never a verdict.
+
+**AI role — never:** aggregate score, percentage, rank, good/bad-fit
+label, recommendation, or auto-decision of any kind. Same boundary as §10's
+AI-usage table (`CLAUDE.md`) — extraction and completeness-checking are
+permitted, scoring and recommendation are not.
+
+**Decisions per side.** Proceed / Hold / Decline. Both Proceed → the deal
+room opens. Anything else → a single shared mutual Connection object,
+retained until deleted by a party.
+
+**Connection states — soft labels only, in every language, no exceptions.**
+Hold → "Potential". Decline → "Parked / revisit later". No hard words
+("rejected", "declined", "failed") anywhere, in any language — this is a
+platform-wide copy rule (see below), not specific to this gate.
+
+**Completeness gate.** A party cannot be prompted to Proceed until the
+counterparty has disclosed against **all** of that party's Must criteria.
+Gaps are shown explicitly, never guessed or silently treated as satisfied.
+
+**Re-request — server-enforced, every duration configurable, none
+hardcoded.**
+
+| Outcome | Cooldown |
+|---|---|
+| Hold | Allowed once the stated re-trigger condition is met; default 14 days otherwise |
+| Decline | Default 30 days |
+| Any sent re-request | Expires after 5 days if not acted on |
+
+Deleting the connection cancels any pending re-request and removes the
+connection entirely.
+
+**Copy and localization rule — platform-wide, not scoped to this gate.**
+Every user-facing string is soft, polite, and professional, in every
+language. Tone is reviewed per-language deliberately; never left to raw
+auto-translation. This generalises the Connection-state soft-labels rule
+above into a standing platform convention.
+
+**Answers to the 11 continuous questions (§A above), natively, at the
+earliest point of contact** — before any `deal_rooms` row exists:
+- **Q3** (who's blocking) — whichever party hasn't yet disclosed against
+  the counterparty's Must criteria.
+- **Q4** (which condition is unsatisfied) — the specific undisclosed or
+  unmet Must criterion.
+- **Q5** (what evidence is required) — any criterion tagged
+  evidence-required and not yet satisfied.
+- **Q11** (what's preventing the next state) — the completeness gate
+  itself, stated plainly rather than left implicit.
+
+**BUILD SEQUENCE.** Build only **after** the Closing-stage record-chain
+substrate (the atomicity work already proven live per `CLAUDE.md`'s
+deal-room record-atomicity entry, 24 Sep 2026) is settled. Not before — this
+gate needs the same append-only record mechanism, proven once rather than
+re-derived a second time for an earlier stage.
