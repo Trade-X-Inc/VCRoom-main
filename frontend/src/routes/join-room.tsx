@@ -5,6 +5,8 @@ import { Loader2, Check, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { callAction } from "@/lib/actions/call";
+import { acceptLawyerInvite } from "@/lib/actions/deal-room-counsel";
 
 // R14B — lawyer / legal counsel room-scoped join. Deliberately separate
 // from join.tsx: that route always creates a startup_team_accounts row
@@ -85,22 +87,38 @@ function JoinRoomPage() {
         return;
       }
 
-      const { data, error } = await supabase.rpc("accept_lawyer_invite", { p_token: token });
-      const result = Array.isArray(data) ? data[0] : data;
-      if (error || !result?.ok) {
-        const msg = result?.error === "self_acceptance_blocked"
+      // scopeId here is the invite token itself, not a deal_room_id — the
+      // real deal_room_id isn't known to the client until AFTER accept
+      // resolves it server-side (it's what this action creates the
+      // caller's first membership row in). acceptLawyerInvite's own
+      // handle() never reads ctx.scopeId — it sources org_id for the
+      // record entry from the resolved invite row directly (see
+      // deal-room-counsel.ts's own header comment) — so this value is
+      // inert, passed only because the envelope requires one.
+      let result: { dealRoomId: string };
+      try {
+        result = await callAction<{ dealRoomId: string }>(
+          acceptLawyerInvite,
+          token,
+          { token },
+        );
+      } catch (err: any) {
+        const errCode = err?.message as string | undefined;
+        const msg = errCode === "self_acceptance_blocked"
           ? "You sent this invite — you can't accept your own invitation. Open this link in a private window or sign in with the invited account."
-          : result?.error === "already_accepted"
+          : errCode === "already_accepted"
             ? "This invitation has already been accepted."
-            : result?.error === "expired"
-              ? "This invitation has expired."
-              : "Could not accept invitation.";
+            : errCode === "expired" || errCode === "invalid_token"
+              ? "This invitation has expired or is no longer valid."
+              : errCode === "forbidden"
+                ? "This invitation link is invalid or has already been used."
+                : "Could not accept invitation.";
         toast.error(msg);
         setAccepting(false);
         return;
       }
 
-      setDealRoomId(result.deal_room_id);
+      setDealRoomId(result.dealRoomId);
       setPageState("accepted");
     } catch (e: any) {
       toast.error(e.message ?? "Could not accept invitation");

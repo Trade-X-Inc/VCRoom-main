@@ -82,8 +82,21 @@ console.log("\n=== 7. Room-wide read-only: writes to content tables in a CLOSED 
 // close room B properly via the fn path (seed both flags + call rpc)
 await svc(`deal_room_close?deal_room_id=eq.${ROOM_B}`,{method:"DELETE",prefer:"return=minimal"});
 await svc(`deal_room_close`,{method:"POST",body:JSON.stringify({deal_room_id:ROOM_B,founder_confirmed:true,investor_confirmed:true}),prefer:"return=minimal"});
-const rpc=await fetch(`${SUPA}/rest/v1/rpc/finalize_deal_close`,{method:"POST",headers:{apikey:KEY,Authorization:`Bearer ${KEY}`,"Content-Type":"application/json"},body:JSON.stringify({p_deal_room_id:ROOM_B})});
+// finalize_deal_close is now the 6-arg atomic-record signature (the 1-arg
+// overload was dropped, migration applied 24 Sep 2026 — see CLAUDE.md's
+// deal-room record-atomicity entry). This is a setup step for section 7's
+// own checks, not itself a record-chain test, so p_actor_id/p_action/
+// p_object_type/p_object_id/p_data are filled with plain, real-shaped
+// values (this service-role script IS the acting party for test setup)
+// rather than sourced from any principal session — section 7 only reads
+// back deal_rooms.status afterward, it never asserts on the record entry
+// this call also writes.
+const rpc=await fetch(`${SUPA}/rest/v1/rpc/finalize_deal_close`,{method:"POST",headers:{apikey:KEY,Authorization:`Bearer ${KEY}`,"Content-Type":"application/json"},body:JSON.stringify({
+  p_deal_room_id:ROOM_B, p_actor_id:fUid, p_action:"test.r15c_setup_close",
+  p_object_type:"deal_room", p_object_id:ROOM_B, p_data:{},
+})});
 const bStatus=(await svc(`deal_rooms?id=eq.${ROOM_B}&select=status`).then(r=>r.json()))[0].status;
+ck("room B closes via finalize_deal_close setup call", bStatus==="closed", `status ${bStatus}, rpc http ${rpc.status}`);
 console.log(`  (room B closed via finalize_deal_close: status=${bStatus}, rpc ${rpc.status})`);
 // founder of room B tries to insert a Q&A / note in the closed room -> must fail (dr_is_open)
 const qaClosed=await asUser(F,`deal_room_qa`,{method:"POST",body:JSON.stringify({deal_room_id:ROOM_B,question:"late question",asked_by:fUid}),prefer:"return=representation"});

@@ -6,6 +6,12 @@ import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { callAction } from "@/lib/actions/call";
 import { roomGetTermSheet } from "@/lib/actions/deal-room-core";
+import {
+  requestLawyerInvite,
+  requestCounselWaive,
+  resolveLawyerRequest,
+  finalizeCounselWaiver,
+} from "@/lib/actions/deal-room-counsel";
 import { triggerLawyerInvite } from "@/lib/email/triggers";
 import { V2Button, StatusLabel } from "@/components/v2";
 
@@ -184,7 +190,14 @@ function CounselPanel({
               <StatusLabel tone="attention">Awaiting acceptance</StatusLabel>
             </div>
           </>
-        ) : isMySide && pendingFromThem ? (
+        ) : pendingFromThem ? (
+          // NOT isMySide-gated — see the header comment above (sides.map)
+          // for why. Rendered on the panel matching the REQUEST's own
+          // side, to whichever principal is NOT its requester (the
+          // counterparty) — never to the requester's own view of their
+          // own panel (pendingFromMe below covers that case instead,
+          // since requested_by === userId is mutually exclusive with
+          // requested_by !== userId on the same request).
           <div className="flex flex-col gap-2">
             <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>
               Wants to invite {pendingFromThem.lawyer_email} as counsel.
@@ -194,7 +207,8 @@ function CounselPanel({
               <V2Button variant="secondary" onClick={onDecline} disabled={busy}><X className="h-3 w-3" /> Decline</V2Button>
             </div>
           </div>
-        ) : isMySide && pendingWaiveFromThem ? (
+        ) : pendingWaiveFromThem ? (
+          // NOT isMySide-gated — same reasoning as pendingFromThem above.
           <div className="flex flex-col gap-2">
             <p className="text-v2-ink-secondary" style={{ fontSize: "13px" }}>Proposed proceeding without counsel.</p>
             <div className="flex gap-2">
@@ -283,15 +297,10 @@ export function LawyerGate({
     if (!userId || !lawyerEmail.trim()) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("deal_room_lawyer_requests").insert({
-        deal_room_id: dealRoomId,
-        kind: "invite_lawyer",
-        side: mySide,
-        lawyer_email: lawyerEmail.trim().toLowerCase(),
-        requested_by: userId,
-        status: "pending",
+      await callAction(requestLawyerInvite, dealRoomId, {
+        dealRoomId,
+        lawyerEmail: lawyerEmail.trim().toLowerCase(),
       });
-      if (error) throw error;
       await notifyCounterparty(
         "Legal counsel requested",
         `${isFounder ? "The founder" : "The investor"} wants to bring in legal counsel for the Investment Terms stage.`,
@@ -311,14 +320,7 @@ export function LawyerGate({
     if (!userId) return;
     setBusy(true);
     try {
-      const { error } = await supabase.from("deal_room_lawyer_requests").insert({
-        deal_room_id: dealRoomId,
-        kind: "waive_counsel",
-        side: mySide,
-        requested_by: userId,
-        status: "pending",
-      });
-      if (error) throw error;
+      await callAction(requestCounselWaive, dealRoomId, { dealRoomId });
       await notifyCounterparty(
         "Proceed without counsel?",
         `${isFounder ? "The founder" : "The investor"} proposed proceeding to Investment Terms without legal counsel.`,
@@ -336,51 +338,41 @@ export function LawyerGate({
     if (!userId) return;
     setBusy(true);
     try {
-      const { error } = await supabase
-        .from("deal_room_lawyer_requests")
-        .update({ status: approve ? "approved" : "declined", approved_by: userId, resolved_at: new Date().toISOString() })
-        .eq("id", request.id)
-        .eq("status", "pending");
-      if (error) throw error;
+      const result = await callAction<{
+        status: "approved" | "declined";
+        kind: "invite_lawyer" | "waive_counsel";
+        inviteToken: string | null;
+        lawyerEmail: string | null;
+        side: "founder" | "investor" | null;
+      }>(resolveLawyerRequest, dealRoomId, {
+        dealRoomId,
+        requestId: request.id,
+        approve,
+      });
 
-      if (approve && request.kind === "invite_lawyer" && request.lawyer_email) {
-        const { data: invited, error: inviteErr } = await supabase
-          .from("deal_room_lawyer_invites")
-          .insert({
-            deal_room_id: dealRoomId,
-            side: request.side,
-            email: request.lawyer_email,
-            invited_by: userId,
-            request_id: request.id,
-          })
-          .select("token")
-          .single();
-        if (inviteErr) throw inviteErr;
-        if (invited?.token) {
-          const { data: { session } } = await supabase.auth.getSession();
-          triggerLawyerInvite({
-            data: {
-              to: request.lawyer_email,
-              inviterName: session?.user?.user_metadata?.full_name || session?.user?.email || "Your contact",
-              companyName,
-              side: request.side,
-              token: invited.token,
-            },
-          }).catch(() => {});
-        }
+      if (approve && result.kind === "invite_lawyer" && result.inviteToken && result.lawyerEmail) {
+        const { data: { session } } = await supabase.auth.getSession();
+        triggerLawyerInvite({
+          data: {
+            to: result.lawyerEmail,
+            inviterName: session?.user?.user_metadata?.full_name || session?.user?.email || "Your contact",
+            companyName,
+            side: result.side ?? request.side,
+            token: result.inviteToken,
+          },
+        }).catch(() => {});
         toast.success("Approved — invite sent.");
-      } else if (approve && request.kind === "waive_counsel") {
-        // Mutual skip: the request row was just flipped to 'approved' above
-        // (its RLS enforces approver <> requester, so this genuinely took
-        // both parties). The waiver flag itself can NOT be set by a direct
-        // deal_rooms update — the enforce_counsel_waiver_write trigger blocks
-        // that (a founder could otherwise waive unilaterally, §6C4). It must
-        // go through finalize_counsel_waiver(), which re-checks that an
-        // approved waive request exists and records both confirmed_by from
-        // it, and works whether the founder OR the investor is the approver.
-        const { data: fin, error: rpcErr } = await supabase.rpc("finalize_counsel_waiver", { p_deal_room_id: dealRoomId });
-        const finRow = Array.isArray(fin) ? fin[0] : fin;
-        if (rpcErr || !finRow?.ok) throw new Error(finRow?.error || rpcErr?.message || "Could not finalize the waiver");
+      } else if (approve && result.kind === "waive_counsel") {
+        // Mutual skip: the request row was just flipped to 'approved' by
+        // resolveLawyerRequest above (its own re-derived check enforces
+        // approver <> requester, so this genuinely took both parties). The
+        // waiver flag itself can NOT be set by a direct deal_rooms update —
+        // the enforce_counsel_waiver_write trigger blocks that (a founder
+        // could otherwise waive unilaterally, §6C4). It must go through
+        // finalizeCounselWaiver, which re-checks that an approved waive
+        // request exists and records both confirmed_by from it, and works
+        // whether the founder OR the investor is the approver.
+        await callAction(finalizeCounselWaiver, dealRoomId, { dealRoomId });
         toast.success("Confirmed — proceeding without counsel.");
       } else {
         toast.success(approve ? "Approved." : "Declined.");
@@ -425,16 +417,48 @@ export function LawyerGate({
     <div className="flex flex-col gap-4 md:flex-row">
       {sides.map(({ key, label }) => {
         const isMySide = key === mySide;
-        // "From them" only makes sense on my own panel (a request directed at
-        // me to approve). On the counterparty's panel there is nothing for
-        // me to act on, so those controls simply don't render (isMySide gates
-        // every interactive branch in CounselPanel).
-        const theirRequestOnMySide = isMySide
-          ? requests.find((r) => r.kind === "invite_lawyer" && r.status === "pending" && r.side === mySide && r.requested_by !== userId)
-          : undefined;
-        const theirWaiveOnMySide = isMySide
-          ? requests.find((r) => r.kind === "waive_counsel" && r.status === "pending" && r.side === mySide && r.requested_by !== userId)
-          : undefined;
+        // FOUND LIVE, 24 Sep 2026 (this pass's own live-verification —
+        // see CLAUDE.md's Closing-stage record-wiring entry): these two
+        // finds were previously ALSO gated on isMySide, same as
+        // myOwnPending below. That made the approve/decline branch
+        // structurally unreachable — side names WHOSE counsel a request
+        // is about (correct, matches the panel labels and invite/
+        // accepted-name display below), which means a pending request's
+        // side always equals its OWN requester's side (only one person
+        // ever occupies a given side in a 2-principal room), so
+        // `side === mySide && requested_by !== userId` could never both
+        // hold for anyone. A request "about my own side" can only ever
+        // have been made by me — the counterparty, not me, is who needs
+        // to approve it, which is the isMySide-gated panel's own request
+        // being shown to whoever is NOT on that side. Fixed by dropping
+        // isMySide here specifically (kept for myOwnPending/onInvite/
+        // onWaive/showInviteForm below — those five stay strictly
+        // self-side-only, unaffected). Zero real production requests
+        // were ever stuck pending as a result (confirmed live before
+        // fixing — only this session's own disposable fixture existed).
+        //
+        // A caller's OWN principal role — not just "not the requester" —
+        // still gates the ability to act (findable !== rendering an
+        // Approve button a lawyer viewer can click): CounselPanel's own
+        // isMySide-gated branches (onInvite/onWaive/showInviteForm) are
+        // unaffected by this change and stay exactly as gated as before.
+        // A room-scoped lawyer reaching this page (meetings.tsx's own
+        // isLawyer routing) is a known, separate, NOT-fixed-in-this-pass
+        // gap — see CLAUDE.md: LawyerGate has no isLawyer prop at all,
+        // so a lawyer viewer's mySide falls through to 'investor' via
+        // isFounder=false, and this fix does not change that. Every
+        // action's own authorize() independently rejects a lawyer caller
+        // regardless (confirmed directly: callerRole() filters
+        // role in (founder,investor), so a lawyer's deal_room_members
+        // row matches zero rows and authorize() returns false) — the gap
+        // is UI-only, not a security hole, and stays open, not silently
+        // absorbed into this fix.
+        const theirRequestOnMySide = requests.find(
+          (r) => r.kind === "invite_lawyer" && r.status === "pending" && r.side === key && r.requested_by !== userId,
+        );
+        const theirWaiveOnMySide = requests.find(
+          (r) => r.kind === "waive_counsel" && r.status === "pending" && r.side === key && r.requested_by !== userId,
+        );
         const myOwnPending = isMySide
           ? requests.find((r) => (r.kind === "invite_lawyer" || r.kind === "waive_counsel") && r.status === "pending" && r.side === mySide && r.requested_by === userId)
           : undefined;
