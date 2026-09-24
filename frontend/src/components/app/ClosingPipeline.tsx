@@ -10,8 +10,23 @@ import { StepUpModal } from "@/components/app/StepUpModal";
 import { useStepUpGate } from "@/hooks/useStepUpGate";
 import {
   setFee, confirmFeePayment, recordSignedAgreement,
-  uploadPaymentProof, reviewPaymentProof, confirmDeliverable, downloadAgreement,
+  uploadPaymentProof, reviewPaymentProof, downloadAgreement,
 } from "@/lib/closing-fn";
+// confirmDeliverable moved onto the gateway (record-atomicity fix, 24 Sep
+// 2026) — the only closing-stage event migrated in this pass. Every other
+// export above is still the legacy closing-fn.ts pattern, deliberately
+// untouched; see CLAUDE.md's deal-room record-atomicity entry for scope.
+//
+// Called directly (its raw createServerFn), NOT via callAction — callAction
+// unwraps ActionResult by THROWING on !ok, but useStepUpGate's wrapGated()
+// requires its wrapped call to return the raw {ok, error?} shape so it can
+// detect STEP_UP_REQUIRED and drive the retry-after-password flow itself
+// (see wrapGated's own type constraint, StepUpAwareResult). Every other
+// gateway action in this codebase is read-oriented or non-step-up and goes
+// through callAction; this is the first step-up-gated action on the
+// gateway, and the mismatch is real, not an oversight — confirmDeliverable
+// is called the same way the legacy closing-fn.ts export was.
+import { confirmDeliverable } from "@/lib/actions/deal-room-closing";
 
 // R15C — the closing pipeline (Gates 4-7). Sole content of the deal room's
 // /close route. Principals only (founder/investor) — LawyerRoomView never renders
@@ -188,11 +203,25 @@ export function ClosingPipeline({
   const doConfirmClose = async () => {
     setBusy("close");
     try {
+      // Gateway ActionResult envelope: {ok:true, data} | {ok:false, error,
+      // status} — NOT the flat {ok, closed, error} the pre-migration
+      // closing-fn.ts export returned directly. wrapGated only inspects
+      // top-level `ok`/`error` (StepUpAwareResult), both of which are
+      // still present at the top level here, so the step-up retry flow is
+      // unaffected; `closed` moves to `r.data.closed` on success.
       const r = await stepUp.wrapGated(async (stepUpToken) =>
-        confirmDeliverable({ data: { dealRoomId, accessToken: await token(), stepUpToken } }),
+        confirmDeliverable({
+          data: {
+            accessToken: await token(),
+            scopeId: dealRoomId,
+            stepUpToken,
+            input: { dealRoomId },
+          },
+        }),
       );
       if (!r.ok) { toast.error(r.error === "payment_not_confirmed" ? "Payment must be confirmed first" : "Could not confirm"); return; }
-      if (r.closed) toast.success("Deal closed — invoices generated"); else toast.success("Your confirmation recorded — awaiting counterparty");
+      const closed = (r.data as { closed?: boolean } | undefined)?.closed;
+      if (closed) toast.success("Deal closed — invoices generated"); else toast.success("Your confirmation recorded — awaiting counterparty");
       refresh();
     } catch (e) {
       if (!(e instanceof Error && e.message === "STEP_UP_CANCELLED")) toast.error("Could not confirm");

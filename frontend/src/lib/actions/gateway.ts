@@ -98,6 +98,23 @@ export type ActionDef<Input, Output extends JsonValue> = {
   // false/absent for every other action; nothing else in this codebase is
   // affected by adding this field.
   requiresStepUp?: boolean;
+  // Atomicity fix (24 Sep 2026, confirmDeliverable) — when true, runAction's
+  // own step-6 append_record call is SKIPPED entirely: the handler already
+  // wrote the record entry itself, atomically, in the same DB transaction as
+  // whatever state change the action performs (see deal-room-closing.ts's
+  // confirmDeliverableDef for the worked example). This exists because the
+  // gateway's default append happens as a SEPARATE HTTP round-trip strictly
+  // after handle() returns — fine for a read, or for a write where "the
+  // write committed but its audit entry didn't" is a tolerable, correctable
+  // gap. For a Commit-class event where that gap is the exact thing being
+  // guaranteed against (a closed deal with no record of closing), the
+  // handler must do the append itself inside the same transaction as the
+  // state change, and the gateway must not append a second, non-atomic entry
+  // on top of it. def.record() is still REQUIRED and still the single
+  // declared TypeScript contract for the payload shape — this flag changes
+  // WHO calls the RPC and WHEN, never what record() itself describes or
+  // whether it exists. See CLAUDE.md's deal-room record-atomicity entry.
+  recordedByHandler?: boolean;
   validate: (raw: unknown) => Input; // narrow the untyped input payload
   authorize: (ctx: ActionCtx, input: Input) => Promise<boolean>;
   handle: (ctx: ActionCtx, input: Input) => Promise<Output>;
@@ -215,6 +232,25 @@ export async function runAction<Input, Output extends JsonValue>(
   // 6. record append (§8.3) — every action, read included. A failure to
   //    append is a records incident, surfaced not swallowed (§7.4 "errors
   //    must be checked"). Same pack_api gateway path.
+  //
+  //    SKIPPED when def.recordedByHandler is true — the handler already
+  //    wrote this action's record entry itself, atomically, inside the same
+  //    DB transaction as its state change (see the field's own doc comment
+  //    above). Appending again here would be a second, non-atomic entry for
+  //    the same event — a duplicate, not a safety net.
+  //
+  //    def.record() is NOT called by the gateway on this path — by
+  //    construction, the handler itself is the one that must have already
+  //    called it (to build the exact payload it passed into its atomic RPC
+  //    call) before runAction ever reaches this line. A gateway-side call
+  //    here would prove nothing about whether the handler used the same
+  //    payload; it can only be a real check if it happens inside handle(),
+  //    which is why confirmDeliverableDef's record() is invoked from within
+  //    its own handle(), not left for the gateway to call at all.
+  if (def.recordedByHandler) {
+    return { ok: true, data: output };
+  }
+
   const rec = def.record(input, output);
   const { data: appendRes, error: appendErr } = await sb
     .schema("pack_api")
