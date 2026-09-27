@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/index.tsx.
@@ -54,9 +55,16 @@ const DOCS = [
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const LEGAL_INDEX_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal" },
+]);
+
 function LegalIndex() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: LEGAL_INDEX_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[var(--v2-accent)] relative overflow-hidden">

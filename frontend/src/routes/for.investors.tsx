@@ -5,6 +5,7 @@ import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED, PR_INK, PR_INK_3, PR_RULE,
 } from "@/components/site/PublicRegisterPrimitives";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // SEO-009 Phase 3 — bespoke rebuild on PUBLIC-REGISTER.md v2.0 tokens,
 // same pattern as for.founders.tsx (see that file's header comment for
@@ -36,9 +37,51 @@ const INVESTOR_TYPES = [
   { label: "Limited Partners", desc: "Your capital, your record", path: "/for/limited-partners" },
 ];
 
+// SEO-010 (AEO pass): FAQPage + BreadcrumbList JSON-LD. Same content
+// discipline as for.founders.tsx's own FAQ block — no verification,
+// scoring, matching, or introduction-brokering claims.
+const INVESTORS_FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How do I manage deal flow without a CRM?",
+      acceptedAnswer: { "@type": "Answer", text: "A deal room replaces the tracking a CRM would otherwise do for each opportunity: it shows which stage a given deal has reached — brief, NDA, diligence, terms, conditions, close — without you maintaining a separate spreadsheet or pipeline board. Each room is scoped to one company, so status is read from the room itself rather than reconstructed from notes." },
+    },
+    {
+      "@type": "Question",
+      name: "What should a deal room include?",
+      acceptedAnswer: { "@type": "Answer", text: "At minimum: a signed, individual NDA gating sensitive documents; per-investor permissioning so access matches what's actually been agreed; a visible lifecycle showing which stage the deal has reached; and a permanent, append-only record of terms, conditions, and confirmations that both sides can point back to after close." },
+    },
+    {
+      "@type": "Question",
+      name: "How do I share deal documents with my LP?",
+      acceptedAnswer: { "@type": "Answer", text: "Lengdon doesn't provide LP reporting or fund-administration tooling — it records the deal-room process itself (documents, terms, conditions, confirmations) so that record exists if you need to produce evidence of process to an LP separately. It is not a substitute for your fund's own LP communication or reporting system." },
+    },
+    {
+      "@type": "Question",
+      name: "What is per-room permissioning?",
+      acceptedAnswer: { "@type": "Answer", text: "Each deal room scopes document and information access to that specific room's members — a founder and the investors they've individually invited into it. An investor in one room has no visibility into a different founder's room, and access within a room is tied to each signed NDA, not shared broadly across a firm." },
+    },
+    {
+      "@type": "Question",
+      name: "How do I run diligence on multiple deals at once?",
+      acceptedAnswer: { "@type": "Answer", text: "Each deal you're evaluating lives in its own room, so diligence on one doesn't get mixed into another — documents, conditions, and communication stay scoped per deal. You can see where each individual room stands in its lifecycle without a shared tracker, since the room itself carries that state." },
+    },
+  ],
+});
+
+const INVESTORS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "For investors" },
+]);
+
 function Investors() {
   return (
     <div style={{ background: PR_BASE, minHeight: "100vh" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: INVESTORS_FAQ_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: INVESTORS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <section style={{ background: PR_BASE }}>

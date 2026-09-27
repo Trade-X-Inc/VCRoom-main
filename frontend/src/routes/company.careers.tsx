@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/company/Careers.tsx.
@@ -67,9 +68,17 @@ const VALUES = [
   { title: "Both parties, always", body: "We represent neither the founder nor the investor. The infrastructure must be equally fair, equally rigorous, and equally useful to both." },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 2-level — no
+// /company hub page exists.
+const CAREERS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Careers" },
+]);
+
 function Careers() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: CAREERS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

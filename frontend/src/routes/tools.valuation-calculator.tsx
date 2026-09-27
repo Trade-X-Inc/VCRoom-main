@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/ValuationCalculator.tsx.
@@ -40,6 +41,14 @@ function fmt(n: number) {
 }
 function pct(n: number) { return `${(n * 100).toFixed(1)}%`; }
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 3-level — /tools
+// (tools.index.tsx) is the real hub page.
+const VALUATION_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Tools", url: "https://lengdon.com/tools" },
+  { name: "Startup valuation calculator" },
+]);
+
 function ValuationCalculator() {
   const [preMoney, setPreMoney] = useState(8_000_000);
   const [raise, setRaise] = useState(2_000_000);
@@ -51,6 +60,7 @@ function ValuationCalculator() {
   return (
     <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: VALUATION_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: VALUATION_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[var(--v2-accent)] relative overflow-hidden">

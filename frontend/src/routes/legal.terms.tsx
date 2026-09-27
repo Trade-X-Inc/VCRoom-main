@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
 
 // Content pass, 31 Aug 2026. Entity mismatch fixed, same correction as
@@ -160,9 +161,17 @@ The current version of these Terms is always available at lengdon.com/legal/term
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const TERMS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal", url: "https://lengdon.com/legal" },
+  { name: "Terms of service" },
+]);
+
 function Terms() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: TERMS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

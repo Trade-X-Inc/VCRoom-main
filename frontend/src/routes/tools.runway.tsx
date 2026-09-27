@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPage";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/Runway.tsx. Calculation logic is
@@ -30,6 +31,13 @@ const RUNWAY_JSON_LD = JSON.stringify({
   "publisher": { "@id": "https://lengdon.com/#organization" },
 });
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const RUNWAY_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Tools", url: "https://lengdon.com/tools" },
+  { name: "Runway calculator" },
+]);
+
 function RunwayCalculator() {
   const [cash, setCash] = useState(3_000_000);
   const [burn, setBurn] = useState(200_000);
@@ -45,6 +53,7 @@ function RunwayCalculator() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: RUNWAY_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: RUNWAY_BREADCRUMB_JSON_LD }} />
       <ToolCalculatorPage
       toolLabel="Runway"
       titleLine1="RUNWAY"

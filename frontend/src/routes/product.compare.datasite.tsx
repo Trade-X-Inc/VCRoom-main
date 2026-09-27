@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Content pass, 31 Aug 2026 — "sealed dual-copy export at close" row
 // removed (not a live capability — CLAUDE.md §12/§20.6, the append-only
@@ -34,8 +35,18 @@ const ROWS = [
   { feature: "Activity analytics", lengdon: true, them: true, note: "Datasite's analytics serve the seller. Lengdon's record serves both parties equally." },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 3-level — /product/compare
+// (product.compare.index.tsx) is a real hub page.
+const DATASITE_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Compare", url: "https://lengdon.com/product/compare" },
+  { name: "Lengdon vs Datasite" },
+]);
+
 function CompareDatasite() {
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: DATASITE_BREADCRUMB_JSON_LD }} />
     <CompetitorComparePage
       eyebrow="Lengdon vs Datasite"
       title="NOT DILIGENCE."
@@ -50,5 +61,6 @@ function CompareDatasite() {
       ctaTitle="Use both. Sequence matters."
       ctaSubtitle="Datasite for diligence. Lengdon for close. They serve different phases."
     />
+    </>
   );
 }

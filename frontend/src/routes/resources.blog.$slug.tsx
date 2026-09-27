@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { getPostBySlug, getPublishedPosts, type BlogPost, type BlogPostWithContent } from "@/lib/notion-blog";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — blog post detail page. Same
 // exemption as resources.blog.index.tsx: real internal work per
@@ -127,9 +128,19 @@ function BlogArticle() {
     ...(post.coverImage ? { "image": post.coverImage } : {}),
   });
 
+  // SEO-010 (AEO pass): BreadcrumbList JSON-LD. 4-level — /resources and
+  // /resources/blog are both real hub pages; the post title is dynamic.
+  const breadcrumbJsonLdString = breadcrumbJsonLd([
+    { name: "Home", url: "https://lengdon.com/" },
+    { name: "Resources", url: "https://lengdon.com/resources" },
+    { name: "Blog", url: "https://lengdon.com/resources/blog" },
+    { name: post.title },
+  ]);
+
   return (
     <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: postJsonLd }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLdString }} />
       <SiteHeader />
       <main id="main-content" className="mx-auto max-w-[720px] px-6 py-16 md:py-24">
         <Link to="/resources/blog" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="inline-flex items-center gap-1.5 text-[13px] text-[#0a2540] hover:opacity-70 mb-10 transition-opacity">

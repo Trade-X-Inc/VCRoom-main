@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/product/compare/Firmex.tsx.
@@ -45,9 +46,17 @@ const ROWS = [
   { feature: "M&A diligence workflow", lengdon: false, them: true, note: "Lengdon begins after diligence." },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const FIRMEX_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Compare", url: "https://lengdon.com/product/compare" },
+  { name: "Lengdon vs Firmex" },
+]);
+
 function CompareFirmex() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FIRMEX_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

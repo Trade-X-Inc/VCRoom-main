@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/product/HowItWorks.tsx.
@@ -63,9 +64,75 @@ const PRINCIPLES = [
   { label: "Dual confirmation", desc: "Critical events — agreement, close — require independent confirmation from both parties before proceeding." },
 ];
 
+// SEO-010 (AEO pass): FAQPage + BreadcrumbList + WebPage/Speakable
+// JSON-LD. FAQ content deliberately matches the six gates actually
+// rendered in this page's own GATES array below (Counsel, Agreement,
+// Conditions, Signing, Payment, Close) — an FAQ block must not
+// contradict the visible body content it sits beside. Found, not fixed
+// in this pass: this page's own head() meta description above (and the
+// homepage's ProcessSection) both use a different seven-stage
+// vocabulary ("Brief, present, NDA, diligence, terms, conditions,
+// close") that doesn't match this six-gate body content — flagged in
+// the SEO-010 report for a separate reconciliation pass.
+const HOW_IT_WORKS_FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What are the six gates in Lengdon's closing process?",
+      acceptedAnswer: { "@type": "Answer", text: "Counsel, Agreement, Conditions, Signing, Payment, and Close. Each gate must be completed before the next opens — the sequence is enforced by the system, not left to convention." },
+    },
+    {
+      "@type": "Question",
+      name: "Can a gate be skipped or reordered?",
+      acceptedAnswer: { "@type": "Answer", text: "No. Lengdon requires each gate to be confirmed before the next becomes available — for example, no data is shared until both parties' counsel is confirmed at Gate 1, and the room cannot advance to Signing until every condition at Gate 3 is marked complete." },
+    },
+    {
+      "@type": "Question",
+      name: "Who confirms each gate — Lengdon or the parties?",
+      acceptedAnswer: { "@type": "Answer", text: "The parties themselves. Lengdon enforces the order and records each confirmation, but the founder and investor (and their counsel, where relevant) are the ones agreeing to proceed at each gate — independently, and in several gates, without visibility into the other side's confirmation until both are complete." },
+    },
+    {
+      "@type": "Question",
+      name: "What happens at the Close gate?",
+      acceptedAnswer: { "@type": "Answer", text: "Mutual confirmation from both parties closes the record permanently. The complete append-only audit trail stops accepting new entries and remains accessible to both parties — nothing in it can be changed, amended, or deleted after that point." },
+    },
+    {
+      "@type": "Question",
+      name: "Does Lengdon hold or move the investment funds?",
+      acceptedAnswer: { "@type": "Answer", text: "No. Funds move directly between the parties, outside the platform. The investor confirms transfer and the founder confirms receipt at the Payment gate — Lengdon records both confirmations but never holds, routes, or has access to the capital itself." },
+    },
+  ],
+});
+
+const HOW_IT_WORKS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "How it works" },
+]);
+
+// SPEAKABLE_JSON_LD lives on a WebPage entity, per Google's structured-
+// data guidance — separate from the FAQPage/BreadcrumbList blocks above,
+// which describe different things about the same page. cssSelector
+// targets the one mechanism-explanation paragraph below (#mechanism-
+// explanation), added directly to that element.
+const SPEAKABLE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://lengdon.com/product/how-it-works",
+  url: "https://lengdon.com/product/how-it-works",
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: ["#mechanism-explanation"],
+  },
+});
+
 function HowItWorks() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: HOW_IT_WORKS_FAQ_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: HOW_IT_WORKS_BREADCRUMB_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SPEAKABLE_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero
@@ -85,7 +152,7 @@ function HowItWorks() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-6">
                 THE GATES
               </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
+              <p id="mechanism-explanation" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
                 Six gates. Each requires the one before it. The system enforces the order — neither party can advance alone.
               </p>
             </div>

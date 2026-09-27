@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/SubProcessors.tsx.
@@ -68,9 +69,17 @@ const PROCESSORS = [
   { name: "Daily.co", category: "Video meetings", location: "United States", purpose: "Hosts live audio and video for in-room meetings and interview sessions. Processes participant audio, video, and display names for the duration of a call." },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const SUB_PROCESSORS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal", url: "https://lengdon.com/legal" },
+  { name: "Sub-processors" },
+]);
+
 function SubProcessors() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SUB_PROCESSORS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[var(--v2-accent)] relative overflow-hidden">
