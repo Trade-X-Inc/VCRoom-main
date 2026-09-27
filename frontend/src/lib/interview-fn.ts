@@ -2,11 +2,16 @@ import { createServerFn } from "@tanstack/react-start";
 import { getEnvVar } from "@/lib/env";
 
 // Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+// SECURITY DEFINER hardening (justify-or-lock audit): check_and_increment_ai_usage
+// is now service_role-only (anon/authenticated revoked — the function trusted
+// p_user_id with zero internal verification, so the anon-key grant this call
+// used to rely on was itself the vulnerability, not a caller-side concern).
+// userId is already server-verified (verifyUser) before this is ever called.
 async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
   if (!userId) return { allowed: true };
   try {
     const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
-    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) return { allowed: true };
     const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
       method: "POST",

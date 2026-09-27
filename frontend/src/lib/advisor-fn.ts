@@ -37,9 +37,14 @@ export const getAIAdvice = createServerFn({ method: "POST" })
       return { reply: "Please sign in again to use the AI advisor.", error: "not_authenticated" };
     }
     // ── AI Usage Cap Check ──
+    // SECURITY DEFINER hardening (justify-or-lock audit): check_and_increment_ai_usage
+    // is now service_role-only (anon/authenticated revoked — the function trusted
+    // p_user_id with zero internal verification, so the anon-key grant this call
+    // used to rely on was itself the vulnerability, not a caller-side concern).
+    // auth.uid is already server-verified above (requireUser) before this runs.
     try {
       const supabaseUrl = (import.meta.env as any).VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
-      const supabaseKey = (import.meta.env as any).VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "";
+      const supabaseKey = (import.meta.env as any).SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
       if (supabaseUrl && supabaseKey) {
         const usageResp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
           method: "POST",

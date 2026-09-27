@@ -9,11 +9,21 @@ type MemoInput = {
 };
 
 // Reuses the same rate-limit RPC as every other AI feature (CLAUDE.md: do not rebuild).
+// SECURITY DEFINER hardening (justify-or-lock audit): check_and_increment_ai_usage
+// is now service_role-only (anon/authenticated revoked — the function trusted
+// p_user_id with zero internal verification, so the anon-key grant this call
+// used to rely on was itself the vulnerability, not a caller-side concern).
+// userId here is already the caller's own auth.uid(), verified via
+// client.auth.getUser() above — never client-supplied. This is a DIFFERENT,
+// narrower credential swap than the main `client` used elsewhere in this file
+// (which stays on the anon key + forwarded user token by design, per this
+// file's own RLS-scoping comment) — checkUsageCap is a self-contained rate
+// -limit RPC call, not a data read that needs per-caller RLS scoping.
 async function checkUsageCap(userId: string, feature: string): Promise<{ allowed: boolean; message?: string }> {
   if (!userId) return { allowed: true };
   try {
     const supabaseUrl = getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
-    const supabaseKey = getEnvVar("VITE_SUPABASE_ANON_KEY") || getEnvVar("SUPABASE_ANON_KEY");
+    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseKey) return { allowed: true };
     const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/check_and_increment_ai_usage`, {
       method: "POST",

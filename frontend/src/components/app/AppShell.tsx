@@ -266,17 +266,15 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
     searchTimeoutRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (!authUser) return;
-        const { data: userRow } = await supabase
-          .from("users")
-          .select("role")
-          .eq("id", authUser.id)
-          .maybeSingle();
+        // Justify-or-lock audit fix (27 Sep 2026): global_search now derives
+        // the caller's identity internally via auth.uid() rather than
+        // trusting a client-supplied searcher_id/searcher_role — those two
+        // parameters were spoofable, letting any authenticated caller read
+        // another user's own deal-room documents/list by passing their id.
+        // No client-side identity lookup needed any more; the function's own
+        // session (forwarded automatically by supabase-js) is authoritative.
         const { data, error } = await supabase.rpc("global_search", {
           search_query: query.trim(),
-          searcher_id: authUser.id,
-          searcher_role: userRow?.role ?? "founder",
           result_limit: 8,
         });
         if (!error && data) setSearchResults(data as SearchResult[]);
