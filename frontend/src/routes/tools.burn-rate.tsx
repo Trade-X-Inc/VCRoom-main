@@ -17,6 +17,19 @@ export const Route = createFileRoute("/tools/burn-rate")({
   component: BurnRate,
 });
 
+// SEO-004: reuses this route's own real title/description above.
+const BURN_RATE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Burn Rate Calculator",
+  "url": "https://lengdon.com/tools/burn-rate",
+  "description": "Calculate your monthly burn rate from revenue and expenses. See how long your cash lasts and what changes extend runway.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 function BurnRate() {
   const [cashBalance, setCashBalance] = useState(2_000_000);
   const [monthlyRevenue, setMonthlyRevenue] = useState(80_000);
@@ -29,7 +42,9 @@ function BurnRate() {
   runoutDate.setMonth(runoutDate.getMonth() + runway);
 
   return (
-    <ToolCalculatorPage
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: BURN_RATE_JSON_LD }} />
+      <ToolCalculatorPage
       toolLabel="Burn Rate"
       titleLine1="BURN RATE"
       titleLine2Outline="CALCULATOR"
@@ -76,6 +91,7 @@ function BurnRate() {
           </div>
         </section>
       }
-    />
+      />
+    </>
   );
 }

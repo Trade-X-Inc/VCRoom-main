@@ -54,6 +54,22 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+// SEO-004: the one WebSite entity for the site, on the homepage only —
+// every other route already has its own canonical, so this is the single
+// natural home for it. No potentialAction/SearchAction: /resources has no
+// real search feature, so asserting one would be a fabricated capability
+// (CLAUDE.md §7.4/§3.8 — a schema claim is exactly as much an invented
+// capability as a marketing sentence). publisher links to the Organization
+// entity __root.tsx already defines, not a duplicate.
+const WEBSITE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://lengdon.com/#website",
+  "name": "Lengdon",
+  "url": "https://lengdon.com",
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 // ── Scroll Reveal ─────────────────────────────────────────
 function useReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -1196,6 +1212,7 @@ function CTASection() {
 function HomePage() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: WEBSITE_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <HeroSection />

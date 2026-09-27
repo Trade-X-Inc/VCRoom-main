@@ -14,6 +14,15 @@ import { PageHero } from "@/components/site/PageHero";
 // compare pages share. See the same note on the Firmex page.
 
 export const Route = createFileRoute("/product/compare/dealroom")({
+  // SEO-004: this file had no head() at all before this pass — see the
+  // matching note on product.compare.datasite.tsx.
+  head: () => ({
+    meta: [
+      { title: "Lengdon vs Dealroom — closing infrastructure vs deal pipeline software — Lengdon" },
+      { name: "description", content: "Dealroom is a deal pipeline and portfolio tool with no closing sequence. Compare it to Lengdon's enforced six-gate close." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/dealroom" }],
+  }),
   component: CompareDealroom,
 });
 

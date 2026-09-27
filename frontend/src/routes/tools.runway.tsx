@@ -17,6 +17,19 @@ export const Route = createFileRoute("/tools/runway")({
   component: RunwayCalculator,
 });
 
+// SEO-004: reuses this route's own real title/description above.
+const RUNWAY_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Runway Calculator",
+  "url": "https://lengdon.com/tools/runway",
+  "description": "Enter your cash balance and monthly burn to see your runway in months. Model scenarios to extend it before your next raise.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 function RunwayCalculator() {
   const [cash, setCash] = useState(3_000_000);
   const [burn, setBurn] = useState(200_000);
@@ -30,7 +43,9 @@ function RunwayCalculator() {
   outDate.setMonth(outDate.getMonth() + Math.floor(adjustedMonths));
 
   return (
-    <ToolCalculatorPage
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: RUNWAY_JSON_LD }} />
+      <ToolCalculatorPage
       toolLabel="Runway"
       titleLine1="RUNWAY"
       titleLine2Outline="CALCULATOR"
@@ -77,6 +92,7 @@ function RunwayCalculator() {
           </div>
         </section>
       }
-    />
+      />
+    </>
   );
 }

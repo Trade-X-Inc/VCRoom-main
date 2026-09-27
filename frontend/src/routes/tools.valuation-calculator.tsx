@@ -19,6 +19,19 @@ export const Route = createFileRoute("/tools/valuation-calculator")({
   component: ValuationCalculator,
 });
 
+// SEO-004: reuses this route's own real title/description above.
+const VALUATION_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Startup Valuation Calculator",
+  "url": "https://lengdon.com/tools/valuation-calculator",
+  "description": "Calculate pre-money and post-money valuation from investment amount and equity percentage. Understand what a term sheet implies.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 function fmt(n: number) {
   if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`;
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
@@ -37,6 +50,7 @@ function ValuationCalculator() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: VALUATION_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[#0a2540] relative overflow-hidden">

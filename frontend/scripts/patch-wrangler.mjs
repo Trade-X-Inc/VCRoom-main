@@ -236,6 +236,91 @@ if (existsSync(redirectsPath)) {
   console.log(`✓ Parsed ${REDIRECT_RULES.length} rule(s) from public/_redirects for in-worker redirect handling`);
 }
 
+// 4d. /sitemap.xml — static page list, computed once here at build time
+// (same approach as REDIRECT_RULES above). Every entry verified live
+// against a full route-file enumeration (createFileRoute paths + each
+// page's own head() canonical href — not the router's internal path
+// shape, which sometimes carries a trailing slash the canonical omits,
+// e.g. /resources/ the route vs /resources the canonical) on 27 Sep 2026.
+// Blog posts are NOT in this list — fetched live at request time instead
+// (see __fetchBlogPostsForSitemap below), since a new post can appear in
+// Notion with no rebuild.
+//
+// Deliberately excluded, and why:
+//   - /sign-in, /sign-up, /forgot-password, /status — noindex (confirmed
+//     via head() meta on each file)
+//   - /app/* (all) — noindex via app.tsx's layout head(), authenticated
+//   - /library — real beforeLoad auth gate despite living outside /app/*
+//   - /p/$slug, /i/$slug, /cv/$slug — dynamic per-entity pages requiring
+//     live Supabase queries per real member/profile (approved exclusion)
+//   - /join, /join-room, /join-deal-room/$token, /join-investor/$token —
+//     token-gated invite-acceptance flows (search-param or path-param),
+//     none declare a head() at all, no organic content without a live
+//     invite token — same "dynamic, transactional, not real content"
+//     reasoning as the three routes above, generalised to this codebase's
+//     actual current route set (which includes 3 more join-flow routes
+//     than existed when the /p, /i, /cv exclusion was first approved)
+//   - /deals-preview/* (all) and /lcs-preview — internal LCS
+//     component-system design previews: unauthenticated but intentionally
+//     unlinked, no nav entry, direct-URL-only, mock data — not a real
+//     product surface
+//   - /docs-v2, /docs-v2/, /docs-v2/$ — staged restoration, zero live
+//     inbound links anywhere in the app (verified by grep), and its own
+//     governing note states coexistence with /docs is "not yet decided"
+//     — putting it in the sitemap would itself be deciding that
+//   - /api/* (all) — endpoints, not content pages
+const SITE_ORIGIN = "https://lengdon.com";
+const STATIC_SITEMAP_ENTRIES = [
+  ["/", 1.0, "weekly"],
+  ["/product/how-it-works", 0.9, "weekly"],
+  ["/product/pricing", 0.9, "weekly"],
+  ["/product/security", 0.9, "weekly"],
+  ["/product/compare", 0.9, "weekly"],
+  ["/product/compare/datasite", 0.9, "weekly"],
+  ["/product/compare/dealroom", 0.9, "weekly"],
+  ["/product/compare/docsend", 0.9, "weekly"],
+  ["/product/compare/firmex", 0.9, "weekly"],
+  ["/product/compare/ideals", 0.9, "weekly"],
+  ["/for/founders", 0.8, "monthly"],
+  ["/for/investors", 0.8, "monthly"],
+  ["/for/angels", 0.8, "monthly"],
+  ["/for/venture-capital", 0.8, "monthly"],
+  ["/for/private-equity", 0.8, "monthly"],
+  ["/for/syndicates", 0.8, "monthly"],
+  ["/for/family-offices", 0.8, "monthly"],
+  ["/for/limited-partners", 0.8, "monthly"],
+  ["/for/spvs", 0.8, "monthly"],
+  ["/for/advisors", 0.8, "monthly"],
+  ["/tools", 0.8, "monthly"],
+  ["/tools/safe-note", 0.8, "monthly"],
+  ["/tools/burn-rate", 0.8, "monthly"],
+  ["/tools/cogs", 0.8, "monthly"],
+  ["/tools/runway", 0.8, "monthly"],
+  ["/tools/valuation-calculator", 0.8, "monthly"],
+  ["/tools/cap-table", 0.8, "monthly"],
+  ["/tools/dilution", 0.8, "monthly"],
+  ["/resources", 0.7, "monthly"],
+  ["/resources/blog", 0.6, "weekly"],
+  ["/resources/changelog", 0.5, "weekly"],
+  ["/docs", 0.7, "weekly"],
+  ["/glossary", 0.6, "monthly"],
+  ["/registry", 0.5, "monthly"],
+  ["/sectors", 0.6, "monthly"],
+  ["/company/about", 0.5, "monthly"],
+  ["/company/careers", 0.4, "monthly"],
+  ["/company/contact", 0.5, "monthly"],
+  ["/feedback", 0.3, "monthly"],
+  ["/legal", 0.3, "monthly"],
+  ["/legal/acceptable-use", 0.3, "monthly"],
+  ["/legal/cookies", 0.3, "monthly"],
+  ["/legal/dpa", 0.3, "monthly"],
+  ["/legal/privacy", 0.3, "monthly"],
+  ["/legal/refunds", 0.3, "monthly"],
+  ["/legal/sub-processors", 0.3, "monthly"],
+  ["/legal/terms", 0.3, "monthly"],
+];
+console.log(`✓ Sitemap: ${STATIC_SITEMAP_ENTRIES.length} static entries prepared (blog posts fetched live at request time)`);
+
 const redirectInjectionSnippet = `
 const __REDIRECT_RULES = ${JSON.stringify(REDIRECT_RULES)};
 function __checkRedirect(request) {
@@ -545,6 +630,91 @@ async function __writeCspReport(env, rows, ua) {
 }
 `;
 
+const sitemapInjectionSnippet = `
+const __SITE_ORIGIN = ${JSON.stringify(SITE_ORIGIN)};
+const __STATIC_SITEMAP_ENTRIES = ${JSON.stringify(STATIC_SITEMAP_ENTRIES)};
+const __NOTION_BLOG_DB_ID = "8a99a69aa1a2422d81fe4b9149a68024";
+
+function __sitemapXmlEscape(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function __sitemapUrlEntry(loc, lastmod, changefreq, priority) {
+  return "<url><loc>" + __sitemapXmlEscape(loc) + "</loc><lastmod>" + lastmod + "</lastmod><changefreq>" + changefreq + "</changefreq><priority>" + priority.toFixed(1) + "</priority></url>";
+}
+
+// Live fetch, mirrors src/lib/notion-blog.ts's getPublishedPosts() minimal
+// subset (slug + publishDate only — that's all a sitemap entry needs).
+// Duplicated rather than imported: getPublishedPosts is a createServerFn,
+// reachable only inside TanStack's own request lifecycle, not from this
+// pre-router interception point — the same reason the CSP-report handler
+// above can't reuse any app-level helper either (see its own comment on
+// why this app's raw-HTTP-route mechanism is this interception point).
+// Never throws — a Notion failure degrades to zero blog entries; the
+// static pages still ship rather than the whole sitemap breaking.
+async function __fetchBlogPostsForSitemap(env) {
+  try {
+    const key = (env && env.NOTION_API_KEY) || "";
+    if (!key) return [];
+    const res = await fetch("https://api.notion.com/v1/databases/" + __NOTION_BLOG_DB_ID + "/query", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + key,
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        page_size: 50,
+        filter: { property: "Status", select: { equals: "Published" } },
+      }),
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const results = (data && data.results) || [];
+    const posts = [];
+    for (const page of results) {
+      if (!page || page.object !== "page") continue;
+      const props = page.properties || {};
+      const rawJoin = (rt) => (rt || []).map((t) => t.plain_text).join("");
+      const rawTitle = props.Title && props.Title.title ? rawJoin(props.Title.title) :
+                        (props.Name && props.Name.title ? rawJoin(props.Name.title) : "untitled");
+      const slug = props.Slug && props.Slug.rich_text && props.Slug.rich_text.length
+        ? rawJoin(props.Slug.rich_text)
+        : rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      const publishDate = (props["Publish Date"] && props["Publish Date"].date && props["Publish Date"].date.start) ||
+                          (props.Date && props.Date.date && props.Date.date.start) ||
+                          new Date(page.created_time).toISOString().slice(0, 10);
+      if (slug) posts.push({ slug: slug, publishDate: publishDate });
+    }
+    return posts;
+  } catch (e) {
+    console.error("[Sitemap] blog fetch failed:", e);
+    return [];
+  }
+}
+
+async function __buildSitemapXml(env) {
+  const today = new Date().toISOString().slice(0, 10);
+  const parts = [];
+  for (const entry of __STATIC_SITEMAP_ENTRIES) {
+    parts.push(__sitemapUrlEntry(__SITE_ORIGIN + entry[0], today, entry[2], entry[1]));
+  }
+  let posts = [];
+  try {
+    posts = await __fetchBlogPostsForSitemap(env);
+  } catch (e) {}
+  for (const p of posts) {
+    parts.push(__sitemapUrlEntry(__SITE_ORIGIN + "/resources/blog/" + p.slug, p.publishDate || today, "monthly", 0.6));
+  }
+  return '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + parts.join("") + "</urlset>";
+}
+`;
+
 let workerCode = readFileSync("dist/client/_worker.js", "utf8");
 
 // Wrap default export to inject CF env on every request.
@@ -557,6 +727,7 @@ ${initCall}
 ${redirectInjectionSnippet}
 ${headerInjectionSnippet}
 ${cspReportInjectionSnippet}
+${sitemapInjectionSnippet}
 // Inject CF env into globalThis.__cf_env and process.env before any handler runs
 const __origServer = server;
 const __patchedServer = {
@@ -604,6 +775,29 @@ const __patchedServer = {
           }
         } catch (e) { console.error('[CSP Report] prepare failed:', e); }
         return new Response(null, { status: 204 });
+      }
+      // /sitemap.xml — same interception, same reason (see the comment on
+      // the CSP-report block just above). Removed from _routes.json's
+      // exclude list in this same change so the request actually reaches
+      // this worker instead of a (now-deleted) static file. Static page
+      // list is computed once at build time; blog posts are fetched live
+      // from Notion on every request — see __buildSitemapXml above.
+      if (__u.pathname === '/sitemap.xml' && request.method === 'GET') {
+        try {
+          const __sitemapXml = await __buildSitemapXml(env);
+          return new Response(__sitemapXml, {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/xml; charset=utf-8',
+              'Cache-Control': 'public, max-age=3600',
+            },
+          });
+        } catch (e) {
+          console.error('[Sitemap] build failed:', e);
+          // Fall through to the router rather than throw — a crawler
+          // hitting TanStack's not-found page is a better failure mode
+          // than a broken response for this one request.
+        }
       }
     } catch(e) {}
     // TanStack Start's own router hard-codes a 500 (Response.json, wrong

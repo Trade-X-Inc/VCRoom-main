@@ -18,6 +18,20 @@ export const Route = createFileRoute("/tools/safe-note")({
   component: SafeNote,
 });
 
+// SEO-004: reuses this route's own real title/description above rather
+// than inventing separate copy for the structured-data name/description.
+const SAFE_NOTE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SAFE Note Calculator",
+  "url": "https://lengdon.com/tools/safe-note",
+  "description": "Model how a SAFE converts at different valuations and round sizes. See dilution, ownership percentage and post-money cap table.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 function fmt(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
@@ -42,6 +56,7 @@ function SafeNote() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SAFE_NOTE_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[#0a2540] relative overflow-hidden">

@@ -7,6 +7,15 @@ import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 // "immutable"/"cryptographically sealed" -> "append-only".
 
 export const Route = createFileRoute("/product/compare/ideals")({
+  // SEO-004: this file had no head() at all before this pass — see the
+  // matching note on product.compare.datasite.tsx.
+  head: () => ({
+    meta: [
+      { title: "Lengdon vs iDeals — closing infrastructure vs a virtual data room — Lengdon" },
+      { name: "description", content: "iDeals is a virtual data room with no enforced transaction sequence. Compare it to Lengdon's six-gate close." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/ideals" }],
+  }),
   component: CompareIdeals,
 });
 

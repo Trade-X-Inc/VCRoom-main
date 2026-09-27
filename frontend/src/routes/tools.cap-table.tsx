@@ -18,6 +18,19 @@ export const Route = createFileRoute("/tools/cap-table")({
   component: CapTable,
 });
 
+// SEO-004: reuses this route's own real title/description above.
+const CAP_TABLE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Cap Table Builder",
+  "url": "https://lengdon.com/tools/cap-table",
+  "description": "Build a startup cap table with founders, investors and options pool. See percentage ownership before and after each funding round.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 interface Holder { name: string; shares: number; }
 const DEFAULT: Holder[] = [
   { name: "Founder A", shares: 4_000_000 },
@@ -53,6 +66,7 @@ function CapTable() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: CAP_TABLE_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[#0a2540] relative overflow-hidden">

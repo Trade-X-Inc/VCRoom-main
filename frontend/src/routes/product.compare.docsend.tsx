@@ -7,6 +7,15 @@ import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 // vocabulary removed: "immutable" -> "append-only".
 
 export const Route = createFileRoute("/product/compare/docsend")({
+  // SEO-004: this file had no head() at all before this pass — see the
+  // matching note on product.compare.datasite.tsx.
+  head: () => ({
+    meta: [
+      { title: "Lengdon vs DocSend — closing infrastructure vs document sharing — Lengdon" },
+      { name: "description", content: "DocSend tracks document views and engagement. Compare it to Lengdon's enforced closing sequence and append-only audit trail." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/docsend" }],
+  }),
   component: CompareDocsend,
 });
 

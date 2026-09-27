@@ -73,8 +73,28 @@ function BlogArticle() {
     );
   }
 
+  // SEO-004: real field names only (post.excerpt, not post.description;
+  // post.publishDate, not post.publishedAt) — dateModified mirrors
+  // datePublished since BlogPost carries no separate "last edited" field.
+  // Author modeled as Person per Google's structured-data guidance for
+  // BlogPosting; post.author is a plain name string either way (falls back
+  // to "The Lengdon Team" in notion-blog.ts when Notion has no Author set).
+  const postJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "datePublished": post.publishDate,
+    "dateModified": post.publishDate,
+    "author": { "@type": "Person", "name": post.author },
+    "publisher": { "@id": "https://lengdon.com/#organization" },
+    "url": `https://lengdon.com/resources/blog/${post.slug}`,
+    ...(post.coverImage ? { "image": post.coverImage } : {}),
+  });
+
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: postJsonLd }} />
       <SiteHeader />
       <main id="main-content" className="mx-auto max-w-[720px] px-6 py-16 md:py-24">
         <Link to="/resources/blog" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="inline-flex items-center gap-1.5 text-[13px] text-[#0a2540] hover:opacity-70 mb-10 transition-opacity">
