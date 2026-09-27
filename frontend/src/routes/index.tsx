@@ -490,8 +490,10 @@ function DemoSection() {
               aria-pressed={playing}
             >
               <img
-                src="/images/homepage/demo-video-poster.jpg"
+                src="/images/homepage/demo-video-poster.webp"
                 alt="Lengdon product walkthrough"
+                width={800}
+                height={533}
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
                   playing ? "opacity-20 scale-105" : "opacity-50 group-hover:opacity-60"
                 }`}
@@ -653,7 +655,7 @@ const PROCESS_PHASES_V2 = [
     num: "01", title: "COUNSEL",
     party: "Both parties",
     desc: "Both legal teams are brought in. Transaction parameters are formally established before any data is shared. No term sheet, no data room — only counsel.",
-    img: "/images/homepage/process-counsel.jpg",
+    img: "/images/homepage/process-counsel.webp",
     imgAlt: "Formal boardroom with long conference table and chairs",
     bg: "#0a2540",
   },
@@ -661,7 +663,7 @@ const PROCESS_PHASES_V2 = [
     num: "02", title: "AGREEMENT",
     party: "Both parties, independently",
     desc: "Each party independently confirms their intent to proceed. No single confirmation can trigger the next gate. Both must act; neither can force the other forward.",
-    img: "/images/homepage/process-agreement.jpg",
+    img: "/images/homepage/process-agreement.webp",
     imgAlt: "Two people shaking hands over a signed document",
     bg: "#0d1b2e",
   },
@@ -669,7 +671,7 @@ const PROCESS_PHASES_V2 = [
     num: "03", title: "CONDITIONS",
     party: "Tracked to satisfaction",
     desc: "Each condition precedent is added to the checklist and tracked until satisfied. The gate itself is enforced — the transaction cannot advance to Signing until every condition is marked complete.",
-    img: "/images/homepage/process-conditions.jpg",
+    img: "/images/homepage/process-conditions.webp",
     imgAlt: "Compliance checklist documentation",
     bg: "#0a2540",
   },
@@ -677,7 +679,7 @@ const PROCESS_PHASES_V2 = [
     num: "04", title: "SIGNING",
     party: "Both parties, separately",
     desc: "Transaction documents are executed in sequence by each party. No joint session — each signs in their own time, in their own jurisdiction, with their own counsel present.",
-    img: "/images/homepage/process-signing.jpg",
+    img: "/images/homepage/process-signing.webp",
     imgAlt: "Person signing a formal document with pen",
     bg: "#0d1b2e",
   },
@@ -685,7 +687,7 @@ const PROCESS_PHASES_V2 = [
     num: "05", title: "PAYMENT",
     party: "Investor + Founder confirm",
     desc: "Investor confirms transfer. Founder confirms receipt. Both confirmations are required to proceed. The system records each action independently.",
-    img: "/images/homepage/process-payment.jpg",
+    img: "/images/homepage/process-payment.webp",
     imgAlt: "Person completing a financial transaction on laptop",
     bg: "#0a2540",
   },
@@ -693,7 +695,7 @@ const PROCESS_PHASES_V2 = [
     num: "06", title: "CLOSE",
     party: "Both parties, independently",
     desc: "Mutual confirmation seals the record permanently. The complete audit trail stops accepting new entries and stays accessible to both parties. Nothing changes after this point.",
-    img: "/images/homepage/process-close.jpg",
+    img: "/images/homepage/process-close.webp",
     imgAlt: "Wooden wax seal stamp on a table",
     bg: "#0d1b2e",
   },
@@ -805,6 +807,8 @@ function ProcessSection() {
                     <img
                       src={phase.img}
                       alt={phase.imgAlt}
+                      width={522}
+                      height={336}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                       style={{ opacity: 0.88 }}
                     />
@@ -914,8 +918,10 @@ function SecuritySection() {
         </Reveal>
         <Reveal delay={150} className="flex-1 overflow-hidden">
           <img
-            src="/images/homepage/security-infrastructure.jpg"
+            src="/images/homepage/security-infrastructure.webp"
             alt="Security infrastructure"
+            width={656}
+            height={510}
             className="w-full h-full object-cover min-h-[400px]"
           />
         </Reveal>
@@ -1148,8 +1154,10 @@ function CTASection() {
           <div className="lg:w-[420px] xl:w-[480px] shrink-0 flex flex-col">
             <div className="flex-1 relative overflow-hidden bg-[#0d1b2e] min-h-[320px]">
               <img
-                src="/images/homepage/cta-transaction.jpg"
+                src="/images/homepage/cta-transaction.webp"
                 alt="Two parties completing a private capital transaction"
+                width={480}
+                height={450}
                 className="w-full h-full object-cover opacity-70"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540]/60 to-transparent pointer-events-none" />

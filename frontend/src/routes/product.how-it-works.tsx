@@ -51,7 +51,7 @@ const GATES = [
   {
     num: "06", title: "Close",
     party: "Both parties, independently",
-    desc: "Mutual confirmation closes the record permanently. The complete append-only audit trail stops accepting new entries and stays accessible to both parties. Nothing in the record can be changed, amended, or deleted after this point.",
+    desc: <>Mutual confirmation closes the record permanently. The complete append-only audit trail stops accepting new entries and stays accessible to both parties. Nothing in the record can be changed, amended, or deleted after this point. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">See how cap table state is recorded at close →</Link></>,
     detail: "The complete record is preserved, unchanged, for both parties.",
   },
 ];

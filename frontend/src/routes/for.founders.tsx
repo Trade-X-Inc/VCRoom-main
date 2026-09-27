@@ -51,7 +51,7 @@ const BENEFITS = [
 ];
 
 const STEPS = [
-  { num: "01", title: "Initialize a room", desc: "Create a deal room in minutes. Add the deal details, invite your counsel, and set the parameters." },
+  { num: "01", title: "Initialize a room", desc: <>Create a deal room in minutes. Add the deal details, invite your counsel, and set the parameters. <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Model your SAFE conversion before your next round →</Link></> },
   { num: "02", title: "Invite both counsel teams", desc: "Gate 1 requires both legal teams to be confirmed before any data is shared. No one gets access before counsel is in place." },
   { num: "03", title: "Run the six gates", desc: "The system guides both parties through Agreement, Conditions, Signing, Payment, and Close in strict sequence." },
   { num: "04", title: "Seal the record", desc: "Mutual confirmation seals the complete audit trail — permanent, append-only, unchanged from that point forward." },

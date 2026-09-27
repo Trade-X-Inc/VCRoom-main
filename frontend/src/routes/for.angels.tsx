@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
@@ -30,7 +30,7 @@ function Angels() {
       sectionLabel="For Angels"
       sectionTitle={<>YOUR CAPITAL.<br />YOUR RECORD.</>}
       features={[
-        { title: "Formal structure for informal deals", desc: "Angel investments often lack the process that institutional deals have. Lengdon gives you the same closing infrastructure regardless of deal size." },
+        { title: "Formal structure for informal deals", desc: <>Angel investments often lack the process that institutional deals have. Lengdon gives you the same closing infrastructure regardless of deal size. <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Calculate SAFE conversion terms →</Link></> },
         { title: "Independent signing workflow", desc: "Sign documents in your own time, with your own counsel present — not in a shared session where pressure can be applied." },
         { title: "Payment proof confirmation", desc: "Upload your proof of transfer. The founder confirms receipt. Both confirmations are in the record before the room closes." },
         { title: "Permanent record at close", desc: "The full audit trail is sealed and preserved, unchanged, for as long as the deal room exists — your investment, your record, always visible to you." },
