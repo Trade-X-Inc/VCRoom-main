@@ -1,148 +1,87 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { PageHero } from "@/components/site/PageHero";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/VentureCapital.tsx. Own distinct
-// capabilities-grid + fund-lifecycle structure.
+// SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
+// Replaces the prior custom PageHero-based build entirely. "Firm-grade"
+// language dropped throughout per PUBLIC-REGISTER.md §9 (unsubstantiated
+// certification framing).
 //
-// Corrected 8 Sep 2026: "secondary transactions" removed from the
-// supported-use-case list, and the entire "Secondary transfer" /
-// "Transfer room" stage removed from the fund-lifecycle table below —
-// Foundation Document §15 explicitly excludes a secondary market in
-// unlisted shares; this page had built a specific room type and
-// mechanism around exactly that exclusion. Every "sealed record"
-// reference (three total) reworded — the phrase implied an exportable
-// artifact; no export capability of any kind exists (CLAUDE.md §12,
-// §20.15). The real append-only record mechanism is kept.
+// EARLY ACCESS: no VC-specific mechanic (lifecycle deal view, house
+// diligence layered on a sector schedule) is built beyond the generic
+// investor deal-room flow yet.
 
 export const Route = createFileRoute("/for/venture-capital")({
   head: () => ({
     meta: [
-      { title: "For venture capital — a disciplined room, a defensible record — Lengdon" },
-      { name: "description", content: "For funds doing four to eight deals a year. Seat pricing, lifecycle deal view, single-notice diligence, full closing record." },
+      { title: "For venture capital — a lifecycle view, not a CRM — Lengdon" },
+      { name: "description", content: "Deploying seats. Deals organized by lifecycle state, house diligence on the sector schedule, one record per close." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/venture-capital" }],
   }),
   component: VentureCapital,
 });
 
-const CAPABILITIES = [
-  {
-    label: "Portfolio-wide consistency",
-    body: "Standardize how every portfolio company runs its close. Same six-gate sequence, same NDA format, same append-only record — across every deal you lead or follow.",
-  },
-  {
-    label: "Lead investor controls",
-    body: "As lead, you set the room structure, invite co-investors, and control document release at each gate. No side channels. No ambiguity about who authorized what.",
-  },
-  {
-    label: "Co-investor coordination",
-    body: "Add co-investors into the same room with defined access levels. Each party signs their own NDA. Each party's actions are individually logged.",
-  },
-  {
-    label: "Condition tracking",
-    body: "Map every condition precedent to a gate. Board approval, regulatory sign-off, third-party consent — each one confirmed in sequence before the close proceeds.",
-  },
-  {
-    label: "Counsel integration",
-    body: "Invite outside counsel as observers or participants. They see the full gate state without becoming custodians of the room data.",
-  },
-  {
-    label: "Permanent fund record",
-    body: "At close, the record goes into your fund's permanent files. LP reporting, audit support, and litigation defense all benefit from an append-only close record.",
-  },
-];
-
 function VentureCapital() {
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
       <SiteHeader />
       <main id="main-content">
-        <PageHero
-          eyebrow="Who it's for · Venture Capital"
-          title="LEAD THE CLOSE."
-          titleOutline="OWN THE RECORD."
-          subtitle="From seed through growth rounds, Lengdon gives VC firms a consistent, structured close process that produces a permanent record — for every deal, every fund, every LP report."
-          cta={{ label: "Set up your firm", to: "/sign-up" }}
-        />
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Built for VC</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
-            FIRM-GRADE<br />INFRASTRUCTURE.
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[#e6e9ef]">
-            {CAPABILITIES.map((c, i) => (
-              <div
-                key={i}
-                className={`p-7 ${[0,1,3,4].includes(i) ? "border-r border-[#e6e9ef]" : ""} ${i < 3 ? "border-b border-[#e6e9ef]" : ""}`}
-              >
-                <div className="w-1.5 h-1.5 bg-[#d4af37] mb-5 mt-0.5" />
-                <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[16px] tracking-[-0.3px] mb-2">{c.label}</h3>
-                <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px] leading-[1.7]">{c.body}</p>
-              </div>
-            ))}
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <PrEyebrow>Who it's for / Venture capital</PrEyebrow>
+              <PrPill>Early access</PrPill>
+            </div>
+            <PrDisplay>Too small for enterprise. Too many deals for a CRM.</PrDisplay>
+            <PrLead>A fund doing four to eight deals a year doesn't fit a generic data room or a pipeline tracker built for sales.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
+            </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>Nothing tracks a deal the way you need.</PrTitle>
+          <PrProse>You're too small a customer for the enterprise vendors and too active a shop for a generic virtual data room. A CRM was never built to track a deal by diligence-and-terms state. House diligence items don't fit anyone's generic template, and once a deal closes, the record lives wherever the last email landed.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for venture capital</PrEyebrow>
+          <PrTitle>Deals by lifecycle state, not pipeline stage.</PrTitle>
+          <PrProse>
+            Each seat sees deals organized by lifecycle state, not a sales pipeline stage. House diligence items sit alongside whatever a sector's own schedule already asks for. Diligence, terms, and closing run through the same room, and the record produced at close stays attached to the deal, visible across your active portfolio.{" "}
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model a deal's cap table before term sheet →</Link>
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>You need the record three times over.</PrTitle>
+          <PrProse>A fund doing four to eight deals a year needs the record again at the next round, at LP reporting, and at exit. Rebuilding it from email each time costs real weeks. Having it already costs one seat.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>Your pipeline stays yours.</PrTitle>
+          <PrProse>We do not source or rank deals — your pipeline is your own. We run the transaction once you've found it, and we hold the record after.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="Deploying seat" cadence="Billed per seat, annually." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Run your next four deals on one record.</PrTitle>
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Across the fund lifecycle</span>
-              </div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-6">
-                FROM FIRST<br />CLOSE TO EXIT.
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75] mb-8">
-                Use Lengdon for initial investment closes, follow-on rounds, and eventual M&A preparation. Each closing produces its own permanent, append-only record — and they accumulate into a complete history of the investment.
-              </p>
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
-              </Link>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
             </div>
-            <div className="border border-[#e6e9ef] divide-y divide-[#e6e9ef]">
-              {[
-                { stage: "Initial close", note: "Lead investor sets structure, conditions are mapped, NDAs signed by all parties" },
-                { stage: "Follow-on round", note: "New room initialized with pro-rata terms, existing investors re-invited" },
-                { stage: "Exit / M&A prep", note: "Acquisition room with full diligence gate, condition precedents, and a permanent record for the buyer" },
-              ].map((s) => (
-                <div key={s.stage} className="flex gap-5 p-6">
-                  <div className="w-1.5 h-1.5 bg-[#d4af37] mt-1.5 shrink-0" />
-                  <div>
-                    <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[15px] tracking-[-0.3px] mb-1">{s.stage}</div>
-                    <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px] leading-[1.6]">{s.note}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <PrCrossLinks />
           </div>
-        </section>
-
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">
-                Set up your firm.
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">One account covers all your deals. Invite your team, build your first room.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
-              </Link>
-              <Link to="/product/pricing" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
-                View pricing →
-              </Link>
-            </div>
-          </div>
-        </section>
+        </PrSection>
       </main>
       <SiteFooter />
     </div>

@@ -1,18 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/Syndicates.tsx.
-//
-// Corrected 8 Sep 2026: "sealed export" removed — no export capability
-// exists (CLAUDE.md §12, §20.15) — replaced with the real permanent,
-// in-room record.
+// SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
+// EARLY ACCESS: no syndicate-specific mechanic (lead package, disclosed
+// commitment, soft-circle tracking) is built beyond the generic
+// investor deal-room flow yet.
 
 export const Route = createFileRoute("/for/syndicates")({
   head: () => ({
     meta: [
-      { title: "For syndicate leads — lead, disclose, allocate, close — Lengdon" },
-      { name: "description", content: "Publish a lead package with committed amount, track soft-circles and followers, close on one defensible record." },
+      { title: "For syndicate leads — a disclosed commitment, a shared record — Lengdon" },
+      { name: "description", content: "Publish your commitment, let followers soft-circle and commit individually, and close on one record every member can see." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/syndicates" }],
   }),
@@ -21,24 +24,63 @@ export const Route = createFileRoute("/for/syndicates")({
 
 function Syndicates() {
   return (
-    <SimpleAudiencePage
-      eyebrow="Who it's for · Syndicates"
-      title="LEAD THE"
-      titleOutline="SYNDICATE."
-      subtitle="You coordinate groups of investors into a single closing. You need a room where everyone follows the same process, and everyone gets the same record."
-      heroCta="Talk to us"
-      sectionLabel="Syndicate infrastructure"
-      sectionTitle={<>EVERYONE IN.<br />ONE RECORD.</>}
-      features={[
-        { title: "One room, multiple investors", desc: <>Invite every syndicate member into a single deal room. Each investor follows the same six-gate sequence independently. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">Model the cap table across your syndicate →</Link></> },
-        { title: "Collective conditions tracking", desc: "Conditions are tracked across the full syndicate. The system enforces that every condition is satisfied before the group advances to signing." },
-        { title: "Per-investor payment confirmation", desc: "Each investor uploads their own payment proof. Each confirmation is recorded individually. The room only closes when all confirmations are in." },
-        { title: "Shared record at close", desc: "The record at close is visible to every syndicate member, not just the lead — the same append-only history, open to all parties." },
-      ]}
-      ctaTitle="Running a syndicate?"
-      ctaSubtitle="We work with syndicate leads directly. Book a call to see how Lengdon fits your deal flow."
-      ctaSecondaryLabel="Book a demo →"
-      ctaSecondaryTo="/company/contact"
-    />
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
+      <SiteHeader />
+      <main id="main-content">
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <PrEyebrow>Who it's for / Syndicate leads</PrEyebrow>
+              <PrPill>Early access</PrPill>
+            </div>
+            <PrDisplay>Your commitment is the signal. Make it real.</PrDisplay>
+            <PrLead>Followers track soft-circles in spreadsheets today. Put your disclosed cheque, and theirs, on a record instead.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
+            </div>
+          </div>
+        </section>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>Allocation is a conversation, not a record.</PrTitle>
+          <PrProse>The lead's commitment is the strongest signal in the deal, but there's nowhere to publish it formally. Followers track interest in spreadsheets and group chats. Final allocation is a conversation, not something either side can point back to afterward.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for syndicate leads</PrEyebrow>
+          <PrTitle>Publish the package. Track every follower.</PrTitle>
+          <PrProse>
+            As lead, you publish a lead package with your own committed amount disclosed. Followers review it, soft-circle their interest, and commit individually — each on their own NDA, each with their own signature.{" "}
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model the cap table across your syndicate →</Link>
+            {" "}Allocation is tracked against the room itself, not a side spreadsheet, and every follower keeps a view onto the same record.
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>A badge stakes nothing. A cheque does.</PrTitle>
+          <PrProse>A badge or a title stakes nothing. A disclosed, committed amount on a record is money a lead could lose — that's why followers weight it the way they do. Publishing it formally, instead of describing it on a call, is the difference.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>We don't form the vehicle.</PrTitle>
+          <PrProse>We record the syndicate and every commitment inside it. We do not form the special purpose vehicle and we do not move funds — that stays with your counsel and your bank.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="Deploying seat" cadence="Billed per seat, annually, per lead." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Lead your next syndicate on a record.</PrTitle>
+            <div>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
+            </div>
+            <PrCrossLinks />
+          </div>
+        </PrSection>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

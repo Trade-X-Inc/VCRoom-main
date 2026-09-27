@@ -1,133 +1,94 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { PageHero } from "@/components/site/PageHero";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/PrivateEquity.tsx. Own distinct
-// numbered-differentiators + stats-row + quote structure.
+// SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
+// Replaces the prior custom PageHero-based build entirely. "Acquisition-
+// grade" language dropped per PUBLIC-REGISTER.md §9.
 //
-// Corrected 8 Sep 2026: "The sealed export produced at close" removed —
-// no export capability exists (CLAUDE.md §12, §20.15) — replaced with
-// the real permanent, in-room record. A second pass found two more
-// problems on the same page: differentiator 03, "Fund-to-fund transfer
-// ready," was built entirely around "secondary sales" — Foundation
-// Document §15 explicitly excludes a secondary market in unlisted
-// shares — rewritten around a real, non-excluded PE use case (co-
-// investment and follow-on structuring). The stats row's "Sealed record
-// retention — Export yours at close, permanently" repeated the same
-// export fabrication a second time on this page and is corrected too.
+// Content corrections from the original task brief, per direct
+// instruction: no data-residency selection and no service-level tier
+// exist — verified false against a live production query (single
+// region, no per-room override) and already corrected out of 6 other
+// files; this page's own body copy was fixed 8 Sep 2026 but its meta
+// description still said "sealed export" until this rewrite, which
+// removes both stale claims. No export capability of any kind exists.
 //
-// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the
-// testimonial ("Principal, lower middle-market PE fund, 2025") was a
-// fabricated quote attributed to a person who does not exist — same
-// pattern as the other for.* testimonials found and removed in the
-// same sweep. Removed outright, no replacement invented.
+// EARLY ACCESS: no PE-specific mechanic (multi-party rooms, the enhanced
+// conditions register) is built beyond the generic investor deal-room
+// flow yet.
 
 export const Route = createFileRoute("/for/private-equity")({
   head: () => ({
     meta: [
-      { title: "For private equity — enterprise diligence, published price — Lengdon" },
-      { name: "description", content: "Multi-party rooms, conditions register, counsel stage, sealed export. Institutional pricing on the page, not on request." },
+      { title: "For private equity — the conditions register, one region — Lengdon" },
+      { name: "description", content: "Multi-party rooms and a full conditions register, each item timestamped and attributed. No published data residency claim — one region, honestly." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/private-equity" }],
   }),
   component: PrivateEquity,
 });
 
-const DIFFERENTIATORS = [
-  {
-    num: "01",
-    title: "Acquisition-grade room structure",
-    body: "PE acquisitions involve more parties, longer condition lists, and higher legal stakes than typical venture deals. Lengdon's six-gate sequence handles the full complexity — counsel, agreement, conditions, signing, payment, close.",
-  },
-  {
-    num: "02",
-    title: "Multi-party condition management",
-    body: "Track every condition precedent across regulatory approvals, financing confirmations, and third-party consents. Each condition is logged when met — with timestamp and confirming party identity.",
-  },
-  {
-    num: "03",
-    title: "Co-investment and follow-on ready",
-    body: "Manage co-investment entries and follow-on rounds with the same structured room format. Every party signs their own agreement. Every action is individually attributed.",
-  },
-  {
-    num: "04",
-    title: "Post-close record integrity",
-    body: "The record produced at close is append-only and tamper-evident. It cannot be modified after the fact. Both parties see the same history — no dispute about what was agreed or when.",
-  },
-];
-
 function PrivateEquity() {
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
       <SiteHeader />
       <main id="main-content">
-        <PageHero
-          eyebrow="Who it's for · Private Equity"
-          title="COMPLEX DEALS."
-          titleOutline="CLEAN RECORD."
-          subtitle="Private equity transactions demand rigorous documentation and multi-party coordination. Lengdon enforces the process and produces an append-only audit trail — from first contact to close."
-          cta={{ label: "Talk to us", to: "/company/contact" }}
-        />
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">PE-specific capabilities</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
-            BUILT FOR<br />THE COMPLEXITY.
-          </h2>
-          <div className="flex flex-col gap-0 border border-[#e6e9ef] divide-y divide-[#e6e9ef]">
-            {DIFFERENTIATORS.map((d) => (
-              <div key={d.num} className="grid grid-cols-1 lg:grid-cols-[120px_1fr] gap-0">
-                <div className="p-8 border-r border-[#e6e9ef] flex items-start">
-                  <span className="font-mono text-[#e6e9ef] text-[32px] font-bold leading-none">{d.num}</span>
-                </div>
-                <div className="p-8">
-                  <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.5px] mb-3">{d.title}</h3>
-                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.75] max-w-[640px]">{d.body}</p>
-                </div>
-              </div>
-            ))}
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <PrEyebrow>Who it's for / Private equity</PrEyebrow>
+              <PrPill>Early access</PrPill>
+            </div>
+            <PrDisplay>Complex deals. A quote that matches the invoice.</PrDisplay>
+            <PrLead>Enterprise data room vendors quote a number, then bill something else. Multi-party rooms shouldn't be a configuration project.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/company/contact">Request early access</PrAction>
+            </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#e6e9ef] divide-x divide-[#e6e9ef]">
-            {[
-              { stat: "6", label: "Gates enforced in sequence", sub: "Non-negotiable close structure" },
-              { stat: "100%", label: "Party-attributed actions", sub: "Every click, every confirm, logged" },
-              { stat: "∞", label: "Sealed record retention", sub: "Preserved, unchanged, permanently" },
-            ].map((s) => (
-              <div key={s.stat} className="p-10 flex flex-col gap-2">
-                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(36px,7vw,56px)] leading-none tracking-[-3px]">{s.stat}</div>
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[14px] tracking-[-0.2px]">{s.label}</div>
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">{s.sub}</div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>No published number, and the invoice never matches.</PrTitle>
+          <PrProse>The enterprise data room vendors price at enterprise scale with no published number, and the invoice rarely matches the quote you were given. Setting up a room for counsel, the principal, and the counterparty at once is its own configuration project every time.</PrProse>
+        </PrSection>
 
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for private equity</PrEyebrow>
+          <PrTitle>Multi-party rooms, one conditions register.</PrTitle>
+          <PrProse>
+            PE runs on the same six-gate spine — counsel, agreement, conditions, signing, payment, close — extended for multiple parties in one room, with a full conditions register tracking every item to satisfaction, each with a timestamp and the confirming party's identity. Counsel is scoped in from the terms stage forward.{" "}
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model the post-close cap table →</Link>
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>PE closes on conditions, not just terms.</PrTitle>
+          <PrProse>The structural difference is the conditions register. PE closes on conditions, not just agreed terms. A record of each condition and exactly when it was satisfied — referenced, timestamped — is the difference between a clean close and a disputed one later.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>One region. No legal opinions.</PrTitle>
+          <PrProse>We do not advise on deal structure, provide legal opinions, or act as counsel. We run one region today — there is no per-room data residency selection, and we don't claim one.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="Institutional" cadence="Scoped individually. Published on request, not negotiated afterward." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Bring your next acquisition onto a record.</PrTitle>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">
-                Ready to modernize<br />your close process?
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">We work with PE firms directly. Get in touch to discuss your transaction volume and workflow.</p>
+              <PrAction to="/company/contact">Request early access</PrAction>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
-              </Link>
-              <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
-                Contact us →
-              </Link>
-            </div>
+            <PrCrossLinks />
           </div>
-        </section>
+        </PrSection>
       </main>
       <SiteFooter />
     </div>

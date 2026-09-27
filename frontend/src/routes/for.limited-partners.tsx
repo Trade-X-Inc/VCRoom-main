@@ -1,28 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { PageHero } from "@/components/site/PageHero";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/LimitedPartners.tsx. Own distinct
-// two-column-lists + record-value-prop structure.
+// SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
+// Replaces the prior custom PageHero-based build entirely.
 //
-// Corrected 8 Sep 2026: the source's central value proposition on this
-// page was "your own sealed export at close" / "the Lengdon sealed
-// export" — there is no export capability of any kind (see CLAUDE.md
-// §12, §20.15, and §7.4's standing rule against rendering a
-// verifiable-looking artifact of a capability that doesn't exist). The
-// real, permanent thing an LP gets is the append-only audit record
-// itself, inspectable in the room and citable by its reference number —
-// not a downloadable file. Rewritten to describe that instead of the
-// export. "Transaction room" also corrected to "deal room" (the real
-// product vocabulary) in the same pass.
+// EARLY ACCESS: no LP-specific permissioned-read mechanic against the
+// beneficial-ownership schedule is built beyond the generic investor
+// deal-room flow yet.
+//
+// No direct LP pricing tier exists — access runs through the vehicle
+// that backs the LP, not a Lengdon plan the LP buys directly. Stated
+// as prose in the commercial line rather than a tier/cadence pair for
+// that reason.
 
 export const Route = createFileRoute("/for/limited-partners")({
   head: () => ({
     meta: [
-      { title: "For limited partners — structured, referenced disclosure — Lengdon" },
-      { name: "description", content: "Read the same fields the deal was built on, permissioned by the vehicle you back. No repackaged summaries." },
+      { title: "For limited partners — the original record, not the repackage — Lengdon" },
+      { name: "description", content: "Read the same structured fields the deal was built on, permissioned by the vehicle you back. No repackaged summary." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/limited-partners" }],
   }),
@@ -31,121 +31,61 @@ export const Route = createFileRoute("/for/limited-partners")({
 
 function LimitedPartners() {
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
       <SiteHeader />
       <main id="main-content">
-        <PageHero
-          eyebrow="Who it's for · Limited Partners"
-          title="YOUR CAPITAL."
-          titleOutline="YOUR RECORD."
-          subtitle="As an LP, you commit capital to funds and co-investments. Lengdon ensures that every deal you participate in produces a permanent, append-only record you can reference — independent of any GP system."
-          cta={{ label: "Join the waitlist", to: "/sign-up" }}
-        />
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">For limited partners</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
-            VISIBILITY<br />AT EVERY GATE.
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef] divide-y lg:divide-y-0 lg:divide-x divide-[#e6e9ef]">
-            <div className="p-10">
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-5">For co-investments</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.75] mb-6">
-                When you co-invest alongside a GP, you're invited into the deal room as a principal. You sign your own NDA, review conditions, and can reference the record at close by its own number.
-              </p>
-              <ul className="flex flex-col gap-3">
-                {[
-                  "Individual NDA — not GP-aggregated",
-                  "Per-gate visibility into conditions",
-                  "A reference number for your own close",
-                  "An append-only, tamper-evident record",
-                ].map((pt) => (
-                  <li key={pt} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 bg-[#d4af37] mt-1.5 shrink-0" />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px]">{pt}</span>
-                  </li>
-                ))}
-              </ul>
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <PrEyebrow>Who it's for / Limited partners</PrEyebrow>
+              <PrPill>Early access</PrPill>
             </div>
-            <div className="p-10">
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-5">For fund commitments</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.75] mb-6">
-                When committing to a new fund close or making a subscription agreement, the room records your commitment confirmation, subscription execution, and payment confirmation as separate gate events.
-              </p>
-              <ul className="flex flex-col gap-3">
-                {[
-                  "Subscription room per LP commitment",
-                  "Payment confirmation gate",
-                  "Counsel review gate for complex LPAs",
-                  "Permanent fund close record",
-                ].map((pt) => (
-                  <li key={pt} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 bg-[#0a2540] mt-1.5 shrink-0" />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px]">{pt}</span>
-                  </li>
-                ))}
-              </ul>
+            <PrDisplay>Read the record. Not the repackage.</PrDisplay>
+            <PrLead>GP disclosure arrives as a summary written for you, not the original.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
             </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-16 items-start">
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>You never see the original.</PrTitle>
+          <PrProse>Disclosure from a GP arrives as a repackaged summary — a PDF, a slide, a quarterly letter. There's no way to check what the underlying deal actually disclosed, no structured fields, nothing you can reference back to a specific record.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for limited partners</PrEyebrow>
+          <PrTitle>The same fields the deal was built on.</PrTitle>
+          <PrProse>
+            Where the vehicle you back permissions it, you get read access to the same structured fields the deal was built on — the beneficial-ownership schedule, the closing record, each disclosed item with its evidence tier shown, not summarized away.{" "}
+            <Link to="/tools/valuation-calculator" style={{ color: "var(--v2-accent)" }}>Check the valuation the round was priced at →</Link>
+            {" "}Access is granted by the party you back, not by us.
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>The original, not someone's account of it.</PrTitle>
+          <PrProse>LP diligence on a GP has historically meant trusting the summary. A structured, referenced closing record gives you the original the deal actually produced, not someone's account of it.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>Read-side only, through your vehicle.</PrTitle>
+          <PrProse>We do not solicit LPs, offer securities, or provide investment advice. Access is read-side only, and only through the vehicle that backs you.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="No direct pricing" cadence="Access is granted through the vehicle that backs you, not a Lengdon plan you buy directly." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Ask your GP to run the room on Lengdon.</PrTitle>
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-5 h-px bg-[#0a2540]/30" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Why it matters</span>
-              </div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-6">
-                A RECORD<br />YOU CAN<br />POINT TO.
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75]">
-                GPs change platforms. Portals get shut down. Deal documents get migrated, lost, or consolidated by fund administrators. Every entry in a Lengdon deal room's record is append-only and tamper-evident — nothing in it can be edited or deleted after the fact, and the whole history stays inspectable for the life of the room.
-              </p>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
             </div>
-            <div className="bg-[#f8f9fb] border border-[#e6e9ef] p-8">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase mb-6">At every close, the room holds</div>
-              <div className="flex flex-col gap-4">
-                {[
-                  { label: "Complete gate log", detail: "Every action by every party, timestamped and attributed" },
-                  { label: "All signed agreements", detail: "NDA, term sheet, subscription docs — full set" },
-                  { label: "Condition record", detail: "Each condition, who confirmed it, when" },
-                  { label: "A reference number", detail: "Checkable reference for the complete record at time of close" },
-                ].map((r) => (
-                  <div key={r.label} className="flex gap-4 pb-4 border-b border-[#e6e9ef] last:border-b-0 last:pb-0">
-                    <div className="w-2 h-2 bg-[#0a2540] mt-1 shrink-0" />
-                    <div>
-                      <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[14px] tracking-[-0.2px] mb-0.5">{r.label}</div>
-                      <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{r.detail}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <PrCrossLinks />
           </div>
-        </section>
-
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">
-                Join as an LP.
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Accept co-investment invitations or request that your GPs send rooms through Lengdon.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
-              </Link>
-              <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
-                Contact us →
-              </Link>
-            </div>
-          </div>
-        </section>
+        </PrSection>
       </main>
       <SiteFooter />
     </div>

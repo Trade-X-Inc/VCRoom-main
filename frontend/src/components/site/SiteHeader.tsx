@@ -43,13 +43,14 @@ const PRODUCT_LINKS: NavLink[] = [
 const FOR_LINKS: NavLink[] = [
   { label: "Founders", to: "/for/founders", desc: "Raise capital with structure" },
   { label: "Investors", to: "/for/investors", desc: "Close with a permanent record" },
-  { label: "Venture Capital", to: "/for/venture-capital", desc: "Firm-grade closing infrastructure" },
+  { label: "Venture Capital", to: "/for/venture-capital", desc: "A lifecycle view, not a CRM" },
   { label: "Private Equity", to: "/for/private-equity", desc: "Complex deals, clean record" },
   { label: "Angels", to: "/for/angels", desc: "Formal process for informal deals" },
   { label: "Syndicates", to: "/for/syndicates", desc: "Lead a group into a close" },
   { label: "SPVs", to: "/for/spvs", desc: "Structured vehicle closing" },
-  { label: "Family Offices", to: "/for/family-offices", desc: "Institutional-grade infrastructure" },
+  { label: "Family Offices", to: "/for/family-offices", desc: "Real diligence, no procurement" },
   { label: "Limited Partners", to: "/for/limited-partners", desc: "Your capital, your record" },
+  { label: "Advisors", to: "/for/advisors", desc: "Mediate the raise, stay on the record" },
 ];
 
 const RESOURCES_LINKS: NavLink[] = [
