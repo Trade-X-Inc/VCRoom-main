@@ -133,6 +133,30 @@ function SafeNote() {
           </div>
         </section>
 
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+          <div className="max-w-[720px] flex flex-col gap-10">
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">A SAFE (Simple Agreement for Future Equity) converts to equity at a future priced round. This calculator shows you how many shares your SAFE converts to, at what price, and what percentage of the post-money cap table the SAFE holder will own — accounting for both valuation cap and discount rate mechanics.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders issuing SAFEs to angel investors or pre-seed funds. Investors evaluating a SAFE offer before signing. Advisors modeling dilution scenarios before a priced round.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Use the converted share count and ownership percentage as inputs to your cap table model. If you are building a deal room on Lengdon, the SAFE terms attach directly to the deal record and flow into the diligence checklist automatically.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Valuation cap: the maximum company valuation at which the SAFE converts, regardless of the actual round valuation. Discount rate: the percentage reduction on the per-share price the SAFE holder receives versus new investors. Post-money SAFE: the cap is calculated on the post-money valuation including the SAFE itself.</p>
+            </div>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+              <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">See how your SAFE converts on the cap table →</Link>
+            </p>
+          </div>
+        </section>
+
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">SAFE terms agreed. Now use Lengdon to close the priced round with a permanent record.</p>

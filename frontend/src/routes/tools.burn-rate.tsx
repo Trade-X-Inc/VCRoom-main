@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPage";
 
@@ -47,6 +47,31 @@ function BurnRate() {
       ]}
       ctaText="Planning your next raise? Lengdon closes the round once terms are agreed — sequenced, documented, permanently recorded."
       ctaLabel="Join the waitlist"
+      belowCalculator={
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+          <div className="max-w-[720px] flex flex-col gap-10">
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Burn rate is the speed at which a company spends its cash reserves. This calculator gives you gross burn (total monthly spend), net burn (spend minus revenue), and monthly runway in months — the three numbers every investor will ask for in a first meeting.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders preparing for fundraising conversations. CFOs producing board-ready financials. Investors running a quick pre-LOI sanity check on a company's cash position.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Net burn and runway feed directly into your fundraising brief. On Lengdon, these figures anchor the financial section of your deal room and are referenced in the diligence checklist as confirmed inputs — so investors see a number that matches your data room, not a slide deck estimate.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Gross burn: total cash out per month before revenue offsets. Net burn: cash out minus cash in — the true depletion rate. Runway: months of cash remaining at current net burn. Zero-cash date: the calendar date at which the company runs out of money at current burn.</p>
+            </div>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+              <Link to="/tools/runway" className="underline hover:opacity-70 transition-opacity">Calculate your runway from this burn rate →</Link>
+            </p>
+          </div>
+        </section>
+      }
     />
   );
 }

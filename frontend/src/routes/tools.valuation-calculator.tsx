@@ -116,6 +116,30 @@ function ValuationCalculator() {
           </div>
         </section>
 
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+          <div className="max-w-[720px] flex flex-col gap-10">
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">This calculator applies the three most common early-stage valuation methods — Berkus, Scorecard, and Revenue Multiple — and shows you a blended range. No single method is authoritative; the range gives you a defensible basis for the number you put on your term sheet.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders setting a valuation for their first priced round. Angel investors sense-checking a founder's ask. Advisors preparing a fairness opinion for a board.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Use the output as a starting point, not a final answer. Comparable transactions in your sector, investor appetite, and competitive tension all move the final number. On Lengdon, the agreed valuation is recorded in the deal record at the Terms stage and referenced in the closing conditions — creating an auditable trail from negotiation to close.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Pre-money valuation: company value before new capital is added. Post-money valuation: pre-money plus the new investment amount. Berkus method: assigns value to five risk factors (idea, prototype, team, board, product rollout). Scorecard method: benchmarks against comparable funded companies and adjusts for relative strength. Revenue multiple: applies a sector-standard multiple to current or projected revenue.</p>
+            </div>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+              <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Model a SAFE at this valuation →</Link>
+            </p>
+          </div>
+        </section>
+
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">

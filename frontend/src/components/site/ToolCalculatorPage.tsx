@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -35,10 +36,15 @@ export interface ToolCalculatorPageProps {
   results: ToolResult[];
   ctaText: string;
   ctaLabel: string;
+  // SEO-002 — optional per-tool body-copy section (H2s + prose), rendered
+  // between the calculator grid and the footer CTA. Only burn-rate.tsx and
+  // runway.tsx pass this; dilution.tsx (the third consumer of this
+  // component) intentionally does not, and its render is unchanged.
+  belowCalculator?: ReactNode;
 }
 
 export function ToolCalculatorPage({
-  toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel,
+  toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel, belowCalculator,
 }: ToolCalculatorPageProps) {
   return (
     <div className="min-h-screen bg-white">
@@ -95,6 +101,8 @@ export function ToolCalculatorPage({
             </div>
           </div>
         </section>
+
+        {belowCalculator}
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
