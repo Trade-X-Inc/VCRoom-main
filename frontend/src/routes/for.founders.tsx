@@ -1,133 +1,95 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { PageHero } from "@/components/site/PageHero";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
+  PrCommercialLine, PrQuietLink, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/Founders.tsx. Own distinct
-// steps+benefits+quote structure — not built from SimpleAudiencePage.
+// SEO-009 Phase 3 — bespoke rebuild on PUBLIC-REGISTER.md v2.0 tokens,
+// same pattern as the 8 SEO-006 /for/* pages (PublicRegisterPrimitives,
+// not a shared wrapper). Correction to the SEO-009 Step-0 audit: this
+// file was reported as a SimpleAudiencePage consumer; it never was —
+// the only "SimpleAudiencePage" hit was a comment stating the opposite
+// ("not built from SimpleAudiencePage"). The real starting point was a
+// PageHero-based bespoke build, now replaced with this one.
 //
-// Corrected 8 Sep 2026: "A record that's yours" claimed a "sealed,
-// signed export... portable, verifiable" and the fourth step was titled
-// "Export at close" ("Both parties receive a sealed, signed copy") — no
-// export capability of any kind exists (CLAUDE.md §12, §20.15). Both
-// reworded to describe the real permanent, in-room record.
-//
-// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the
-// testimonial ("Founder, Technology Company — Series A, 2026") was a
-// fabricated quote attributed to a person who does not exist — same
-// pattern as for.investors.tsx's removed testimonial, found during the
-// same sweep. No real quote exists to replace it with, so the section
-// was removed outright.
+// Content preserved/adapted from the prior v1 build, not reinvented —
+// including its two prior corrections: no "export" language (no export
+// capability exists, CLAUDE.md §12/§20.15) and no fabricated testimonial
+// (removed 13 Sep 2026, never restored). No EARLY ACCESS pill: same
+// reasoning as for.angels.tsx — this is the generic founder-side flow,
+// which genuinely is the product, nothing audience-specific is unbuilt.
 
 export const Route = createFileRoute("/for/founders")({
   head: () => ({
     meta: [
       { title: "For founders — close the round, keep the record clean — Lengdon" },
-      { name: "description", content: "Fixed raise spine, single-notice diligence, a disclosure pack that carries to the next round. Deferred fee payable at close." },
+      { name: "description", content: "A fixed raise spine, conditions you can enforce, and a permanent record that carries to the next round. No sequence you have to police yourself." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/founders" }],
   }),
   component: Founders,
 });
 
-const BENEFITS = [
-  {
-    title: "Your process. Documented.",
-    body: "Every commitment made — oral or written — needs to be in the record. Lengdon captures every action taken by both parties from the moment counsel is confirmed to the moment the room closes.",
-  },
-  {
-    title: "Conditions you can enforce.",
-    body: "Add your conditions precedent to the room and assign each to a named owner. The system tracks completion — and neither party can advance to signing until every condition is satisfied.",
-  },
-  {
-    title: "A record that's yours.",
-    body: "At close, the full audit trail seals — append-only, unchanged from that point on. It belongs to you and the investor jointly, not the platform, and it stays permanent for the life of the room.",
-  },
-  {
-    title: "Per-person confidentiality.",
-    body: "Every participant on the investor side signs their own NDA. Not a company-level agreement — a named individual agreement. If someone leaves the firm, their access ends with them.",
-  },
-];
-
-const STEPS = [
-  { num: "01", title: "Initialize a room", desc: <>Create a deal room in minutes. Add the deal details, invite your counsel, and set the parameters. <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Model your SAFE conversion before your next round →</Link></> },
-  { num: "02", title: "Invite both counsel teams", desc: "Gate 1 requires both legal teams to be confirmed before any data is shared. No one gets access before counsel is in place." },
-  { num: "03", title: "Run the six gates", desc: "The system guides both parties through Agreement, Conditions, Signing, Payment, and Close in strict sequence." },
-  { num: "04", title: "Seal the record", desc: "Mutual confirmation seals the complete audit trail — permanent, append-only, unchanged from that point forward." },
-];
-
 function Founders() {
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
       <SiteHeader />
       <main id="main-content">
-        <PageHero
-          eyebrow="Who it's for · Founders"
-          title="RAISE WITH"
-          titleOutline="STRUCTURE."
-          subtitle="You're raising from angels, syndicates, or institutional investors. You need a closing process that protects you as much as the investor — and leaves a record you own and can export."
-          cta={{ label: "Initialize a room", to: "/sign-up", search: { role: "founder" } }}
-        />
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">How it works for you</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
-            FROM FIRST CALL<br />TO SEALED CLOSE
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border border-[#e6e9ef]">
-            {STEPS.map((step, i) => (
-              <div key={step.num} className={`p-8 flex flex-col gap-4 ${i < STEPS.length - 1 ? "border-b lg:border-b-0 lg:border-r border-[#e6e9ef]" : ""}`}>
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px]">{step.num}</span>
-                <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.3px]">{step.title}</h3>
-                <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65]">{step.desc}</p>
-              </div>
-            ))}
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <PrEyebrow>Who it's for / Founders</PrEyebrow>
+            <PrDisplay maxWidth="16ch">Raise with structure.</PrDisplay>
+            <PrLead>You're raising from angels, syndicates, or institutional investors. The closing process should protect you as much as the investor — and leave a record you actually own.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up" search={{ role: "founder" }}>Initialize a room</PrAction>
+            </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef] bg-[#f8f9fb]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Why Founders use Lengdon</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
-            PROTECTED.<br />DOCUMENTED.<br />YOURS.
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef]">
-            {BENEFITS.map((b, i) => (
-              <div key={i} className={`p-8 bg-white ${i % 2 === 0 ? "lg:border-r border-[#e6e9ef]" : ""} ${i < 2 ? "border-b border-[#e6e9ef]" : ""}`}>
-                <div className="w-2 h-2 bg-[#0a2540] mb-5" />
-                <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.4px] mb-3">{b.title}</h3>
-                <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">{b.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>Every commitment needs to be in the record.</PrTitle>
+          <PrProse>A raise runs on verbal commitments and scattered email threads. Nothing forces the sequence both sides implicitly agree to — conditions get skipped, signing happens before conditions clear, payments are confirmed on trust. Lengdon captures every action taken by both parties from the moment counsel is confirmed to the moment the room closes.</PrProse>
+        </PrSection>
 
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for founders</PrEyebrow>
+          <PrTitle>From first call to sealed close.</PrTitle>
+          <PrProse>
+            Initialize a room and invite your counsel. Gate 1 requires both legal teams confirmed before any data is shared — nobody gets access before counsel is in place.{" "}
+            <Link to="/tools/safe-note" style={{ color: "var(--v2-accent)" }}>Model your SAFE conversion before your next round →</Link>
+            {" "}From there the room guides both parties through Agreement, Conditions, Signing, and Payment in strict sequence, then Close. Add your own conditions precedent and assign each to a named owner — neither side can advance to signing until every condition is marked satisfied.
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>Protected. Documented. Yours.</PrTitle>
+          <PrProse>Every participant on the investor side signs their own NDA — not a company-level agreement, a named individual one. If someone leaves the firm, their access ends with them. At close, the full audit trail seals: append-only, unchanged from that point on. It belongs to you and the investor jointly, not the platform, and it stays permanent for the life of the room — the document the next round's counsel actually wants to see.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>We don't draft your documents.</PrTitle>
+          <PrProse>Your counsel drafts and negotiates the term sheet and the NDA. Lengdon enforces the sequence they agree to and keeps the record of what was agreed and when — it is not a substitute for legal advice.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="Standard" cadence="Billed monthly, active raise only." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Initialize a room and begin the six-gate process.</PrTitle>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">
-                Ready to close?
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">
-                Initialize a room and begin the six-gate process today.
-              </p>
+              <PrAction to="/sign-up" search={{ role: "founder" }}>Initialize a room</PrAction>
             </div>
-            <div className="flex gap-4 shrink-0">
-              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
-              </Link>
-              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 text-white/60 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
-                Sign in →
-              </Link>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+              <PrQuietLink to="/product/how-it-works">The six-gate sequence</PrQuietLink>
+              <PrQuietLink to="/product/pricing">Pricing</PrQuietLink>
+              <PrQuietLink to="/for/investors">The investor side</PrQuietLink>
             </div>
           </div>
-        </section>
+        </PrSection>
       </main>
       <SiteFooter />
     </div>
