@@ -102,6 +102,34 @@ function CogsCalculator() {
           </div>
         </section>
 
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+          <div className="max-w-[720px] flex flex-col gap-10">
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Cost of Goods Sold (COGS) is the direct cost of producing whatever a company sells. This calculator separates COGS from operating expenses, computes gross margin, and shows gross profit — the line investors use to assess unit economics before scaling costs are layered in.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders presenting unit economics in a pitch. Investors evaluating whether a business model is viable at scale. Finance teams preparing investor-ready P&L summaries.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Gross margin percentage is one of the first numbers a sophisticated investor will benchmark against sector norms. For SaaS, above 70% is expected. For hardware or food, below 40% is common. Know where you sit before entering a deal room.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">COGS: direct costs — materials, manufacturing, hosting costs directly tied to revenue, direct labour. Gross profit: revenue minus COGS. Gross margin: gross profit as a percentage of revenue. Operating expenses (OpEx): indirect costs not included in COGS — sales, marketing, G&A, R&D.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Your gross margin percentage determines how investors benchmark you against sector peers. In a Lengdon deal room, your P&L summary is part of the diligence checklist — COGS and gross margin appear as confirmed line items, not a slide deck approximation.</p>
+            </div>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+              <Link to="/tools/valuation-calculator" className="underline hover:opacity-70 transition-opacity">Use your gross margin in the valuation calculator →</Link>
+            </p>
+          </div>
+        </section>
+
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">Metrics ready for investor review? Lengdon closes the round — sequenced, recorded, sealed.</p>

@@ -111,6 +111,34 @@ function CapTable() {
           </div>
         </section>
 
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+          <div className="max-w-[720px] flex flex-col gap-10">
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">A cap table (capitalisation table) records who owns what percentage of a company, at what cost basis, and on what terms. This calculator models a simple cap table through multiple funding rounds, showing dilution at each stage and the ownership percentage of each shareholder class after each round closes.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders understanding their own dilution before signing a term sheet. Lead investors verifying ownership math before wiring. Lawyers confirming share counts match the closing documents.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">The post-money ownership percentages from this model should match — exactly — the figures in your closing documents. Discrepancies between a cap table model and the actual closing docs are one of the most common causes of deal disputes. On Lengdon, the cap table state is recorded at close and sealed into the deal record — creating an immutable reference point for future rounds.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Common shares: typically held by founders and employees. Preferred shares: held by investors, with liquidation preference and other protective provisions. Fully diluted: ownership calculated assuming all options, warrants, and convertible instruments have converted. Option pool: shares reserved for future employee grants, usually created before a priced round (pre-money), which dilutes founders not new investors.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">In a Lengdon deal room, the post-money cap table is attached at close and sealed into the deal record. Future investors and legal counsel can access the closing cap table as part of the permanent record — no reconstruction required.</p>
+            </div>
+            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+              <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Calculate SAFE conversion before adding it here →</Link>
+            </p>
+          </div>
+        </section>
+
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">Cap table modeled. Now close the round that creates it — with a permanent record both parties keep.</p>
