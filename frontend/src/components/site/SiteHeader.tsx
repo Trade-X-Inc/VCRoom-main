@@ -181,7 +181,6 @@ export function SiteHeader() {
               <>
                 <Link
                   to="/sign-in"
-                  search={{ redirect: "/app" }}
                   className="hidden sm:inline-flex whitespace-nowrap transition-colors duration-200"
                   style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: "13px", textDecoration: "none" }}
                 >
@@ -234,7 +233,6 @@ export function SiteHeader() {
                 <>
                   <Link
                     to="/sign-in"
-                    search={{ redirect: "/app" }}
                     onClick={() => setMobileMenuOpen(false)}
                     style={{ fontFamily: FONT_REGULAR, textAlign: "center", border: `1px solid ${RULE}`, color: INK, padding: "10px 0", textDecoration: "none" }}
                   >

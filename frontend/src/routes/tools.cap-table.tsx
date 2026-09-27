@@ -8,6 +8,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // add/remove shareholder table editor shape.
 
 export const Route = createFileRoute("/tools/cap-table")({
+  head: () => ({
+    meta: [
+      { title: "Cap table builder — model your ownership structure — Lengdon" },
+      { name: "description", content: "Build a startup cap table with founders, investors and options pool. See percentage ownership before and after each funding round." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/cap-table" }],
+  }),
   component: CapTable,
 });
 

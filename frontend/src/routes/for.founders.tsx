@@ -21,6 +21,13 @@ import { PageHero } from "@/components/site/PageHero";
 // was removed outright.
 
 export const Route = createFileRoute("/for/founders")({
+  head: () => ({
+    meta: [
+      { title: "For founders — close the round, keep the record clean — Lengdon" },
+      { name: "description", content: "Fixed raise spine, single-notice diligence, a disclosure pack that carries to the next round. Deferred fee payable at close." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/founders" }],
+  }),
   component: Founders,
 });
 
@@ -115,7 +122,7 @@ function Founders() {
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
                 Join the waitlist
               </Link>
-              <Link to="/sign-in" search={{ redirect: "/app" } as any} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 text-white/60 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 text-white/60 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                 Sign in →
               </Link>
             </div>

@@ -53,6 +53,13 @@ import { PageHero } from "@/components/site/PageHero";
 // not before.
 
 export const Route = createFileRoute("/legal/terms")({
+  head: () => ({
+    meta: [
+      { title: "Terms of service — Lengdon" },
+      { name: "description", content: "Terms governing use of the Lengdon platform and closing infrastructure services." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/terms" }],
+  }),
   component: Terms,
 });
 

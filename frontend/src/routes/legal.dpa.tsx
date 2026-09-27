@@ -33,6 +33,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // inside a legal document that earlier passes did not sweep.
 
 export const Route = createFileRoute("/legal/dpa")({
+  head: () => ({
+    meta: [
+      { title: "Data processing agreement — Lengdon" },
+      { name: "description", content: "The data processing agreement between Lengdon and its customers covering sub-processors, retention and data subject rights." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/dpa" }],
+  }),
   component: Dpa,
 });
 

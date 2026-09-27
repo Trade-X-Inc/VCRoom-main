@@ -7,6 +7,13 @@ import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPa
 // (net/gross burn, runway, cash-out date) is the source's own, unchanged.
 
 export const Route = createFileRoute("/tools/burn-rate")({
+  head: () => ({
+    meta: [
+      { title: "Burn rate calculator — monthly cash burn and runway — Lengdon" },
+      { name: "description", content: "Calculate your monthly burn rate from revenue and expenses. See how long your cash lasts and what changes extend runway." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/burn-rate" }],
+  }),
   component: BurnRate,
 });
 

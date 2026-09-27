@@ -6,6 +6,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // LENGDONPUBLIC-NEW's src/pages/legal/index.tsx.
 
 export const Route = createFileRoute("/legal/")({
+  head: () => ({
+    meta: [
+      { title: "Legal — terms, privacy, DPA and sub-processors — Lengdon" },
+      { name: "description", content: "The complete legal surface for Lengdon, dated and versioned. Terms of service, privacy policy, data processing agreement." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal" }],
+  }),
   component: LegalIndex,
 });
 

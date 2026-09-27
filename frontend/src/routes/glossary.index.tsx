@@ -31,6 +31,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // same class this pass exists to catch, not a wording preference.
 
 export const Route = createFileRoute("/glossary/")({
+  head: () => ({
+    meta: [
+      { title: "Private capital glossary — terms of art, defined plainly — Lengdon" },
+      { name: "description", content: "Accurate definitions of disclosure, diligence and closing terms used in private-capital transactions. Disclosure pack to sealed export." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/glossary" }],
+  }),
   component: Glossary,
 });
 

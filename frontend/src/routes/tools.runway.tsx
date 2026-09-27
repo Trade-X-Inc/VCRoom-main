@@ -7,6 +7,13 @@ import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPa
 // the source's own, unchanged.
 
 export const Route = createFileRoute("/tools/runway")({
+  head: () => ({
+    meta: [
+      { title: "Runway calculator — how long does your cash last — Lengdon" },
+      { name: "description", content: "Enter your cash balance and monthly burn to see your runway in months. Model scenarios to extend it before your next raise." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/runway" }],
+  }),
   component: RunwayCalculator,
 });
 

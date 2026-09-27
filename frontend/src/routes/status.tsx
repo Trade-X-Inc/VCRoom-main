@@ -20,6 +20,14 @@ import { PageHero } from "@/components/site/PageHero";
 // corrected to "Deal room."
 
 export const Route = createFileRoute("/status")({
+  head: () => ({
+    meta: [
+      { title: "System status — Lengdon" },
+      { name: "description", content: "Current operational status of Lengdon platform services." },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/status" }],
+  }),
   component: Status,
 });
 

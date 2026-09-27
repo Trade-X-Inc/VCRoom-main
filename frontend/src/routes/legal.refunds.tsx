@@ -26,6 +26,13 @@ import { PageHero } from "@/components/site/PageHero";
 // the same words rather than two independently-worded versions.
 
 export const Route = createFileRoute("/legal/refunds")({
+  head: () => ({
+    meta: [
+      { title: "Refund terms — Lengdon" },
+      { name: "description", content: "Lengdon's refund policy, conditions and process." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/refunds" }],
+  }),
   component: Refunds,
 });
 

@@ -3,6 +3,14 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/forgot-password')({
+  head: () => ({
+    meta: [
+      { title: "Reset password — Lengdon" },
+      { name: "description", content: "Reset your Lengdon account password." },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/forgot-password" }],
+  }),
   component: ForgotPassword
 })
 

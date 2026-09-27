@@ -8,6 +8,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // dynamic funding-round editor + waterfall dilution shape.
 
 export const Route = createFileRoute("/tools/dilution")({
+  head: () => ({
+    meta: [
+      { title: "Dilution modeller — model equity dilution across funding rounds — Lengdon" },
+      { name: "description", content: "See how your ownership stake changes across seed, Series A and later rounds. Model new shares, options pool and investor dilution." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/dilution" }],
+  }),
   component: Dilution,
 });
 

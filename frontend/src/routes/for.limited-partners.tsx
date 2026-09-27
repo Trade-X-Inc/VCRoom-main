@@ -19,6 +19,13 @@ import { PageHero } from "@/components/site/PageHero";
 // product vocabulary) in the same pass.
 
 export const Route = createFileRoute("/for/limited-partners")({
+  head: () => ({
+    meta: [
+      { title: "For limited partners — structured, referenced disclosure — Lengdon" },
+      { name: "description", content: "Read the same fields the deal was built on, permissioned by the vehicle you back. No repackaged summaries." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/limited-partners" }],
+  }),
   component: LimitedPartners,
 });
 

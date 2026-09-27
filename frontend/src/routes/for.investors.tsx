@@ -25,6 +25,13 @@ import { PageHero } from "@/components/site/PageHero";
 // claim (§7.4) and was fixed ahead of the scheduled fake-reviews sweep.
 
 export const Route = createFileRoute("/for/investors")({
+  head: () => ({
+    meta: [
+      { title: "For investors — diligence and close on a defensible record — Lengdon" },
+      { name: "description", content: "Angels to institutions. One disciplined deal spine, a full audit trail, decisions recorded with reasons." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/investors" }],
+  }),
   component: Investors,
 });
 
@@ -109,7 +116,7 @@ function Investors() {
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
                 Join the waitlist
               </Link>
-              <Link to="/sign-in" search={{ redirect: "/app" } as any} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                 Sign in →
               </Link>
             </div>

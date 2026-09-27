@@ -17,6 +17,13 @@ import { PageHero } from "@/components/site/PageHero";
 // linked" -> "tamper-evident".
 
 export const Route = createFileRoute("/product/compare/")({
+  head: () => ({
+    meta: [
+      { title: "Compare — closing infrastructure vs virtual data rooms — Lengdon" },
+      { name: "description", content: "An honest comparison against DocSend, Notion and Google Drive on pricing, transaction record, diligence discipline and sector coverage." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/compare" }],
+  }),
   component: Compare,
 });
 

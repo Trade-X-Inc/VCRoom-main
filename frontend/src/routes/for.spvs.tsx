@@ -11,6 +11,13 @@ import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 // override). Replaced with a real capability.
 
 export const Route = createFileRoute("/for/spvs")({
+  head: () => ({
+    meta: [
+      { title: "For SPVs — one clean, portable record of ownership — Lengdon" },
+      { name: "description", content: "Beneficial ownership, diligence and closing record for a single vehicle. Carries forward to the next round without re-onboarding." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/spvs" }],
+  }),
   component: SPVs,
 });
 

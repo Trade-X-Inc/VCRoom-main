@@ -109,6 +109,13 @@ import { PageHero } from "@/components/site/PageHero";
 // already exists.
 
 export const Route = createFileRoute("/product/pricing")({
+  head: () => ({
+    meta: [
+      { title: "Pricing — published, flat, event-tied — Lengdon" },
+      { name: "description", content: "Four tiers from deferred founder fee to institutional. Every price on the page. No percentage of the round, no invoice shock." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/pricing" }],
+  }),
   component: Pricing,
 });
 

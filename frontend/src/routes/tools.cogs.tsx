@@ -9,6 +9,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // panel, unlike the slider-based tools.
 
 export const Route = createFileRoute("/tools/cogs")({
+  head: () => ({
+    meta: [
+      { title: "COGS calculator — cost of goods sold for your business — Lengdon" },
+      { name: "description", content: "Calculate cost of goods sold and gross margin. Model how pricing, volume and direct costs affect your unit economics." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/cogs" }],
+  }),
   component: CogsCalculator,
 });
 

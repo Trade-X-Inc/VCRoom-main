@@ -224,7 +224,6 @@ export function SiteFooter() {
         <div className="flex items-center gap-4">
           <Link
             to="/sign-in"
-            search={{ redirect: "/app" }}
             className="transition-colors"
             style={{ fontFamily: FONT_INTER_REG, color: INK_FAINT, fontSize: "12px", textDecoration: "none" }}
           >

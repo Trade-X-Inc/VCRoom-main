@@ -35,6 +35,13 @@ import { getPublishedPosts, type BlogPost } from "@/lib/notion-blog";
 // page explicitly called out for real wiring.
 
 export const Route = createFileRoute("/resources/blog/")({
+  head: () => ({
+    meta: [
+      { title: "Blog — insights on private capital and closing — Lengdon" },
+      { name: "description", content: "Analysis and notes on fundraising, diligence, deal structure and the record. Written for founders and investors in private markets." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/resources/blog" }],
+  }),
   loader: () => getPublishedPosts(),
   component: BlogIndex,
 });

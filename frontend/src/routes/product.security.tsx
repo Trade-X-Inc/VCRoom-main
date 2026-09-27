@@ -121,6 +121,13 @@ import { PageHero } from "@/components/site/PageHero";
 // this page's and legal.terms.tsx's claims did.
 
 export const Route = createFileRoute("/product/security")({
+  head: () => ({
+    meta: [
+      { title: "Trust and security — built to be examined — Lengdon" },
+      { name: "description", content: "Mandatory MFA, TLS 1.3, encryption at rest, NDA-gated rooms, hash-chained audit record. SOC 2 in progress. No custody, no money movement." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/security" }],
+  }),
   component: Security,
 });
 

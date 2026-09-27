@@ -42,6 +42,13 @@ import { PageHero } from "@/components/site/PageHero";
 // one cookie that exists.
 
 export const Route = createFileRoute("/legal/cookies")({
+  head: () => ({
+    meta: [
+      { title: "Cookie policy — Lengdon" },
+      { name: "description", content: "What cookies Lengdon uses, why, and how to control them." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/cookies" }],
+  }),
   component: Cookies,
 });
 

@@ -20,6 +20,13 @@ import { PageHero } from "@/components/site/PageHero";
 // "deal room."
 
 export const Route = createFileRoute("/sectors/")({
+  head: () => ({
+    meta: [
+      { title: "Sector schedules — diligence built for the sector, not just tech — Lengdon" },
+      { name: "description", content: "Field sets and checklists for technology, manufacturing, property, healthcare and energy deals. One engine, different fields, three evidence tiers." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/sectors" }],
+  }),
   component: Sectors,
 });
 

@@ -6,6 +6,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // LENGDONPUBLIC-NEW's src/pages/tools/index.tsx.
 
 export const Route = createFileRoute("/tools/")({
+  head: () => ({
+    meta: [
+      { title: "Free tools for founders — calculators and modellers — Lengdon" },
+      { name: "description", content: "SAFE note calculator, burn rate, runway, dilution, cap table, COGS and valuation tools. Free, no account required." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools" }],
+  }),
   component: ToolsIndex,
 });
 

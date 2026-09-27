@@ -34,6 +34,13 @@ import { CHANGELOG } from "@/lib/docs/content/changelog";
 // treatment as the blog index page's newsletter section.
 
 export const Route = createFileRoute("/resources/changelog")({
+  head: () => ({
+    meta: [
+      { title: "Changelog — what changed, when and why — Lengdon" },
+      { name: "description", content: "A dated, referenced record of the Lengdon product. What shipped, what changed, what was corrected." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/resources/changelog" }],
+  }),
   component: Changelog,
 });
 

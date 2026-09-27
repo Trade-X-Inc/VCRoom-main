@@ -21,6 +21,13 @@ import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 // than passing an empty value) correctly omits the section.
 
 export const Route = createFileRoute("/for/advisors")({
+  head: () => ({
+    meta: [
+      { title: "For advisors and introducers — run every founder from one desk — Lengdon" },
+      { name: "description", content: "A portfolio dashboard for advisory firms and warm-introducers. Mediate raises on the record, with disclosed representation." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/advisors" }],
+  }),
   component: Advisors,
 });
 

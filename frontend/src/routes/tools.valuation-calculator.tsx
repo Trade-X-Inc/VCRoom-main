@@ -9,6 +9,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // with slider min/max range labels beneath each field.
 
 export const Route = createFileRoute("/tools/valuation-calculator")({
+  head: () => ({
+    meta: [
+      { title: "Startup valuation calculator — pre-money and post-money — Lengdon" },
+      { name: "description", content: "Calculate pre-money and post-money valuation from investment amount and equity percentage. Understand what a term sheet implies." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/valuation-calculator" }],
+  }),
   component: ValuationCalculator,
 });
 

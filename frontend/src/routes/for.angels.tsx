@@ -9,6 +9,13 @@ import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 // §12, §20.15). Reworded to describe the real permanent record.
 
 export const Route = createFileRoute("/for/angels")({
+  head: () => ({
+    meta: [
+      { title: "For angel investors — a clean cheque with a real record — Lengdon" },
+      { name: "description", content: "Run a direct angel deal on a short, disciplined spine. NDA to sealed record. Invest, hold, or decline — each decision captured." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/angels" }],
+  }),
   component: Angels,
 });
 
