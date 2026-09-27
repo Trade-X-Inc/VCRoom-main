@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
@@ -30,7 +30,7 @@ function Syndicates() {
       sectionLabel="Syndicate infrastructure"
       sectionTitle={<>EVERYONE IN.<br />ONE RECORD.</>}
       features={[
-        { title: "One room, multiple investors", desc: "Invite every syndicate member into a single deal room. Each investor follows the same six-gate sequence independently." },
+        { title: "One room, multiple investors", desc: <>Invite every syndicate member into a single deal room. Each investor follows the same six-gate sequence independently. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">Model the cap table across your syndicate →</Link></> },
         { title: "Collective conditions tracking", desc: "Conditions are tracked across the full syndicate. The system enforces that every condition is satisfied before the group advances to signing." },
         { title: "Per-investor payment confirmation", desc: "Each investor uploads their own payment proof. Each confirmation is recorded individually. The room only closes when all confirmations are in." },
         { title: "Shared record at close", desc: "The record at close is visible to every syndicate member, not just the lead — the same append-only history, open to all parties." },

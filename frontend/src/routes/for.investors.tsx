@@ -36,7 +36,7 @@ export const Route = createFileRoute("/for/investors")({
 });
 
 const FEATURES = [
-  { title: "Receive structured rooms", desc: "Founders invite you into a sequenced deal room. Every gate is enforced — you see exactly what stage the deal is at and what remains before close." },
+  { title: "Receive structured rooms", desc: <>Founders invite you into a sequenced deal room. Every gate is enforced — you see exactly what stage the deal is at and what remains before close. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">Run the cap table before you commit →</Link></> },
   { title: "Per-investor NDA", desc: "You sign your own NDA — not a catch-all company-level agreement. Your access is individually logged and keyed to your identity." },
   { title: "Condition visibility", desc: "Track every outstanding condition in real time. Regulatory approvals, board consents, third-party sign-offs — all mapped against the close sequence." },
   { title: "Permanent audit record", desc: "At close, the full deal record is locked in place — append-only, nothing further can be edited or removed by either party." },

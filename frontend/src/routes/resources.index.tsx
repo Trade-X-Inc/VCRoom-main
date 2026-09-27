@@ -49,7 +49,7 @@ const HUBS = [
     label: "Tools",
     path: "/tools",
     tag: "Free",
-    desc: "Interactive calculators for founders and investors — valuation, burn rate, runway, cap table, SAFE conversion, dilution modeling, and COGS.",
+    desc: <>Interactive calculators for founders and investors — valuation, burn rate, runway, cap table, SAFE conversion, dilution modeling, and COGS. <Link to="/tools/runway" className="underline hover:opacity-70 transition-opacity">Calculate your runway →</Link></>,
     items: ["Valuation calculator", "Burn rate & runway", "Cap table builder", "SAFE note calculator"],
   },
   {

@@ -188,8 +188,10 @@ export function SiteFooter() {
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-10 mb-12 pb-12 border-b" style={{ borderColor: RULE }}>
         <div className="col-span-2 lg:col-span-1">
           <img
-            src="/lengdon-logo-full.png"
+            src="/lengdon-logo-full.webp"
             alt="Lengdon"
+            width={132}
+            height={30}
             style={{ height: "30px", width: "auto", display: "block", marginBottom: "12px" }}
           />
           <p style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: "13px", lineHeight: 1.6, maxWidth: "240px" }}>

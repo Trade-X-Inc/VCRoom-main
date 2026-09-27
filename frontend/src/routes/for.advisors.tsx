@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
@@ -43,7 +43,7 @@ function Advisors() {
       sectionTitle={<>YOUR ROLE.<br />YOUR ACCESS.</>}
       features={[
         { title: "Neutral record", desc: "Lengdon records every action by both parties without you controlling the platform. You're in the room — you're not the room owner." },
-        { title: "Read-only access, scoped per room", desc: "Join a deal room with read-only visibility at any gate. See what's been confirmed, what conditions remain, and what's been signed — without being able to change anything." },
+        { title: "Read-only access, scoped per room", desc: <>Join a deal room with read-only visibility at any gate. See what's been confirmed, what conditions remain, and what's been signed — without being able to change anything. <Link to="/tools/burn-rate" className="underline hover:opacity-70 transition-opacity">Check burn rate before advising on runway →</Link></> },
         { title: "Multi-party coordination", desc: "Manage deals where you're coordinating across multiple principals, counsel teams, and investors — all within a single, structured room." },
         { title: "Full audit trail", desc: "The append-only record of the room — every action, confirmation, and signature — stays in place and inspectable for the life of the deal." },
       ]}

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { getPostBySlug, type BlogPostWithContent } from "@/lib/notion-blog";
+import { getPostBySlug, getPublishedPosts, type BlogPost, type BlogPostWithContent } from "@/lib/notion-blog";
 
 // Public site rebuild, 31 Aug 2026 — blog post detail page. Same
 // exemption as resources.blog.index.tsx: real internal work per
@@ -15,7 +15,7 @@ import { getPostBySlug, type BlogPostWithContent } from "@/lib/notion-blog";
 
 export const Route = createFileRoute("/resources/blog/$slug")({
   head: ({ loaderData, params }) => {
-    const post = loaderData as BlogPostWithContent | null;
+    const { post } = (loaderData ?? {}) as { post: BlogPostWithContent | null };
     if (!post) return { meta: [{ title: "Post not found — Lengdon Blog" }] };
     const url = `https://lengdon.com/resources/blog/${params.slug}`;
     return {
@@ -30,7 +30,19 @@ export const Route = createFileRoute("/resources/blog/$slug")({
       links: [{ rel: "canonical", href: url }],
     };
   },
-  loader: ({ params }) => getPostBySlug({ data: { slug: params.slug } }),
+  loader: async ({ params }) => {
+    const post = await getPostBySlug({ data: { slug: params.slug } });
+    if (!post) return { post: null, related: null };
+    // SEO-003 — tag-based related post, computed here rather than hand-
+    // authored per post: content lives in Notion, not in this repo, so
+    // there is no file to add per-post cross-links to. First other
+    // published post sharing at least one tag; null (render nothing) if
+    // none match, per instruction ("don't force it").
+    const allPosts = await getPublishedPosts();
+    const related: BlogPost | null =
+      allPosts.find((p) => p.slug !== post.slug && p.tags.some((t) => post.tags.includes(t))) ?? null;
+    return { post, related };
+  },
   component: BlogArticle,
 });
 
@@ -43,7 +55,7 @@ function formatDate(iso: string): string {
 }
 
 function BlogArticle() {
-  const post = Route.useLoaderData() as BlogPostWithContent | null;
+  const { post, related } = Route.useLoaderData() as { post: BlogPostWithContent | null; related: BlogPost | null };
 
   if (!post) {
     return (
@@ -119,6 +131,19 @@ function BlogArticle() {
             [&_figure]:my-6 [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#64748b]"
           dangerouslySetInnerHTML={{ __html: post.contentHtml }}
         />
+
+        {related && (
+          <div className="mt-12 pt-6 border-t border-[#e6e9ef]">
+            <Link
+              to="/resources/blog/$slug"
+              params={{ slug: related.slug }}
+              style={{ fontFamily: "'Inter:Medium', sans-serif" }}
+              className="text-[13px] text-[#0a2540] underline hover:opacity-70 transition-opacity"
+            >
+              Related: {related.title} →
+            </Link>
+          </div>
+        )}
 
         <div className="mt-16 p-8 bg-[#f8f9fb] border border-[#e6e9ef] text-center">
           <p style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="text-[#0a2540] mb-2 text-[17px] font-semibold">Ready to close your first transaction?</p>

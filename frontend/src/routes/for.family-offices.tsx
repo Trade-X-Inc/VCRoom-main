@@ -37,7 +37,7 @@ export const Route = createFileRoute("/for/family-offices")({
 
 const FEATURES = [
   { title: "Institutional-grade infrastructure", desc: "Family offices operate at institutional scale with the confidentiality requirements of private individuals. Lengdon separates these concerns by design." },
-  { title: "Permanent record retention", desc: "Transactions close — records don't expire. Every deal you run through Lengdon contributes to a permanent, auditable history of your capital deployment." },
+  { title: "Permanent record retention", desc: <>Transactions close — records don't expire. Every deal you run through Lengdon contributes to a permanent, auditable history of your capital deployment. <Link to="/tools/valuation-calculator" className="underline hover:opacity-70 transition-opacity">Run a valuation check before term sheet →</Link></> },
   { title: "Compliance-ready audit trail", desc: "Every action is timestamped, encrypted, and appended to a tamper-evident log. The audit trail is ready for compliance review, fund reporting, or legal proceedings without any additional work." },
   { title: "Per-portfolio room architecture", desc: "Each transaction gets its own isolated room. Access is scoped to the individuals named in that room — no cross-contamination between portfolio companies or investment vehicles." },
   { title: "One room per transaction", desc: "Run as many concurrent deals as your deployment schedule requires. Each gets its own room — nothing is shared or aggregated across transactions." },

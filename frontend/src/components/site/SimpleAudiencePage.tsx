@@ -11,7 +11,11 @@ import { PageHero } from "@/components/site/PageHero";
 // PrivateEquity.tsx and LimitedPartners.tsx each have their own distinct
 // extra section and are NOT built from this component).
 
-export interface AudienceFeature { title: string; desc: string; }
+// SEO-003 — desc widened from `string` to `React.ReactNode` (additive
+// only) so a single feature item's body copy can carry an inline <Link>.
+// A plain string remains perfectly valid — every existing caller renders
+// unchanged.
+export interface AudienceFeature { title: string; desc: React.ReactNode; }
 
 export interface SimpleAudiencePageProps {
   eyebrow: string;
