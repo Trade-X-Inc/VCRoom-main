@@ -64,29 +64,29 @@ function RunwayCalculator() {
       ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full six-gate sequence."
       ctaLabel="Join the waitlist"
       belowCalculator={
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[var(--v2-rule)]">
           <div className="max-w-[720px] flex flex-col gap-10">
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Runway is the number of months a company can operate before it runs out of cash, assuming no new revenue or fundraising. This calculator gives you current runway, projected runway under different burn scenarios, and the latest date to close your next round to avoid a cash-out event.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Runway is the number of months a company can operate before it runs out of cash, assuming no new revenue or fundraising. This calculator gives you current runway, projected runway under different burn scenarios, and the latest date to close your next round to avoid a cash-out event.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders timing their fundraise. Investors assessing urgency and negotiating leverage. Board members monitoring financial health between rounds.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Founders timing their fundraise. Investors assessing urgency and negotiating leverage. Board members monitoring financial health between rounds.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Standard advice: begin your next raise when you have 9–12 months of runway remaining. Less than 6 months and you are raising from a position of weakness. Use this number to set your fundraising start date, not your wire date.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Standard advice: begin your next raise when you have 9–12 months of runway remaining. Less than 6 months and you are raising from a position of weakness. Use this number to set your fundraising start date, not your wire date.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Runway: months of cash at current burn. Cash-out date: the calendar date cash reaches zero. Fundraising buffer: the months required to close a round (seed: 3–6 months; Series A: 4–8 months). Hard deadline: cash-out date minus fundraising buffer — the latest date to begin raising.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Runway: months of cash at current burn. Cash-out date: the calendar date cash reaches zero. Fundraising buffer: the months required to close a round (seed: 3–6 months; Series A: 4–8 months). Hard deadline: cash-out date minus fundraising buffer — the latest date to begin raising.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Runway is the first number an investor uses to assess urgency. In a Lengdon deal room, the runway figure you calculate here feeds into the deal brief — so your stated timeline to close is grounded in a real number, visible to all parties.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Runway is the first number an investor uses to assess urgency. In a Lengdon deal room, the runway figure you calculate here feeds into the deal brief — so your stated timeline to close is grounded in a real number, visible to all parties.</p>
             </div>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
               <Link to="/tools/burn-rate" className="underline hover:opacity-70 transition-opacity">Recalculate burn rate to update this projection →</Link>
             </p>
           </div>

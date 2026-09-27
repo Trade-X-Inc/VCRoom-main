@@ -85,40 +85,40 @@ function Docs() {
     <div className="min-h-screen bg-white">
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Documentation</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Documentation</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(44px,7vw,72px)] leading-[0.88] tracking-[-3px] mb-6">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[clamp(44px,7vw,72px)] leading-[0.88] tracking-[-3px] mb-6">
               DOCS.
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[480px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[15px] max-w-[480px]">
               Everything you need to understand, configure, and build on Lengdon.
             </p>
           </div>
         </div>
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[#e6e9ef]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[var(--v2-rule)]">
             {SECTIONS.map((section, si) => (
               <div
                 key={section.slug}
-                className={`p-8 ${[0,1,3,4].includes(si) ? "border-r border-[#e6e9ef]" : ""} ${si < 3 ? "border-b border-[#e6e9ef]" : ""}`}
+                className={`p-8 ${[0,1,3,4].includes(si) ? "border-r border-[var(--v2-rule)]" : ""} ${si < 3 ? "border-b border-[var(--v2-rule)]" : ""}`}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="font-mono text-[#e6e9ef] text-[20px] font-bold leading-none">{section.icon}</span>
-                  <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.4px]">{section.title}</h2>
+                  <span className="font-mono text-[var(--v2-rule)] text-[20px] font-bold leading-none">{section.icon}</span>
+                  <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px]">{section.title}</h2>
                 </div>
                 <div className="flex flex-col gap-3">
                   {section.articles.map((a) => (
                     <div key={a.title} className="group">
-                      <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] tracking-[-0.2px] mb-0.5 group-hover:text-[#425466] transition-colors cursor-pointer">
+                      <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] tracking-[-0.2px] mb-0.5 group-hover:text-[var(--v2-ink-secondary)] transition-colors cursor-pointer">
                         {a.title}
                       </div>
-                      <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] leading-[1.5]">{a.desc}</div>
+                      <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px] leading-[1.5]">{a.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -127,21 +127,21 @@ function Docs() {
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef]">
-            <div className="p-10 border-r border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase mb-4">Quick start</div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">New to Lengdon?</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">We're not onboarding new accounts right now. Join the waitlist and we'll reach out.</p>
-              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="inline-block bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[var(--v2-rule)] pt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[var(--v2-rule)]">
+            <div className="p-10 border-r border-[var(--v2-rule)]">
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[2px] uppercase mb-4">Quick start</div>
+              <h3 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.5px] mb-3">New to Lengdon?</h3>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[14px] leading-[1.65] mb-5">We're not onboarding new accounts right now. Join the waitlist and we'll reach out.</p>
+              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="inline-block bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
                 Join the waitlist →
               </Link>
             </div>
             <div className="p-10">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase mb-4">Questions</div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.5px] mb-3">Need something specific?</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.65] mb-5">Reach out and we'll walk you through how a deal room fits your transaction.</p>
-              <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-block border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[2px] uppercase mb-4">Questions</div>
+              <h3 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.5px] mb-3">Need something specific?</h3>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[14px] leading-[1.65] mb-5">Reach out and we'll walk you through how a deal room fits your transaction.</p>
+              <Link to="/company/contact" style={{ fontFamily: "var(--font-v2-ui)" }} className="inline-block border border-[var(--v2-rule)] hover:border-[var(--v2-accent)]/30 text-[var(--v2-ink-secondary)] text-[13px] px-8 py-3.5 transition-all duration-200">
                 Contact us →
               </Link>
             </div>

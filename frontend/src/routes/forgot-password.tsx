@@ -39,28 +39,28 @@ function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-5">
-      <div className="w-full max-w-md border border-[#e6e9ef] p-10">
+      <div className="w-full max-w-md border border-[var(--v2-rule)] p-10">
         {sent ? (
           <div className="text-center">
-            <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="text-xl text-[#0a2540] mb-2">Check your email</h2>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-sm">
+            <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="text-xl text-[var(--v2-accent)] mb-2">Check your email</h2>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-sm">
               Password reset link sent to{' '}
-              <strong style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540]">{email}</strong>
+              <strong style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)]">{email}</strong>
             </p>
-            <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-block mt-6 text-[#0a2540] text-sm hover:text-[#13233a] transition-colors">
+            <Link to="/sign-in" style={{ fontFamily: "var(--font-v2-ui)" }} className="inline-block mt-6 text-[var(--v2-accent)] text-sm hover:opacity-70 transition-colors">
               Back to sign in →
             </Link>
           </div>
         ) : (
           <>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="text-2xl text-[#0a2540] mb-2">Reset password</h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-sm mb-8">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="text-2xl text-[var(--v2-accent)] mb-2">Reset password</h1>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-sm mb-8">
               Enter your email and we'll send you a reset link
             </p>
 
             {error && (
-              <div className="mb-4 border border-red-200 bg-red-50 px-4 py-3">
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-red-700 text-[13px]">{error}</span>
+              <div className="mb-4 border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3">
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-v2-adverse text-[13px]">{error}</span>
               </div>
             )}
 
@@ -71,21 +71,21 @@ function ForgotPassword() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 placeholder="your@email.com"
-                style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                className="w-full border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors duration-150"
+                style={{ fontFamily: "var(--font-v2-ui)" }}
+                className="w-full border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors duration-150"
               />
               <button
                 type="submit"
                 disabled={loading}
-                style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
-                className="w-full bg-[#0a2540] hover:bg-[#13233a] disabled:opacity-50 text-white text-sm py-4 transition-colors duration-200"
+                style={{ fontFamily: "var(--font-v2-ui)" }}
+                className="w-full bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 disabled:opacity-50 text-white text-sm py-4 transition-colors duration-200"
               >
                 {loading ? 'Sending...' : 'Send reset link →'}
               </button>
             </form>
 
             <div className="mt-6 text-center">
-              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-sm hover:text-[#0a2540] transition-colors">
+              <Link to="/sign-in" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-sm hover:text-[var(--v2-accent)] transition-colors">
                 ← Back to sign in
               </Link>
             </div>

@@ -91,32 +91,32 @@ function Dpa() {
     <div className="min-h-screen bg-white">
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Legal · Data Processing</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Legal · Data Processing</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
               DATA PROCESSING<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>AGREEMENT</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[14px]">Effective date: 1 January 2025 · Last updated: 1 August 2025</p>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[14px]">Effective date: 1 January 2025 · Last updated: 1 August 2025</p>
           </div>
         </div>
 
         <section className="max-w-[860px] mx-auto px-8 lg:px-0 py-16">
           <div className="flex flex-col gap-10">
             {SECTIONS.map((s) => (
-              <div key={s.title} className="border-l-2 border-[#e6e9ef] pl-8">
-                <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.4px] mb-4">{s.title}</h2>
-                <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.8]">{s.body}</p>
+              <div key={s.title} className="border-l-2 border-[var(--v2-rule)] pl-8">
+                <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[20px] tracking-[-0.4px] mb-4">{s.title}</h2>
+                <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.8]">{s.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 border-t border-[#e6e9ef] pt-10">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px] leading-[1.7]">
+          <div className="mt-16 border-t border-[var(--v2-rule)] pt-10">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[13px] leading-[1.7]">
               Questions about this DPA? Contact our data protection team at privacy@lengdon.com. For a copy of applicable Standard Contractual Clauses or for enterprise DPA execution, contact us directly.
             </p>
           </div>
