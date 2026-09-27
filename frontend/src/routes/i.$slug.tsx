@@ -25,6 +25,27 @@ const font = {
 } as const;
 
 export const Route = createFileRoute("/i/$slug")({
+  // SEO-009 Phase 6: mirrors p.$slug.tsx's head() pattern exactly —
+  // derived from the real loader data (profile is null when private/
+  // unpublished/nonexistent, same as that file), never fabricated.
+  head: ({ loaderData }) => {
+    const d = loaderData as { profile: any; slug: string } | undefined;
+    const profile = d?.profile;
+    if (!profile) {
+      return { meta: [{ title: "Investor profile not found — Lengdon" }] };
+    }
+    const name = profile.your_name || profile.fund_name || "Investor profile";
+    const fallbackDescription = [profile.role, profile.fund_name].filter(Boolean).join(" · ") || "Investor profile on Lengdon.";
+    const description = profile.thesis_statement || fallbackDescription;
+    return {
+      meta: [
+        { title: `${name} — Lengdon` },
+        { name: "description", content: description },
+        { property: "og:title", content: `${name} — Lengdon` },
+        { property: "og:description", content: description },
+      ],
+    };
+  },
   loader: async ({ params }) => {
     // get_public_investor_profile() is SECURITY DEFINER and callable by anon —
     // it re-checks profile_published internally and returns ONLY the columns
@@ -54,7 +75,13 @@ export const Route = createFileRoute("/i/$slug")({
 });
 
 function InvestorPublicProfileWrapper() {
-  const { profile: publicProfile, teamMembers: publicTeam, portfolio: publicPortfolio, slug } = Route.useLoaderData();
+  // SEO-009 Phase 6: explicit cast, matching p.$slug.tsx's established
+  // convention — adding head()'s own loaderData typing above otherwise
+  // breaks pure inference here (order-sensitive), so every call site casts
+  // rather than relying on it. Same shape the loader above always returned.
+  const { profile: publicProfile, teamMembers: publicTeam, portfolio: publicPortfolio, slug } = Route.useLoaderData() as {
+    profile: any; teamMembers: any[]; portfolio: any[]; slug: string;
+  };
 
   const [ownerState, setOwnerState] = useState<
     | { loading: true }
