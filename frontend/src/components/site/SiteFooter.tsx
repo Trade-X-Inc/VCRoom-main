@@ -75,6 +75,7 @@ const COLS: { heading: string; items: FooterLink[] }[] = [
       { label: "Changelog", to: "/resources/changelog" },
       { label: "Glossary", to: "/glossary" },
       { label: "Tools", to: "/tools" },
+      { label: "Templates", to: "/templates" },
       { label: "Sectors", to: "/sectors" },
       { label: "Registry", to: "/registry" },
       { label: "Status", to: "/status" },
