@@ -1,30 +1,34 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/Advisors.tsx.
+// SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 //
-// Corrected 8 Sep 2026: "Observer access" was invented terminology for a
-// real underlying capability — the real role is `external` (see
-// lib/roles.ts), the investor-team role built for exactly this use case
-// ("third-party DD firms and agencies"), scoped read-only to assigned
-// deal rooms. Reworded to name the real role rather than an invented
-// one. "The sealed export" removed — no export capability exists (see
-// CLAUDE.md §12, §20.15) — replaced with the real permanent, in-room
-// record. "Transaction room(s)" corrected to "deal room(s)" throughout.
+// Content correction from the original task brief, per direct instruction:
+// the brief's mechanism note described a "portfolio dashboard... every
+// founder you represent, every active raise" and a "sealed export at
+// close carries your involvement." Neither is real. The portfolio
+// dashboard describes CLAUDE.md §20.15's Advisor Dashboard, an explicit
+// frontend-only design preview with no backend and no advisor role — not
+// a feature. No export capability of any kind exists anywhere in the
+// product. The real, live mechanism for this audience is the `external`
+// role (lib/roles.ts) — scoped, read-only, per-room — which is what this
+// page describes instead, and what the pre-rewrite version of this exact
+// file already correctly described.
 //
-// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the `quote`
-// prop ("Corporate Finance Advisor, 2026") was a fabricated testimonial
-// attributed to a person who does not exist — same pattern found and
-// removed across four other for.* pages in the same sweep. `quote` is
-// optional on SimpleAudiencePage, so removing the prop entirely (rather
-// than passing an empty value) correctly omits the section.
+// EARLY ACCESS: the underlying `external` role exists and is real (not
+// unbuilt), but the audience page itself and its framing are new — kept
+// consistent with the other 6 non-angels pages per direct instruction.
 
 export const Route = createFileRoute("/for/advisors")({
   head: () => ({
     meta: [
-      { title: "For advisors and introducers — run every founder from one desk — Lengdon" },
-      { name: "description", content: "A portfolio dashboard for advisory firms and warm-introducers. Mediate raises on the record, with disclosed representation." },
+      { title: "For advisors — mediate the raise, stay on the record — Lengdon" },
+      { name: "description", content: "Join a founder's room with scoped, read-only access. See every gate, every condition, every signature — without holding the data." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/advisors" }],
   }),
@@ -33,24 +37,63 @@ export const Route = createFileRoute("/for/advisors")({
 
 function Advisors() {
   return (
-    <SimpleAudiencePage
-      eyebrow="Who it's for · Advisors & Agents"
-      title="COORDINATE."
-      titleOutline="DON'T CONTROL."
-      subtitle="You facilitate transactions between parties. You need visibility without becoming a custodian of the data — and a record that proves you did your job."
-      heroCta="Learn more"
-      sectionLabel="Built for advisors"
-      sectionTitle={<>YOUR ROLE.<br />YOUR ACCESS.</>}
-      features={[
-        { title: "Neutral record", desc: "Lengdon records every action by both parties without you controlling the platform. You're in the room — you're not the room owner." },
-        { title: "Read-only access, scoped per room", desc: <>Join a deal room with read-only visibility at any gate. See what's been confirmed, what conditions remain, and what's been signed — without being able to change anything. <Link to="/tools/burn-rate" className="underline hover:opacity-70 transition-opacity">Check burn rate before advising on runway →</Link></> },
-        { title: "Multi-party coordination", desc: "Manage deals where you're coordinating across multiple principals, counsel teams, and investors — all within a single, structured room." },
-        { title: "Full audit trail", desc: "The append-only record of the room — every action, confirmation, and signature — stays in place and inspectable for the life of the deal." },
-      ]}
-      ctaTitle="Work with us."
-      ctaSubtitle="We work with advisors and agents directly. Get in touch to discuss your workflow."
-      ctaSecondaryLabel="Contact us →"
-      ctaSecondaryTo="/company/contact"
-    />
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
+      <SiteHeader />
+      <main id="main-content">
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <PrEyebrow>Who it's for / Advisors</PrEyebrow>
+              <PrPill>Early access</PrPill>
+            </div>
+            <PrDisplay>You mediate the deal. The record proves it.</PrDisplay>
+            <PrLead>A warm introduction is reputational collateral with nothing behind it. Put your involvement on the record instead.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
+            </div>
+          </div>
+        </section>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>Your involvement lives in an inbox.</PrTitle>
+          <PrProse>You're running several founder raises out of one inbox. There's no way to sit between founder and investor with any real visibility into the deal, and no way to show, afterward, exactly what you disclosed and to whom.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for advisors</PrEyebrow>
+          <PrTitle>Read-only access, scoped to your rooms.</PrTitle>
+          <PrProse>
+            Advisors join a deal room with the read-only role — access scoped to the specific rooms you're added to. You see what's been confirmed, which conditions remain outstanding, and what's been signed, at every gate, without the ability to change anything.{" "}
+            <Link to="/tools/burn-rate" style={{ color: "var(--v2-accent)" }}>Check burn rate before advising on runway →</Link>
+            {" "}Your involvement is recorded the same way every other party's is.
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>Reputational collateral, written down.</PrTitle>
+          <PrProse>A warm introduction is reputational collateral with nothing written down. A record that shows you were in the room, at which gates, changes what your involvement is worth the next time you make one.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>We don't broker the deal.</PrTitle>
+          <PrProse>Advisors mediate and are recorded. We do not pay referral fees, take a percentage of the round, or act as a broker of record.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="Deploying seat" cadence="Billed per seat, annually, per advisor." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Mediate your next raise on a record.</PrTitle>
+            <div>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
+            </div>
+            <PrCrossLinks />
+          </div>
+        </PrSection>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

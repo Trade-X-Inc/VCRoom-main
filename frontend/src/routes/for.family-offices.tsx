@@ -1,96 +1,91 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { PageHero } from "@/components/site/PageHero";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/FamilyOffices.tsx. Uses a 3-column
-// feature grid (vs. the 2-column grid SimpleAudiencePage assumes) — not
-// built from that shared component to keep the exact column count.
+// SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
+// Replaces the prior custom PageHero-based build entirely.
 //
-// Corrected 8 Sep 2026: the source named a "Firm plan" pricing tier with
-// "unlimited rooms" — no such tier exists (see CLAUDE.md §20.2, which
-// tracks the real, still-unresolved pricing model as a blocking item).
-// Reworded to describe the real, tier-independent capability instead of
-// naming a plan that isn't real. Also removed "Custom data residency" —
-// no per-room jurisdiction-selection feature exists anywhere in the
-// deal-room code (verified against a live query of the real production
-// Supabase project: single region, ap-southeast-1, no per-room override)
-// — replaced with a real capability instead.
+// Content correction from the original task brief, per direct
+// instruction: "sealed export" does not exist anywhere in the product
+// (no export capability of any kind — CLAUDE.md §12/§20.15, and this
+// exact page's own prior version already removed this same claim once,
+// 8 Sep 2026). Removed entirely rather than reworded around.
 //
-// Corrected 13 Sep 2026 (legal/compliance audit, item 5): the
-// testimonial ("Principal, Multi-family Office — 2026") was a fabricated
-// quote attributed to a person who does not exist — same pattern as
-// for.investors.tsx/for.founders.tsx's removed testimonials, found
-// during the same sweep. Removed outright, no replacement invented.
+// EARLY ACCESS: no family-office-specific mechanic beyond the generic
+// investor deal-room flow is built yet.
 
 export const Route = createFileRoute("/for/family-offices")({
   head: () => ({
     meta: [
-      { title: "For family offices — serious diligence, no procurement — Lengdon" },
-      { name: "description", content: "A private, disciplined deal workspace with a full closing record. Seat pricing, no enterprise contract required." },
+      { title: "For family offices — real diligence, no procurement — Lengdon" },
+      { name: "description", content: "A full room, staged diligence, a conditions register. Seat pricing a principal can approve directly — no enterprise contract." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/family-offices" }],
   }),
   component: FamilyOffices,
 });
 
-const FEATURES = [
-  { title: "Institutional-grade infrastructure", desc: "Family offices operate at institutional scale with the confidentiality requirements of private individuals. Lengdon separates these concerns by design." },
-  { title: "Permanent record retention", desc: <>Transactions close — records don't expire. Every deal you run through Lengdon contributes to a permanent, auditable history of your capital deployment. <Link to="/tools/valuation-calculator" className="underline hover:opacity-70 transition-opacity">Run a valuation check before term sheet →</Link></> },
-  { title: "Compliance-ready audit trail", desc: "Every action is timestamped, encrypted, and appended to a tamper-evident log. The audit trail is ready for compliance review, fund reporting, or legal proceedings without any additional work." },
-  { title: "Per-portfolio room architecture", desc: "Each transaction gets its own isolated room. Access is scoped to the individuals named in that room — no cross-contamination between portfolio companies or investment vehicles." },
-  { title: "One room per transaction", desc: "Run as many concurrent deals as your deployment schedule requires. Each gets its own room — nothing is shared or aggregated across transactions." },
-  { title: "Individually scoped access", desc: "Every person you name into a room signs their own NDA and is individually logged. Nothing is visible to a party until they're explicitly added." },
-];
-
 function FamilyOffices() {
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
       <SiteHeader />
       <main id="main-content">
-        <PageHero
-          eyebrow="Who it's for · Family Offices"
-          title="PRIVATE CAPITAL"
-          titleOutline="AT SCALE."
-          subtitle="You deploy capital with the confidentiality requirements of private individuals and the compliance standards of institutional investors. Lengdon was built for exactly this."
-          cta={{ label: "Book a demo", to: "/sign-up" }}
-        />
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Family Office infrastructure</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-16">
-            BUILT FOR<br />DISCRETION.
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[#e6e9ef]">
-            {FEATURES.map((f, i) => (
-              <div
-                key={i}
-                className={`p-8 ${i % 3 < 2 ? "lg:border-r border-[#e6e9ef]" : ""} ${i % 2 === 0 ? "md:border-r md:lg:border-r-0" : ""} ${i < 3 ? "border-b border-[#e6e9ef]" : ""}`}
-              >
-                <div className="w-2 h-2 bg-[#0a2540] mb-5" />
-                <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.3px] mb-3">{f.title}</h3>
-                <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">{f.desc}</p>
-              </div>
-            ))}
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <PrEyebrow>Who it's for / Family offices</PrEyebrow>
+              <PrPill>Early access</PrPill>
+            </div>
+            <PrDisplay>Diligence discipline, without the procurement cycle.</PrDisplay>
+            <PrLead>You run diligence the way an institution does. Your tooling still runs on email and PDF.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
+            </div>
           </div>
         </section>
 
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>Deep diligence, no dedicated tooling.</PrTitle>
+          <PrProse>Family offices bring a deep diligence culture with no dedicated tooling to match it. The enterprise data room vendors require a procurement process; the boutique platforms are too light for what you actually check. Everything ends up back in email and attached PDFs.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for family offices</PrEyebrow>
+          <PrTitle>A full room, batched by stage.</PrTitle>
+          <PrProse>
+            A full deal room, diligence requests batched by stage rather than drip-fed one at a time, a conditions register tracking what's outstanding, and a permanent, inspectable record at close. Nothing is shown to the other side until an NDA is signed.{" "}
+            <Link to="/tools/valuation-calculator" style={{ color: "var(--v2-accent)" }}>Run a valuation check before term sheet →</Link>
+            {" "}Seat pricing is something a principal approves directly — no procurement process required.
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>Defensible to the next generation.</PrTitle>
+          <PrProse>A family office that ran diligence on a structured record can defend every decision to the next generation of principals. A closed folder of forwarded emails cannot.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>We're the room, not the advisor.</PrTitle>
+          <PrProse>We do not provide investment advice, manage assets, or act as custodian of anything. We are the room the deal closes inside.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrCommercialLine tier="Deploying seat" cadence="Billed per seat, annually." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Run your next diligence process on a record.</PrTitle>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">Let's talk.</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">We work with family offices and multi-family offices directly. No sales process — just a conversation.</p>
+              <PrAction to="/sign-up" search={{ role: "investor" }}>Request early access</PrAction>
             </div>
-            <div className="flex gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">Join the waitlist</Link>
-              <Link to="/company/contact" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">Book a call →</Link>
-            </div>
+            <PrCrossLinks />
           </div>
-        </section>
+        </PrSection>
       </main>
       <SiteFooter />
     </div>
