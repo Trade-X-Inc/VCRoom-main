@@ -120,6 +120,10 @@ function CogsCalculator() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">COGS: direct costs — materials, manufacturing, hosting costs directly tied to revenue, direct labour. Gross profit: revenue minus COGS. Gross margin: gross profit as a percentage of revenue. Operating expenses (OpEx): indirect costs not included in COGS — sales, marketing, G&A, R&D.</p>
             </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Your gross margin percentage determines how investors benchmark you against sector peers. In a Lengdon deal room, your P&L summary is part of the diligence checklist — COGS and gross margin appear as confirmed line items, not a slide deck approximation.</p>
+            </div>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
               <Link to="/tools/valuation-calculator" className="underline hover:opacity-70 transition-opacity">Use your gross margin in the valuation calculator →</Link>
             </p>

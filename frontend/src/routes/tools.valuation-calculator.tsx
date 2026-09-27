@@ -134,6 +134,10 @@ function ValuationCalculator() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Pre-money valuation: company value before new capital is added. Post-money valuation: pre-money plus the new investment amount. Berkus method: assigns value to five risk factors (idea, prototype, team, board, product rollout). Scorecard method: benchmarks against comparable funded companies and adjusts for relative strength. Revenue multiple: applies a sector-standard multiple to current or projected revenue.</p>
             </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">The agreed pre-money valuation is recorded in the Lengdon deal record at the Terms stage. Using a calculation method you can explain — rather than a number you picked — gives investors a basis to engage rather than a position to challenge.</p>
+            </div>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
               <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Model a SAFE at this valuation →</Link>
             </p>

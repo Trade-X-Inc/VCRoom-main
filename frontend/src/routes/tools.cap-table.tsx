@@ -129,6 +129,10 @@ function CapTable() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Common shares: typically held by founders and employees. Preferred shares: held by investors, with liquidation preference and other protective provisions. Fully diluted: ownership calculated assuming all options, warrants, and convertible instruments have converted. Option pool: shares reserved for future employee grants, usually created before a priced round (pre-money), which dilutes founders not new investors.</p>
             </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">In a Lengdon deal room, the post-money cap table is attached at close and sealed into the deal record. Future investors and legal counsel can access the closing cap table as part of the permanent record — no reconstruction required.</p>
+            </div>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
               <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Calculate SAFE conversion before adding it here →</Link>
             </p>

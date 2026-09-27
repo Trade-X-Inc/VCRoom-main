@@ -151,6 +151,10 @@ function SafeNote() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Valuation cap: the maximum company valuation at which the SAFE converts, regardless of the actual round valuation. Discount rate: the percentage reduction on the per-share price the SAFE holder receives versus new investors. Post-money SAFE: the cap is calculated on the post-money valuation including the SAFE itself.</p>
             </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">When you issue a SAFE through Lengdon, the calculated conversion terms attach to the deal record at the Brief stage. At close, the conversion is sealed into the record and referenced in the closing conditions — so every party has the same numbers at every stage, with no version confusion.</p>
+            </div>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
               <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">See how your SAFE converts on the cap table →</Link>
             </p>

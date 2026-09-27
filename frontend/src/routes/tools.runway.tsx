@@ -67,6 +67,10 @@ function RunwayCalculator() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Runway: months of cash at current burn. Cash-out date: the calendar date cash reaches zero. Fundraising buffer: the months required to close a round (seed: 3–6 months; Series A: 4–8 months). Hard deadline: cash-out date minus fundraising buffer — the latest date to begin raising.</p>
             </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Runway is the first number an investor uses to assess urgency. In a Lengdon deal room, the runway figure you calculate here feeds into the deal brief — so your stated timeline to close is grounded in a real number, visible to all parties.</p>
+            </div>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
               <Link to="/tools/burn-rate" className="underline hover:opacity-70 transition-opacity">Recalculate burn rate to update this projection →</Link>
             </p>

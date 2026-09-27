@@ -66,6 +66,10 @@ function BurnRate() {
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Gross burn: total cash out per month before revenue offsets. Net burn: cash out minus cash in — the true depletion rate. Runway: months of cash remaining at current net burn. Zero-cash date: the calendar date at which the company runs out of money at current burn.</p>
             </div>
+            <div>
+              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Investors will ask for your net burn figure in the first meeting. Having it pre-calculated and attached to your deal room means you are not estimating in the room — you are referencing a number that is already in the data room and consistent with your financial exhibits.</p>
+            </div>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
               <Link to="/tools/runway" className="underline hover:opacity-70 transition-opacity">Calculate your runway from this burn rate →</Link>
             </p>
