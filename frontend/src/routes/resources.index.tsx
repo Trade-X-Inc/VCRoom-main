@@ -59,6 +59,13 @@ const HUBS = [
     desc: "How Lengdon applies across technology, life sciences, PE buyouts, SPVs, family offices, and emerging markets.",
     items: ["Technology & SaaS", "Life sciences", "Private equity", "SPV & syndicates"],
   },
+  {
+    label: "Templates",
+    path: "/templates",
+    tag: "Free",
+    desc: "Ten annotated documents for founders and investors — convertible notes, SAFE, due diligence, data rooms, NDAs, investment memos, and LP updates.",
+    items: ["Convertible note & SAFE", "Due diligence checklists", "Investment memo & LP update", "Data room index"],
+  },
 ];
 
 function ResourcesIndex() {
@@ -88,9 +95,9 @@ function ResourcesIndex() {
               <Link
                 key={hub.path}
                 to={hub.path as any}
-                className={`group flex flex-col p-8 hover:bg-[#f8f9fb] transition-colors ${
-                  [0,1,3,4].includes(i) ? "border-r border-[#e6e9ef]" : ""
-                } ${i < 3 ? "border-b border-[#e6e9ef]" : ""}`}
+                className={`group flex flex-col p-8 hover:bg-[#f8f9fb] transition-colors border-b border-[#e6e9ef] ${
+                  (i + 1) % 3 !== 0 ? "lg:border-r" : ""
+                } ${i < HUBS.length - (HUBS.length % 3 || 3) ? "" : "last:border-b-0"}`}
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-2 h-2 bg-[#0a2540]/10 group-hover:bg-[#d4af37] transition-colors" />
