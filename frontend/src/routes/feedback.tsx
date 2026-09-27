@@ -10,6 +10,13 @@ import { PageHero } from "@/components/site/PageHero";
 // demo forms, per instruction.
 
 export const Route = createFileRoute("/feedback")({
+  head: () => ({
+    meta: [
+      { title: "Feedback — tell us directly — Lengdon" },
+      { name: "description", content: "Share what is working, what is not, and what you need. Direct line to the team building the platform." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/feedback" }],
+  }),
   component: Feedback,
 });
 

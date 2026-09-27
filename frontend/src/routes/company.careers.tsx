@@ -13,6 +13,13 @@ import { PageHero } from "@/components/site/PageHero";
 // rationale as the About page's CTA button.
 
 export const Route = createFileRoute("/company/careers")({
+  head: () => ({
+    meta: [
+      { title: "Careers — build the infrastructure — Lengdon" },
+      { name: "description", content: "How we work and the roles we are building for. Private capital infrastructure, DIFC, Dubai." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/company/careers" }],
+  }),
   component: Careers,
 });
 

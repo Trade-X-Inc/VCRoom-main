@@ -17,6 +17,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // describe the real append-only in-room record.
 
 export const Route = createFileRoute("/legal/acceptable-use")({
+  head: () => ({
+    meta: [
+      { title: "Acceptable use policy — Lengdon" },
+      { name: "description", content: "What the Lengdon platform may and may not be used for. Prohibited conduct and enforcement." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/acceptable-use" }],
+  }),
   component: AcceptableUse,
 });
 

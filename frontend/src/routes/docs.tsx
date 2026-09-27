@@ -10,6 +10,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // source (cursor-pointer text, not anchors) — reproduced as-is.
 
 export const Route = createFileRoute("/docs")({
+  head: () => ({
+    meta: [
+      { title: "Documentation — how the record is built, in the open — Lengdon" },
+      { name: "description", content: "Open documentation for the disclosure standard, reference numbering, record integrity and security posture." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/docs" }],
+  }),
   component: Docs,
 });
 

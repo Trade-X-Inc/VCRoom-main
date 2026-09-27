@@ -26,6 +26,13 @@ import { PageHero } from "@/components/site/PageHero";
 // pass.
 
 export const Route = createFileRoute("/registry")({
+  head: () => ({
+    meta: [
+      { title: "The close reference — deal records and transaction registry — Lengdon" },
+      { name: "description", content: "A referenced, searchable record of closed deals and disclosed transactions on the Lengdon platform." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/registry" }],
+  }),
   component: Registry,
 });
 

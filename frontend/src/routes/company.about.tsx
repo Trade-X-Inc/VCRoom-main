@@ -23,6 +23,13 @@ import { PageHero } from "@/components/site/PageHero";
 // intact, only the false export mechanism is removed).
 
 export const Route = createFileRoute("/company/about")({
+  head: () => ({
+    meta: [
+      { title: "About — closing infrastructure for private capital — Lengdon" },
+      { name: "description", content: "What we build, the principle that governs it, where we are. DIFC FinTech Hive, Dubai. We record who asserted what. Parties judge." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/company/about" }],
+  }),
   component: About,
 });
 

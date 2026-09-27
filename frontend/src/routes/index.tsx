@@ -44,6 +44,13 @@ import { syncContactToHubSpot } from "@/lib/hubspot";
 // found with an existing `pulse-glow` keyframe.
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Closing infrastructure for private capital — Lengdon" },
+      { name: "description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/" }],
+  }),
   component: HomePage,
 });
 
@@ -1113,7 +1120,7 @@ function CTASection() {
                 <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f5f0e8] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-all duration-200 active:scale-95">
                   Join the waitlist
                 </Link>
-                <Link to="/sign-in" search={{ redirect: "/app" }} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+                <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                   Sign in →
                 </Link>
               </div>

@@ -18,6 +18,13 @@ import { PageHero } from "@/components/site/PageHero";
 // §20.15). The real append-only record mechanism is kept.
 
 export const Route = createFileRoute("/for/venture-capital")({
+  head: () => ({
+    meta: [
+      { title: "For venture capital — a disciplined room, a defensible record — Lengdon" },
+      { name: "description", content: "For funds doing four to eight deals a year. Seat pricing, lifecycle deal view, single-notice diligence, full closing record." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/venture-capital" }],
+  }),
   component: VentureCapital,
 });
 

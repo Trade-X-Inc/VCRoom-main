@@ -25,6 +25,13 @@ import { PageHero } from "@/components/site/PageHero";
 // during the same sweep. Removed outright, no replacement invented.
 
 export const Route = createFileRoute("/for/family-offices")({
+  head: () => ({
+    meta: [
+      { title: "For family offices — serious diligence, no procurement — Lengdon" },
+      { name: "description", content: "A private, disciplined deal workspace with a full closing record. Seat pricing, no enterprise contract required." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/family-offices" }],
+  }),
   component: FamilyOffices,
 });
 

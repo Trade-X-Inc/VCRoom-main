@@ -8,6 +8,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // toggle (capped/uncapped) + conditional-field shape.
 
 export const Route = createFileRoute("/tools/safe-note")({
+  head: () => ({
+    meta: [
+      { title: "SAFE note calculator — convert your SAFE at any valuation — Lengdon" },
+      { name: "description", content: "Model how a SAFE converts at different valuations and round sizes. See dilution, ownership percentage and post-money cap table." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/tools/safe-note" }],
+  }),
   component: SafeNote,
 });
 

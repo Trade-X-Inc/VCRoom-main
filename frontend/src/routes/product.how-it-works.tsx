@@ -7,6 +7,13 @@ import { PageHero } from "@/components/site/PageHero";
 // LENGDONPUBLIC-NEW's src/pages/product/HowItWorks.tsx.
 
 export const Route = createFileRoute("/product/how-it-works")({
+  head: () => ({
+    meta: [
+      { title: "How it works — the seven-state closing lifecycle — Lengdon" },
+      { name: "description", content: "Brief, present, NDA, diligence, terms, conditions, close. One recorded spine for every private-capital raise. See the full lifecycle." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/how-it-works" }],
+  }),
   component: HowItWorks,
 });
 
@@ -148,7 +155,7 @@ function HowItWorks() {
               <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
                 Join the waitlist
               </Link>
-              <Link to="/sign-in" search={{ redirect: "/app" }} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                 Sign in →
               </Link>
             </div>

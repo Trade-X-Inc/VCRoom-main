@@ -35,6 +35,13 @@ import { syncContactToHubSpot } from "@/lib/hubspot";
 // session.
 
 export const Route = createFileRoute("/company/contact")({
+  head: () => ({
+    meta: [
+      { title: "Contact — reach the people who built it — Lengdon" },
+      { name: "description", content: "Access requests, security disclosures and general enquiries. DIFC FinTech Hive, Dubai." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/company/contact" }],
+  }),
   component: Contact,
 });
 

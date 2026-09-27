@@ -47,6 +47,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // surface in the other direction.
 
 export const Route = createFileRoute("/legal/sub-processors")({
+  head: () => ({
+    meta: [
+      { title: "Sub-processors — Lengdon" },
+      { name: "description", content: "A maintained list of third-party sub-processors used by Lengdon, their purpose and data region." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/sub-processors" }],
+  }),
   component: SubProcessors,
 });
 

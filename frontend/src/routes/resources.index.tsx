@@ -6,6 +6,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // LENGDONPUBLIC-NEW's src/pages/resources/index.tsx.
 
 export const Route = createFileRoute("/resources/")({
+  head: () => ({
+    meta: [
+      { title: "Resources — guides, tools and reference for private capital — Lengdon" },
+      { name: "description", content: "Free tools, blog posts, templates and reference material for founders raising and investors deploying capital." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/resources" }],
+  }),
   component: ResourcesIndex,
 });
 
@@ -127,7 +134,7 @@ function ResourcesIndex() {
               <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
                 Join the waitlist
               </Link>
-              <Link to="/sign-in" search={{ redirect: "/app" } as any} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
+              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
                 Sign in →
               </Link>
             </div>

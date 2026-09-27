@@ -34,6 +34,13 @@ import { PageHero } from "@/components/site/PageHero";
 // standalone Cookie Policy instead of standing alone.
 
 export const Route = createFileRoute("/legal/privacy")({
+  head: () => ({
+    meta: [
+      { title: "Privacy policy — Lengdon" },
+      { name: "description", content: "How Lengdon collects, processes and protects personal data. DIFC data protection law." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/legal/privacy" }],
+  }),
   component: Privacy,
 });
 

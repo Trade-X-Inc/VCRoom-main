@@ -25,6 +25,13 @@ import { PageHero } from "@/components/site/PageHero";
 // same sweep. Removed outright, no replacement invented.
 
 export const Route = createFileRoute("/for/private-equity")({
+  head: () => ({
+    meta: [
+      { title: "For private equity — enterprise diligence, published price — Lengdon" },
+      { name: "description", content: "Multi-party rooms, conditions register, counsel stage, sealed export. Institutional pricing on the page, not on request." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/private-equity" }],
+  }),
   component: PrivateEquity,
 });
 

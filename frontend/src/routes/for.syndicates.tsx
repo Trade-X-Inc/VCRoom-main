@@ -9,6 +9,13 @@ import { SimpleAudiencePage } from "@/components/site/SimpleAudiencePage";
 // in-room record.
 
 export const Route = createFileRoute("/for/syndicates")({
+  head: () => ({
+    meta: [
+      { title: "For syndicate leads — lead, disclose, allocate, close — Lengdon" },
+      { name: "description", content: "Publish a lead package with committed amount, track soft-circles and followers, close on one defensible record." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/for/syndicates" }],
+  }),
   component: Syndicates,
 });
 
