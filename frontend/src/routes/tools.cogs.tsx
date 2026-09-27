@@ -19,6 +19,19 @@ export const Route = createFileRoute("/tools/cogs")({
   component: CogsCalculator,
 });
 
+// SEO-004: reuses this route's own real title/description above.
+const COGS_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "COGS Calculator",
+  "url": "https://lengdon.com/tools/cogs",
+  "description": "Calculate cost of goods sold and gross margin. Model how pricing, volume and direct costs affect your unit economics.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 function fmt(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
@@ -40,6 +53,7 @@ function CogsCalculator() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: COGS_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[#0a2540] relative overflow-hidden">

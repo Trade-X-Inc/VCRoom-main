@@ -8,6 +8,17 @@ import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 // "append-only"/"tamper-evident".
 
 export const Route = createFileRoute("/product/compare/datasite")({
+  // SEO-004: this file had no head() at all before this pass — found while
+  // building the sitemap (the user's own approved page set includes this
+  // route). Title/description drawn from this file's own ROWS content
+  // below, not invented.
+  head: () => ({
+    meta: [
+      { title: "Lengdon vs Datasite — closing infrastructure vs a document repository — Lengdon" },
+      { name: "description", content: "Datasite is a document repository with no enforced closing sequence. See how Lengdon's six-gate process and per-person NDAs compare." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/datasite" }],
+  }),
   component: CompareDatasite,
 });
 

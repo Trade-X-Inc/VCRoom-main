@@ -21,6 +21,15 @@ import { PageHero } from "@/components/site/PageHero";
 // "append-only".
 
 export const Route = createFileRoute("/product/compare/firmex")({
+  // SEO-004: this file had no head() at all before this pass — see the
+  // matching note on product.compare.datasite.tsx.
+  head: () => ({
+    meta: [
+      { title: "Lengdon vs Firmex — closing infrastructure vs a virtual data room — Lengdon" },
+      { name: "description", content: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced six-gate closing sequence." },
+    ],
+    links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/firmex" }],
+  }),
   component: CompareFirmex,
 });
 

@@ -130,7 +130,22 @@ const JSON_LD = JSON.stringify({
       // qualifier. A bare legalName in machine-readable structured data asserts
       // a completed incorporation without the qualifier that makes it true.
       "url": "https://lengdon.com",
-      "logo": "https://lengdon.com/apple-touch-icon.png",
+      // SEO-004: updated to the real webp logo asset (was the apple-touch-icon
+      // PNG, which is a favicon, not a logo) and given a company-level
+      // description distinct from the SoftwareApplication entry above, which
+      // already covers the product pitch. No incorporation-status claim here
+      // either, for the same reason legalName was removed.
+      "logo": "https://lengdon.com/lengdon-logo-full.webp",
+      "description": "Lengdon builds closing infrastructure for private capital transactions, based in the DIFC FinTech Hive in Dubai.",
+      "foundingDate": "2024",
+      // The one real, already-established external identifier for this
+      // entity anywhere in the codebase — the twitter:site meta tag a few
+      // lines above already asserts @lengdondotcom. No other social profile
+      // is referenced anywhere in the app (checked SiteFooter.tsx and the
+      // rest of src/ for linkedin/twitter/x.com/instagram/facebook links —
+      // zero hits), so this stays a one-item array rather than an invented
+      // list.
+      "sameAs": ["https://x.com/lengdondotcom"],
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "DIFC FinTech Hive",
@@ -201,6 +216,9 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
       { rel: "shortcut icon", href: "/favicon.ico" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      // SEO-004: dynamic worker route, not the old static file — see
+      // patch-wrangler.mjs's sitemap interception block.
+      { rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
     ],
   }),
   shellComponent: RootShell,

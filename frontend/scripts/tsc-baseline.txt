@@ -47,5 +47,4 @@ src/routes/app.users.tsx: error TS2352: Conversion of type '{ id: any; user_id: 
 src/routes/i.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.
 src/routes/p.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.
 src/routes/p.$slug.tsx: error TS2352: Conversion of type 'undefined' to type '{ startup: PublicStartup | null; slug: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-src/routes/resources.blog.$slug.tsx: error TS2352: Conversion of type 'undefined' to type 'BlogPostWithContent | null' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 vite.config.ts: error TS2769: No overload matches this call.
