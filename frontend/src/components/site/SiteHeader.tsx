@@ -3,33 +3,24 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
-// LENGDONPUBLIC-NEW's src/components/Navigation.tsx (the founder's Figma
-// Make export, cloned into lengdon-public-new/ this session). Per the
-// binding rule: copy exact spacing/color/type/structure, no interpretation
-// of design intent, no invented pattern. Values below (colors, font
-// families, sizes, tracking, dropdown structure, link set) are the source
-// file's values, unchanged.
-//
-// Two things NOT from the source, both functional necessities the source
-// has no equivalent for (it is a logged-out marketing site only):
-//   1. The signed-in "Open dashboard" branch — real app auth state.
-//   2. The mobile menu and skip-to-content link — the source's own
-//      responsive behavior (if any) wasn't inspectable at this fidelity
-//      from static JSX alone; kept from the prior implementation rather
-//      than guessed, since inventing a mobile pattern "in the spirit of"
-//      the design is exactly what the binding rule prohibits.
-// Sign-in/sign-up preserved as real functional links, per instruction
-// (login mechanics stay).
+// SEO-009 Phase 1 — migrated to PUBLIC-REGISTER.md v2.0 tokens.
+// Structure/spacing/layout unchanged from the 31 Aug pixel-exact port;
+// only font-family and color values are swapped to already-defined
+// --v2-*/--pub-*/--font-v2-* tokens (no new tokens introduced). This is
+// the universal nav chrome rendered on every public route, including the
+// already-migrated /for/* (SEO-006) and /templates (SEO-008) pages — see
+// the SEO-009 Step-0 finding that those pages still had v1 chrome around
+// v2.0 body content until this pass.
 
-const FONT_SEMIBOLD = "'Geist:SemiBold', sans-serif";
-const FONT_REGULAR = "'Geist:Regular', sans-serif";
-const FONT_INTER = "'Inter:Regular', sans-serif";
+const FONT_UI = "var(--font-v2-ui)";
 
-const INK = "#0a2540";
-const INK_MUTED = "#425466";
-const INK_FAINT = "#64748b";
-const RULE = "#e6e9ef";
+const INK = "var(--v2-ink)";
+const INK_SECONDARY = "var(--v2-ink-secondary)";
+const INK_MUTED = "var(--v2-ink-muted)";
+const ACCENT = "var(--v2-accent)";
+const RULE = "var(--v2-rule)";
+const RULE_LIGHT = "var(--v2-rule-light)";
+const PANEL = "var(--pub-n-00)";
 
 type NavLink = { label: string; to: string; desc: string };
 
@@ -73,16 +64,19 @@ const COMPANY_LINKS: NavLink[] = [
 function Dropdown({ items, onNavigate }: { items: NavLink[]; onNavigate?: () => void }) {
   return (
     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50">
-      <div className="bg-white border border-[#e6e9ef] shadow-[0_16px_40px_rgba(10,37,64,0.10)] min-w-[240px]">
+      <div style={{ background: PANEL, border: `1px solid ${RULE}`, boxShadow: "0 16px 40px rgba(27,58,99,0.10)", minWidth: "240px" }}>
         {items.map((item, i) => (
           <Link
             key={item.to}
             to={item.to as any}
             onClick={onNavigate}
-            className={`flex flex-col gap-0.5 px-5 py-3.5 hover:bg-[#f8f9fb] transition-colors duration-150 ${i < items.length - 1 ? "border-b border-[#f0f2f5]" : ""}`}
+            className="flex flex-col gap-0.5 px-5 py-3.5 transition-colors duration-150"
+            style={{ borderBottom: i < items.length - 1 ? `1px solid ${RULE_LIGHT}` : "none" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--pub-n-04)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
-            <span style={{ fontFamily: FONT_REGULAR, color: INK, fontSize: "14px", letterSpacing: "-0.2px" }}>{item.label}</span>
-            <span style={{ fontFamily: FONT_INTER, color: INK_FAINT, fontSize: "12px" }}>{item.desc}</span>
+            <span style={{ fontFamily: FONT_UI, color: INK, fontSize: "14px", letterSpacing: "-0.2px" }}>{item.label}</span>
+            <span style={{ fontFamily: FONT_UI, color: INK_MUTED, fontSize: "12px" }}>{item.desc}</span>
           </Link>
         ))}
       </div>
@@ -107,7 +101,7 @@ function NavItem({ label, items }: { label: string; items: NavLink[] }) {
     <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button
         className="flex items-center gap-1 whitespace-nowrap transition-colors duration-200"
-        style={{ fontFamily: FONT_REGULAR, fontSize: "13px", letterSpacing: "0.1px", color: open ? INK : INK_MUTED }}
+        style={{ fontFamily: FONT_UI, fontSize: "13px", letterSpacing: "0.1px", color: open ? INK : INK_SECONDARY }}
         onClick={() => setOpen((p) => !p)}
         aria-expanded={open}
       >
@@ -151,8 +145,8 @@ export function SiteHeader() {
 
       <nav
         aria-label="Primary"
-        className={`sticky top-0 z-50 transition-all duration-400 ${scrolled ? "bg-white/98 backdrop-blur-sm" : "bg-white"}`}
-        style={{ borderBottom: `1px solid ${RULE}` }}
+        className={`sticky top-0 z-50 transition-all duration-400 ${scrolled ? "backdrop-blur-sm" : ""}`}
+        style={{ background: scrolled ? "rgba(255,255,255,0.98)" : PANEL, borderBottom: `1px solid ${RULE}` }}
       >
         <div className="max-w-[1280px] mx-auto px-10 h-16 flex items-center justify-between">
           <Link to="/" className="shrink-0" style={{ textDecoration: "none" }}>
@@ -177,7 +171,7 @@ export function SiteHeader() {
               <Link
                 to={dashboardUrl as any}
                 className="hidden sm:inline-flex"
-                style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 28px", textDecoration: "none" }}
+                style={{ fontFamily: FONT_UI, fontWeight: 500, background: ACCENT, color: "#fff", fontSize: "13px", padding: "10px 28px", textDecoration: "none" }}
               >
                 Open dashboard
               </Link>
@@ -186,7 +180,7 @@ export function SiteHeader() {
                 <Link
                   to="/sign-in"
                   className="hidden sm:inline-flex whitespace-nowrap transition-colors duration-200"
-                  style={{ fontFamily: FONT_REGULAR, color: INK_MUTED, fontSize: "13px", textDecoration: "none" }}
+                  style={{ fontFamily: FONT_UI, color: INK_SECONDARY, fontSize: "13px", textDecoration: "none" }}
                 >
                   Sign in
                 </Link>
@@ -194,7 +188,7 @@ export function SiteHeader() {
                   to="/sign-up"
                   search={{ role: "founder" } as any}
                   className="hidden sm:inline-flex whitespace-nowrap transition-colors duration-200"
-                  style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, background: INK, color: "#fff", fontSize: "13px", padding: "10px 16px", textDecoration: "none" }}
+                  style={{ fontFamily: FONT_UI, fontWeight: 500, background: ACCENT, color: "#fff", fontSize: "13px", padding: "10px 16px", textDecoration: "none" }}
                 >
                   Join the waitlist
                 </Link>
@@ -205,7 +199,7 @@ export function SiteHeader() {
               onClick={() => setMobileMenuOpen((v) => !v)}
               className="md:hidden"
               aria-label="Toggle menu"
-              style={{ display: "grid", placeItems: "center", height: "32px", width: "32px", border: `1px solid ${RULE}`, background: "#fff", color: INK_MUTED }}
+              style={{ display: "grid", placeItems: "center", height: "32px", width: "32px", border: `1px solid ${RULE}`, background: PANEL, color: INK_SECONDARY }}
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -213,13 +207,13 @@ export function SiteHeader() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden" style={{ borderTop: `1px solid ${RULE}`, background: "#fff", padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px" }}>
+          <div className="md:hidden" style={{ borderTop: `1px solid ${RULE}`, background: PANEL, padding: "12px 24px 16px", display: "flex", flexDirection: "column", gap: "2px" }}>
             {[PRODUCT_LINKS, FOR_LINKS, RESOURCES_LINKS, COMPANY_LINKS].flat().map((l) => (
               <Link
                 key={l.to}
                 to={l.to as any}
                 onClick={() => setMobileMenuOpen(false)}
-                style={{ fontFamily: FONT_REGULAR, fontSize: "13.5px", color: INK_MUTED, padding: "10px 0", textDecoration: "none", display: "block" }}
+                style={{ fontFamily: FONT_UI, fontSize: "13.5px", color: INK_SECONDARY, padding: "10px 0", textDecoration: "none", display: "block" }}
               >
                 {l.label}
               </Link>
@@ -229,7 +223,7 @@ export function SiteHeader() {
                 <Link
                   to={dashboardUrl as any}
                   onClick={() => setMobileMenuOpen(false)}
-                  style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, textAlign: "center", background: INK, color: "#fff", padding: "10px 0", textDecoration: "none" }}
+                  style={{ fontFamily: FONT_UI, fontWeight: 500, textAlign: "center", background: ACCENT, color: "#fff", padding: "10px 0", textDecoration: "none" }}
                 >
                   Open dashboard
                 </Link>
@@ -238,7 +232,7 @@ export function SiteHeader() {
                   <Link
                     to="/sign-in"
                     onClick={() => setMobileMenuOpen(false)}
-                    style={{ fontFamily: FONT_REGULAR, textAlign: "center", border: `1px solid ${RULE}`, color: INK, padding: "10px 0", textDecoration: "none" }}
+                    style={{ fontFamily: FONT_UI, textAlign: "center", border: `1px solid ${RULE}`, color: INK, padding: "10px 0", textDecoration: "none" }}
                   >
                     Sign in
                   </Link>
@@ -246,7 +240,7 @@ export function SiteHeader() {
                     to="/sign-up"
                     search={{ role: "founder" } as any}
                     onClick={() => setMobileMenuOpen(false)}
-                    style={{ fontFamily: FONT_SEMIBOLD, fontWeight: 600, textAlign: "center", background: INK, color: "#fff", padding: "10px 0", textDecoration: "none" }}
+                    style={{ fontFamily: FONT_UI, fontWeight: 500, textAlign: "center", background: ACCENT, color: "#fff", padding: "10px 0", textDecoration: "none" }}
                   >
                     Join the waitlist
                   </Link>
