@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
 
 // New document, 22 Sep 2026. Content sourced entirely from a live recon
@@ -101,9 +102,17 @@ Related: see our Privacy Policy for how we handle personal data more broadly, an
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const COOKIES_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal", url: "https://lengdon.com/legal" },
+  { name: "Cookie policy" },
+]);
+
 function Cookies() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: COOKIES_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

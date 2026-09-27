@@ -83,16 +83,52 @@ function TemplateCard({ t }: { t: Template }) {
   );
 }
 
+// SEO-010 (AEO pass): FAQPage JSON-LD. No BreadcrumbList — /templates is
+// explicitly top-level (not nested under /resources), per the routing
+// convention this route already documents in its own header comment.
+const TEMPLATES_FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is a convertible note term sheet?",
+      acceptedAnswer: { "@type": "Answer", text: "A convertible note term sheet sets out the terms of a loan that converts into equity at a future priced round, rather than issuing shares immediately. It typically specifies an interest rate, a maturity date, and a valuation cap and/or discount that determines the price the note converts at." },
+    },
+    {
+      "@type": "Question",
+      name: "What is the difference between a SAFE and a convertible note?",
+      acceptedAnswer: { "@type": "Answer", text: "A SAFE (Simple Agreement for Future Equity) is not debt — it carries no interest rate and no maturity date, and converts to equity only at a future priced round. A convertible note is a debt instrument: it accrues interest and has a maturity date by which it must convert or be repaid. SAFEs are generally simpler and faster to negotiate; notes give investors debt-like protections a SAFE doesn't." },
+    },
+    {
+      "@type": "Question",
+      name: "What should be in a Series A data room?",
+      acceptedAnswer: { "@type": "Answer", text: "A Series A data room typically covers company formation documents, the cap table, financial statements and projections, material contracts, IP assignments, employment agreements, and prior financing documents. What counts as complete varies by sector and by what each investor's diligence process specifically requires." },
+    },
+    {
+      "@type": "Question",
+      name: "What does an LP quarterly update include?",
+      acceptedAnswer: { "@type": "Answer", text: "A quarterly LP update typically reports fund performance (NAV, IRR, multiples where meaningful), portfolio company progress and any material events, capital called and distributed in the period, and forward-looking commentary. Direct, specific reporting is generally more useful to LPs than promotional language." },
+    },
+    {
+      "@type": "Question",
+      name: "What do investors look for in due diligence?",
+      acceptedAnswer: { "@type": "Answer", text: "Investor due diligence typically covers legal structure and cap table cleanliness, financial accuracy and unit economics, the strength and completeness of the team, customer and revenue concentration risk, and any pending legal or regulatory exposure. The specific checklist varies by stage and sector." },
+    },
+  ],
+});
+
 function TemplatesIndex() {
   return (
     <div style={{ background: PR_BASE, minHeight: "100vh" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: TEMPLATES_FAQ_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <section style={{ background: PR_BASE }}>
           <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 32px", display: "flex", flexDirection: "column", gap: "20px" }}>
             <PrEyebrow>Resources / Templates</PrEyebrow>
             <PrDisplay maxWidth="20ch">Working documents, not blank forms.</PrDisplay>
-            <PrLead>Every template here is annotated with market context. Built for practitioners — founders preparing a raise, investors running a process.</PrLead>
+            <PrLead>Lengdon publishes ten annotated templates — convertible notes, SAFEs, due diligence checklists, data room indexes, NDAs, investment memos, and LP updates — each with market-standard structure and clause-by-clause context, free to download.</PrLead>
           </div>
           <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "0 24px 56px" }}>
             <div

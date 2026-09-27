@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPage";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/BurnRate.tsx. Calculation logic
@@ -30,6 +31,13 @@ const BURN_RATE_JSON_LD = JSON.stringify({
   "publisher": { "@id": "https://lengdon.com/#organization" },
 });
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const BURN_RATE_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Tools", url: "https://lengdon.com/tools" },
+  { name: "Burn rate calculator" },
+]);
+
 function BurnRate() {
   const [cashBalance, setCashBalance] = useState(2_000_000);
   const [monthlyRevenue, setMonthlyRevenue] = useState(80_000);
@@ -44,6 +52,7 @@ function BurnRate() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: BURN_RATE_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: BURN_RATE_BREADCRUMB_JSON_LD }} />
       <ToolCalculatorPage
       toolLabel="Burn Rate"
       titleLine1="BURN RATE"

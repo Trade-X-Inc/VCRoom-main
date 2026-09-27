@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { syncContactToHubSpot } from "@/lib/hubspot";
 
 // Wiring pass, 31 Aug 2026 — pixel-exact port of LENGDONPUBLIC-NEW's
@@ -54,6 +55,13 @@ const REASONS = [
   "Other",
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 2-level — no
+// /company hub page exists.
+const CONTACT_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Contact" },
+]);
+
 function Contact() {
   const [form, setForm] = useState({ name: "", email: "", company: "", reason: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -90,6 +98,7 @@ function Contact() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: CONTACT_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

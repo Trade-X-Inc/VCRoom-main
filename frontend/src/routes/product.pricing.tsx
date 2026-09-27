@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Content pass, 31 Aug 2026 — replaces the prior three-tier scheme
 // (£499/room, £2,400/month, custom) with the real four-tier fee-by-
@@ -226,9 +227,16 @@ const FAQS = [
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const PRICING_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Pricing" },
+]);
+
 function Pricing() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: PRICING_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

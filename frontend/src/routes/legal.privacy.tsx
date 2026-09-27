@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
 
 // Content pass, 31 Aug 2026. Entity mismatch fixed: the source's
@@ -142,9 +143,17 @@ This policy was last updated: 22 September 2026.`,
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const PRIVACY_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal", url: "https://lengdon.com/legal" },
+  { name: "Privacy policy" },
+]);
+
 function Privacy() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: PRIVACY_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

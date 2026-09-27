@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Content pass, 31 Aug 2026 — rewrite of the pixel-exact port of
 // LENGDONPUBLIC-NEW's About.tsx. Per direct instruction: removed the
@@ -46,9 +47,17 @@ const ENTITY = [
   { label: "Jurisdiction", value: "DIFC FinTech Hive" },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 2-level — no
+// /company hub page exists.
+const ABOUT_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "About" },
+]);
+
 function About() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ABOUT_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

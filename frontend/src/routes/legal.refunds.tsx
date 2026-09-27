@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
 
 // New document, 22 Sep 2026. Written against a real recon finding, not
@@ -75,9 +76,17 @@ This policy was last updated: 22 September 2026.`,
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const REFUNDS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal", url: "https://lengdon.com/legal" },
+  { name: "Refund terms" },
+]);
+
 function Refunds() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: REFUNDS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

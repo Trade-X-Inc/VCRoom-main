@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/index.tsx.
@@ -26,9 +27,49 @@ const TOOLS = [
   { slug: "cogs", label: "COGS Calculator", desc: "Cost of goods sold and gross margin analysis for SaaS and product businesses." },
 ];
 
+// SEO-010 (AEO pass): FAQPage + BreadcrumbList JSON-LD.
+const TOOLS_FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How do I calculate startup runway?",
+      acceptedAnswer: { "@type": "Answer", text: "Divide your current cash balance by your net monthly burn rate (monthly expenses minus monthly revenue). The result is how many months of operation remain at the current spending rate if nothing changes — a starting estimate, not a forecast that accounts for revenue growth or new funding." },
+    },
+    {
+      "@type": "Question",
+      name: "What is a cap table?",
+      acceptedAnswer: { "@type": "Answer", text: "A capitalization table (cap table) lists everyone who owns equity in a company — founders, employees, and investors — along with the number and type of shares each holds and the resulting ownership percentage. It's updated at every funding round, option grant, or share transfer to reflect current ownership." },
+    },
+    {
+      "@type": "Question",
+      name: "How do I model a SAFE note?",
+      acceptedAnswer: { "@type": "Answer", text: "Model a SAFE's conversion using its valuation cap and/or discount rate against the priced round's actual terms: the SAFE converts at whichever price is more favorable to the investor — the cap price or the discounted round price — determining how many shares the SAFE amount buys at conversion." },
+    },
+    {
+      "@type": "Question",
+      name: "What is a good burn rate for a seed startup?",
+      acceptedAnswer: { "@type": "Answer", text: "There's no single correct figure — a sustainable burn rate depends on runway, revenue growth, and how much capital has been raised. A common reference point is maintaining 18-24 months of runway at the current burn rate, but the right number for a specific company depends on its stage, sector, and fundraising timeline." },
+    },
+    {
+      "@type": "Question",
+      name: "How do I calculate post-money valuation?",
+      acceptedAnswer: { "@type": "Answer", text: "Post-money valuation equals pre-money valuation plus the amount of new capital raised in the round. If a company is valued at $8M pre-money and raises $2M, the post-money valuation is $10M, and the new investors own 20% of the company (the $2M raised divided by the $10M post-money value)." },
+    },
+  ],
+});
+
+const TOOLS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Tools" },
+]);
+
 function ToolsIndex() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: TOOLS_FAQ_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: TOOLS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[var(--v2-accent)] relative overflow-hidden">

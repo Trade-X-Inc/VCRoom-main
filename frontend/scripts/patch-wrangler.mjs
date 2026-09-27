@@ -299,6 +299,9 @@ const STATIC_SITEMAP_ENTRIES = [
   ["/tools/valuation-calculator", 0.8, "monthly"],
   ["/tools/cap-table", 0.8, "monthly"],
   ["/tools/dilution", 0.8, "monthly"],
+  // /templates was added in SEO-008 and never added here — found missing
+  // during the SEO-010 AEO pass's sitemap check.
+  ["/templates", 0.8, "monthly"],
   ["/resources", 0.7, "monthly"],
   ["/resources/blog", 0.6, "weekly"],
   ["/resources/changelog", 0.5, "weekly"],

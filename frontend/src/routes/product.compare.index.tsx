@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Content pass, 31 Aug 2026 — applies the same standard CLAUDE.md §12
 // (Group 4) already used once: "sealed export" as a live, user-facing
@@ -99,9 +100,16 @@ const PRINCIPLES = [
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const COMPARE_INDEX_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Compare" },
+]);
+
 function Compare() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: COMPARE_INDEX_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

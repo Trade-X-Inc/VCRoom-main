@@ -54,6 +54,23 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+// SEO-010 (AEO pass): SpeakableSpecification on a WebPage entity,
+// separate from WEBSITE_JSON_LD below (a WebSite entity, not a WebPage —
+// speakable belongs on the latter per Google's structured-data
+// guidance). cssSelector targets the hero headline and the value-
+// proposition paragraph directly beneath it (#hero-headline,
+// #hero-value-prop, added to those elements in HeroSection below).
+const SPEAKABLE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://lengdon.com/",
+  url: "https://lengdon.com/",
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: ["#hero-headline", "#hero-value-prop"],
+  },
+});
+
 // SEO-004: the one WebSite entity for the site, on the homepage only —
 // every other route already has its own canonical, so this is the single
 // natural home for it. No potentialAction/SearchAction: /resources has no
@@ -232,7 +249,7 @@ function HeroSection() {
               </span>
             </div>
 
-            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
+            <h1 id="hero-headline" style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
               <span className="block text-[var(--v2-accent)] text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
               <span className="block text-[var(--v2-accent)] text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
               <span className="block text-[clamp(64px,8vw,120px)]"
@@ -241,7 +258,7 @@ function HeroSection() {
               </span>
             </h1>
 
-            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
+            <p id="hero-value-prop" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
               Lengdon structures the transaction between the term sheet and the close — giving founders and investors one shared environment to manage diligence, documentation, approvals, and execution.
             </p>
 
@@ -1213,6 +1230,7 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: WEBSITE_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SPEAKABLE_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <HeroSection />

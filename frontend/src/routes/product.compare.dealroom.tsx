@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Content pass, 31 Aug 2026 — "Sealed dual-party export" row removed
 // (not a live capability, same standard as CLAUDE.md §12 Group 4).
@@ -38,9 +39,17 @@ const ROWS = [
   { feature: "Document sharing", lengdon: true, them: true, note: "Lengdon's documents are gate-scoped. Dealroom's are unstructured." },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const DEALROOM_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Compare", url: "https://lengdon.com/product/compare" },
+  { name: "Lengdon vs Dealroom" },
+]);
+
 function CompareDealroom() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: DEALROOM_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

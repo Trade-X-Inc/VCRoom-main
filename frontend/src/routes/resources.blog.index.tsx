@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { getPublishedPosts, type BlogPost } from "@/lib/notion-blog";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact LAYOUT port of
 // LENGDONPUBLIC-NEW's src/pages/resources/Blog.tsx, WIRED TO REAL DATA.
@@ -54,6 +55,14 @@ function formatDate(iso: string): string {
   }
 }
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 3-level — /resources
+// (resources.index.tsx) is the real hub page that links to this one.
+const BLOG_INDEX_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Resources", url: "https://lengdon.com/resources" },
+  { name: "Blog" },
+]);
+
 function BlogIndex() {
   const posts = Route.useLoaderData() as BlogPost[];
   const [activeCategory, setActiveCategory] = useState("All");
@@ -73,6 +82,7 @@ function BlogIndex() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: BLOG_INDEX_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <PageHero

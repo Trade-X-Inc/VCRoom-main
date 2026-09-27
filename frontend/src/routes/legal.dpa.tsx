@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/Dpa.tsx. This page inlines its own
@@ -86,9 +87,17 @@ const SECTIONS = [
   },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD.
+const DPA_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Legal", url: "https://lengdon.com/legal" },
+  { name: "Data processing agreement" },
+]);
+
 function Dpa() {
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: DPA_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[var(--v2-accent)] relative overflow-hidden">

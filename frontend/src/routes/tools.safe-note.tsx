@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/SafeNote.tsx. Standalone: unique
@@ -39,6 +40,14 @@ function fmt(n: number) {
 }
 function pct(n: number) { return `${(n * 100).toFixed(2)}%`; }
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 3-level — /tools
+// (tools.index.tsx) is the real hub page.
+const SAFE_NOTE_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Tools", url: "https://lengdon.com/tools" },
+  { name: "SAFE note calculator" },
+]);
+
 function SafeNote() {
   const [safeAmount, setSafeAmount] = useState(500_000);
   const [capType, setCapType] = useState<"capped" | "uncapped">("capped");
@@ -57,6 +66,7 @@ function SafeNote() {
   return (
     <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SAFE_NOTE_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SAFE_NOTE_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <div className="bg-[var(--v2-accent)] relative overflow-hidden">

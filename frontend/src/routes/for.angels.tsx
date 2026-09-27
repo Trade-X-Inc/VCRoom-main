@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
@@ -24,9 +25,17 @@ export const Route = createFileRoute("/for/angels")({
   component: Angels,
 });
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 2-level (Home > Page) —
+// no /for hub page exists to link an intermediate segment to.
+const ANGELS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Angels" },
+]);
+
 function Angels() {
   return (
     <div style={{ background: PR_BASE, minHeight: "100vh" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ANGELS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <section style={{ background: PR_BASE }}>

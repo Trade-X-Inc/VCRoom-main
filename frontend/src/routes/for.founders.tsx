@@ -5,6 +5,7 @@ import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
   PrCommercialLine, PrQuietLink, PR_BASE, PR_PANEL, PR_RECESSED,
 } from "@/components/site/PublicRegisterPrimitives";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // SEO-009 Phase 3 — bespoke rebuild on PUBLIC-REGISTER.md v2.0 tokens,
 // same pattern as the 8 SEO-006 /for/* pages (PublicRegisterPrimitives,
@@ -32,16 +33,59 @@ export const Route = createFileRoute("/for/founders")({
   component: Founders,
 });
 
+// SEO-010 (AEO pass): FAQPage + BreadcrumbList JSON-LD. Answers are
+// direct and factual — written to the standard of "would this be the
+// answer you'd want Lengdon cited for," per the content rules for this
+// pass. No verification/scoring/matching/introduction-brokering claims.
+const FOUNDERS_FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How do I share my pitch deck safely?",
+      acceptedAnswer: { "@type": "Answer", text: "Require the investor to sign an individual, per-person NDA before the deck goes out — not a company-wide agreement, and not after the fact. In a Lengdon room, that signature gates the deck: nothing sensitive unlocks until it exists, so there's a permanent record of who agreed to confidentiality and when, rather than a deck circulating with no agreement attached to it at all." },
+    },
+    {
+      "@type": "Question",
+      name: "What happens after an investor signs an NDA?",
+      acceptedAnswer: { "@type": "Answer", text: "The deal room's next tier of documents unlocks for that specific investor — the pitch deck and early materials become visible, and the relationship enters the diligence and terms stages of the process. The signature is tied to that individual, not their firm, so their access ends if they leave it." },
+    },
+    {
+      "@type": "Question",
+      name: "What is a deal room?",
+      acceptedAnswer: { "@type": "Answer", text: "A deal room is a structured, permissioned space where a founder and an investor exchange the documents, terms, and confirmations a fundraising round requires, with every action recorded. It differs from a shared folder or DocSend link in three ways: it gates sensitive documents behind a signed NDA, it scopes each investor's access to what's actually been agreed with them, and it tracks which stage the relationship has reached — brief, NDA, diligence, terms, conditions, close." },
+    },
+    {
+      "@type": "Question",
+      name: "How do I track which investors have seen my deck?",
+      acceptedAnswer: { "@type": "Answer", text: "Each investor's access happens inside their own room, tied to their individual NDA and identity — so a founder can see exactly which investor has reached which stage, rather than reconstructing it from a DocSend view count or an email thread. Access and stage progression are recorded per person, not per link." },
+    },
+    {
+      "@type": "Question",
+      name: "When should I start a data room?",
+      acceptedAnswer: { "@type": "Answer", text: "Before the first pitch deck goes out, not after an investor asks for one. Setting up the room's tiers upfront — what's visible pre-NDA, what unlocks after signature, what's reserved for active diligence — means every subsequent investor conversation reuses the same structure instead of being decided fresh each time, and the NDA gate is already in place before anything sensitive is shared." },
+    },
+  ],
+});
+
+const FOUNDERS_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "For founders" },
+]);
+
 function Founders() {
   return (
     <div style={{ background: PR_BASE, minHeight: "100vh" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FOUNDERS_FAQ_JSON_LD }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FOUNDERS_BREADCRUMB_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
         <section style={{ background: PR_BASE }}>
           <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
             <PrEyebrow>Who it's for / Founders</PrEyebrow>
             <PrDisplay maxWidth="16ch">Raise with structure.</PrDisplay>
-            <PrLead>You're raising from angels, syndicates, or institutional investors. The closing process should protect you as much as the investor — and leave a record you actually own.</PrLead>
+            <PrLead>Lengdon gives founders a structured deal room for closing a private raise — a fixed sequence from NDA to close, conditions you can enforce, and a permanent record you keep. It protects you as much as the investor.</PrLead>
             <div style={{ marginTop: "8px" }}>
               <PrAction to="/sign-up" search={{ role: "founder" }}>Initialize a room</PrAction>
             </div>

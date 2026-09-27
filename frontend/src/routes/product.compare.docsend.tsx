@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
+import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
 // Content pass, 31 Aug 2026 — "Sealed dual-party export" row and the
 // "seal the record" prose claims removed/reworded (not a live
@@ -31,8 +32,18 @@ const ROWS = [
   { feature: "Investor engagement analytics", lengdon: false, them: true, note: "" },
 ];
 
+// SEO-010 (AEO pass): BreadcrumbList JSON-LD. 3-level — /product/compare
+// (product.compare.index.tsx) is a real hub page.
+const DOCSEND_BREADCRUMB_JSON_LD = breadcrumbJsonLd([
+  { name: "Home", url: "https://lengdon.com/" },
+  { name: "Compare", url: "https://lengdon.com/product/compare" },
+  { name: "Lengdon vs DocSend" },
+]);
+
 function CompareDocsend() {
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: DOCSEND_BREADCRUMB_JSON_LD }} />
     <CompetitorComparePage
       eyebrow="Lengdon vs DocSend"
       title="VIEWED."
@@ -47,5 +58,6 @@ function CompareDocsend() {
       ctaTitle="They said yes. Now close it."
       ctaSubtitle="DocSend got you to term sheet. Lengdon closes it, with a record."
     />
+    </>
   );
 }
