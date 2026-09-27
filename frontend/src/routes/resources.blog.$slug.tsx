@@ -13,17 +13,52 @@ import { getPostBySlug, getPublishedPosts, type BlogPost, type BlogPostWithConte
 // the old Syne/purple v1 tokens, so it reads as one system with the
 // rest of the rebuilt site.
 
+// SEO-005: 8 published posts' Notion "SEO Description" all exceed Google's
+// ~155-char meta description guidance (231/218/188/180/178/171/162/161
+// chars, verified live against the Notion CMS 27 Sep 2026 — every
+// currently-published post was over the limit, none needed leaving out).
+// Keyed by slug, checked at render time only — the Notion database itself
+// is NOT touched, so a future edit to a post's real SEO Description there
+// is invisible to this map until someone removes the corresponding entry.
+// "lengdon-beta-features-deal-room-2026"'s trim also drops "thesis
+// matching" from the real Notion text — that's a described, live-in-beta
+// feature per Foundation §15/§25 (matching/recommendation, prohibited),
+// already found and retired/stubbed multiple times elsewhere in this
+// codebase (CLAUDE.md §19a/§19i). Not fixed in Notion (out of scope here
+// and Notion content stays untouched either way), but this override is
+// new code being written, not existing content being left alone — so it
+// doesn't reproduce that phrase.
+const META_OVERRIDES: Record<string, string> = {
+  "investor-grade-data-room-2026":
+    "An investor-grade data room in 2026 has six non-negotiable elements and a staged disclosure structure. Here's exactly what to include.",
+  "how-investors-make-funding-decisions-stages-2026":
+    "Investors make funding decisions in four distinct stages, each with different information requirements and thresholds.",
+  "why-ai-pitch-ignored-investors-2026":
+    "85% of VCs now use AI tools daily, and 33% of all pitches call themselves AI-powered. Here's what investors are screening for in 2026.",
+  "lengdon-vs-docsend-notion-google-drive-2026":
+    "DocSend, Notion, and Google Drive each solve part of the fundraising process. Lengdon was built for all of it.",
+  "warm-intro-losing-power-fundraising-2026":
+    "Warm introductions to VCs still convert at 40% vs 0.5% for cold email. But the information gap that made them necessary is closing.",
+  "5-minute-investor-check-before-pitching-2026":
+    "After every good VC meeting, investors run a silent 5-minute background check. Most founders fail it without knowing.",
+  "lengdon-beta-features-deal-room-2026":
+    "Lengdon is live in beta. Explore the deal room features helping founders close rounds faster — AI summaries, investor signals, and due diligence.",
+  "remote-investor-trust-deal-room-2026":
+    "Physical meetings no longer determine who gets funded. Discover how deal rooms build investor trust and close rounds faster.",
+};
+
 export const Route = createFileRoute("/resources/blog/$slug")({
   head: ({ loaderData, params }) => {
     const { post } = (loaderData ?? {}) as { post: BlogPostWithContent | null };
     if (!post) return { meta: [{ title: "Post not found — Lengdon Blog" }] };
     const url = `https://lengdon.com/resources/blog/${params.slug}`;
+    const description = META_OVERRIDES[post.slug] ?? (post.seoDescription || post.excerpt);
     return {
       meta: [
         { title: `${post.seoTitle || post.title} — Lengdon Blog` },
-        { name: "description", content: post.seoDescription || post.excerpt },
+        { name: "description", content: description },
         { property: "og:title", content: post.seoTitle || post.title },
-        { property: "og:description", content: post.seoDescription || post.excerpt },
+        { property: "og:description", content: description },
         { property: "og:url", content: url },
         ...(post.coverImage ? [{ property: "og:image", content: post.coverImage }] : []),
       ],
