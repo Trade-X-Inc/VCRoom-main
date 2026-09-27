@@ -1,5 +1,4 @@
 src/components/app/AppShell.tsx: error TS2554: Expected 1 arguments, but got 0.
-src/hooks/useStageTransition.ts: error TS2322: Type '(transitionId: string) => Promise<{ ok: boolean; } | undefined>' is not assignable to type '(transitionId: string) => Promise<void>'.
 src/lib/document-extractor.ts: error TS2353: Object literal may only specify known properties, and 'isEvalSupported' does not exist in type 'DocumentInitParameters'.
 src/lib/document-extractor.ts: error TS2353: Object literal may only specify known properties, and 'isEvalSupported' does not exist in type 'DocumentInitParameters'.
 src/lib/investor-profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => FundDeckExtractInput>) => Promise<FundDeckExtractResult>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => FundDeckExtractInput, Promise<FundDeckExtractResult>, true>'.

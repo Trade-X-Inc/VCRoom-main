@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { callAction } from "@/lib/actions/call";
+import {
+  requestNextStage as requestNextStageAction,
+  approveTransition as approveTransitionAction,
+  rejectTransition as rejectTransitionAction,
+} from "@/lib/actions/deal-room-stage";
 
 export interface TransitionRow {
   id: string;
@@ -53,7 +59,7 @@ interface UseStageTransitionResult {
   approving: boolean;
   requestNextStage: () => Promise<void>;
   approveTransition: (transitionId: string) => Promise<void>;
-  rejectTransition: (transitionId: string) => Promise<void>;
+  rejectTransition: (transitionId: string) => Promise<{ ok: boolean }>;
 }
 
 export function useStageTransition({
@@ -110,48 +116,34 @@ export function useStageTransition({
   }, [dealRoomId]);
 
   const requestNextStage = async () => {
-    const next = nextStage(currentStage);
-    if (!next) return;
-
-    // Block if a pending transition already exists
-    const { data: existing } = await supabase
-      .from("deal_room_stage_transitions")
-      .select("id")
-      .eq("deal_room_id", dealRoomId)
-      .eq("status", "pending")
-      .limit(1)
-      .maybeSingle();
-
-    if (existing) {
-      toast.info("A stage advance request is already pending.");
-      return;
-    }
-
-    // diligence → term_sheet by investor requires no approval (was
-    // due_diligence, the value collapsed into diligence — Build Step 1)
-    const needsApproval = !(currentStage === "diligence" && isInvestor);
-
+    // Ported to the gateway (Closing-stage record-wiring pass, 27 Sep
+    // 2026) — deal_room.stage.requestNext (src/lib/actions/deal-room-
+    // stage.ts). The action now does everything this function used to
+    // do client-side: reads currentStage server-side, checks for an
+    // existing pending transition, decides the diligence+investor
+    // auto-advance exception, and — for the auto-approve branch — also
+    // calls advance_workflow_stage itself (via the shared advanceStage()
+    // helper), rather than this hook calling approveTransition() as a
+    // second step. Every branch appends its own record entry.
     setRequesting(true);
     try {
-      const { data: inserted, error } = await supabase
-        .from("deal_room_stage_transitions")
-        .insert({
-          deal_room_id: dealRoomId,
-          from_stage: currentStage,
-          to_stage: next,
-          requested_by: userId,
-          status: needsApproval ? "pending" : "approved",
-        })
-        .select()
-        .single();
+      const result = await callAction<{
+        transitionId: string;
+        status: "pending" | "approved";
+        fromStage: string;
+        toStage: string;
+        autoApproved: boolean;
+      }>(requestNextStageAction, dealRoomId, { dealRoomId });
 
-      if (error) throw error;
-
-      if (!needsApproval) {
-        // Auto-approve immediately (investor advancing to term_sheet)
-        await approveTransition(inserted.id);
+      if (result.autoApproved) {
+        setPendingTransition(null);
+        queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
+        queryClient.invalidateQueries({ queryKey: ["deal-room-detail"] });
+        toast.success(`Advanced to ${stageLabel(result.toStage)}.`);
       } else {
-        // Notify the other party
+        // Notify the other party — client-side, best-effort, same as
+        // before. Not gated by or recorded through the gateway (see
+        // deal-room-stage.ts's header comment on notification scope).
         const recipient = isInvestor ? founderUserId : investorUserId;
         if (recipient) {
           const { error: notifErr } = await supabase.from("notifications").insert({
@@ -159,68 +151,65 @@ export function useStageTransition({
             kind: "ai_operator",
             title: "Stage advance request",
             body: isInvestor
-              ? `The investor has requested to move to the next stage: ${stageLabel(next)}`
-              : `The founder has requested to move to the next stage: ${stageLabel(next)}`,
+              ? `The investor has requested to move to the next stage: ${stageLabel(result.toStage)}`
+              : `The founder has requested to move to the next stage: ${stageLabel(result.toStage)}`,
             read: false,
-            meta: { deal_room_id: dealRoomId, transition_id: inserted.id },
+            meta: { deal_room_id: dealRoomId, transition_id: result.transitionId },
             action_url: `/app/deal-rooms/${dealRoomId}`,
           });
           if (notifErr) console.error("[stage] request notification failed:", notifErr);
         }
-        setPendingTransition(inserted as TransitionRow);
+        setPendingTransition({
+          id: result.transitionId,
+          deal_room_id: dealRoomId,
+          from_stage: result.fromStage,
+          to_stage: result.toStage,
+          requested_by: userId,
+          approved_by: null,
+          status: "pending",
+          created_at: new Date().toISOString(),
+          resolved_at: null,
+        });
         toast.success("Stage advance requested — waiting for approval.");
       }
     } catch (e: any) {
-      toast.error(e.message ?? "Could not request next stage.");
+      const msg = e?.message as string | undefined;
+      if (msg === "already_pending") {
+        toast.info("A stage advance request is already pending.");
+      } else if (msg === "no_next_stage") {
+        toast.info("This room is already at its final stage.");
+      } else {
+        toast.error(msg ?? "Could not request next stage.");
+      }
     } finally {
       setRequesting(false);
     }
   };
 
   const approveTransition = async (transitionId: string) => {
+    // Ported to the gateway (Closing-stage record-wiring pass, 27 Sep
+    // 2026) — deal_room.stage.approve (src/lib/actions/deal-room-
+    // stage.ts). The action re-fetches the transition server-side,
+    // enforces requested_by !== ctx.uid (self-approval is a hard
+    // FORBIDDEN, always — see the action's own header comment), updates
+    // deal_room_stage_transitions, then calls advance_workflow_stage
+    // itself via the shared advanceStage() helper. Both the approve
+    // write and the stage-advance RPC now happen server-side inside one
+    // action call, not two sequential client calls.
     setApproving(true);
     try {
-      // Fetch the transition to get to_stage and requested_by
-      const { data: transition, error: fetchErr } = await supabase
-        .from("deal_room_stage_transitions")
-        .select("*")
-        .eq("id", transitionId)
-        .single();
-      if (fetchErr) throw fetchErr;
+      const result = await callAction<{
+        fromStage: string;
+        toStage: string;
+        requestedBy: string;
+      }>(approveTransitionAction, dealRoomId, { dealRoomId, transitionId });
 
-      // Update transition to approved
-      const { error: updateErr } = await supabase
-        .from("deal_room_stage_transitions")
-        .update({
-          status: "approved",
-          approved_by: userId,
-          resolved_at: new Date().toISOString(),
-        })
-        .eq("id", transitionId);
-      if (updateErr) throw updateErr;
-
-      // Advance the deal room workflow_stage — via the sanctioned RPC
-      // (Build Step 1), not a direct .update(). The RPC derives the caller
-      // via auth.uid(), checks they're a founder/investor principal, and
-      // validates old->new adjacency against the canonical sequence before
-      // writing; a BEFORE UPDATE trigger enforces the same adjacency rule
-      // as defense-in-depth for any write that bypasses this RPC.
-      const { data: advanceResult, error: rpcErr } = await supabase.rpc("advance_workflow_stage", {
-        p_deal_room_id: dealRoomId,
-        p_to_stage: transition.to_stage,
-      });
-      const advanceRow = Array.isArray(advanceResult) ? advanceResult[0] : advanceResult;
-      if (rpcErr || !advanceRow?.ok) {
-        throw new Error(advanceRow?.error || rpcErr?.message || "Could not advance stage");
-      }
-
-      // Notify the requester (if different from approver)
-      if (transition.requested_by && transition.requested_by !== userId) {
+      if (result.requestedBy && result.requestedBy !== userId) {
         const { error: apprNotifErr } = await supabase.from("notifications").insert({
-          user_id: transition.requested_by,
+          user_id: result.requestedBy,
           kind: "ai_operator",
           title: "Stage advance approved",
-          body: `Your request to advance to ${stageLabel(transition.to_stage)} has been approved.`,
+          body: `Your request to advance to ${stageLabel(result.toStage)} has been approved.`,
           read: false,
           meta: { deal_room_id: dealRoomId, transition_id: transitionId },
           action_url: `/app/deal-rooms/${dealRoomId}`,
@@ -229,40 +218,49 @@ export function useStageTransition({
       }
 
       setPendingTransition(null);
-
-      // Invalidate deal room query so the stage bar re-renders
       queryClient.invalidateQueries({ queryKey: ["deal-room", dealRoomId] });
       queryClient.invalidateQueries({ queryKey: ["deal-room-detail"] });
-
-      toast.success(`Advanced to ${stageLabel(transition.to_stage)}.`);
+      toast.success(`Advanced to ${stageLabel(result.toStage)}.`);
     } catch (e: any) {
-      toast.error(e.message ?? "Could not approve transition.");
+      const msg = e?.message as string | undefined;
+      if (msg === "cannot_approve_own_request") {
+        toast.error("You can't approve your own request.");
+      } else if (msg === "not_pending") {
+        toast.error("This request has already been resolved.");
+      } else {
+        toast.error(msg ?? "Could not approve transition.");
+      }
     } finally {
       setApproving(false);
     }
   };
 
   const rejectTransition = async (transitionId: string) => {
+    // Ported to the gateway (Closing-stage record-wiring pass, 27 Sep
+    // 2026) — deal_room.stage.reject (src/lib/actions/deal-room-
+    // stage.ts). BEHAVIOR CHANGE, deliberate and reviewed: this now
+    // permits the REQUESTER to reject their own pending request
+    // (withdrawal), not just the counterparty (decline) — confirmed live
+    // before this change that the old direct-RLS path silently no-op'd
+    // (0 rows updated, no error) when a requester tried to reject their
+    // own request, and this hook's own toast.success("Request
+    // declined.") fired regardless, a false success. The gateway action
+    // distinguishes the two outcomes (outcome: "withdrawn" | "declined")
+    // and records them as distinct chain actions.
     try {
-      // Fetch to get requester
-      const { data: transition } = await supabase
-        .from("deal_room_stage_transitions")
-        .select("requested_by, to_stage")
-        .eq("id", transitionId)
-        .single();
+      const result = await callAction<{
+        outcome: "withdrawn" | "declined";
+        fromStage: string;
+        toStage: string;
+        requestedBy: string;
+      }>(rejectTransitionAction, dealRoomId, { dealRoomId, transitionId });
 
-      const { error: rejErr } = await supabase
-        .from("deal_room_stage_transitions")
-        .update({ status: "rejected", resolved_at: new Date().toISOString() })
-        .eq("id", transitionId);
-      if (rejErr) { console.error("[stage] reject update failed:", rejErr); return { ok: false }; }
-
-      if (transition?.requested_by && transition.requested_by !== userId) {
+      if (result.outcome === "declined" && result.requestedBy && result.requestedBy !== userId) {
         const { error: declNotifErr } = await supabase.from("notifications").insert({
-          user_id: transition.requested_by,
+          user_id: result.requestedBy,
           kind: "ai_operator",
           title: "Stage advance declined",
-          body: `Your request to advance to ${stageLabel(transition.to_stage)} was declined.`,
+          body: `Your request to advance to ${stageLabel(result.toStage)} was declined.`,
           read: false,
           meta: { deal_room_id: dealRoomId, transition_id: transitionId },
           action_url: `/app/deal-rooms/${dealRoomId}`,
@@ -271,9 +269,12 @@ export function useStageTransition({
       }
 
       setPendingTransition(null);
-      toast.success("Request declined.");
+      toast.success(result.outcome === "withdrawn" ? "Request withdrawn." : "Request declined.");
+      return { ok: true };
     } catch (e: any) {
-      toast.error(e.message ?? "Could not reject transition.");
+      const msg = e?.message as string | undefined;
+      toast.error(msg === "not_pending" ? "This request has already been resolved." : msg ?? "Could not reject transition.");
+      return { ok: false };
     }
   };
 
