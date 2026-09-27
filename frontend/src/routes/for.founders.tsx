@@ -123,14 +123,16 @@ function Founders() {
         <PrSection ground={PR_BASE}>
           <PrCommercialLine tier="Standard" cadence="Billed monthly, active raise only." />
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
-            <PrTitle>Initialize a room and begin the six-gate process.</PrTitle>
+            <PrTitle>Initialize a room and begin the seven-stage process.</PrTitle>
             <div>
               <PrAction to="/sign-up" search={{ role: "founder" }}>Initialize a room</PrAction>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-              <PrQuietLink to="/product/how-it-works">The six-gate sequence</PrQuietLink>
+              <PrQuietLink to="/product/how-it-works">The seven-stage sequence</PrQuietLink>
               <PrQuietLink to="/product/pricing">Pricing</PrQuietLink>
               <PrQuietLink to="/for/investors">The investor side</PrQuietLink>
+              <PrQuietLink to="/tools">Free tools</PrQuietLink>
+              <PrQuietLink to="/templates">Templates</PrQuietLink>
             </div>
           </div>
         </PrSection>

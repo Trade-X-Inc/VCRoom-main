@@ -89,9 +89,9 @@ function SafeNote() {
             <div className="flex flex-col gap-7">
               <div className="flex flex-col gap-2">
                 <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">SAFE investment amount</label>
-                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
-                  <input type="number" value={safeAmount} onChange={(e) => setSafeAmount(Math.max(0, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none" />
+                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
+                  <input type="number" value={safeAmount} onChange={(e) => setSafeAmount(Math.max(0, Number(e.target.value)))} placeholder="e.g. 500,000" style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
                 </div>
               </div>
 
@@ -109,51 +109,59 @@ function SafeNote() {
               {capType === "capped" && (
                 <div className="flex flex-col gap-2">
                   <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Valuation cap</label>
-                  <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
-                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
-                    <input type="number" value={valuationCap} onChange={(e) => setValuationCap(Math.max(0, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none" />
+                  <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                    <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
+                    <input type="number" value={valuationCap} onChange={(e) => setValuationCap(Math.max(0, Number(e.target.value)))} placeholder="e.g. 10,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
                   </div>
                 </div>
               )}
 
               <div className="flex flex-col gap-2">
                 <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Discount rate (%)</label>
-                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
-                  <input type="number" min={0} max={50} value={discount} onChange={(e) => setDiscount(Math.max(0, Math.min(50, Number(e.target.value))))} style={{ fontFamily: "var(--font-v2-ui)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none" />
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-l border-[var(--v2-rule)]">%</span>
+                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                  <input type="number" min={0} max={50} value={discount} onChange={(e) => setDiscount(Math.max(0, Math.min(50, Number(e.target.value))))} placeholder="e.g. 20" style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-l border-[var(--v2-rule)]">%</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Priced round pre-money valuation</label>
-                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
-                  <input type="number" value={priceRoundValuation} onChange={(e) => setPriceRoundValuation(Math.max(1, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none" />
+                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
+                  <input type="number" value={priceRoundValuation} onChange={(e) => setPriceRoundValuation(Math.max(1, Number(e.target.value)))} placeholder="e.g. 18,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Priced round raise amount</label>
-                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
-                  <input type="number" value={priceRoundRaise} onChange={(e) => setPriceRoundRaise(Math.max(0, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none" />
+                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
+                  <input type="number" value={priceRoundRaise} onChange={(e) => setPriceRoundRaise(Math.max(0, Number(e.target.value)))} placeholder="e.g. 3,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)] h-fit">
-              {[
-                { label: "Conversion price (relative)", value: capType === "capped" ? `Cap: ${(capPrice * 100).toFixed(1)}% · Disc: ${pct(1 - discount / 100)}` : `Discount only: ${pct(1 - discount / 100)}`, accent: false },
-                { label: "Effective conversion price", value: `${(conversionPrice * 100).toFixed(1)}% of round price`, accent: true },
-                { label: "Estimated ownership post-close", value: pct(ownershipPct), accent: false },
-                { label: "Priced round post-money", value: fmt(postMoney), accent: false },
-                { label: "SAFE amount invested", value: fmt(safeAmount), accent: false },
-              ].map((r) => (
-                <div key={r.label} className={`flex items-start justify-between px-6 py-5 gap-4 ${r.accent ? "bg-[var(--v2-accent)]" : ""}`}>
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[13px] leading-[1.4] ${r.accent ? "text-white/60" : "text-[var(--v2-ink-secondary)]"}`}>{r.label}</span>
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`font-semibold text-[14px] tracking-[-0.3px] text-right shrink-0 ${r.accent ? "text-white" : "text-[var(--v2-accent)]"}`}>{r.value}</span>
-                </div>
-              ))}
+            <div className="flex flex-col gap-4 h-fit">
+              <div className="flex flex-col gap-2 p-6 bg-[var(--v2-panel)] border border-[var(--v2-rule)]">
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[13px] tracking-[0.02em]">Estimated ownership post-close</span>
+                <div className="pub-title" style={{ fontFamily: "var(--font-v2-data)", color: "var(--v2-accent)" }}>{pct(ownershipPct)}</div>
+                <p style={{ fontFamily: "var(--font-v2-doc)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.6] mt-1">
+                  This is the percentage of the company the SAFE holder owns immediately after the priced round closes and the SAFE converts, at the {capType === "capped" ? "cap or discount price, whichever is more favorable to the investor" : "discounted price"}.
+                </p>
+              </div>
+              <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)]">
+                {[
+                  { label: "Conversion price (relative)", value: capType === "capped" ? `Cap: ${(capPrice * 100).toFixed(1)}% · Disc: ${pct(1 - discount / 100)}` : `Discount only: ${pct(1 - discount / 100)}`, accent: false },
+                  { label: "Effective conversion price", value: `${(conversionPrice * 100).toFixed(1)}% of round price`, accent: true },
+                  { label: "Priced round post-money", value: fmt(postMoney), accent: false },
+                  { label: "SAFE amount invested", value: fmt(safeAmount), accent: false },
+                ].map((r) => (
+                  <div key={r.label} className={`flex items-start justify-between px-6 py-5 gap-4 ${r.accent ? "bg-[var(--v2-accent)]" : ""}`}>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[13px] leading-[1.4] ${r.accent ? "text-white/60" : "text-[var(--v2-ink-secondary)]"}`}>{r.label}</span>
+                    <span style={{ fontFamily: "var(--font-v2-data)" }} className={`font-semibold text-[14px] tracking-[-0.3px] text-right shrink-0 ${r.accent ? "text-white" : "text-[var(--v2-accent)]"}`}>{r.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -180,9 +188,13 @@ function SafeNote() {
               <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">When you issue a SAFE through Lengdon, the calculated conversion terms attach to the deal record at the Brief stage. At close, the conversion is sealed into the record and referenced in the closing conditions — so every party has the same numbers at every stage, with no version confusion.</p>
             </div>
-            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
-              <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">See how your SAFE converts on the cap table →</Link>
-            </p>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Related tools</h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link to="/tools/cap-table" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Cap Table Builder</Link>
+                <Link to="/tools/valuation-calculator" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Valuation Calculator</Link>
+              </div>
+            </div>
           </div>
         </section>
 

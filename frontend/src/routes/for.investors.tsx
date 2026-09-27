@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
-  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED, PR_INK, PR_INK_3, PR_RULE,
+  PrCommercialLine, PrCrossLinks, PrQuietLink, PR_BASE, PR_PANEL, PR_RECESSED, PR_INK, PR_INK_3, PR_RULE,
 } from "@/components/site/PublicRegisterPrimitives";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
@@ -151,6 +151,9 @@ function Investors() {
               <PrAction to="/sign-up">Create investor account</PrAction>
             </div>
             <PrCrossLinks />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+              <PrQuietLink to="/templates">Templates</PrQuietLink>
+            </div>
           </div>
         </PrSection>
       </main>

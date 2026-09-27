@@ -18,41 +18,58 @@ export const Route = createFileRoute("/product/how-it-works")({
   component: HowItWorks,
 });
 
+// SEO-011: rewritten from the stale six-gate vocabulary (Counsel,
+// Agreement, Conditions, Signing, Payment, Close) to the real seven-stage
+// model already live in this page's own head() description and the
+// SEO-007 blog posts (Brief, Present, NDA, Diligence, Terms, Conditions,
+// Close) — the two had diverged (flagged in SEO-010) since this array
+// was never updated to match. Structure (num/title/party/desc/detail)
+// unchanged; content only. Signing and payment confirmation, previously
+// their own named gates, are folded into Close — matching how the
+// SEO-007 post "The 7 Stages Every Private Deal Goes Through" already
+// describes Close ("Signatures happen, funds move, and the record...
+// is preserved"), not invented here.
 const GATES = [
   {
-    num: "01", title: "Counsel",
+    num: "01", title: "Brief",
+    party: "Founder",
+    desc: "The founder initializes the room and defines the raise — amount, structure, and the story that ties them together — before a single investor is invited in. Nothing is shared with an investor until this stage is complete.",
+    detail: "The room's foundation. No investor sees anything until the brief is set.",
+  },
+  {
+    num: "02", title: "Present",
+    party: "Founder → Investor",
+    desc: "The pitch deck and an overview of the opportunity go out to each invited investor. This is the first material an investor sees, and it stays scoped to what's appropriate to share before any confidentiality agreement is in place.",
+    detail: "Only public-tier materials are visible at this stage.",
+  },
+  {
+    num: "03", title: "NDA",
+    party: "Investor",
+    desc: "The investor signs an individual, per-person NDA before anything sensitive unlocks. This is not a company-wide agreement — it's tied to that specific investor's identity, and their access ends if they leave the firm.",
+    detail: "Per-person NDA enforced. No sensitive data shared until this stage is confirmed.",
+  },
+  {
+    num: "04", title: "Diligence",
+    party: "Investor",
+    desc: "Full data room access is granted once the NDA is signed. The investor reviews financials, legal documents, and the underlying business in depth, working from a consistent, gated set of materials rather than a scattered email thread.",
+    detail: "Access unlocks only after NDA confirmation — never before.",
+  },
+  {
+    num: "05", title: "Terms",
     party: "Both parties",
-    desc: "Both legal teams are brought in before any data is shared. Transaction parameters are formally established and each party's counsel acknowledged. This gate cannot be bypassed — Lengdon requires both parties to confirm counsel is in place before proceeding.",
-    detail: "Per-person NDA enforced. No data shared until this gate is confirmed.",
+    desc: "The term sheet stage: commercial terms — valuation, instrument, board rights, whatever applies — are proposed and negotiated between the parties, with documents exchanged in the room rather than reconstructed later from memory.",
+    detail: "Every proposed term is recorded the moment it's exchanged.",
   },
   {
-    num: "02", title: "Agreement",
-    party: "Both parties, independently",
-    desc: "Each party independently confirms their intent to proceed. No single confirmation can trigger the next gate — both must act in their own time, without visibility into the other's confirmation until both are complete.",
-    detail: "Independent confirmation prevents any coercive or premature disclosure.",
-  },
-  {
-    num: "03", title: "Conditions",
+    num: "06", title: "Conditions",
     party: "Tracked to satisfaction",
-    desc: "Each condition precedent is added to the room and tracked until satisfied — regulatory approval, board consent, financing confirmations, whatever the deal requires. The gate itself is enforced: the room cannot advance to Signing until every condition is marked complete. Which party clears which condition, and in what order, is a matter both parties agree on directly — Lengdon enforces the boundary, not the internal workflow.",
+    desc: "Every condition precedent — regulatory approval, board consent, financing confirmations, whatever the deal requires — is added to the room and tracked until satisfied. The room cannot advance to Close until every condition is marked complete. Which party clears which condition is a matter both parties agree on directly — Lengdon enforces the boundary, not the internal workflow.",
     detail: "The gate is enforced. Condition-by-condition sequencing inside it is not — that's between the parties.",
   },
   {
-    num: "04", title: "Signing",
-    party: "Both parties, separately",
-    desc: "Transaction documents are executed in sequence by each party, in their own time, with their own counsel. No joint session required. Each signature event is recorded individually to the audit log.",
-    detail: "No joint session. Each party signs independently, with their own counsel.",
-  },
-  {
-    num: "05", title: "Payment",
-    party: "Investor + Founder confirm",
-    desc: "Funds move directly between the parties, outside the platform. Investor confirms transfer. Founder confirms receipt. Both confirmations are required to advance to Close. Lengdon records the confirmation — it never holds, routes, or has access to the capital itself.",
-    detail: "Dual confirmation required. The system records each action independently.",
-  },
-  {
-    num: "06", title: "Close",
+    num: "07", title: "Close",
     party: "Both parties, independently",
-    desc: <>Mutual confirmation closes the record permanently. The complete append-only audit trail stops accepting new entries and stays accessible to both parties. Nothing in the record can be changed, amended, or deleted after this point. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">See how cap table state is recorded at close →</Link></>,
+    desc: <>Signatures are executed, funds move directly between the parties outside the platform, and mutual confirmation seals the record permanently. The complete append-only audit trail stops accepting new entries and stays accessible to both parties — nothing in it can be changed, amended, or deleted after this point. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">See how cap table state is recorded at close →</Link></>,
     detail: "The complete record is preserved, unchanged, for both parties.",
   },
 ];
@@ -61,47 +78,43 @@ const PRINCIPLES = [
   { label: "Append-only", desc: "No entry in the audit record can be deleted or modified. The system only ever adds to the log." },
   { label: "Tamper-evident", desc: "Each record entry references the previous entry. Altering any earlier entry breaks that reference visibly." },
   { label: "Per-person, not per-company", desc: "Every NDA, every access grant, every signature is tied to a specific individual — not a company, not a role, not a team." },
-  { label: "Dual confirmation", desc: "Critical events — agreement, close — require independent confirmation from both parties before proceeding." },
+  { label: "Dual confirmation", desc: "Critical events — the NDA signature, the close — require independent confirmation from both parties before proceeding." },
 ];
 
-// SEO-010 (AEO pass): FAQPage + BreadcrumbList + WebPage/Speakable
-// JSON-LD. FAQ content deliberately matches the six gates actually
-// rendered in this page's own GATES array below (Counsel, Agreement,
-// Conditions, Signing, Payment, Close) — an FAQ block must not
-// contradict the visible body content it sits beside. Found, not fixed
-// in this pass: this page's own head() meta description above (and the
-// homepage's ProcessSection) both use a different seven-stage
-// vocabulary ("Brief, present, NDA, diligence, terms, conditions,
-// close") that doesn't match this six-gate body content — flagged in
-// the SEO-010 report for a separate reconciliation pass.
+// SEO-011: rewritten from the stale six-gate FAQ (Counsel, Agreement,
+// Conditions, Signing, Payment, Close) to match the seven-stage GATES
+// array above — the mismatch SEO-010 flagged (this page's own meta
+// description already said "Brief, present, NDA, diligence, terms,
+// conditions, close" while the body and this FAQ both said six gates)
+// is now closed on both sides at once.
 const HOW_IT_WORKS_FAQ_JSON_LD = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
     {
       "@type": "Question",
-      name: "What are the six gates in Lengdon's closing process?",
-      acceptedAnswer: { "@type": "Answer", text: "Counsel, Agreement, Conditions, Signing, Payment, and Close. Each gate must be completed before the next opens — the sequence is enforced by the system, not left to convention." },
+      name: "What are the seven stages in Lengdon's closing process?",
+      acceptedAnswer: { "@type": "Answer", text: "Brief, Present, NDA, Diligence, Terms, Conditions, and Close. Each stage must be completed before the next opens — the sequence is enforced by the system, not left to convention." },
     },
     {
       "@type": "Question",
-      name: "Can a gate be skipped or reordered?",
-      acceptedAnswer: { "@type": "Answer", text: "No. Lengdon requires each gate to be confirmed before the next becomes available — for example, no data is shared until both parties' counsel is confirmed at Gate 1, and the room cannot advance to Signing until every condition at Gate 3 is marked complete." },
+      name: "Can a stage be skipped or reordered?",
+      acceptedAnswer: { "@type": "Answer", text: "No. Lengdon requires each stage to be confirmed before the next becomes available — for example, an investor cannot reach Diligence-tier materials until they've signed the NDA at the NDA stage, and the room cannot advance to Close until every condition at the Conditions stage is marked complete." },
     },
     {
       "@type": "Question",
-      name: "Who confirms each gate — Lengdon or the parties?",
-      acceptedAnswer: { "@type": "Answer", text: "The parties themselves. Lengdon enforces the order and records each confirmation, but the founder and investor (and their counsel, where relevant) are the ones agreeing to proceed at each gate — independently, and in several gates, without visibility into the other side's confirmation until both are complete." },
+      name: "Who confirms each stage — Lengdon or the parties?",
+      acceptedAnswer: { "@type": "Answer", text: "The parties themselves. Lengdon enforces the order and records each confirmation, but the founder and investor are the ones agreeing to proceed at each stage — for example, it's the investor's own NDA signature that unlocks Diligence, not an action Lengdon takes on their behalf." },
     },
     {
       "@type": "Question",
-      name: "What happens at the Close gate?",
-      acceptedAnswer: { "@type": "Answer", text: "Mutual confirmation from both parties closes the record permanently. The complete append-only audit trail stops accepting new entries and remains accessible to both parties — nothing in it can be changed, amended, or deleted after that point." },
+      name: "What happens at the Close stage?",
+      acceptedAnswer: { "@type": "Answer", text: "Signatures are executed, funds move directly between the parties outside the platform, and mutual confirmation seals the record permanently. The complete append-only audit trail stops accepting new entries and remains accessible to both parties — nothing in it can be changed, amended, or deleted after that point." },
     },
     {
       "@type": "Question",
       name: "Does Lengdon hold or move the investment funds?",
-      acceptedAnswer: { "@type": "Answer", text: "No. Funds move directly between the parties, outside the platform. The investor confirms transfer and the founder confirms receipt at the Payment gate — Lengdon records both confirmations but never holds, routes, or has access to the capital itself." },
+      acceptedAnswer: { "@type": "Answer", text: "No. Funds move directly between the parties, outside the platform. Lengdon records confirmation of the transfer as part of the Close stage, but it never holds, routes, or has access to the capital itself." },
     },
   ],
 });
@@ -137,9 +150,9 @@ function HowItWorks() {
       <main id="main-content">
         <PageHero
           eyebrow="Product · How It Works"
-          title="SIX GATES."
+          title="SEVEN STAGES."
           titleOutline="ONE CLOSE."
-          subtitle="Every private capital transaction follows the same sequence. Lengdon enforces it — not by convention, but by the system itself. No gate can be opened until the one before it is complete."
+          subtitle="Every private capital transaction follows the same sequence. Lengdon enforces it — not by convention, but by the system itself. No stage can be opened until the one before it is complete."
         />
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
@@ -150,10 +163,10 @@ function HowItWorks() {
                 <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">The Sequence</span>
               </div>
               <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-6">
-                THE GATES
+                THE STAGES
               </h2>
               <p id="mechanism-explanation" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
-                Six gates. Each requires the one before it. The system enforces the order — neither party can advance alone.
+                Seven stages. Each requires the one before it. The system enforces the order — neither party can advance alone.
               </p>
             </div>
 
@@ -215,7 +228,7 @@ function HowItWorks() {
                 Ready to run the sequence?
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] leading-[1.6]">
-                Initialize a room and begin the six-gate process today.
+                Initialize a room and begin the seven-stage process today.
               </p>
             </div>
             <div className="flex gap-4 shrink-0">

@@ -43,9 +43,16 @@ function RunwayCalculator() {
   const [burn, setBurn] = useState(200_000);
   const [growth, setGrowth] = useState(0);
 
-  const baseMonths = burn > 0 ? cash / burn : 999;
-  const adjustedBurn = burn * (1 + growth / 100);
-  const adjustedMonths = adjustedBurn > 0 ? cash / adjustedBurn : 999;
+  // SEO-011: cash/burn previously had no clamp — a typed negative value
+  // flowed straight through. growth's own negative range (min: -20) is
+  // intentional (declining burn), not an error case, so it's excluded.
+  const hasInvalidInput = cash < 0 || burn < 0;
+  const safeCash = Math.max(0, cash);
+  const safeBurn = Math.max(0, burn);
+
+  const baseMonths = safeBurn > 0 ? safeCash / safeBurn : 999;
+  const adjustedBurn = safeBurn * (1 + growth / 100);
+  const adjustedMonths = adjustedBurn > 0 ? safeCash / adjustedBurn : 999;
 
   const outDate = new Date();
   outDate.setMonth(outDate.getMonth() + Math.floor(adjustedMonths));
@@ -64,13 +71,20 @@ function RunwayCalculator() {
         { label: "Monthly net burn", value: burn, set: setBurn, min: 10_000, max: 2_000_000, step: 10_000, prefix: "$" },
         { label: "Monthly burn growth rate (%)", value: growth, set: setGrowth, min: -20, max: 50, step: 1, prefix: "%" },
       ]}
+      errorMessage={hasInvalidInput ? "Cash balance and monthly burn can't be negative — enter zero or a positive number." : undefined}
+      primaryResult={{
+        label: "Adjusted runway",
+        value: adjustedMonths >= 999 ? "∞" : `${Math.floor(adjustedMonths)} months`,
+        explanation: adjustedMonths >= 999
+          ? "At this burn rate, cash isn't depleting — there's no cash-out date to project."
+          : `At this burn rate, with the growth rate applied, you have ${Math.floor(adjustedMonths)} month${Math.floor(adjustedMonths) === 1 ? "" : "s"} before you need to raise or become profitable.`,
+      }}
       results={[
         { label: "Runway at flat burn", value: `${Math.floor(baseMonths)}mo` },
         { label: "Adjusted monthly burn", value: fmtMoney(adjustedBurn), accent: true },
-        { label: "Adjusted runway", value: adjustedMonths >= 999 ? "∞" : `${Math.floor(adjustedMonths)}mo` },
         { label: "Projected cash-out date", value: adjustedMonths >= 999 ? "N/A" : outDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
       ]}
-      ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full six-gate sequence."
+      ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full seven-stage sequence."
       ctaLabel="Join the waitlist"
       belowCalculator={
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[var(--v2-rule)]">
@@ -95,9 +109,13 @@ function RunwayCalculator() {
               <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Runway is the first number an investor uses to assess urgency. In a Lengdon deal room, the runway figure you calculate here feeds into the deal brief — so your stated timeline to close is grounded in a real number, visible to all parties.</p>
             </div>
-            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
-              <Link to="/tools/burn-rate" className="underline hover:opacity-70 transition-opacity">Recalculate burn rate to update this projection →</Link>
-            </p>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Related tools</h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link to="/tools/burn-rate" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Burn Rate Calculator</Link>
+                <Link to="/tools/cap-table" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Cap Table Builder</Link>
+              </div>
+            </div>
           </div>
         </section>
       }

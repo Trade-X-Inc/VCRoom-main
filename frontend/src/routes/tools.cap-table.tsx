@@ -61,12 +61,26 @@ function CapTable() {
   const [holders, setHolders] = useState<Holder[]>(DEFAULT);
   const [newName, setNewName] = useState("");
   const [newShares, setNewShares] = useState("");
+  const [addError, setAddError] = useState("");
 
   const total = holders.reduce((s, h) => s + h.shares, 0);
 
+  // SEO-011: newShares previously had no validation at all — a negative
+  // or non-numeric value would have been added straight to the table,
+  // corrupting every ownership percentage. Now checked before adding,
+  // with a clear inline message rather than a silent bad row.
   const addHolder = () => {
-    if (!newName.trim() || !newShares) return;
-    setHolders((p) => [...p, { name: newName.trim(), shares: Number(newShares) }]);
+    if (!newName.trim()) {
+      setAddError("Enter a shareholder name.");
+      return;
+    }
+    const sharesNum = Number(newShares);
+    if (!newShares || Number.isNaN(sharesNum) || sharesNum <= 0) {
+      setAddError("Enter a positive number of shares.");
+      return;
+    }
+    setAddError("");
+    setHolders((p) => [...p, { name: newName.trim(), shares: sharesNum }]);
     setNewName("");
     setNewShares("");
   };
@@ -105,8 +119,8 @@ function CapTable() {
             {holders.map((h, i) => (
               <div key={i} className={`grid grid-cols-[1fr_140px_140px_40px] ${i < holders.length - 1 ? "border-b border-[var(--v2-rule)]" : ""}`}>
                 <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 text-[var(--v2-accent)] text-[14px]">{h.name}</div>
-                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 text-[var(--v2-ink-secondary)] text-[14px] text-right border-l border-[var(--v2-rule)]">{fmt(h.shares)}</div>
-                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-[var(--v2-accent)] text-[14px] text-right border-l border-[var(--v2-rule)]">{pct(h.shares, total)}</div>
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 text-[var(--v2-ink-secondary)] text-[14px] text-right border-l border-[var(--v2-rule)]">{fmt(h.shares)}</div>
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 font-semibold text-[var(--v2-accent)] text-[14px] text-right border-l border-[var(--v2-rule)]">{pct(h.shares, total)}</div>
                 <div className="flex items-center justify-center border-l border-[var(--v2-rule)]">
                   <button onClick={() => remove(i)} className="w-full h-full flex items-center justify-center text-[var(--v2-ink-muted)] hover:text-v2-adverse transition-colors text-[16px]">×</button>
                 </div>
@@ -114,20 +128,25 @@ function CapTable() {
             ))}
             <div className="grid grid-cols-[1fr_140px_140px_40px] bg-[var(--v2-accent)] border-t border-[var(--v2-rule)]">
               <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-white text-[14px]">Total</div>
-              <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">{fmt(total)}</div>
-              <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">100%</div>
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">{fmt(total)}</div>
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">100%</div>
               <div className="border-l border-white/10" />
             </div>
           </div>
 
+          {addError && (
+            <div style={{ fontFamily: "var(--font-v2-ui)" }} className="mb-4 border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3 text-v2-adverse text-[13px] leading-[1.5]">
+              {addError}
+            </div>
+          )}
           <div className="flex gap-3 items-end">
             <div className="flex-1 flex flex-col gap-1.5">
               <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Name</label>
-              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="New Series A investor" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors" />
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. New Series A investor" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]" />
             </div>
             <div className="w-40 flex flex-col gap-1.5">
               <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Shares</label>
-              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="1,000,000" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors" />
+              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="e.g. 1,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]" />
             </div>
             <button onClick={addHolder} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-6 py-3 transition-colors duration-200">
               Add
@@ -157,9 +176,13 @@ function CapTable() {
               <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">In a Lengdon deal room, the post-money cap table is attached at close and sealed into the deal record. Future investors and legal counsel can access the closing cap table as part of the permanent record — no reconstruction required.</p>
             </div>
-            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
-              <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Calculate SAFE conversion before adding it here →</Link>
-            </p>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Related tools</h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link to="/tools/safe-note" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">SAFE Note Calculator</Link>
+                <Link to="/tools/dilution" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Dilution Modeller</Link>
+              </div>
+            </div>
           </div>
         </section>
 

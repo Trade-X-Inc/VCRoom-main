@@ -82,6 +82,24 @@ export const Route = createFileRoute("/resources/blog/$slug")({
   component: BlogArticle,
 });
 
+// SEO-011: a small, honest tag -> {tool, template} map for a reader-
+// service cross-link, not a keyword-stuffing exercise. Picks the first
+// matching tag in this priority order; falls back to a broadly relevant
+// default pair when no tag matches (e.g. Product Update, GCC Ecosystem, AI).
+const RELATED_BY_TAG: Record<string, { toolHref: string; toolLabel: string; templateHref: string; templateLabel: string }> = {
+  "Founders": { toolHref: "/tools/cap-table", toolLabel: "Cap Table Builder", templateHref: "/templates", templateLabel: "Due Diligence Checklist" },
+  "Investors": { toolHref: "/tools/safe-note", toolLabel: "SAFE Note Calculator", templateHref: "/templates", templateLabel: "Investor Due Diligence Checklist" },
+  "Fundraising": { toolHref: "/tools/valuation-calculator", toolLabel: "Valuation Calculator", templateHref: "/templates", templateLabel: "Convertible Note Term Sheet" },
+  "Deal Flow": { toolHref: "/tools/cap-table", toolLabel: "Cap Table Builder", templateHref: "/templates", templateLabel: "Mutual NDA" },
+};
+const DEFAULT_RELATED = { toolHref: "/tools/runway", toolLabel: "Runway Calculator", templateHref: "/templates", templateLabel: "Data Room Index" };
+function getRelatedLinks(tags: string[]) {
+  for (const t of ["Founders", "Investors", "Fundraising", "Deal Flow"]) {
+    if (tags.includes(t)) return RELATED_BY_TAG[t];
+  }
+  return DEFAULT_RELATED;
+}
+
 function formatDate(iso: string): string {
   try {
     return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
@@ -210,6 +228,19 @@ function BlogArticle() {
             </Link>
           </div>
         )}
+
+        {(() => {
+          const rel = getRelatedLinks(post.tags);
+          return (
+            <div className={related ? "mt-4" : "mt-12 pt-6 border-t border-[#e6e9ef]"}>
+              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] tracking-[1px] uppercase text-[#64748b] mb-2">Related tools & templates</div>
+              <div className="flex flex-wrap gap-x-6 gap-y-1">
+                <Link to={rel.toolHref as any} style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[13px] text-[#0a2540] underline hover:opacity-70 transition-opacity">{rel.toolLabel}</Link>
+                <Link to={rel.templateHref as any} style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[13px] text-[#0a2540] underline hover:opacity-70 transition-opacity">{rel.templateLabel}</Link>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="mt-16 p-8 bg-[#f8f9fb] border border-[#e6e9ef] text-center">
           <p style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="text-[#0a2540] mb-2 text-[17px] font-semibold">Ready to close your first transaction?</p>

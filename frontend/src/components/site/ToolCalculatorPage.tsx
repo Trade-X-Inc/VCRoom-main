@@ -11,12 +11,14 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // repeated layout scaffolding, not any tool-specific math.
 //
 // SEO-009 Phase 2 — migrated to PUBLIC-REGISTER.md v2.0 tokens (real
-// Tailwind utilities from styles.css's @theme block). Only 3 of the 7
-// tool pages (burn-rate, runway, valuation-calculator) use this
-// component; the other 4 (cap-table, cogs, dilution, safe-note) are
-// fully custom and are touched up per-file in Phase 5, along with any
-// extra tool-specific UI those 3 wrapper-consumers render beyond what
-// this shared shape provides.
+// Tailwind utilities from styles.css's @theme block). Only 2 of the 7
+// tool pages (burn-rate, runway) use this component; the other 5
+// (cap-table, cogs, dilution, safe-note, valuation-calculator) are fully
+// custom. Corrected 4 Oct 2026 (SEO-011 step 0) — this comment previously
+// listed valuation-calculator as a consumer; its own header comment says
+// otherwise ("Standalone (not built from ToolCalculatorPage)"), and its
+// source confirms that's the true one — it renders SiteHeader/SiteFooter
+// and its own JSX directly, never imports this component.
 
 export interface ToolField {
   label: string;
@@ -49,10 +51,19 @@ export interface ToolCalculatorPageProps {
   // runway.tsx pass this; dilution.tsx (the third consumer of this
   // component) intentionally does not, and its render is unchanged.
   belowCalculator?: ReactNode;
+  // SEO-011 — the single most important output, rendered large and
+  // prominent above the results list, with a one-line plain-English
+  // "what this means" explanation beneath it. Optional: not every result
+  // set has one obvious primary number.
+  primaryResult?: { label: string; value: string; explanation: string };
+  // SEO-011 — a clear inline message shown above the results panel when
+  // an input is invalid (negative, or would divide by zero). Results
+  // still render below it using safety-clamped values, never NaN.
+  errorMessage?: string;
 }
 
 export function ToolCalculatorPage({
-  toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel, belowCalculator,
+  toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel, belowCalculator, primaryResult, errorMessage,
 }: ToolCalculatorPageProps) {
   return (
     <div className="min-h-screen bg-v2-surface">
@@ -79,13 +90,13 @@ export function ToolCalculatorPage({
               {fields.map((field) => (
                 <div key={field.label} className="flex flex-col gap-3">
                   <label className="font-v2-ui text-v2-ink text-[13px] tracking-[0.02em]">{field.label}</label>
-                  <div className="flex items-center border border-v2-rule focus-within:border-v2-accent transition-colors">
-                    <span className="font-v2-ui px-4 text-v2-ink-muted text-[14px] border-r border-v2-rule">{field.prefix ?? "$"}</span>
+                  <div className="flex items-center border border-v2-rule focus-within:border-v2-accent transition-colors bg-v2-panel">
+                    <span className="font-v2-data px-4 text-v2-ink-muted text-[14px] border-r border-v2-rule">{field.prefix ?? "$"}</span>
                     <input
                       type="number"
                       value={field.value}
                       onChange={(e) => field.set(Number(e.target.value))}
-                      className="font-v2-ui flex-1 px-4 py-3.5 text-[14px] text-v2-ink focus:outline-none bg-v2-panel"
+                      className="font-v2-data flex-1 px-4 py-3.5 text-[14px] text-v2-ink focus:outline-none bg-v2-panel"
                     />
                   </div>
                   <input type="range" min={field.min} max={field.max} step={field.step} value={field.value} onChange={(e) => field.set(Number(e.target.value))} className="w-full accent-v2-accent" />
@@ -93,17 +104,31 @@ export function ToolCalculatorPage({
               ))}
             </div>
 
-            <div className="flex flex-col gap-0 border border-v2-rule divide-y divide-v2-rule h-fit">
-              {results.map((r) => (
-                <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-v2-accent" : "bg-v2-panel"}`}>
-                  <span className={`font-v2-ui text-[14px] ${r.accent ? "text-white/60" : "text-v2-ink-secondary"}`}>{r.label}</span>
-                  <span
-                    className={`font-v2-ui font-medium text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : r.warn ? "text-v2-adverse" : "text-v2-ink"}`}
-                  >
-                    {r.value}
-                  </span>
+            <div className="flex flex-col gap-4 h-fit">
+              {errorMessage && (
+                <div className="font-v2-ui border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3 text-v2-adverse text-[13px] leading-[1.5]">
+                  {errorMessage}
                 </div>
-              ))}
+              )}
+              {primaryResult && (
+                <div className="flex flex-col gap-2 p-6 bg-v2-panel border border-v2-rule">
+                  <span className="font-v2-ui text-v2-ink-muted text-[13px] tracking-[0.02em]">{primaryResult.label}</span>
+                  <div className="pub-title font-v2-data text-v2-accent">{primaryResult.value}</div>
+                  <p className="font-v2-doc text-v2-ink-secondary text-[15px] leading-[1.6] mt-1">{primaryResult.explanation}</p>
+                </div>
+              )}
+              <div className="flex flex-col gap-0 border border-v2-rule divide-y divide-v2-rule">
+                {results.map((r) => (
+                  <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-v2-accent" : "bg-v2-panel"}`}>
+                    <span className={`font-v2-ui text-[14px] ${r.accent ? "text-white/60" : "text-v2-ink-secondary"}`}>{r.label}</span>
+                    <span
+                      className={`font-v2-data font-medium text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : r.warn ? "text-v2-adverse" : "text-v2-ink"}`}
+                    >
+                      {r.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
