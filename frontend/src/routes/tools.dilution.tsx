@@ -18,6 +18,22 @@ export const Route = createFileRoute("/tools/dilution")({
   component: Dilution,
 });
 
+// SEO-009 Phase 5: reuses this route's own real title/description above —
+// the only one of the 7 /tools/* pages missing this JSON-LD (a gap in
+// SEO-004, found during the SEO-009 audit), matching the sibling tools'
+// established SoftwareApplication schema exactly.
+const DILUTION_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Dilution Modeller",
+  "url": "https://lengdon.com/tools/dilution",
+  "description": "See how your ownership stake changes across seed, Series A and later rounds. Model new shares, options pool and investor dilution.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@id": "https://lengdon.com/#organization" },
+});
+
 function pct(n: number) { return `${(n * 100).toFixed(1)}%`; }
 
 interface Round { name: string; raise: number; preVal: number; }
@@ -49,50 +65,51 @@ function Dilution() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: DILUTION_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
-            <Link to="/tools" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">← All tools</Link>
+            <Link to="/tools" style={{ fontFamily: "var(--font-v2-ui)" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">← All tools</Link>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · Dilution</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · Dilution</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
               DILUTION<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>MODELER</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[440px]">See how founder ownership dilutes across successive funding rounds.</p>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[15px] max-w-[440px]">See how founder ownership dilutes across successive funding rounds.</p>
           </div>
         </div>
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.4px] mb-6">Funding rounds</h2>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px] mb-6">Funding rounds</h2>
               <div className="flex flex-col gap-4">
                 {rounds.map((r, i) => (
-                  <div key={i} className="border border-[#e6e9ef] p-5 flex flex-col gap-3">
+                  <div key={i} className="border border-[var(--v2-rule)] p-5 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                      <input value={r.name} onChange={(e) => updateRound(i, "name", e.target.value)} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[15px] tracking-[-0.3px] focus:outline-none border-b border-transparent focus:border-[#e6e9ef] pb-0.5" />
-                      <button onClick={() => setRounds((p) => p.filter((_, idx) => idx !== i))} className="text-[#64748b] hover:text-red-400 text-[18px] transition-colors">×</button>
+                      <input value={r.name} onChange={(e) => updateRound(i, "name", e.target.value)} style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[15px] tracking-[-0.3px] focus:outline-none border-b border-transparent focus:border-[var(--v2-rule)] pb-0.5" />
+                      <button onClick={() => setRounds((p) => p.filter((_, idx) => idx !== i))} className="text-[var(--v2-ink-muted)] hover:text-v2-adverse text-[18px] transition-colors">×</button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1">
-                        <label style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[0.3px]">Raise amount ($)</label>
-                        <input type="number" value={r.raise} onChange={(e) => updateRound(i, "raise", Number(e.target.value))} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-3 py-2 text-[13px] text-[#0a2540] focus:outline-none focus:border-[#0a2540]" />
+                        <label style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Raise amount ($)</label>
+                        <input type="number" value={r.raise} onChange={(e) => updateRound(i, "raise", Number(e.target.value))} style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)]" />
                       </div>
                       <div className="flex flex-col gap-1">
-                        <label style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[0.3px]">Pre-money valuation ($)</label>
-                        <input type="number" value={r.preVal} onChange={(e) => updateRound(i, "preVal", Math.max(1, Number(e.target.value)))} style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-3 py-2 text-[13px] text-[#0a2540] focus:outline-none focus:border-[#0a2540]" />
+                        <label style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Pre-money valuation ($)</label>
+                        <input type="number" value={r.preVal} onChange={(e) => updateRound(i, "preVal", Math.max(1, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)]" />
                       </div>
                     </div>
                   </div>
                 ))}
                 <button
                   onClick={() => setRounds((p) => [...p, { name: `Round ${p.length + 1}`, raise: 5_000_000, preVal: 20_000_000 }])}
-                  style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                  className="border border-dashed border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#64748b] hover:text-[#0a2540] text-[13px] py-4 transition-all"
+                  style={{ fontFamily: "var(--font-v2-ui)" }}
+                  className="border border-dashed border-[var(--v2-rule)] hover:border-[var(--v2-accent)]/30 text-[var(--v2-ink-muted)] hover:text-[var(--v2-accent)] text-[13px] py-4 transition-all"
                 >
                   + Add round
                 </button>
@@ -100,36 +117,36 @@ function Dilution() {
             </div>
 
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.4px] mb-6">Founder ownership over time</h2>
-              <div className="border border-[#e6e9ef] overflow-hidden">
-                <div className="bg-[#0a2540] px-6 py-4 flex justify-between">
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[1px] uppercase">Before any raise</span>
-                  <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[15px]">100.0%</span>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px] mb-6">Founder ownership over time</h2>
+              <div className="border border-[var(--v2-rule)] overflow-hidden">
+                <div className="bg-[var(--v2-accent)] px-6 py-4 flex justify-between">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[1px] uppercase">Before any raise</span>
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[15px]">100.0%</span>
                 </div>
                 {roundResults.map((r, i) => (
-                  <div key={i} className="px-6 py-5 flex items-center justify-between border-t border-[#e6e9ef]">
+                  <div key={i} className="px-6 py-5 flex items-center justify-between border-t border-[var(--v2-rule)]">
                     <div>
-                      <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] mb-0.5">{r.name}</div>
-                      <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{pct(r.investorPct)} new investor ownership</div>
+                      <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] mb-0.5">{r.name}</div>
+                      <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px]">{pct(r.investorPct)} new investor ownership</div>
                     </div>
-                    <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.5px]">
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.5px]">
                       {pct(r.founderPctAfter)}
                     </span>
                   </div>
                 ))}
-                <div className="bg-[#f8f9fb] px-6 py-4 border-t border-[#e6e9ef] flex justify-between">
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px]">Final founder ownership</span>
-                  <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.5px]">{pct(founderFinal)}</span>
+                <div className="bg-[var(--v2-surface)] px-6 py-4 border-t border-[var(--v2-rule)] flex justify-between">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px]">Final founder ownership</span>
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.5px]">{pct(founderFinal)}</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[var(--v2-rule)] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">Model is clear. Close the round with Lengdon — a six-gate process both parties execute, and one sealed record both parties can always see.</p>
-            <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">Join the waitlist</Link>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[14px] max-w-[480px]">Model is clear. Close the round with Lengdon — a six-gate process both parties execute, and one sealed record both parties can always see.</p>
+            <Link to="/sign-up" style={{ fontFamily: "var(--font-v2-ui)" }} className="shrink-0 bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">Join the waitlist</Link>
           </div>
         </section>
       </main>

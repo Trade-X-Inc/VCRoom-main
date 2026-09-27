@@ -69,94 +69,94 @@ function CapTable() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: CAP_TABLE_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
-            <Link to="/tools" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">← All tools</Link>
+            <Link to="/tools" style={{ fontFamily: "var(--font-v2-ui)" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">← All tools</Link>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · Cap Table</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · Cap Table</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
               CAP TABLE<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>BUILDER</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[440px]">Model equity ownership and calculate percentages across your shareholder table.</p>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[15px] max-w-[440px]">Model equity ownership and calculate percentages across your shareholder table.</p>
           </div>
         </div>
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16">
-          <div className="border border-[#e6e9ef] overflow-hidden mb-6">
-            <div className="grid grid-cols-[1fr_140px_140px_40px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#64748b] text-[11px] tracking-[1px] uppercase">Shareholder</div>
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#64748b] text-[11px] tracking-[1px] uppercase text-right border-l border-[#e6e9ef]">Shares</div>
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-6 py-4 text-[#64748b] text-[11px] tracking-[1px] uppercase text-right border-l border-[#e6e9ef]">Ownership</div>
-              <div className="border-l border-[#e6e9ef]" />
+          <div className="border border-[var(--v2-rule)] overflow-hidden mb-6">
+            <div className="grid grid-cols-[1fr_140px_140px_40px] bg-[var(--v2-surface)] border-b border-[var(--v2-rule)]">
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 text-[var(--v2-ink-muted)] text-[11px] tracking-[1px] uppercase">Shareholder</div>
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 text-[var(--v2-ink-muted)] text-[11px] tracking-[1px] uppercase text-right border-l border-[var(--v2-rule)]">Shares</div>
+              <div style={{ fontFamily: "var(--font-v2-data)" }} className="px-6 py-4 text-[var(--v2-ink-muted)] text-[11px] tracking-[1px] uppercase text-right border-l border-[var(--v2-rule)]">Ownership</div>
+              <div className="border-l border-[var(--v2-rule)]" />
             </div>
             {holders.map((h, i) => (
-              <div key={i} className={`grid grid-cols-[1fr_140px_140px_40px] ${i < holders.length - 1 ? "border-b border-[#e6e9ef]" : ""}`}>
-                <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="px-6 py-4 text-[#0a2540] text-[14px]">{h.name}</div>
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-4 text-[#425466] text-[14px] text-right border-l border-[#e6e9ef]">{fmt(h.shares)}</div>
-                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-4 font-semibold text-[#0a2540] text-[14px] text-right border-l border-[#e6e9ef]">{pct(h.shares, total)}</div>
-                <div className="flex items-center justify-center border-l border-[#e6e9ef]">
-                  <button onClick={() => remove(i)} className="w-full h-full flex items-center justify-center text-[#64748b] hover:text-red-400 transition-colors text-[16px]">×</button>
+              <div key={i} className={`grid grid-cols-[1fr_140px_140px_40px] ${i < holders.length - 1 ? "border-b border-[var(--v2-rule)]" : ""}`}>
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 text-[var(--v2-accent)] text-[14px]">{h.name}</div>
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 text-[var(--v2-ink-secondary)] text-[14px] text-right border-l border-[var(--v2-rule)]">{fmt(h.shares)}</div>
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-[var(--v2-accent)] text-[14px] text-right border-l border-[var(--v2-rule)]">{pct(h.shares, total)}</div>
+                <div className="flex items-center justify-center border-l border-[var(--v2-rule)]">
+                  <button onClick={() => remove(i)} className="w-full h-full flex items-center justify-center text-[var(--v2-ink-muted)] hover:text-v2-adverse transition-colors text-[16px]">×</button>
                 </div>
               </div>
             ))}
-            <div className="grid grid-cols-[1fr_140px_140px_40px] bg-[#0a2540] border-t border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-4 font-semibold text-white text-[14px]">Total</div>
-              <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">{fmt(total)}</div>
-              <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">100%</div>
+            <div className="grid grid-cols-[1fr_140px_140px_40px] bg-[var(--v2-accent)] border-t border-[var(--v2-rule)]">
+              <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-white text-[14px]">Total</div>
+              <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">{fmt(total)}</div>
+              <div style={{ fontFamily: "var(--font-v2-ui)" }} className="px-6 py-4 font-semibold text-white text-[14px] text-right border-l border-white/10">100%</div>
               <div className="border-l border-white/10" />
             </div>
           </div>
 
           <div className="flex gap-3 items-end">
             <div className="flex-1 flex flex-col gap-1.5">
-              <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Name</label>
-              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="New Series A investor" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
+              <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Name</label>
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="New Series A investor" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors" />
             </div>
             <div className="w-40 flex flex-col gap-1.5">
-              <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Shares</label>
-              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="1,000,000" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors" />
+              <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Shares</label>
+              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="1,000,000" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors" />
             </div>
-            <button onClick={addHolder} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-6 py-3 transition-colors duration-200">
+            <button onClick={addHolder} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-6 py-3 transition-colors duration-200">
               Add
             </button>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[var(--v2-rule)]">
           <div className="max-w-[720px] flex flex-col gap-10">
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">A cap table (capitalisation table) records who owns what percentage of a company, at what cost basis, and on what terms. This calculator models a simple cap table through multiple funding rounds, showing dilution at each stage and the ownership percentage of each shareholder class after each round closes.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">A cap table (capitalisation table) records who owns what percentage of a company, at what cost basis, and on what terms. This calculator models a simple cap table through multiple funding rounds, showing dilution at each stage and the ownership percentage of each shareholder class after each round closes.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders understanding their own dilution before signing a term sheet. Lead investors verifying ownership math before wiring. Lawyers confirming share counts match the closing documents.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Founders understanding their own dilution before signing a term sheet. Lead investors verifying ownership math before wiring. Lawyers confirming share counts match the closing documents.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">The post-money ownership percentages from this model should match — exactly — the figures in your closing documents. Discrepancies between a cap table model and the actual closing docs are one of the most common causes of deal disputes. On Lengdon, the cap table state is recorded at close and sealed into the deal record — creating an immutable reference point for future rounds.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">The post-money ownership percentages from this model should match — exactly — the figures in your closing documents. Discrepancies between a cap table model and the actual closing docs are one of the most common causes of deal disputes. On Lengdon, the cap table state is recorded at close and sealed into the deal record — creating an immutable reference point for future rounds.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Common shares: typically held by founders and employees. Preferred shares: held by investors, with liquidation preference and other protective provisions. Fully diluted: ownership calculated assuming all options, warrants, and convertible instruments have converted. Option pool: shares reserved for future employee grants, usually created before a priced round (pre-money), which dilutes founders not new investors.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Common shares: typically held by founders and employees. Preferred shares: held by investors, with liquidation preference and other protective provisions. Fully diluted: ownership calculated assuming all options, warrants, and convertible instruments have converted. Option pool: shares reserved for future employee grants, usually created before a priced round (pre-money), which dilutes founders not new investors.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">In a Lengdon deal room, the post-money cap table is attached at close and sealed into the deal record. Future investors and legal counsel can access the closing cap table as part of the permanent record — no reconstruction required.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">In a Lengdon deal room, the post-money cap table is attached at close and sealed into the deal record. Future investors and legal counsel can access the closing cap table as part of the permanent record — no reconstruction required.</p>
             </div>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
               <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Calculate SAFE conversion before adding it here →</Link>
             </p>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[var(--v2-rule)] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">Cap table modeled. Now close the round that creates it — with a permanent record both parties keep.</p>
-            <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">Join the waitlist</Link>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[14px] max-w-[480px]">Cap table modeled. Now close the round that creates it — with a permanent record both parties keep.</p>
+            <Link to="/sign-up" style={{ fontFamily: "var(--font-v2-ui)" }} className="shrink-0 bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">Join the waitlist</Link>
           </div>
         </section>
       </main>

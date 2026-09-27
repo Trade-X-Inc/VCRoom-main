@@ -121,34 +121,34 @@ function ProductCard() {
 
   return (
     <div className="pub-card-float relative w-[540px] shrink-0">
-      <div className="absolute -inset-4 bg-gradient-to-br from-[#0a2540]/8 via-transparent to-[#0a2540]/4 blur-2xl rounded-2xl" />
+      <div className="absolute -inset-4 bg-gradient-to-br from-[var(--v2-accent)]/8 via-transparent to-[var(--v2-accent)]/4 blur-2xl rounded-2xl" />
 
-      <div className="relative bg-white border border-[#e0e5ee] shadow-[0_24px_64px_rgba(10,37,64,0.12),0_4px_16px_rgba(10,37,64,0.06)] overflow-hidden">
-        <div className="bg-[#f8f9fb] border-b border-[#e6e9ef] px-4 py-3 flex items-center gap-3">
+      <div className="relative bg-white border border-[var(--v2-rule)] shadow-[0_24px_64px_rgba(10,37,64,0.12),0_4px_16px_rgba(10,37,64,0.06)] overflow-hidden">
+        <div className="bg-[var(--v2-surface)] border-b border-[var(--v2-rule)] px-4 py-3 flex items-center gap-3">
           <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#e0e5ee]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[var(--v2-rule)]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[var(--v2-rule)]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[var(--v2-rule)]" />
           </div>
-          <div className="flex-1 bg-white border border-[#e6e9ef] rounded-sm px-3 py-1 text-center">
-            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[10px] text-[#64748b] tracking-[0.3px]">
+          <div className="flex-1 bg-white border border-[var(--v2-rule)] rounded-sm px-3 py-1 text-center">
+            <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[10px] text-[var(--v2-ink-muted)] tracking-[0.3px]">
               app.lengdon.com/room/000042
             </span>
           </div>
         </div>
 
-        <div className="bg-[#0a2540] px-5 py-4 flex items-center justify-between">
+        <div className="bg-[var(--v2-accent)] px-5 py-4 flex items-center justify-between">
           <div>
-            <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[14px] tracking-[-0.2px]">
+            <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[14px] tracking-[-0.2px]">
               Deal Room #000042
             </div>
-            <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[11px] mt-0.5 tracking-[0.3px]">
+            <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[11px] mt-0.5 tracking-[0.3px]">
               ROM Capital · Technology Sector
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-emerald-500/15 border border-emerald-400/30 px-2.5 py-1 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 pub-pulse-glow" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-300 text-[10px] tracking-[0.8px]">ACTIVE</span>
+          <div className="flex items-center gap-2 bg-v2-satisfied/15 border border-v2-satisfied/30 px-2.5 py-1 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-v2-satisfied pub-pulse-glow" />
+            <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white text-[10px] tracking-[0.8px]">ACTIVE</span>
           </div>
         </div>
 
@@ -156,56 +156,56 @@ function ProductCard() {
           {GATE_ROWS.map((g, i) => (
             <div key={g.num}
               className={`flex items-center justify-between py-2.5 ${
-                i < GATE_ROWS.length - 1 ? "border-b border-[#f0f2f5]" : ""
+                i < GATE_ROWS.length - 1 ? "border-b border-[var(--v2-rule-light)]" : ""
               }`}>
               <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#64748b] w-4">{g.num}</span>
-                <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[13px] ${
-                  g.done ? "text-[#0a2540]" : "text-[#0a2540] font-semibold"
+                <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-[var(--v2-ink-muted)] w-4">{g.num}</span>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[13px] ${
+                  g.done ? "text-[var(--v2-accent)]" : "text-[var(--v2-accent)] font-semibold"
                 }`}>{g.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#64748b]">{g.party}</span>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[11px] text-[var(--v2-ink-muted)]">{g.party}</span>
                 {g.done ? (
-                  <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                  <div className="w-4 h-4 rounded-full bg-v2-satisfied flex items-center justify-center shrink-0">
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
                       <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
                 ) : (
-                  <div className="w-4 h-4 rounded-full border-2 border-[#0a2540] shrink-0 pub-pulse-glow" />
+                  <div className="w-4 h-4 rounded-full border-2 border-[var(--v2-accent)] shrink-0 pub-pulse-glow" />
                 )}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-[#e6e9ef] bg-[#f8f9fb] px-5 py-3">
-          <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#64748b] tracking-[1px] uppercase mb-2">
+        <div className="border-t border-[var(--v2-rule)] bg-[var(--v2-surface)] px-5 py-3">
+          <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-[var(--v2-ink-muted)] tracking-[1px] uppercase mb-2">
             Latest Activity
           </div>
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-3">
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[10px] w-10 shrink-0">14:32</span>
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[11px]">Condition Met: Regulatory Approval</span>
+              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[10px] w-10 shrink-0">14:32</span>
+              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[11px]">Condition Met: Regulatory Approval</span>
             </div>
             {newEvent && (
               <div className="flex items-center gap-3" style={{ animation: "pub-data-in 0.5s ease-out" }}>
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[10px] w-10 shrink-0">15:45</span>
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[11px]">Term Accepted: Board Seat</span>
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="ml-auto text-[9px] text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-sm tracking-[0.5px]">NEW</span>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[10px] w-10 shrink-0">15:45</span>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[11px]">Term Accepted: Board Seat</span>
+                <span style={{ fontFamily: "var(--font-v2-data)" }} className="ml-auto text-[9px] text-v2-satisfied bg-v2-satisfied-wash border border-v2-satisfied/30 px-1.5 py-0.5 rounded-sm tracking-[0.5px]">NEW</span>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <div className="absolute -right-2 top-[30%] bg-[#0a2540] px-3 py-2 shadow-lg"
+      <div className="absolute -right-2 top-[30%] bg-[var(--v2-accent)] px-3 py-2 shadow-lg"
         style={{ animation: "pub-card-float 7s ease-in-out infinite 1.5s" }}>
-        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[9px] text-[#d4af37]/70 tracking-[1px] mb-1">AUDIT LOG</div>
-        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/60 font-mono">REF-0017</div>
+        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[9px] text-white/70 tracking-[1px] mb-1">AUDIT LOG</div>
+        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-white/60 font-mono">REF-0017</div>
         <div className="w-px h-3 bg-white/20 mx-auto my-0.5" />
-        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-white/50 font-mono">REF-0018</div>
+        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-white/50 font-mono">REF-0018</div>
       </div>
     </div>
   );
@@ -214,10 +214,10 @@ function ProductCard() {
 // ── Hero Section ──────────────────────────────────────────
 function HeroSection() {
   return (
-    <section className="bg-white min-h-screen flex flex-col relative overflow-hidden border-b border-[#e6e9ef]">
+    <section className="bg-white min-h-screen flex flex-col relative overflow-hidden border-b border-[var(--v2-rule)]">
       <div className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: "linear-gradient(transparent calc(100% - 1px), #f0f2f5 calc(100% - 1px))",
+          backgroundImage: "linear-gradient(transparent calc(100% - 1px), var(--v2-rule-light) calc(100% - 1px))",
           backgroundSize: "100% 80px",
           opacity: 0.5
         }} />
@@ -226,30 +226,30 @@ function HeroSection() {
         <div className="flex items-start justify-between gap-8 w-full">
           <div className="flex flex-col gap-8 max-w-[600px] min-w-0">
             <div className="flex items-center gap-3">
-              <div className="w-4 h-px bg-[#0a2540]/40" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase">
+              <div className="w-4 h-px bg-[var(--v2-accent)]/40" />
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[2px] uppercase">
                 Private Capital · Closing Infrastructure
               </span>
             </div>
 
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
-              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
-              <span className="block text-[#0a2540] text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
+              <span className="block text-[var(--v2-accent)] text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
+              <span className="block text-[var(--v2-accent)] text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
               <span className="block text-[clamp(64px,8vw,120px)]"
-                style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
+                style={{ WebkitTextStroke: "2px var(--v2-accent)", color: "transparent" }}>
                 WAY TO CLOSE
               </span>
             </h1>
 
-            <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#425466] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
               Lengdon structures the transaction between the term sheet and the close — giving founders and investors one shared environment to manage diligence, documentation, approvals, and execution.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] px-9 py-4 transition-colors duration-200 text-center">
+              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[14px] px-9 py-4 transition-colors duration-200 text-center">
                 Join the waitlist
               </Link>
-              <Link to="/product/how-it-works" style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] hover:text-[#0a2540] text-[14px] px-9 py-4 transition-all duration-200 text-center">
+              <Link to="/product/how-it-works" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] hover:border-[var(--v2-accent)]/30 text-[var(--v2-ink-secondary)] hover:text-[var(--v2-accent)] text-[14px] px-9 py-4 transition-all duration-200 text-center">
                 See how it works →
               </Link>
             </div>
@@ -261,7 +261,7 @@ function HeroSection() {
         </div>
       </div>
 
-      <div className="relative z-10 bg-[#0a2540] py-2.5 border-t border-[#13233a]">
+      <div className="relative z-10 bg-[var(--v2-accent)] py-2.5 border-t border-white/10">
         <div className="pub-ticker-wrap">
           <div className="pub-ticker-inner">
             {[
@@ -279,7 +279,7 @@ function HeroSection() {
               "000021 · Payment Proof Uploaded · 9d4c...6b7a",
               "000022 · Close Confirmed: Both Parties · 2e5f...0c9d",
             ]).map((ev, i) => (
-              <span key={i} style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[11px] text-white/50 tracking-[0.5px] mx-8">
+              <span key={i} style={{ fontFamily: "var(--font-v2-data)" }} className="text-[11px] text-white/50 tracking-[0.5px] mx-8">
                 <span className="text-white/20 mr-2">▸</span>{ev}
               </span>
             ))}
@@ -294,8 +294,8 @@ function HeroSection() {
 function SectionLabel({ children }: { children: string }) {
   return (
     <div className="flex items-center gap-3 mb-6">
-      <div className="w-5 h-px bg-[#0a2540]/30" />
-      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">
+      <div className="w-5 h-px bg-[var(--v2-accent)]/30" />
+      <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[10px] tracking-[2px] uppercase">
         {children}
       </span>
     </div>
@@ -327,34 +327,34 @@ const RECORD_ENTRIES = [
 // Replaced with a real property of the record itself.
 function AppendOnlyRecordSection() {
   return (
-    <section className="bg-white border-b border-[#e6e9ef] py-24 max-w-[1440px] mx-auto w-full overflow-hidden">
+    <section className="bg-white border-b border-[var(--v2-rule)] py-24 max-w-[1440px] mx-auto w-full overflow-hidden">
       <div className="px-12 lg:px-16">
         <Reveal>
           <SectionLabel>Architecture</SectionLabel>
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-20 items-start">
             <div className="lg:w-[400px] shrink-0">
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold leading-[0.88] tracking-[-3px] mb-8">
-                <span className="block text-[#0a2540] text-[clamp(48px,7vw,80px)]">THE</span>
-                <span className="block text-[#0a2540] text-[clamp(48px,7vw,80px)]">APPEND-ONLY</span>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3px] mb-8">
+                <span className="block text-[var(--v2-accent)] text-[clamp(48px,7vw,80px)]">THE</span>
+                <span className="block text-[var(--v2-accent)] text-[clamp(48px,7vw,80px)]">APPEND-ONLY</span>
                 <span className="block text-[clamp(48px,7vw,80px)]"
-                  style={{ WebkitTextStroke: "2px #0a2540", color: "transparent" }}>
+                  style={{ WebkitTextStroke: "2px var(--v2-accent)", color: "transparent" }}>
                   RECORD.
                 </span>
               </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] mb-8">
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[16px] leading-[1.7] mb-8">
                 Every action is written to a permanent, append-only log where each entry references the one before it. Altering an earlier entry breaks that reference — visibly, and permanently.
               </p>
-              <div className="flex flex-col gap-4 border-t border-[#e6e9ef] pt-6">
+              <div className="flex flex-col gap-4 border-t border-[var(--v2-rule)] pt-6">
                 {[
                   { prop: "Append-only", desc: "No deletes. No edits. Additions only." },
                   { prop: "Tamper-evident", desc: "Each entry references its predecessor." },
                   { prop: "Permanent", desc: "The sealed record stays inspectable by both parties, unchanged, for the life of the deal." },
                 ].map((item) => (
                   <div key={item.prop} className="flex gap-4">
-                    <div className="w-2 h-2 rounded-full bg-[#0a2540] mt-1.5 shrink-0" />
+                    <div className="w-2 h-2 rounded-full bg-[var(--v2-accent)] mt-1.5 shrink-0" />
                     <div>
-                      <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px]">{item.prop} — </span>
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px]">{item.desc}</span>
+                      <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px]">{item.prop} — </span>
+                      <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[13px]">{item.desc}</span>
                     </div>
                   </div>
                 ))}
@@ -364,7 +364,7 @@ function AppendOnlyRecordSection() {
             <div className="flex-1 min-w-0">
               <div className="relative">
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#0a2540]/20 to-transparent"
+                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--v2-accent)]/20 to-transparent"
                     style={{ animation: "pub-scan-verify 4s ease-in-out infinite" }} />
                 </div>
 
@@ -375,38 +375,38 @@ function AppendOnlyRecordSection() {
                         {i > 0 && (
                           <div className="flex items-center gap-4 px-6 py-2">
                             <div className="flex flex-col items-center gap-1 w-8 shrink-0">
-                              <div className="w-px h-3 bg-[#e6e9ef]" />
-                              <div className="w-4 h-4 rounded-full border-2 border-[#e6e9ef] flex items-center justify-center">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#c9d0db]" />
+                              <div className="w-px h-3 bg-[var(--v2-rule)]" />
+                              <div className="w-4 h-4 rounded-full border-2 border-[var(--v2-rule)] flex items-center justify-center">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--v2-rule)]" />
                               </div>
-                              <div className="w-px h-3 bg-[#e6e9ef]" />
+                              <div className="w-px h-3 bg-[var(--v2-rule)]" />
                             </div>
-                            <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] text-[#64748b] tracking-[0.5px]">
+                            <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-[var(--v2-ink-muted)] tracking-[0.5px]">
                               next entry in the record
                             </div>
                           </div>
                         )}
 
-                        <div className="border border-[#e6e9ef] bg-white hover:border-[#0a2540]/20 transition-colors duration-300 relative group">
-                          <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#0a2540]" />
+                        <div className="border border-[var(--v2-rule)] bg-white hover:border-[var(--v2-accent)]/20 transition-colors duration-300 relative group">
+                          <div className="absolute top-0 left-0 bottom-0 w-1 bg-[var(--v2-accent)]" />
                           <div className="pl-6 pr-6 py-5">
                             <div className="flex items-start justify-between gap-4 mb-3">
                               <div className="flex items-center gap-3">
-                                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[11px]">
+                                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px]">
                                   {entry.ts}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-700 text-[10px] tracking-[0.5px]">RECORDED</span>
+                              <div className="flex items-center gap-2 bg-v2-satisfied-wash border border-v2-satisfied/30 px-2 py-0.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-v2-satisfied" />
+                                <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-v2-satisfied text-[10px] tracking-[0.5px]">RECORDED</span>
                               </div>
                             </div>
-                            <p style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[16px] mb-3">
+                            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[16px] mb-3">
                               {entry.action}
                             </p>
                             <div className="flex items-center gap-2">
-                              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[11px] text-[#64748b] tracking-[0.3px]">REFERENCE:</span>
-                              <span className="font-mono text-[12px] text-[#425466] bg-[#f8f9fb] px-2 py-0.5 border border-[#e6e9ef]">
+                              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[11px] text-[var(--v2-ink-muted)] tracking-[0.3px]">REFERENCE:</span>
+                              <span className="font-v2-data text-[12px] text-[var(--v2-ink-secondary)] bg-[var(--v2-surface)] px-2 py-0.5 border border-[var(--v2-rule)]">
                                 {entry.ref}
                               </span>
                             </div>
@@ -419,15 +419,15 @@ function AppendOnlyRecordSection() {
                   <Reveal delay={400}>
                     <div className="flex items-center gap-4 px-6 py-3">
                       <div className="flex flex-col items-center gap-1 w-8 shrink-0">
-                        <div className="w-px h-4 bg-[#e6e9ef]" />
+                        <div className="w-px h-4 bg-[var(--v2-rule)]" />
                       </div>
-                      <div className="flex items-center gap-3 bg-[#0a2540] px-4 py-2">
+                      <div className="flex items-center gap-3 bg-[var(--v2-accent)] px-4 py-2">
                         <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
                           <rect x="1" y="5" width="10" height="8" rx="1" stroke="white" strokeWidth="1.2"/>
                           <path d="M3.5 5V3.5a2.5 2.5 0 0 1 5 0V5" stroke="white" strokeWidth="1.2"/>
                           <circle cx="6" cy="9.5" r="1" fill="white"/>
                         </svg>
-                        <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white text-[11px] tracking-[1px]">
+                        <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white text-[11px] tracking-[1px]">
                           RECORD CONTINUES → SEALED AT CLOSE
                         </span>
                       </div>
@@ -487,11 +487,11 @@ function DemoSection() {
   };
 
   return (
-    <section className="bg-white border-b border-[#e6e9ef] py-24 max-w-[1440px] mx-auto w-full">
+    <section className="bg-white border-b border-[var(--v2-rule)] py-24 max-w-[1440px] mx-auto w-full">
       <div className="px-12 lg:px-16">
         <Reveal>
           <SectionLabel>Demo</SectionLabel>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(40px,7vw,80px)] leading-[0.9] tracking-[-2.5px] mb-16">
+          <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[clamp(40px,7vw,80px)] leading-[0.9] tracking-[-2.5px] mb-16">
             SEE LENGDON CLOSE
           </h2>
         </Reveal>
@@ -500,7 +500,7 @@ function DemoSection() {
           <Reveal className="flex-1">
             <button
               type="button"
-              className="relative bg-[#0a2540] overflow-hidden cursor-pointer group h-full min-h-[420px] w-full text-left block"
+              className="relative bg-[var(--v2-accent)] overflow-hidden cursor-pointer group h-full min-h-[420px] w-full text-left block"
               onClick={() => setPlaying(!playing)}
               aria-label={playing ? "Pause product walkthrough video" : "Play product walkthrough video"}
               aria-pressed={playing}
@@ -538,13 +538,13 @@ function DemoSection() {
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 p-7">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[1px] mb-2">
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[1px] mb-2">
                   3:24 MIN
                 </div>
-                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[22px] tracking-[-0.5px]">
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[22px] tracking-[-0.5px]">
                   The full transaction lifecycle
                 </div>
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/60 text-[14px] mt-1">
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/60 text-[14px] mt-1">
                   Room setup → Engage → Close. No narration, just the product.
                 </div>
               </div>
@@ -553,7 +553,7 @@ function DemoSection() {
                 {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch, i) => (
                   <div key={ch} className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${playing && i === 2 ? "bg-white" : "bg-white/30"}`} />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[10px] tracking-[0.5px]">{ch}</span>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[10px] tracking-[0.5px]">{ch}</span>
                   </div>
                 ))}
               </div>
@@ -561,17 +561,17 @@ function DemoSection() {
           </Reveal>
 
           <Reveal delay={150} className="flex-1 max-w-[480px]">
-            <div className="border border-[#e6e9ef] p-8 lg:p-10 h-full flex flex-col">
+            <div className="border border-[var(--v2-rule)] p-8 lg:p-10 h-full flex flex-col">
               {submitted ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 py-12">
-                  <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-v2-satisfied-wash border border-v2-satisfied/30 flex items-center justify-center">
                     <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-                      <path d="M2 8L8 14L20 2" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M2 8L8 14L20 2" stroke="var(--v2-satisfied)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
                   <div>
-                    <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] mb-2">Confirmed</div>
-                    <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.6]">
+                    <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] mb-2">Confirmed</div>
+                    <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.6]">
                       Your demo is booked for <strong>{formData.slot}</strong>.<br />
                       Expect a calendar invite at {formData.email}.
                     </p>
@@ -580,69 +580,69 @@ function DemoSection() {
               ) : (
                 <>
                   <div className="mb-8">
-                    <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[26px] tracking-[-0.5px] mb-2">
+                    <h3 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[26px] tracking-[-0.5px] mb-2">
                       Book a private demo
                     </h3>
-                    <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.6]">
+                    <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[14px] leading-[1.6]">
                       30 minutes. We'll show you a live transaction from Room setup to Close. No sales pressure — just the product.
                     </p>
                   </div>
 
                   <form onSubmit={handleSubmit} className="flex flex-col gap-5 flex-1">
                     <div className="flex flex-col gap-1.5">
-                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Full name</label>
+                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Full name</label>
                       <input
                         type="text" placeholder="Jane Thornton"
                         value={formData.name}
                         onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                        style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors"
+                        style={{ fontFamily: "var(--font-v2-ui)" }}
+                        className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Work email</label>
+                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Work email</label>
                       <input
                         type="email" placeholder="jane@firm.com"
                         value={formData.email}
                         onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                        style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors"
+                        style={{ fontFamily: "var(--font-v2-ui)" }}
+                        className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Company</label>
+                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Company</label>
                       <input
                         type="text" placeholder="ROM Capital Partners"
                         value={formData.company}
                         onChange={e => setFormData(p => ({ ...p, company: e.target.value }))}
-                        style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                        className="border border-[#e6e9ef] px-4 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors"
+                        style={{ fontFamily: "var(--font-v2-ui)" }}
+                        className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.3px]">Select a time</label>
+                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Select a time</label>
                       <div className="grid grid-cols-2 gap-2">
                         {slots.map(slot => (
                           <button type="button" key={slot}
                             onClick={() => setFormData(p => ({ ...p, slot }))}
                             className={`border px-3 py-2.5 text-left transition-all duration-150 ${
                               formData.slot === slot
-                                ? "border-[#0a2540] bg-[#0a2540] text-white"
-                                : "border-[#e6e9ef] text-[#425466] hover:border-[#0a2540]/30"
+                                ? "border-[var(--v2-accent)] bg-[var(--v2-accent)] text-white"
+                                : "border-[var(--v2-rule)] text-[var(--v2-ink-secondary)] hover:border-[var(--v2-accent)]/30"
                             }`}>
-                            <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[12px] leading-[1.4]">{slot}</span>
+                            <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[12px] leading-[1.4]">{slot}</span>
                           </button>
                         ))}
                       </div>
                     </div>
                     {submitError && (
-                      <div className="border border-red-200 bg-red-50 px-4 py-3">
-                        <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-red-700 text-[13px]">{submitError}</span>
+                      <div className="border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3">
+                        <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-v2-adverse text-[13px]">{submitError}</span>
                       </div>
                     )}
                     <button type="submit"
-                      style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
-                      className="mt-auto bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[14px] py-4 transition-colors duration-200 disabled:opacity-40"
+                      style={{ fontFamily: "var(--font-v2-ui)" }}
+                      className="mt-auto bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[14px] py-4 transition-colors duration-200 disabled:opacity-40"
                       disabled={!formData.name || !formData.email || !formData.slot || submitting}>
                       {submitting ? "Booking…" : "Confirm booking"}
                     </button>
@@ -673,7 +673,7 @@ const PROCESS_PHASES_V2 = [
     desc: "Both legal teams are brought in. Transaction parameters are formally established before any data is shared. No term sheet, no data room — only counsel.",
     img: "/images/homepage/process-counsel.webp",
     imgAlt: "Formal boardroom with long conference table and chairs",
-    bg: "#0a2540",
+    bg: "var(--v2-accent)",
   },
   {
     num: "02", title: "AGREEMENT",
@@ -681,7 +681,7 @@ const PROCESS_PHASES_V2 = [
     desc: "Each party independently confirms their intent to proceed. No single confirmation can trigger the next gate. Both must act; neither can force the other forward.",
     img: "/images/homepage/process-agreement.webp",
     imgAlt: "Two people shaking hands over a signed document",
-    bg: "#0d1b2e",
+    bg: "var(--pub-n-0d)",
   },
   {
     num: "03", title: "CONDITIONS",
@@ -689,7 +689,7 @@ const PROCESS_PHASES_V2 = [
     desc: "Each condition precedent is added to the checklist and tracked until satisfied. The gate itself is enforced — the transaction cannot advance to Signing until every condition is marked complete.",
     img: "/images/homepage/process-conditions.webp",
     imgAlt: "Compliance checklist documentation",
-    bg: "#0a2540",
+    bg: "var(--v2-accent)",
   },
   {
     num: "04", title: "SIGNING",
@@ -697,7 +697,7 @@ const PROCESS_PHASES_V2 = [
     desc: "Transaction documents are executed in sequence by each party. No joint session — each signs in their own time, in their own jurisdiction, with their own counsel present.",
     img: "/images/homepage/process-signing.webp",
     imgAlt: "Person signing a formal document with pen",
-    bg: "#0d1b2e",
+    bg: "var(--pub-n-0d)",
   },
   {
     num: "05", title: "PAYMENT",
@@ -705,7 +705,7 @@ const PROCESS_PHASES_V2 = [
     desc: "Investor confirms transfer. Founder confirms receipt. Both confirmations are required to proceed. The system records each action independently.",
     img: "/images/homepage/process-payment.webp",
     imgAlt: "Person completing a financial transaction on laptop",
-    bg: "#0a2540",
+    bg: "var(--v2-accent)",
   },
   {
     num: "06", title: "CLOSE",
@@ -713,7 +713,7 @@ const PROCESS_PHASES_V2 = [
     desc: "Mutual confirmation seals the record permanently. The complete audit trail stops accepting new entries and stays accessible to both parties. Nothing changes after this point.",
     img: "/images/homepage/process-close.webp",
     imgAlt: "Wooden wax seal stamp on a table",
-    bg: "#0d1b2e",
+    bg: "var(--pub-n-0d)",
   },
 ];
 
@@ -723,17 +723,17 @@ function ProcessSection() {
   const toggle = (num: string) => setOpenPhase(prev => prev === num ? null : num);
 
   return (
-    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
+    <section className="bg-white border-b border-[var(--v2-rule)] max-w-[1440px] mx-auto w-full">
       <div className="flex" style={{ minHeight: "100vh" }}>
-        <div className="hidden lg:flex w-[480px] xl:w-[540px] shrink-0 sticky top-0 h-screen flex-col border-r border-[#e6e9ef] px-12 xl:px-16 py-20">
+        <div className="hidden lg:flex w-[480px] xl:w-[540px] shrink-0 sticky top-0 h-screen flex-col border-r border-[var(--v2-rule)] px-12 xl:px-16 py-20">
           <div className="flex flex-col gap-6 flex-1">
             <SectionLabel>Process</SectionLabel>
 
-            <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(64px, 6vw, 88px)" }} className="font-semibold text-[#0a2540] leading-[0.88] tracking-[-3.5px]">
+            <h2 style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(64px, 6vw, 88px)" }} className="font-semibold text-[var(--v2-accent)] leading-[0.88] tracking-[-3.5px]">
               PROCESS
             </h2>
 
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75] max-w-[320px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.75] max-w-[320px]">
               Six sequential gates. Each requires the one before it. The order is enforced by the system — not by convention.
             </p>
 
@@ -747,9 +747,9 @@ function ProcessSection() {
                   }`}
                 >
                   <div className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${
-                    openPhase === p.num ? "bg-[#0a2540]" : "bg-[#c9d0db] group-hover:bg-[#0a2540]/40"
+                    openPhase === p.num ? "bg-[var(--v2-accent)]" : "bg-[var(--v2-rule)] group-hover:bg-[var(--v2-accent)]/40"
                   }`} />
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[12px] tracking-[0.5px]">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.5px]">
                     {p.num} — {p.title}
                   </span>
                 </button>
@@ -757,7 +757,7 @@ function ProcessSection() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-[#64748b] text-[11px] tracking-[1px]" style={{ fontFamily: "'Inter:Regular', sans-serif" }}>
+          <div className="flex items-center gap-2 text-[var(--v2-ink-muted)] text-[11px] tracking-[1px]" style={{ fontFamily: "var(--font-v2-ui)" }}>
             <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
               <path d="M1 4H15M15 4L12 1M15 4L12 7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -773,7 +773,7 @@ function ProcessSection() {
             return (
               <div
                 key={phase.num}
-                className={`group overflow-hidden cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isLast ? "border-b border-[#e6e9ef]" : ""}`}
+                className={`group overflow-hidden cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isLast ? "border-b border-[var(--v2-rule)]" : ""}`}
                 style={{ height: isOpen ? 540 : 90 }}
                 onClick={() => toggle(phase.num)}
                 role="button"
@@ -783,34 +783,34 @@ function ProcessSection() {
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(phase.num); } }}
               >
                 <div className="h-[90px] flex items-center px-8 lg:px-12 gap-6 select-none relative overflow-hidden">
-                  <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] w-5 shrink-0">
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[10px] tracking-[2px] w-5 shrink-0">
                     {phase.num}
                   </span>
 
                   <span
-                    style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(60px, 5.5vw, 80px)", whiteSpace: "nowrap" }}
+                    style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(60px, 5.5vw, 80px)", whiteSpace: "nowrap" }}
                     className={`font-semibold leading-[90px] tracking-[-2.5px] overflow-hidden transition-colors duration-300 ${
                       isOpen
-                        ? "text-[#0a2540]"
-                        : "text-[#0a2540]/70 group-hover:text-[#0a2540]"
+                        ? "text-[var(--v2-accent)]"
+                        : "text-[var(--v2-accent)]/70 group-hover:text-[var(--v2-accent)]"
                     }`}
                   >
                     {phase.title}
                   </span>
 
                   <div className="ml-auto flex items-center gap-5 shrink-0">
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="hidden md:block text-[#64748b] text-[11px] tracking-[0.3px]">
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="hidden md:block text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">
                       {phase.party}
                     </span>
                     <svg
                       width="18" height="10" viewBox="0 0 18 10" fill="none"
                       className={`transition-transform duration-500 shrink-0 ${isOpen ? "rotate-180" : ""}`}
                     >
-                      <path d="M1 1L9 9L17 1" stroke={isOpen ? "#0a2540" : "#94a3b8"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M1 1L9 9L17 1" stroke={isOpen ? "var(--v2-accent)" : "var(--v2-ink-muted)"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
 
-                  <div className={`absolute bottom-0 left-0 h-px bg-[#0a2540]/8 transition-all duration-500 ${
+                  <div className={`absolute bottom-0 left-0 h-px bg-[var(--v2-accent)]/8 transition-all duration-500 ${
                     isOpen ? "w-full" : "w-0 group-hover:w-full"
                   }`} />
                 </div>
@@ -819,7 +819,7 @@ function ProcessSection() {
                   className={`flex transition-opacity duration-500 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                   style={{ height: 450 }}
                 >
-                  <div className="w-[55%] lg:w-[58%] shrink-0 overflow-hidden relative bg-[#0a2540]">
+                  <div className="w-[55%] lg:w-[58%] shrink-0 overflow-hidden relative bg-[var(--v2-accent)]">
                     <img
                       src={phase.img}
                       alt={phase.imgAlt}
@@ -828,8 +828,8 @@ function ProcessSection() {
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                       style={{ opacity: 0.88 }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0a2540]/30 pointer-events-none" />
-                    <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="absolute bottom-6 left-8 font-semibold text-white/12 text-[120px] leading-none tracking-[-5px] select-none pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[var(--v2-accent)]/30 pointer-events-none" />
+                    <div style={{ fontFamily: "var(--font-v2-ui)" }} className="absolute bottom-6 left-8 font-semibold text-white/12 text-[120px] leading-none tracking-[-5px] select-none pointer-events-none">
                       {phase.num}
                     </div>
                   </div>
@@ -840,24 +840,24 @@ function ProcessSection() {
                   >
                     <div className="flex flex-col gap-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-4 h-px bg-[#d4af37]/50" />
-                        <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#d4af37]/70 text-[10px] tracking-[2px] uppercase">
+                        <div className="w-4 h-px bg-white/50" />
+                        <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[10px] tracking-[2px] uppercase">
                           Gate {phase.num} of 06
                         </span>
                       </div>
 
-                      <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[32px] xl:text-[38px] leading-[1.05] tracking-[-1px]">
+                      <h3 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[32px] xl:text-[38px] leading-[1.05] tracking-[-1px]">
                         {phase.title}
                       </h3>
 
                       <div className="inline-flex items-center gap-2 border border-white/10 px-3.5 py-1.5 w-fit">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/70" />
-                        <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[0.8px] uppercase">
+                        <div className="w-1.5 h-1.5 rounded-full bg-v2-satisfied/70" />
+                        <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[0.8px] uppercase">
                           {phase.party}
                         </span>
                       </div>
 
-                      <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/65 text-[14px] xl:text-[15px] leading-[1.75]">
+                      <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/65 text-[14px] xl:text-[15px] leading-[1.75]">
                         {phase.desc}
                       </p>
                     </div>
@@ -868,14 +868,14 @@ function ProcessSection() {
                           key={p.num}
                           className={`transition-all duration-300 ${
                             p.num === phase.num
-                              ? "w-6 h-1.5 bg-[#d4af37]/80"
+                              ? "w-6 h-1.5 bg-white/80"
                               : parseInt(p.num) < parseInt(phase.num)
                               ? "w-1.5 h-1.5 rounded-full bg-white/30"
                               : "w-1.5 h-1.5 rounded-full bg-white/10"
                           }`}
                         />
                       ))}
-                      <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
+                      <span style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
                         {phase.num} / 06
                       </span>
                     </div>
@@ -894,13 +894,13 @@ function ProcessSection() {
 function InfrastructureBannerSection() {
   return (
     <Reveal>
-      <section className="bg-[#0d1b2e] py-20 px-12 lg:px-16 max-w-[1440px] mx-auto w-full border-b border-[#e6e9ef]">
+      <section className="bg-[var(--pub-n-0d)] py-20 px-12 lg:px-16 max-w-[1440px] mx-auto w-full border-b border-[var(--v2-rule)]">
         <div className="flex flex-col lg:flex-row items-end justify-between gap-12">
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(48px,6vw,96px)" }} className="font-semibold text-[#f9fcff] leading-[0.88] tracking-[-3px] max-w-[700px]">
+          <h2 style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(48px,6vw,96px)" }} className="font-semibold text-white leading-[0.88] tracking-[-3px] max-w-[700px]">
             INFRASTRUCTURE,<br />NOT PARTICIPANT
           </h2>
           <div className="lg:max-w-[400px]">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/65 text-[16px] leading-[1.7]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/65 text-[16px] leading-[1.7]">
               Lengdon is closing infrastructure for private capital. It begins when two parties have already decided to talk, and ends when the transaction closes or is declined — leaving a permanent, verifiable record either way.
             </p>
           </div>
@@ -918,17 +918,17 @@ function InfrastructureBannerSection() {
 // override).
 function SecuritySection() {
   return (
-    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
+    <section className="bg-white border-b border-[var(--v2-rule)] max-w-[1440px] mx-auto w-full">
       <div className="flex flex-col lg:flex-row">
-        <Reveal className="flex-1 px-12 lg:px-16 py-24 border-r border-[#e6e9ef]">
+        <Reveal className="flex-1 px-12 lg:px-16 py-24 border-r border-[var(--v2-rule)]">
           <SectionLabel>Trust</SectionLabel>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(40px,7vw,64px)] leading-[0.9] tracking-[-2px] mb-8">
+          <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[clamp(40px,7vw,64px)] leading-[0.9] tracking-[-2px] mb-8">
             SECURITY<br />&amp; TRUST
           </h2>
-          <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[16px] leading-[1.7] max-w-[400px] mb-10">
+          <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[16px] leading-[1.7] max-w-[400px] mb-10">
             Encryption at rest and in transit; mandatory multi-factor authentication; role-scoped access; per-person NDAs; the append-only record; no money movement, no custody, no escrow.
           </p>
-          <Link to="/legal/privacy" style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="flex items-center gap-2 text-[#0a2540] text-[14px] hover:opacity-60 transition-opacity">
+          <Link to="/legal/privacy" style={{ fontFamily: "var(--font-v2-data)" }} className="flex items-center gap-2 text-[var(--v2-accent)] text-[14px] hover:opacity-60 transition-opacity">
             Read the Privacy Policy <span>→</span>
           </Link>
         </Reveal>
@@ -1003,17 +1003,17 @@ function AudienceSection() {
   const current = AUDIENCES[active];
 
   return (
-    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full">
-      <div className="px-12 lg:px-16 pt-24 pb-14 border-b border-[#e6e9ef]">
+    <section className="bg-white border-b border-[var(--v2-rule)] max-w-[1440px] mx-auto w-full">
+      <div className="px-12 lg:px-16 pt-24 pb-14 border-b border-[var(--v2-rule)]">
         <Reveal>
           <div className="flex flex-col lg:flex-row justify-between gap-8 items-end">
             <div>
               <SectionLabel>Audience</SectionLabel>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(52px,6vw,80px)" }} className="font-semibold text-[#0a2540] leading-[0.9] tracking-[-2.5px]">
+              <h2 style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(52px,6vw,80px)" }} className="font-semibold text-[var(--v2-accent)] leading-[0.9] tracking-[-2.5px]">
                 WHO IT'S FOR
               </h2>
             </div>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75] max-w-[440px] pb-1">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.75] max-w-[440px] pb-1">
               Lengdon is built for every party in a private capital transaction — not just the two principals. Each role gets the access and record they need, separated by design.
             </p>
           </div>
@@ -1021,28 +1021,28 @@ function AudienceSection() {
       </div>
 
       <div className="flex flex-col lg:flex-row lg:min-h-[560px]">
-        <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 border-r border-[#e6e9ef] flex flex-col">
+        <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 border-r border-[var(--v2-rule)] flex flex-col">
           {AUDIENCES.map((a, i) => (
             <button
               key={a.role}
               onClick={() => setActive(i)}
-              className={`group flex items-center justify-between px-8 py-4 border-b border-[#e6e9ef] text-left transition-all duration-200 last:border-b-0 ${
+              className={`group flex items-center justify-between px-8 py-4 border-b border-[var(--v2-rule)] text-left transition-all duration-200 last:border-b-0 ${
                 active === i
-                  ? "bg-[#0a2540]"
-                  : "bg-white hover:bg-[#f8f9fb]"
+                  ? "bg-[var(--v2-accent)]"
+                  : "bg-white hover:bg-[var(--v2-surface)]"
               }`}
             >
               <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[#64748b]"}`}>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[var(--v2-ink-muted)]"}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span style={{ fontFamily: "'Geist:Regular', sans-serif" }} className={`text-[15px] tracking-[-0.2px] transition-colors ${active === i ? "text-white" : "text-[#0a2540] group-hover:text-[#0a2540]"}`}>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[15px] tracking-[-0.2px] transition-colors ${active === i ? "text-white" : "text-[var(--v2-accent)] group-hover:text-[var(--v2-accent)]"}`}>
                   {a.role}
                 </span>
               </div>
               <svg width="14" height="8" viewBox="0 0 14 8" fill="none"
                 className={`shrink-0 transition-opacity ${active === i ? "opacity-100" : "opacity-0 group-hover:opacity-30"}`}>
-                <path d="M1 4H13M13 4L10 1M13 4L10 7" stroke={active === i ? "white" : "#0a2540"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 4H13M13 4L10 1M13 4L10 7" stroke={active === i ? "white" : "var(--v2-accent)"} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           ))}
@@ -1052,26 +1052,26 @@ function AudienceSection() {
           <div className="flex-1 min-w-0 px-12 xl:px-16 py-12 flex flex-col justify-between">
             <div className="flex flex-col gap-7">
               <div className="flex items-center gap-3">
-                <div className="w-4 h-px bg-[#d4af37]/60" />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#d4af37]/80 text-[10px] tracking-[2px] uppercase">
+                <div className="w-4 h-px bg-[var(--v2-accent)]/60" />
+                <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)]/80 text-[10px] tracking-[2px] uppercase">
                   {current.tag}
                 </span>
               </div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(36px,4vw,52px)" }} className="font-semibold text-[#0a2540] leading-[1.0] tracking-[-1.5px]">
+              <h3 style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(36px,4vw,52px)" }} className="font-semibold text-[var(--v2-accent)] leading-[1.0] tracking-[-1.5px]">
                 {current.role}
               </h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] xl:text-[16px] leading-[1.75] max-w-[480px]">
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] xl:text-[16px] leading-[1.75] max-w-[480px]">
                 {current.desc}
               </p>
-              <div className="flex flex-col gap-0 border-t border-[#e6e9ef] pt-6">
+              <div className="flex flex-col gap-0 border-t border-[var(--v2-rule)] pt-6">
                 {current.uses.map((u, i) => (
-                  <div key={i} className={`flex items-center gap-4 py-3 ${i < current.uses.length - 1 ? "border-b border-[#f0f2f5]" : ""}`}>
-                    <div className="w-4 h-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <div key={i} className={`flex items-center gap-4 py-3 ${i < current.uses.length - 1 ? "border-b border-[var(--v2-rule-light)]" : ""}`}>
+                    <div className="w-4 h-4 rounded-full bg-v2-satisfied-wash border border-v2-satisfied/30 flex items-center justify-center shrink-0">
                       <svg width="7" height="5" viewBox="0 0 7 5" fill="none">
-                        <path d="M1 2.5L2.5 4L6 1" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M1 2.5L2.5 4L6 1" stroke="var(--v2-satisfied)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px]">{u}</span>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[13px]">{u}</span>
                   </div>
                 ))}
               </div>
@@ -1080,26 +1080,26 @@ function AudienceSection() {
               {AUDIENCES.map((a, i) => (
                 <button key={i} onClick={() => setActive(i)}
                   aria-label={`View ${a.role}`} aria-current={i === active ? "true" : undefined}
-                  className={`transition-all duration-300 ${i === active ? "w-5 h-1.5 bg-[#0a2540]" : "w-1.5 h-1.5 rounded-full bg-[#e6e9ef] hover:bg-[#c9d0db]"}`} />
+                  className={`transition-all duration-300 ${i === active ? "w-5 h-1.5 bg-[var(--v2-accent)]" : "w-1.5 h-1.5 rounded-full bg-[var(--v2-rule)] hover:bg-[var(--v2-rule)]"}`} />
               ))}
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="ml-auto text-[#64748b] text-[11px] tracking-[0.5px]">
+              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-[var(--v2-ink-muted)] text-[11px] tracking-[0.5px]">
                 {String(active + 1).padStart(2, "0")} / {String(AUDIENCES.length).padStart(2, "0")}
               </span>
             </div>
           </div>
 
-          <div className="hidden xl:flex w-[280px] shrink-0 border-l border-[#e6e9ef] bg-[#f8f9fb] flex-col items-center justify-center relative overflow-hidden">
+          <div className="hidden xl:flex w-[280px] shrink-0 border-l border-[var(--v2-rule)] bg-[var(--v2-surface)] flex-col items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
-              <span style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(80px, 10vw, 140px)", writingMode: "vertical-rl", transform: "rotate(180deg)" }} className="font-semibold text-[#0a2540]/5 leading-none tracking-[-4px]">
+              <span style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(80px, 10vw, 140px)", writingMode: "vertical-rl", transform: "rotate(180deg)" }} className="font-semibold text-[var(--v2-accent)]/5 leading-none tracking-[-4px]">
                 {current.role.toUpperCase()}
               </span>
             </div>
             <div className="relative z-10 flex flex-col items-center gap-3">
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Role</span>
-              <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(36px,7vw,56px)] leading-none tracking-[-2px]">
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[10px] tracking-[2px] uppercase">Role</span>
+              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[clamp(36px,7vw,56px)] leading-none tracking-[-2px]">
                 {String(active + 1).padStart(2, "0")}
               </span>
-              <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>
+              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>
             </div>
           </div>
         </div>
@@ -1111,10 +1111,10 @@ function AudienceSection() {
 // ── CTA SECTION ───────────────────────────────────────────
 function CTASection() {
   return (
-    <section className="bg-white border-b border-[#e6e9ef] max-w-[1440px] mx-auto w-full overflow-hidden">
+    <section className="bg-white border-b border-[var(--v2-rule)] max-w-[1440px] mx-auto w-full overflow-hidden">
       <Reveal>
         <div className="flex flex-col lg:flex-row">
-          <div className="flex-1 bg-[#0a2540] px-12 xl:px-20 py-24 lg:py-32 flex flex-col justify-between relative overflow-hidden">
+          <div className="flex-1 bg-[var(--v2-accent)] px-12 xl:px-20 py-24 lg:py-32 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none"
               style={{
                 backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
@@ -1122,27 +1122,27 @@ function CTASection() {
               }} />
             <div className="relative z-10 flex flex-col gap-10">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-emerald-400" style={{ animation: "pub-pulse-glow 2s ease-in-out infinite" }} />
-                <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-emerald-400/70 text-[11px] tracking-[2px] uppercase">
+                <div className="w-2 h-2 rounded-full bg-v2-satisfied" style={{ animation: "pub-pulse-glow 2s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[11px] tracking-[2px] uppercase">
                   Infrastructure live
                 </span>
               </div>
 
               <div>
-                <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(64px, 8vw, 116px)" }} className="font-semibold text-white leading-[0.88] tracking-[-3.5px]">
+                <h2 style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(64px, 8vw, 116px)" }} className="font-semibold text-white leading-[0.88] tracking-[-3.5px]">
                   READY<br />TO CLOSE?
                 </h2>
               </div>
 
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[440px]">
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[440px]">
                 Initialize a room, invite both parties, and begin the six-gate process today. No integration, no setup call, no consultant required.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f5f0e8] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-all duration-200 active:scale-95">
+                <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-white hover:bg-v2-surface text-[var(--v2-accent)] font-semibold text-[14px] px-10 py-4 transition-all duration-200 active:scale-95">
                   Join the waitlist
                 </Link>
-                <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+                <Link to="/sign-in" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
                   Sign in →
                 </Link>
               </div>
@@ -1155,20 +1155,20 @@ function CTASection() {
                   "Per-person NDA, not per company",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
-                    <div className="w-1 h-1 rounded-full bg-[#d4af37]/60" />
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[12px] tracking-[0.3px]">{item}</span>
+                    <div className="w-1 h-1 rounded-full bg-white/60" />
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[12px] tracking-[0.3px]">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(120px, 18vw, 260px)" }} className="absolute bottom-0 right-0 font-semibold text-white/4 leading-none tracking-[-8px] select-none pointer-events-none">
+            <div style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(120px, 18vw, 260px)" }} className="absolute bottom-0 right-0 font-semibold text-white/4 leading-none tracking-[-8px] select-none pointer-events-none">
               06
             </div>
           </div>
 
           <div className="lg:w-[420px] xl:w-[480px] shrink-0 flex flex-col">
-            <div className="flex-1 relative overflow-hidden bg-[#0d1b2e] min-h-[320px]">
+            <div className="flex-1 relative overflow-hidden bg-[var(--pub-n-0d)] min-h-[320px]">
               <img
                 src="/images/homepage/cta-transaction.webp"
                 alt="Two parties completing a private capital transaction"
@@ -1176,27 +1176,27 @@ function CTASection() {
                 height={450}
                 className="w-full h-full object-cover opacity-70"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a2540]/60 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--v2-accent)]/60 to-transparent pointer-events-none" />
               <div className="absolute bottom-6 left-8 right-8">
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
-                <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-white/80 text-[13px] tracking-[-0.2px]">
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/80 text-[13px] tracking-[-0.2px]">
                   000042 · Conditions gate — 5 of 6 satisfied
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 border-t border-[#e6e9ef]">
+            <div className="grid grid-cols-2 border-t border-[var(--v2-rule)]">
               {[
                 { val: "6",     label: "Sequential gates",        accent: false },
                 { val: "1:1",   label: "Per-person confidentiality", accent: true  },
                 { val: "100%",  label: "Append-only record",      accent: false },
                 { val: "∞",     label: "Sealed at every close",   accent: true  },
               ].map((s, i) => (
-                <div key={i} className={`px-8 py-7 flex flex-col gap-1 border-[#e6e9ef] ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b" : ""}`}>
-                  <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[36px] leading-none tracking-[-1.5px]">
+                <div key={i} className={`px-8 py-7 flex flex-col gap-1 border-[var(--v2-rule)] ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b" : ""}`}>
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[36px] leading-none tracking-[-1.5px]">
                     {s.val}
                   </span>
-                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] leading-[1.4]">
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px] leading-[1.4]">
                     {s.label}
                   </span>
                 </div>

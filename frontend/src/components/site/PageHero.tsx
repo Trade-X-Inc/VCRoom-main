@@ -1,11 +1,14 @@
 import { Link } from "@tanstack/react-router";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/components/PageHero.tsx. Real shared component
-// in the source (used by 30 of its ~44 pages), ported as a real shared
-// component here rather than inlined per-page, matching the source's own
-// architecture. Values (colors, type, spacing, clamp ranges) are the
-// source's, unchanged.
+// SEO-009 Phase 2 — migrated to PUBLIC-REGISTER.md v2.0 tokens.
+// Structure/spacing/layout/props contract unchanged (21 consumers,
+// verified zero v2.0 consumers before this change — see the SEO-009
+// Step-0 audit). Title now uses the real `.pub-display` class (§3.1)
+// instead of the old fixed 96px/weight-600 scale — this is the
+// documented, intentional v2.0 display treatment, not an approximation.
+// The hollow/outline second-line device is kept (not prohibited by
+// PUBLIC-REGISTER.md §9 — a design decision, not a compliance question)
+// with its stroke color swapped to the v2 ink/accent tokens.
 
 export interface PageHeroProps {
   eyebrow: string;
@@ -19,36 +22,40 @@ export interface PageHeroProps {
 export function PageHero({ eyebrow, title, titleOutline, subtitle, cta, dark = false }: PageHeroProps) {
   return (
     <section
-      className={`pt-32 pb-20 border-b border-[#e6e9ef] relative overflow-hidden ${dark ? "bg-[#0a2540]" : "bg-white"}`}
+      className="pt-32 pb-20 relative overflow-hidden"
+      style={{
+        borderBottom: `1px solid var(--v2-rule)`,
+        background: dark ? "var(--pub-n-0d)" : "var(--pub-n-06)",
+      }}
     >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(transparent calc(100% - 1px), ${dark ? "rgba(255,255,255,0.04)" : "#f0f2f5"} calc(100% - 1px))`,
+          backgroundImage: `linear-gradient(transparent calc(100% - 1px), ${dark ? "rgba(255,255,255,0.04)" : "var(--v2-rule-light)"} calc(100% - 1px))`,
           backgroundSize: "100% 80px",
           opacity: 0.5,
         }}
       />
       <div className="relative z-10 max-w-[1280px] mx-auto px-10">
         <div className="flex items-center gap-3 mb-8">
-          <div className={`w-4 h-px ${dark ? "bg-white/40" : "bg-[#0a2540]/40"}`} />
+          <div className="w-4 h-px" style={{ background: dark ? "rgba(255,255,255,0.4)" : "var(--v2-accent)", opacity: dark ? 1 : 0.4 }} />
           <span
-            style={{ fontFamily: "'Inter:Medium', sans-serif" }}
-            className={`text-[11px] tracking-[2px] uppercase ${dark ? "text-white/50" : "text-[#64748b]"}`}
+            style={{ fontFamily: "var(--font-v2-data)", color: dark ? "rgba(255,255,255,0.5)" : "var(--v2-ink-muted)" }}
+            className="text-[11px] tracking-[0.09em] uppercase"
           >
             {eyebrow}
           </span>
         </div>
         <h1
-          style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(56px, 7vw, 96px)" }}
-          className="font-semibold leading-[0.9] tracking-[-3px] mb-6"
+          className="pub-display mb-6"
+          style={{ fontFamily: "var(--font-v2-ui)", color: dark ? "#FFFFFF" : "var(--v2-ink)" }}
         >
-          <span className={`block ${dark ? "text-white" : "text-[#0a2540]"}`}>{title}</span>
+          <span className="block">{title}</span>
           {titleOutline && (
             <span
               className="block"
               style={{
-                WebkitTextStroke: `2px ${dark ? "rgba(255,255,255,0.6)" : "#0a2540"}`,
+                WebkitTextStroke: `2px ${dark ? "rgba(255,255,255,0.6)" : "var(--v2-accent)"}`,
                 color: "transparent",
               }}
             >
@@ -58,8 +65,8 @@ export function PageHero({ eyebrow, title, titleOutline, subtitle, cta, dark = f
         </h1>
         {subtitle && (
           <p
-            style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-            className={`text-[17px] leading-[1.7] max-w-[560px] ${dark ? "text-white/60" : "text-[#425466]"}`}
+            style={{ fontFamily: "var(--font-v2-ui)", color: dark ? "rgba(255,255,255,0.6)" : "var(--v2-ink-secondary)" }}
+            className="text-[17px] leading-[1.7] max-w-[560px]"
           >
             {subtitle}
           </p>
@@ -69,12 +76,12 @@ export function PageHero({ eyebrow, title, titleOutline, subtitle, cta, dark = f
             <Link
               to={cta.to as any}
               search={cta.search as any}
-              style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
-              className={`inline-block font-semibold text-[14px] px-10 py-4 transition-colors duration-200 ${
-                dark
-                  ? "bg-white text-[#0a2540] hover:bg-[#f0ece0]"
-                  : "bg-[#0a2540] text-white hover:bg-[#13233a]"
-              }`}
+              style={{
+                fontFamily: "var(--font-v2-ui)", fontWeight: 500,
+                background: dark ? "#FFFFFF" : "var(--v2-accent)",
+                color: dark ? "var(--v2-accent)" : "#FFFFFF",
+              }}
+              className="inline-block text-[14px] px-10 py-4 transition-colors duration-200"
             >
               {cta.label}
             </Link>

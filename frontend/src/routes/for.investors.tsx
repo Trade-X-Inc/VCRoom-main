@@ -1,127 +1,115 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { PageHero } from "@/components/site/PageHero";
+import {
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
+  PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED, PR_INK, PR_INK_3, PR_RULE,
+} from "@/components/site/PublicRegisterPrimitives";
 
-// Public site rebuild, 31 Aug 2026 — pixel-exact port of
-// LENGDONPUBLIC-NEW's src/pages/for/Investors.tsx. Own distinct
-// features+investor-type-nav+quote structure — not built from
-// SimpleAudiencePage.
-//
-// Corrected 8 Sep 2026: "Sealed audit export" removed — no export
-// capability exists (CLAUDE.md §12, §20.15) — replaced with the real
-// permanent, in-room record. The testimonial quote referenced the same
-// fabricated "sealed export" as an attributed factual claim, which is
-// worse than an unattributed one (§7.4); reworded to describe the real
-// mechanism. "Transaction room" corrected to "deal room."
-//
-// Corrected 13 Sep 2026 (legal/compliance audit): the testimonial itself
-// was the deeper problem, not just its "sealed export" wording — it is
-// a fabricated quote attributed to a real-seeming person ("Angel
-// investor, Series A round, 2026") who does not exist. No real user
-// testimonial exists to replace it with, so the section was removed
-// outright rather than reworded again. A fabricated attribution to a
-// real person is a more serious category than an unattributed marketing
-// claim (§7.4) and was fixed ahead of the scheduled fake-reviews sweep.
+// SEO-009 Phase 3 — bespoke rebuild on PUBLIC-REGISTER.md v2.0 tokens,
+// same pattern as for.founders.tsx (see that file's header comment for
+// the SimpleAudiencePage correction — identical situation here). Content
+// preserved/adapted from the prior v1 build, including its two prior
+// corrections: no "sealed export" language (CLAUDE.md §12/§20.15) and
+// no fabricated testimonial (removed 13 Sep 2026 — a fabricated quote
+// attributed to a named-seeming person, never restored). No EARLY
+// ACCESS pill: same reasoning as for.angels.tsx/for.founders.tsx — this
+// is the generic investor-side flow, which genuinely is the product.
 
 export const Route = createFileRoute("/for/investors")({
   head: () => ({
     meta: [
       { title: "For investors — diligence and close on a defensible record — Lengdon" },
-      { name: "description", content: "Angels to institutions. One disciplined deal spine, a full audit trail, decisions recorded with reasons." },
+      { name: "description", content: "Angels to institutions. One disciplined deal spine, condition visibility in real time, and a permanent audit record you keep." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/investors" }],
   }),
   component: Investors,
 });
 
-const FEATURES = [
-  { title: "Receive structured rooms", desc: <>Founders invite you into a sequenced deal room. Every gate is enforced — you see exactly what stage the deal is at and what remains before close. <Link to="/tools/cap-table" className="underline hover:opacity-70 transition-opacity">Run the cap table before you commit →</Link></> },
-  { title: "Per-investor NDA", desc: "You sign your own NDA — not a catch-all company-level agreement. Your access is individually logged and keyed to your identity." },
-  { title: "Condition visibility", desc: "Track every outstanding condition in real time. Regulatory approvals, board consents, third-party sign-offs — all mapped against the close sequence." },
-  { title: "Permanent audit record", desc: "At close, the full deal record is locked in place — append-only, nothing further can be edited or removed by either party." },
-];
-
 const INVESTOR_TYPES = [
-  { label: "Angel", path: "/for/angels" },
-  { label: "Venture Capital", path: "/for/venture-capital" },
-  { label: "Private Equity", path: "/for/private-equity" },
-  { label: "Syndicates", path: "/for/syndicates" },
-  { label: "Family Offices", path: "/for/family-offices" },
-  { label: "Limited Partners", path: "/for/limited-partners" },
+  { label: "Angels", desc: "Formal process for informal deals", path: "/for/angels" },
+  { label: "Venture Capital", desc: "A lifecycle view, not a CRM", path: "/for/venture-capital" },
+  { label: "Private Equity", desc: "Complex deals, clean record", path: "/for/private-equity" },
+  { label: "Syndicates", desc: "Lead a group into a close", path: "/for/syndicates" },
+  { label: "Family Offices", desc: "Real diligence, no procurement", path: "/for/family-offices" },
+  { label: "Limited Partners", desc: "Your capital, your record", path: "/for/limited-partners" },
 ];
 
 function Investors() {
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ background: PR_BASE, minHeight: "100vh" }}>
       <SiteHeader />
       <main id="main-content">
-        <PageHero
-          eyebrow="Who it's for · Investors"
-          title="INVEST."
-          titleOutline="WITH RECORD."
-          subtitle="Every deal you participate in through Lengdon is structured, sequenced, and permanently recorded — so the record of your diligence and the terms you agreed to is yours forever."
-          cta={{ label: "Create investor account", to: "/sign-up" }}
-        />
-
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-[#e6e9ef]">
-            {FEATURES.map((f, i) => (
-              <div
-                key={i}
-                className={`p-8 ${i % 2 === 0 ? "border-r border-[#e6e9ef]" : ""} ${i < 2 ? "border-b border-[#e6e9ef]" : ""}`}
-              >
-                <div className="w-2 h-2 bg-[#d4af37] mb-5" />
-                <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.4px] mb-3">{f.title}</h3>
-                <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">{f.desc}</p>
-              </div>
-            ))}
+        <section style={{ background: PR_BASE }}>
+          <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "72px 24px 64px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <PrEyebrow>Who it's for / Investors</PrEyebrow>
+            <PrDisplay maxWidth="16ch">Invest with a record.</PrDisplay>
+            <PrLead>Every deal you participate in through Lengdon is structured, sequenced, and permanently recorded — so the record of your diligence and the terms you agreed to is yours to keep.</PrLead>
+            <div style={{ marginTop: "8px" }}>
+              <PrAction to="/sign-up">Create investor account</PrAction>
+            </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-5 h-px bg-[#0a2540]/30" />
-            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">By investor type</span>
-          </div>
-          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-[0.95] tracking-[-2px] mb-12">
-            FIND YOUR<br />PROFILE.
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 border border-[#e6e9ef]">
-            {INVESTOR_TYPES.map((t, i) => (
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>The problem we solve</PrEyebrow>
+          <PrTitle>Diligence rarely leaves a record worth keeping.</PrTitle>
+          <PrProse>Founders send materials over email and a shared folder, with no enforced order and no signed confirmation of what was actually disclosed under what terms. Six months on, if a number in the deck ever becomes disputed, there's nothing to point to that shows what you saw and when.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>How it works for investors</PrEyebrow>
+          <PrTitle>A structured room, from invitation to close.</PrTitle>
+          <PrProse>
+            Founders invite you into a sequenced deal room. Every gate is enforced — you see exactly what stage the deal is at and what remains before close.{" "}
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Run the cap table before you commit →</Link>
+            {" "}You sign your own NDA, not a catch-all company-level agreement — your access is individually logged and keyed to your identity. Every outstanding condition is tracked in real time: regulatory approvals, board consents, third-party sign-offs, all mapped against the close sequence.
+          </PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_RECESSED}>
+          <PrEyebrow>Why the record matters</PrEyebrow>
+          <PrTitle>A permanent audit record.</PrTitle>
+          <PrProse>At close, the full deal record locks in place — append-only, nothing further can be edited or removed by either party. It's the same record the founder sees, not a summary reconstructed afterward, and it survives long after the wire clears.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
+          <PrEyebrow>What we don't do</PrEyebrow>
+          <PrTitle>We don't recommend deals.</PrTitle>
+          <PrProse>There is no matching, no scoring, no deal-flow feed to browse. You decide who to fund; the room runs what happens after that decision, not before it.</PrProse>
+        </PrSection>
+
+        <PrSection ground={PR_BASE}>
+          <PrEyebrow>By investor type</PrEyebrow>
+          <PrTitle>Find your profile.</PrTitle>
+          <div className="grid grid-cols-2 md:grid-cols-3" style={{ gap: "1px", background: PR_RULE, border: `1px solid ${PR_RULE}`, marginTop: "8px" }}>
+            {INVESTOR_TYPES.map((t) => (
               <Link
                 key={t.label}
                 to={t.path as any}
-                className={`flex flex-col justify-between p-6 hover:bg-[#f8f9fb] transition-colors group ${i < 5 ? "border-r border-[#e6e9ef]" : ""}`}
+                style={{
+                  background: PR_PANEL, padding: "24px", textDecoration: "none",
+                  display: "flex", flexDirection: "column", gap: "4px",
+                }}
               >
-                <div className="w-1.5 h-1.5 bg-[#0a2540]/20 group-hover:bg-[#d4af37] transition-colors mb-8" />
-                <div>
-                  <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[15px] tracking-[-0.3px] mb-1">{t.label}</div>
-                  <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px] group-hover:text-[#0a2540] transition-colors">View →</div>
-                </div>
+                <span style={{ fontFamily: "var(--font-v2-ui)", fontWeight: 500, color: PR_INK, fontSize: "15px" }}>{t.label}</span>
+                <span style={{ fontFamily: "var(--font-v2-ui)", color: PR_INK_3, fontSize: "13px" }}>{t.desc}</span>
               </Link>
             ))}
           </div>
-        </section>
+        </PrSection>
 
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <PrSection ground={PR_RECESSED}>
+          <PrCommercialLine tier="Deploying seat" cadence="Billed per seat, per year." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
+            <PrTitle>Your next deal, properly closed.</PrTitle>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">
-                Your next deal.<br />Properly closed.
-              </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">Join as an investor. Accept room invitations and close with a permanent record.</p>
+              <PrAction to="/sign-up">Create investor account</PrAction>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
-                Join the waitlist
-              </Link>
-              <Link to="/sign-in" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
-                Sign in →
-              </Link>
-            </div>
+            <PrCrossLinks />
           </div>
-        </section>
+        </PrSection>
       </main>
       <SiteFooter />
     </div>

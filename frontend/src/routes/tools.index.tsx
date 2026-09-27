@@ -31,7 +31,7 @@ function ToolsIndex() {
     <div className="min-h-screen bg-white">
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -43,10 +43,10 @@ function ToolsIndex() {
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Free tools · Private capital</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Free tools · Private capital</span>
             </div>
             <h1
-              style={{ fontFamily: "'Geist:SemiBold', sans-serif", fontSize: "clamp(48px, 6vw, 88px)" }}
+              style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(48px, 6vw, 88px)" }}
               className="font-semibold text-white leading-[0.88] tracking-[-3px] mb-8"
             >
               TOOLS FOR<br />
@@ -54,30 +54,30 @@ function ToolsIndex() {
                 FOUNDERS.
               </span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[520px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[520px]">
               Free calculators and models for founders and investors navigating private capital transactions. No signup required.
             </p>
           </div>
         </div>
 
         <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[#e6e9ef]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border border-[var(--v2-rule)]">
             {TOOLS.map((tool, i) => (
               <Link
                 key={tool.slug}
                 to={`/tools/${tool.slug}` as any}
-                className={`group flex flex-col gap-4 p-8 hover:bg-[#f8f9fb] transition-colors border-b border-[#e6e9ef] ${
+                className={`group flex flex-col gap-4 p-8 hover:bg-[var(--v2-surface)] transition-colors border-b border-[var(--v2-rule)] ${
                   (i + 1) % 3 !== 0 ? "lg:border-r" : ""
                 } ${i < TOOLS.length - (TOOLS.length % 3 || 3) ? "" : "last:border-b-0"}`}
               >
-                <div className="w-2 h-2 bg-[#0a2540]/15 group-hover:bg-[#d4af37] transition-colors" />
+                <div className="w-2 h-2 bg-[var(--v2-accent)]/15 group-hover:bg-[var(--v2-accent)] transition-colors" />
                 <div>
-                  <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[18px] tracking-[-0.4px] mb-2 group-hover:text-[#0a2540]">
+                  <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px] mb-2 group-hover:text-[var(--v2-accent)]">
                     {tool.label}
                   </h2>
-                  <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[13px] leading-[1.65]">{tool.desc}</p>
+                  <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[13px] leading-[1.65]">{tool.desc}</p>
                 </div>
-                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[12px] group-hover:text-[#0a2540] transition-colors mt-auto">
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[12px] group-hover:text-[var(--v2-accent)] transition-colors mt-auto">
                   Open tool →
                 </div>
               </Link>
@@ -85,21 +85,21 @@ function ToolsIndex() {
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-20 border-t border-[#e6e9ef] pt-16">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-20 border-t border-[var(--v2-rule)] pt-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
                 Ready to close?
               </h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[14px]">
                 Once the numbers work, Lengdon closes the transaction.
               </p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
+              <Link to="/sign-up" style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
                 Join the waitlist
               </Link>
-              <Link to="/product/how-it-works" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-8 py-3.5 transition-all duration-200">
+              <Link to="/product/how-it-works" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] hover:border-[var(--v2-accent)]/30 text-[var(--v2-ink-secondary)] text-[13px] px-8 py-3.5 transition-all duration-200">
                 See how it works →
               </Link>
             </div>

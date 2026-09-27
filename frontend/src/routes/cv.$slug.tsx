@@ -3,7 +3,28 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Printer, MapPin, Phone } from "lucide-react";
 
+// SEO-009 Phase 6: no loader exists on this route (profile data is
+// fetched client-side via useQuery), so head() can only derive from the
+// URL slug itself, not the fetched profile — a humanized slug plus a
+// generic, honest fallback description. Nothing fabricated.
+function humanizeSlug(slug: string): string {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .join(" ");
+}
+
 export const Route = createFileRoute("/cv/$slug")({
+  head: ({ params }) => {
+    const name = humanizeSlug(params.slug);
+    return {
+      meta: [
+        { title: name ? `${name} — CV — Lengdon` : "CV — Lengdon" },
+        { name: "description", content: "Team member CV, published on Lengdon." },
+      ],
+    };
+  },
   component: PublicCVPage,
 });
 

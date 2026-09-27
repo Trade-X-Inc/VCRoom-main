@@ -84,36 +84,36 @@ function Glossary() {
     <div className="min-h-screen bg-white">
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-24 pt-32">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Private capital · Terminology</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Private capital · Terminology</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(44px,7vw,72px)] leading-[0.88] tracking-[-3px] mb-6">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[clamp(44px,7vw,72px)] leading-[0.88] tracking-[-3px] mb-6">
               GLOSSARY.
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[480px]">Key terms for private capital transactions, closing infrastructure, and Lengdon's platform.</p>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[15px] max-w-[480px]">Key terms for private capital transactions, closing infrastructure, and Lengdon's platform.</p>
           </div>
         </div>
 
-        <div className="max-w-[1440px] mx-auto px-12 lg:px-16 py-8 border-b border-[#e6e9ef] flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="max-w-[1440px] mx-auto px-12 lg:px-16 py-8 border-b border-[var(--v2-rule)] flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <input
             type="text"
             placeholder="Search terms…"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setActive(""); }}
-            style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-            className="flex-1 border border-[#e6e9ef] px-5 py-3 text-[14px] text-[#0a2540] placeholder-[#64748b] focus:outline-none focus:border-[#0a2540] transition-colors max-w-[400px]"
+            style={{ fontFamily: "var(--font-v2-ui)" }}
+            className="flex-1 border border-[var(--v2-rule)] px-5 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors max-w-[400px]"
           />
           <div className="flex flex-wrap gap-1">
             {ALPHABET.map((l) => (
               <button
                 key={l}
                 onClick={() => { setActive(a => a === l ? "" : l); setSearch(""); }}
-                style={{ fontFamily: "'Inter:Medium', sans-serif" }}
-                className={`w-8 h-8 text-[12px] transition-all ${active === l ? "bg-[#0a2540] text-white" : "border border-[#e6e9ef] text-[#64748b] hover:border-[#0a2540]/30 hover:text-[#0a2540]"}`}
+                style={{ fontFamily: "var(--font-v2-data)" }}
+                className={`w-8 h-8 text-[12px] transition-all ${active === l ? "bg-[var(--v2-accent)] text-white" : "border border-[var(--v2-rule)] text-[var(--v2-ink-muted)] hover:border-[var(--v2-accent)]/30 hover:text-[var(--v2-accent)]"}`}
               >
                 {l}
               </button>
@@ -123,22 +123,22 @@ function Glossary() {
 
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16">
           {Object.keys(grouped).length === 0 ? (
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">No terms match your search.</p>
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[14px]">No terms match your search.</p>
           ) : (
             Object.entries(grouped).map(([letter, terms]) => (
               <div key={letter} className="mb-12">
                 <div className="flex items-center gap-4 mb-6">
-                  <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[40px] leading-none tracking-[-2px]">{letter}</span>
-                  <div className="flex-1 h-px bg-[#e6e9ef]" />
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[40px] leading-none tracking-[-2px]">{letter}</span>
+                  <div className="flex-1 h-px bg-[var(--v2-rule)]" />
                 </div>
-                <div className="flex flex-col gap-0 border border-[#e6e9ef] divide-y divide-[#e6e9ef]">
+                <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)]">
                   {terms.map((t) => (
                     <div key={t.term} className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-0">
-                      <div className="px-7 py-6 border-b lg:border-b-0 lg:border-r border-[#e6e9ef]">
-                        <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[16px] tracking-[-0.3px]">{t.term}</span>
+                      <div className="px-7 py-6 border-b lg:border-b-0 lg:border-r border-[var(--v2-rule)]">
+                        <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[16px] tracking-[-0.3px]">{t.term}</span>
                       </div>
                       <div className="px-7 py-6">
-                        <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[14px] leading-[1.7]">{t.def}</p>
+                        <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[14px] leading-[1.7]">{t.def}</p>
                       </div>
                     </div>
                   ))}

@@ -40,6 +40,16 @@ import { PageHero } from "@/components/site/PageHero";
 // differentiation without asserting unconfirmable specifics as fact.
 // Category-level positioning claims already safe (e.g. "DocSend excels
 // at controlled document distribution") were left unchanged.
+//
+// SEO-009 Phase 2 — migrated to PUBLIC-REGISTER.md v2.0 tokens (real
+// Tailwind utilities exposed via styles.css's @theme block: bg-v2-*,
+// text-v2-*, border-v2-*, font-v2-*). Structure, row data, and copy
+// unchanged — token/class-level swap only. Note (flagged, not fixed,
+// per Phase 2's token-only scope): this component renders TWO dark
+// (navy) sections per page (the competitor/Lengdon blurb card, and the
+// bottom CTA) — PUBLIC-REGISTER.md §5.5 specifies one dark section per
+// page maximum. Pre-existing since the 31 Aug pixel-exact port; a real
+// fix here is a content-architecture decision, not a token migration.
 
 export interface CompareRow {
   feature: string;
@@ -70,7 +80,7 @@ export function CompetitorComparePage({
   rows, ctaTitle, ctaSubtitle,
 }: CompetitorComparePageProps) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-v2-surface">
       <SiteHeader />
       <main id="main-content">
         <PageHero
@@ -81,57 +91,57 @@ export function CompetitorComparePage({
           cta={{ label: "See Lengdon in action", to: "/sign-up", search: { role: "founder" } }}
         />
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-[#e6e9ef] divide-y lg:divide-y-0 lg:divide-x divide-[#e6e9ef]">
-            <div className="p-10">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[2px] uppercase mb-5">{competitorName}</div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#64748b] text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{competitorBlurbTitle}</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] leading-[1.75]">
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-v2-rule">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-v2-rule divide-y lg:divide-y-0 lg:divide-x divide-v2-rule">
+            <div className="p-10 bg-v2-panel">
+              <div className="font-v2-ui text-v2-ink-muted text-[11px] tracking-[0.08em] uppercase mb-5">{competitorName}</div>
+              <h3 className="font-v2-ui font-semibold text-v2-ink-muted text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{competitorBlurbTitle}</h3>
+              <p className="font-v2-ui text-v2-ink-muted text-[14px] leading-[1.75]">
                 {competitorBlurb}
               </p>
             </div>
-            <div className="p-10 bg-[#0a2540]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[11px] tracking-[2px] uppercase mb-5">Lengdon</div>
-              <h3 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{lengdonBlurbTitle}</h3>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/60 text-[14px] leading-[1.75]">
+            <div className="p-10 bg-v2-accent">
+              <div className="font-v2-ui text-white/50 text-[11px] tracking-[0.08em] uppercase mb-5">Lengdon</div>
+              <h3 className="font-v2-ui font-semibold text-white text-[24px] tracking-[-0.8px] mb-4 leading-[1.15]">{lengdonBlurbTitle}</h3>
+              <p className="font-v2-ui text-white/60 text-[14px] leading-[1.75]">
                 {lengdonBlurb}
               </p>
             </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-[#e6e9ef]">
-          <div className="border border-[#e6e9ef] overflow-hidden">
-            <div className="grid grid-cols-[1fr_160px_160px] bg-[#f8f9fb] border-b border-[#e6e9ef]">
-              <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="px-8 py-5 text-[#64748b] text-[11px] tracking-[1px] uppercase">Capability</div>
-              <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="px-6 py-5 font-semibold text-[#0a2540] text-[13px] text-center border-l border-[#e6e9ef]">Lengdon</div>
-              <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-6 py-5 text-[#64748b] text-[13px] text-center border-l border-[#e6e9ef]">{competitorName}</div>
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20 border-b border-v2-rule">
+          <div className="border border-v2-rule overflow-hidden">
+            <div className="grid grid-cols-[1fr_160px_160px] bg-v2-surface border-b border-v2-rule">
+              <div className="font-v2-ui px-8 py-5 text-v2-ink-muted text-[11px] tracking-[0.06em] uppercase">Capability</div>
+              <div className="font-v2-ui px-6 py-5 font-semibold text-v2-ink text-[13px] text-center border-l border-v2-rule">Lengdon</div>
+              <div className="font-v2-ui px-6 py-5 text-v2-ink-muted text-[13px] text-center border-l border-v2-rule">{competitorName}</div>
             </div>
             {rows.map((row, i) => (
-              <div key={i} className={`grid grid-cols-[1fr_160px_160px] ${i < rows.length - 1 ? "border-b border-[#e6e9ef]" : ""} hover:bg-[#fafbfc] transition-colors`}>
+              <div key={i} className={`grid grid-cols-[1fr_160px_160px] ${i < rows.length - 1 ? "border-b border-v2-rule" : ""} bg-v2-panel hover:bg-v2-surface transition-colors`}>
                 <div className="px-8 py-5">
-                  <div style={{ fontFamily: "'Geist:Regular', sans-serif" }} className="text-[#0a2540] text-[14px] mb-1">{row.feature}</div>
-                  {row.note && <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{row.note}</div>}
+                  <div className="font-v2-ui text-v2-ink text-[14px] mb-1">{row.feature}</div>
+                  {row.note && <div className="font-v2-ui text-v2-ink-muted text-[12px]">{row.note}</div>}
                 </div>
-                <div className="px-6 py-5 flex items-center justify-center border-l border-[#e6e9ef]">
+                <div className="px-6 py-5 flex items-center justify-center border-l border-v2-rule">
                   {row.lengdon ? (
-                    <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-v2-satisfied flex items-center justify-center">
                       <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   ) : (
-                    <div className="w-5 h-5 rounded-full border border-[#e6e9ef] flex items-center justify-center">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 2L6 6M6 2L2 6" stroke="#e6e9ef" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    <div className="w-5 h-5 rounded-full border border-v2-rule flex items-center justify-center">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2 2L6 6M6 2L2 6" stroke="var(--v2-rule)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                     </div>
                   )}
                 </div>
-                <div className="px-6 py-5 flex items-center justify-center border-l border-[#e6e9ef]">
+                <div className="px-6 py-5 flex items-center justify-center border-l border-v2-rule">
                   {row.them ? (
-                    <div className="w-5 h-5 rounded-full bg-[#94a3b8]/15 border border-[#94a3b8]/30 flex items-center justify-center">
-                      <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <div className="w-5 h-5 rounded-full bg-v2-ink-muted/15 border border-v2-ink-muted/30 flex items-center justify-center">
+                      <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="var(--v2-ink-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   ) : (
-                    <div className="w-5 h-5 rounded-full border border-[#e6e9ef] flex items-center justify-center">
-                      <div className="w-2 h-px bg-[#c9d0db]" />
+                    <div className="w-5 h-5 rounded-full border border-v2-rule flex items-center justify-center">
+                      <div className="w-2 h-px bg-v2-rule" />
                     </div>
                   )}
                 </div>
@@ -140,14 +150,14 @@ export function CompetitorComparePage({
           </div>
         </section>
 
-        <section className="bg-[#0a2540] max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
+        <section className="bg-v2-accent max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">{ctaTitle}</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">{ctaSubtitle}</p>
+              <h2 className="font-v2-ui font-semibold text-white text-[40px] leading-[0.95] tracking-[-1.5px] mb-3">{ctaTitle}</h2>
+              <p className="font-v2-ui text-white/55 text-[15px]">{ctaSubtitle}</p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="bg-white hover:bg-[#f0ece0] text-[#0a2540] font-semibold text-[14px] px-10 py-4 transition-colors duration-200">
+              <Link to="/sign-up" search={{ role: "founder" } as any} className="font-v2-ui font-semibold bg-white hover:bg-v2-surface text-v2-accent text-[14px] px-10 py-4 transition-colors duration-200">
                 Join the waitlist
               </Link>
             </div>

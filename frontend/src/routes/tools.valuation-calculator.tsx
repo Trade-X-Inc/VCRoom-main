@@ -53,21 +53,21 @@ function ValuationCalculator() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: VALUATION_JSON_LD }} />
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-[var(--v2-accent)] relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
-            <Link to="/tools" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">
+            <Link to="/tools" style={{ fontFamily: "var(--font-v2-ui)" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">
               ← All tools
             </Link>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · Valuation</span>
+              <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · Valuation</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
+            <h1 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
               VALUATION<br />
               <span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>CALCULATOR</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[440px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[15px] max-w-[440px]">
               Model pre-money and post-money valuation based on round size and investor ownership.
             </p>
           </div>
@@ -77,43 +77,43 @@ function ValuationCalculator() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
             <div className="flex flex-col gap-8">
               <div className="flex flex-col gap-3">
-                <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px] tracking-[0.3px]">Pre-money valuation</label>
-                <div className="flex items-center border border-[#e6e9ef] focus-within:border-[#0a2540] transition-colors">
-                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-4 text-[#64748b] text-[14px] border-r border-[#e6e9ef]">$</span>
+                <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Pre-money valuation</label>
+                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
                   <input
                     type="number"
                     value={preMoney}
                     onChange={(e) => setPreMoney(Math.max(0, Number(e.target.value)))}
-                    style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                    className="flex-1 px-4 py-3.5 text-[14px] text-[#0a2540] focus:outline-none"
+                    style={{ fontFamily: "var(--font-v2-ui)" }}
+                    className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none"
                   />
                 </div>
-                <input type="range" min={500_000} max={100_000_000} step={500_000} value={preMoney} onChange={(e) => setPreMoney(Number(e.target.value))} className="w-full accent-[#0a2540]" />
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex justify-between text-[#64748b] text-[11px]">
+                <input type="range" min={500_000} max={100_000_000} step={500_000} value={preMoney} onChange={(e) => setPreMoney(Number(e.target.value))} className="w-full accent-[var(--v2-accent)]" />
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="flex justify-between text-[var(--v2-ink-muted)] text-[11px]">
                   <span>$500K</span><span>$100M</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-3">
-                <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px] tracking-[0.3px]">Round size (investment amount)</label>
-                <div className="flex items-center border border-[#e6e9ef] focus-within:border-[#0a2540] transition-colors">
-                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-4 text-[#64748b] text-[14px] border-r border-[#e6e9ef]">$</span>
+                <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Round size (investment amount)</label>
+                <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
                   <input
                     type="number"
                     value={raise}
                     onChange={(e) => setRaise(Math.max(0, Number(e.target.value)))}
-                    style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                    className="flex-1 px-4 py-3.5 text-[14px] text-[#0a2540] focus:outline-none"
+                    style={{ fontFamily: "var(--font-v2-ui)" }}
+                    className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none"
                   />
                 </div>
-                <input type="range" min={100_000} max={20_000_000} step={100_000} value={raise} onChange={(e) => setRaise(Number(e.target.value))} className="w-full accent-[#0a2540]" />
-                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="flex justify-between text-[#64748b] text-[11px]">
+                <input type="range" min={100_000} max={20_000_000} step={100_000} value={raise} onChange={(e) => setRaise(Number(e.target.value))} className="w-full accent-[var(--v2-accent)]" />
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="flex justify-between text-[var(--v2-ink-muted)] text-[11px]">
                   <span>$100K</span><span>$20M</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-0 border border-[#e6e9ef] divide-y divide-[#e6e9ef] h-fit">
+            <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)] h-fit">
               {[
                 { label: "Pre-money valuation", value: fmt(preMoney), accent: false },
                 { label: "Round size", value: fmt(raise), accent: false },
@@ -121,49 +121,49 @@ function ValuationCalculator() {
                 { label: "Investor ownership", value: pct(investorPct), accent: false },
                 { label: "Founder/existing ownership", value: pct(founderPct), accent: false },
               ].map((r) => (
-                <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-[#0a2540]" : ""}`}>
-                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[14px] ${r.accent ? "text-white/60" : "text-[#425466]"}`}>{r.label}</span>
-                  <span style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className={`font-semibold text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : "text-[#0a2540]"}`}>{r.value}</span>
+                <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-[var(--v2-accent)]" : ""}`}>
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[14px] ${r.accent ? "text-white/60" : "text-[var(--v2-ink-secondary)]"}`}>{r.label}</span>
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`font-semibold text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : "text-[var(--v2-accent)]"}`}>{r.value}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[#e6e9ef]">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[var(--v2-rule)]">
           <div className="max-w-[720px] flex flex-col gap-10">
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">This calculator applies the three most common early-stage valuation methods — Berkus, Scorecard, and Revenue Multiple — and shows you a blended range. No single method is authoritative; the range gives you a defensible basis for the number you put on your term sheet.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">This calculator applies the three most common early-stage valuation methods — Berkus, Scorecard, and Revenue Multiple — and shows you a blended range. No single method is authoritative; the range gives you a defensible basis for the number you put on your term sheet.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Founders setting a valuation for their first priced round. Angel investors sense-checking a founder's ask. Advisors preparing a fairness opinion for a board.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Who uses it</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Founders setting a valuation for their first priced round. Angel investors sense-checking a founder's ask. Advisors preparing a fairness opinion for a board.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Use the output as a starting point, not a final answer. Comparable transactions in your sector, investor appetite, and competitive tension all move the final number. On Lengdon, the agreed valuation is recorded in the deal record at the Terms stage and referenced in the closing conditions — creating an auditable trail from negotiation to close.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What to do with the output</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Use the output as a starting point, not a final answer. Comparable transactions in your sector, investor appetite, and competitive tension all move the final number. On Lengdon, the agreed valuation is recorded in the deal record at the Terms stage and referenced in the closing conditions — creating an auditable trail from negotiation to close.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">Pre-money valuation: company value before new capital is added. Post-money valuation: pre-money plus the new investment amount. Berkus method: assigns value to five risk factors (idea, prototype, team, board, product rollout). Scorecard method: benchmarks against comparable funded companies and adjusts for relative strength. Revenue multiple: applies a sector-standard multiple to current or projected revenue.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Pre-money valuation: company value before new capital is added. Post-money valuation: pre-money plus the new investment amount. Berkus method: assigns value to five risk factors (idea, prototype, team, board, product rollout). Scorecard method: benchmarks against comparable funded companies and adjusts for relative strength. Revenue multiple: applies a sector-standard multiple to current or projected revenue.</p>
             </div>
             <div>
-              <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
-              <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">The agreed pre-money valuation is recorded in the Lengdon deal record at the Terms stage. Using a calculation method you can explain — rather than a number you picked — gives investors a basis to engage rather than a position to challenge.</p>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">The agreed pre-money valuation is recorded in the Lengdon deal record at the Terms stage. Using a calculation method you can explain — rather than a number you picked — gives investors a basis to engage rather than a position to challenge.</p>
             </div>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#0a2540] text-[14px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
               <Link to="/tools/safe-note" className="underline hover:opacity-70 transition-opacity">Model a SAFE at this valuation →</Link>
             </p>
           </div>
         </section>
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[var(--v2-rule)] pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">
+            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[14px] max-w-[480px]">
               Once your round terms are set, use Lengdon to close the transaction — sequenced, documented, and permanently recorded.
             </p>
-            <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
+            <Link to="/sign-up" style={{ fontFamily: "var(--font-v2-ui)" }} className="shrink-0 bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
               Join the waitlist
             </Link>
           </div>

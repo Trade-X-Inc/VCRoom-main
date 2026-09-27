@@ -9,6 +9,14 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // source files before building this. Each tool's own calculation logic
 // stays in its own route file — this component only holds the real,
 // repeated layout scaffolding, not any tool-specific math.
+//
+// SEO-009 Phase 2 — migrated to PUBLIC-REGISTER.md v2.0 tokens (real
+// Tailwind utilities from styles.css's @theme block). Only 3 of the 7
+// tool pages (burn-rate, runway, valuation-calculator) use this
+// component; the other 4 (cap-table, cogs, dilution, safe-note) are
+// fully custom and are touched up per-file in Phase 5, along with any
+// extra tool-specific UI those 3 wrapper-consumers render beyond what
+// this shared shape provides.
 
 export interface ToolField {
   label: string;
@@ -47,21 +55,21 @@ export function ToolCalculatorPage({
   toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel, belowCalculator,
 }: ToolCalculatorPageProps) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-v2-surface">
       <SiteHeader />
       <main id="main-content">
-        <div className="bg-[#0a2540] relative overflow-hidden">
+        <div className="bg-v2-accent relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
           <div className="relative z-10 max-w-[1440px] mx-auto px-12 lg:px-16 py-20 pt-32">
-            <Link to="/tools" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">← All tools</Link>
+            <Link to="/tools" className="font-v2-ui inline-flex items-center gap-2 text-white/50 text-[13px] hover:text-white/70 transition-colors mb-8">← All tools</Link>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-white/20" />
-              <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-white/50 text-[10px] tracking-[2.5px] uppercase">Tool · {toolLabel}</span>
+              <span className="font-v2-data text-white/50 text-[10px] tracking-[0.09em] uppercase">Tool · {toolLabel}</span>
             </div>
-            <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
+            <h1 className="font-v2-ui font-medium text-white text-[clamp(36px,7vw,56px)] leading-[0.9] tracking-[-2.5px] mb-4">
               {titleLine1}<br /><span style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.4)", color: "transparent" }}>{titleLine2Outline}</span>
             </h1>
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] max-w-[440px]">{subtitle}</p>
+            <p className="font-v2-ui text-white/55 text-[15px] max-w-[440px]">{subtitle}</p>
           </div>
         </div>
 
@@ -70,29 +78,27 @@ export function ToolCalculatorPage({
             <div className="flex flex-col gap-8">
               {fields.map((field) => (
                 <div key={field.label} className="flex flex-col gap-3">
-                  <label style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px] tracking-[0.3px]">{field.label}</label>
-                  <div className="flex items-center border border-[#e6e9ef] focus-within:border-[#0a2540] transition-colors">
-                    <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="px-4 text-[#64748b] text-[14px] border-r border-[#e6e9ef]">{field.prefix ?? "$"}</span>
+                  <label className="font-v2-ui text-v2-ink text-[13px] tracking-[0.02em]">{field.label}</label>
+                  <div className="flex items-center border border-v2-rule focus-within:border-v2-accent transition-colors">
+                    <span className="font-v2-ui px-4 text-v2-ink-muted text-[14px] border-r border-v2-rule">{field.prefix ?? "$"}</span>
                     <input
                       type="number"
                       value={field.value}
                       onChange={(e) => field.set(Number(e.target.value))}
-                      style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-                      className="flex-1 px-4 py-3.5 text-[14px] text-[#0a2540] focus:outline-none"
+                      className="font-v2-ui flex-1 px-4 py-3.5 text-[14px] text-v2-ink focus:outline-none bg-v2-panel"
                     />
                   </div>
-                  <input type="range" min={field.min} max={field.max} step={field.step} value={field.value} onChange={(e) => field.set(Number(e.target.value))} className="w-full accent-[#0a2540]" />
+                  <input type="range" min={field.min} max={field.max} step={field.step} value={field.value} onChange={(e) => field.set(Number(e.target.value))} className="w-full accent-v2-accent" />
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-col gap-0 border border-[#e6e9ef] divide-y divide-[#e6e9ef] h-fit">
+            <div className="flex flex-col gap-0 border border-v2-rule divide-y divide-v2-rule h-fit">
               {results.map((r) => (
-                <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-[#0a2540]" : ""}`}>
-                  <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className={`text-[14px] ${r.accent ? "text-white/60" : "text-[#425466]"}`}>{r.label}</span>
+                <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-v2-accent" : "bg-v2-panel"}`}>
+                  <span className={`font-v2-ui text-[14px] ${r.accent ? "text-white/60" : "text-v2-ink-secondary"}`}>{r.label}</span>
                   <span
-                    style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
-                    className={`font-semibold text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : r.warn ? "text-red-600" : "text-[#0a2540]"}`}
+                    className={`font-v2-ui font-medium text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : r.warn ? "text-v2-adverse" : "text-v2-ink"}`}
                   >
                     {r.value}
                   </span>
@@ -104,10 +110,10 @@ export function ToolCalculatorPage({
 
         {belowCalculator}
 
-        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-[#e6e9ef] pt-12">
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-v2-rule pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px] max-w-[480px]">{ctaText}</p>
-            <Link to="/sign-up" style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="shrink-0 bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">{ctaLabel}</Link>
+            <p className="font-v2-ui text-v2-ink-muted text-[14px] max-w-[480px]">{ctaText}</p>
+            <Link to="/sign-up" className="font-v2-ui shrink-0 bg-v2-accent hover:bg-v2-accent/90 text-white font-medium text-[13px] px-8 py-3.5 transition-colors duration-200">{ctaLabel}</Link>
           </div>
         </section>
       </main>
