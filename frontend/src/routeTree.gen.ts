@@ -25,6 +25,7 @@ import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
+import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
 import { Route as LegalIndexRouteImport } from './routes/legal.index'
@@ -269,6 +270,11 @@ const IndexRoute = IndexRouteImport.update({
 const ToolsIndexRoute = ToolsIndexRouteImport.update({
   id: '/tools/',
   path: '/tools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SectorsIndexRoute = SectorsIndexRouteImport.update({
@@ -1230,6 +1236,7 @@ export interface FileRoutesByFullPath {
   '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
+  '/templates/': typeof TemplatesIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1410,6 +1417,7 @@ export interface FileRoutesByTo {
   '/legal': typeof LegalIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/sectors': typeof SectorsIndexRoute
+  '/templates': typeof TemplatesIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1594,6 +1602,7 @@ export interface FileRoutesById {
   '/legal/': typeof LegalIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
+  '/templates/': typeof TemplatesIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/api/internal/data': typeof ApiInternalDataRoute
   '/api/internal/email-test': typeof ApiInternalEmailTestRoute
@@ -1779,6 +1788,7 @@ export interface FileRouteTypes {
     | '/legal/'
     | '/resources/'
     | '/sectors/'
+    | '/templates/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -1959,6 +1969,7 @@ export interface FileRouteTypes {
     | '/legal'
     | '/resources'
     | '/sectors'
+    | '/templates'
     | '/tools'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -2142,6 +2153,7 @@ export interface FileRouteTypes {
     | '/legal/'
     | '/resources/'
     | '/sectors/'
+    | '/templates/'
     | '/tools/'
     | '/api/internal/data'
     | '/api/internal/email-test'
@@ -2306,6 +2318,7 @@ export interface RootRouteChildren {
   LegalIndexRoute: typeof LegalIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   SectorsIndexRoute: typeof SectorsIndexRoute
+  TemplatesIndexRoute: typeof TemplatesIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
   ApiInternalDataRoute: typeof ApiInternalDataRoute
   ApiInternalEmailTestRoute: typeof ApiInternalEmailTestRoute
@@ -2438,6 +2451,13 @@ declare module '@tanstack/react-router' {
       path: '/tools'
       fullPath: '/tools/'
       preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sectors/': {
@@ -3923,6 +3943,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalIndexRoute: LegalIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   SectorsIndexRoute: SectorsIndexRoute,
+  TemplatesIndexRoute: TemplatesIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
   ApiInternalDataRoute: ApiInternalDataRoute,
   ApiInternalEmailTestRoute: ApiInternalEmailTestRoute,

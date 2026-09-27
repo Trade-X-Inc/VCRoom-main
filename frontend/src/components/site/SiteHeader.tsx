@@ -60,6 +60,7 @@ const RESOURCES_LINKS: NavLink[] = [
   { label: "Changelog", to: "/resources/changelog", desc: "What's new in Lengdon" },
   { label: "Glossary", to: "/glossary", desc: "Private capital terminology" },
   { label: "Tools", to: "/tools", desc: "Free calculators for founders" },
+  { label: "Templates", to: "/templates", desc: "Annotated documents for founders and investors" },
 ];
 
 const COMPANY_LINKS: NavLink[] = [

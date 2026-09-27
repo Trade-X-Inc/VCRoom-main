@@ -1,0 +1,47 @@
+<h2 class="section-title">Summary of Terms</h2>
+<p>This template follows Y Combinator's post-money Simple Agreement for Future Equity (&ldquo;<strong>SAFE</strong>&rdquo;) structure, the most widely used pre-seed/seed instrument in US venture financing. A SAFE is not debt &mdash; it has no maturity date, no interest rate, and no repayment obligation. It is a right to receive equity in the future, triggered by a priced equity financing, a liquidity event, or dissolution.</p>
+
+<h3 class="clause-name">Purchase Amount</h3>
+<p class="clause-body">The amount the Investor pays the Company at signing, e.g., <span class="market-tag market-standard">USD 500,000</span>. Unlike a note, this is not a loan &mdash; there is no obligation to repay it in cash under any circumstance.</p>
+<div class="annotation"><span class="label">Why this matters</span>Because a SAFE is not debt, it does not appear as a liability on the Company's balance sheet the way a note does, and it never accrues interest the Company has to think about.</div>
+<div class="annotation range"><span class="label">Market range</span>Individual SAFE checks commonly range USD 10,000&ndash;USD 750,000; a full pre-seed round raised on SAFEs typically totals USD 250,000&ndash;USD 2,000,000 across several investors.</div>
+
+<h3 class="clause-name">Post-Money Valuation Cap</h3>
+<p class="clause-body">Valuation cap: <span class="market-tag market-standard">e.g., USD 5,000,000</span>. Under the post-money SAFE, the cap already includes the money being raised in this and all other outstanding SAFEs &mdash; it is not the Company's pre-money valuation with the round added on top. The Investor's ownership percentage at conversion is calculated directly as Purchase Amount &divide; Post-Money Valuation Cap.</p>
+<div class="annotation"><span class="label">Why this matters</span>Because the ownership percentage is fixed and knowable at signing (Purchase Amount &divide; Cap), a post-money SAFE tells an investor exactly what percentage they are buying on day one &mdash; the pre-money SAFE never could, because it depended on how much other SAFE money the Company raised afterward.</div>
+<div class="annotation range"><span class="label">Market range</span>A cap set so total SAFEs represent 15&ndash;25% of the post-money cap table is typical for a pre-seed round. A founder stacking SAFEs past roughly 25&ndash;30% combined ownership is giving away an unusually large share of the company before a priced round ever happens.</div>
+
+<h3 class="clause-name">Discount Rate</h3>
+<p class="clause-body">Discount rate: <span class="market-tag market-standard">0&ndash;20%</span>, if included. Some post-money SAFEs carry a cap only, with no separate discount; others carry both, in which case the Investor converts at whichever of the two produces the lower price per share.</p>
+<div class="annotation"><span class="label">Why this matters</span>Many seed-stage SAFEs today are cap-only, no discount &mdash; the discount matters most when there is meaningful uncertainty that the priced round will price anywhere near the cap.</div>
+<div class="annotation range"><span class="label">Market range</span>Cap-only is now the most common structure at seed. A 10&ndash;20% discount stacked on top of the cap is more typical of a later or riskier bridge.</div>
+
+<h2 class="section-title">Post-Money vs. Pre-Money &mdash; Why the Difference Is Not Cosmetic</h2>
+<p>A <strong>pre-money</strong> SAFE cap sets the Company's valuation before the money being raised in this and other SAFEs is added. A <strong>post-money</strong> SAFE cap already includes it. The practical consequence: under a post-money SAFE, each investor's ownership percentage at conversion is fixed the moment they sign &mdash; Purchase Amount &divide; Post-Money Cap &mdash; and does not shift based on how many other SAFEs the Company later stacks on top of it at the same or a different cap.</p>
+<p>Founders consistently underestimate what this means in practice: <strong>the fixed percentage protects each individual SAFE holder from being diluted by the next SAFE the Company issues &mdash; but it does this by transferring that dilution entirely onto the founders instead.</strong> Every additional post-money SAFE a founder signs reduces the founders' own remaining ownership, not the ownership of SAFE holders who signed earlier. A founder who stacks five SAFEs, each priced at "10% of the post-money cap," has not given away 10% once &mdash; they have given away close to 50% of the company before a single priced round has happened, unless the caps are set with this compounding effect explicitly in mind.</p>
+
+<div class="callout">
+<p class="callout-label">Worked example &mdash; USD 500,000 SAFE on a USD 5,000,000 post-money cap</p>
+<p>At signing: Ownership at conversion = USD 500,000 &divide; USD 5,000,000 = <strong>10%</strong>. This 10% is fixed regardless of what the Company is later valued at &mdash; it is set by the cap, not by the eventual priced round's price per share, unless the priced round prices <em>below</em> the cap (in which case the SAFE converts at the round's own lower, more favorable price instead).</p>
+<p>What the priced round itself does to that 10% depends on how much new money the round raises relative to the Company's resulting valuation. The SAFE holder's fixed 10% share of the pre-round capitalization is diluted by the round's own new shares, exactly like every other existing shareholder, including the founders:</p>
+<table>
+<tr><th>Priced round raises</th><th>Round pre-money</th><th>Dilution from new money</th><th>SAFE holder's ownership after the round</th></tr>
+<tr><td class="mono">USD 2,000,000</td><td class="mono">USD 8,000,000</td><td class="mono">20.0%</td><td class="mono"><strong>8.0%</strong></td></tr>
+<tr><td class="mono">USD 2,000,000</td><td class="mono">USD 15,000,000</td><td class="mono">11.8%</td><td class="mono"><strong>8.8%</strong></td></tr>
+<tr><td class="mono">USD 2,000,000</td><td class="mono">USD 25,000,000</td><td class="mono">7.4%</td><td class="mono"><strong>9.3%</strong></td></tr>
+</table>
+<p>The pattern: the SAFE holder's 10% is locked in relative to the pre-round cap table, but the priced round itself dilutes everyone &mdash; founders and SAFE holders alike &mdash; by roughly (new money raised &divide; post-round valuation). A stronger round, priced higher relative to the amount raised, dilutes the SAFE holder (and the founders) less. This is the number every founder should actually be modeling before signing &mdash; not just the cap in isolation.</p>
+</div>
+
+<h3 class="clause-name">Pro Rata Rights</h3>
+<p class="clause-body">A separate side letter, not the SAFE itself, typically grants the Investor the right to purchase their pro rata share of the priced round that triggers conversion, calculated on their post-conversion ownership percentage.</p>
+<div class="annotation"><span class="label">Why this matters</span>Because the SAFE itself is silent on future rounds beyond the one that triggers conversion, pro rata rights for the priced round specifically must be granted in a side letter &mdash; check that one exists if the investor expects this right.</div>
+<div class="annotation range"><span class="label">Market range</span>Standard for SAFE checks above roughly USD 25,000&ndash;USD 50,000; smaller checks are often left without a pro rata side letter to reduce administrative complexity.</div>
+
+<h3 class="clause-name">Most Favored Nation (MFN)</h3>
+<p class="clause-body">If the Company issues a subsequent SAFE on terms more favorable than this one before this SAFE converts, the Investor may elect to receive the more favorable terms instead &mdash; typically only offered as a side letter provision, since YC's standard post-money SAFE form does not include MFN by default.</p>
+<div class="annotation"><span class="label">Why this matters</span>Unlike the convertible note market, where MFN is close to universal, the standard post-money SAFE template does not include it &mdash; an investor who wants this protection needs to negotiate it explicitly, usually via a side letter.</div>
+<div class="annotation range"><span class="label">Market range</span>Common for larger checks (typically above USD 100,000) in a round with several different caps in play; rare for smaller checks in a round priced uniformly.</div>
+
+<h2 class="section-title">Reading This Template</h2>
+<p>A post-money SAFE answers one question precisely &mdash; what percentage of the Company does this specific check buy, at this specific cap &mdash; and leaves a second, equally important question to the priced round that eventually triggers conversion: how much does that fixed percentage end up being worth, and how much further does it get diluted once real new money enters the cap table. Model both, not just the first.</p>
