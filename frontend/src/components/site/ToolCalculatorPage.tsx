@@ -188,7 +188,7 @@ export function ToolCalculatorPage({
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 pb-16 border-t border-v2-rule pt-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="font-v2-ui text-v2-ink-muted text-[14px] max-w-[480px]">{ctaText}</p>
-            <Link to="/sign-up" className="font-v2-ui shrink-0 bg-v2-accent hover:bg-v2-accent/90 text-white font-medium text-[13px] px-8 py-3.5 transition-colors duration-200">{ctaLabel}</Link>
+            <Link to="/sign-up" search={{ role: "founder" } as any} className="font-v2-ui shrink-0 bg-v2-accent hover:bg-v2-accent/90 text-white font-medium text-[13px] px-8 py-3.5 transition-colors duration-200">{ctaLabel}</Link>
           </div>
         </section>
       </main>

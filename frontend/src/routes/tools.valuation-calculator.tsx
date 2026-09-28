@@ -211,7 +211,7 @@ function ValuationCalculator() {
             <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[14px] max-w-[480px]">
               Once your round terms are set, use Lengdon to close the transaction — sequenced, documented, and permanently recorded.
             </p>
-            <Link to="/sign-up" style={{ fontFamily: "var(--font-v2-ui)" }} className="shrink-0 bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
+            <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="shrink-0 bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
               Join the waitlist
             </Link>
           </div>
