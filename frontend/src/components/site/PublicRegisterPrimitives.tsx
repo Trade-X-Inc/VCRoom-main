@@ -242,7 +242,7 @@ export function PrCardGrid({ children }: { children: React.ReactNode }) {
 // 20x20 viewBox, no fills, matching Phase 2's sector-icon convention.
 export function PrIconLock() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="4" y="9" width="12" height="8" />
       <path d="M6.5 9V6a3.5 3.5 0 0 1 7 0v3" />
     </svg>
@@ -251,7 +251,7 @@ export function PrIconLock() {
 
 export function PrIconCheck() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M4 10.5l3.5 3.5L16 5" />
     </svg>
   );
@@ -259,7 +259,7 @@ export function PrIconCheck() {
 
 export function PrIconFile() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M6 3h6l3 3v11H6z" />
       <path d="M12 3v3h3" />
     </svg>
@@ -268,7 +268,7 @@ export function PrIconFile() {
 
 export function PrIconTimer() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="10" cy="11" r="6.5" />
       <path d="M10 8v3.5l2.2 1.3" />
       <path d="M8 2.5h4" />
@@ -278,7 +278,7 @@ export function PrIconTimer() {
 
 export function PrIconLayers() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M10 3l7 3.5L10 10 3 6.5z" />
       <path d="M3 10l7 3.5L17 10" />
       <path d="M3 13.5l7 3.5 7-3.5" />
@@ -288,7 +288,7 @@ export function PrIconLayers() {
 
 export function PrIconEye() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M2 10s2.8-5 8-5 8 5 8 5-2.8 5-8 5-8-5-8-5z" />
       <circle cx="10" cy="10" r="2" />
     </svg>
@@ -297,7 +297,7 @@ export function PrIconEye() {
 
 export function PrIconShield() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M10 2.5l6.5 2.5v4.5c0 4-2.7 6.8-6.5 8-3.8-1.2-6.5-4-6.5-8V5z" />
     </svg>
   );
@@ -305,7 +305,7 @@ export function PrIconShield() {
 
 export function PrIconLink() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M8 12l4-4" />
       <path d="M9 6.5l1-1a3 3 0 0 1 4.2 4.2l-1 1" />
       <path d="M11 13.5l-1 1a3 3 0 0 1-4.2-4.2l1-1" />

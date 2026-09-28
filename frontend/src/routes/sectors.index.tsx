@@ -38,7 +38,7 @@ export const Route = createFileRoute("/sectors/")({
 // below, not the deleted sectors.energy.tsx-style names.
 function IconChip() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="5" y="5" width="10" height="10" />
       <circle cx="8" cy="8" r="0.6" fill="#0a2540" stroke="none" />
       <circle cx="12" cy="8" r="0.6" fill="#0a2540" stroke="none" />
@@ -51,7 +51,7 @@ function IconChip() {
 
 function IconTrajectory() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 15c3-1 5-3 6.5-6S13 4 17 3" />
       <path d="M12.5 3H17v4.5" />
     </svg>
@@ -60,7 +60,7 @@ function IconTrajectory() {
 
 function IconHelix() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M6 2.5c0 5 8 5.5 8 10.5s-8 5-8 4.5" />
       <path d="M14 2.5c0 5-8 5.5-8 10.5s8 5 8 4.5" />
       <path d="M6.7 6h6.6M6.4 10h7.2M6.7 14h6.6" />
@@ -70,7 +70,7 @@ function IconHelix() {
 
 function IconFacade() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 17V6l7-3.5L17 6v11" />
       <path d="M3 17h14" />
       <rect x="5.5" y="8" width="2.4" height="2.4" />
@@ -82,7 +82,7 @@ function IconFacade() {
 
 function IconBriefcase() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="2.5" y="7" width="15" height="9.5" />
       <path d="M7 7V4.5h6V7" />
       <path d="M2.5 11.5h15" />
@@ -92,7 +92,7 @@ function IconBriefcase() {
 
 function IconShield() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M10 2.5l6.5 2.5v4.5c0 4-2.7 6.8-6.5 8-3.8-1.2-6.5-4-6.5-8V5z" />
     </svg>
   );
@@ -100,7 +100,7 @@ function IconShield() {
 
 function IconNetwork() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M6 14l4-9 4 9" />
       <path d="M6 14h8" />
       <circle cx="10" cy="5" r="1.4" fill="#0a2540" stroke="none" />
@@ -112,7 +112,7 @@ function IconNetwork() {
 
 function IconGlobe() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="10" cy="10" r="7" />
       <path d="M3 10h14" />
       <path d="M10 3c2.4 2 2.4 12 0 14M10 3c-2.4 2-2.4 12 0 14" />
