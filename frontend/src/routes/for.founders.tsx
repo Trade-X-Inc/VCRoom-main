@@ -115,7 +115,7 @@ function Founders() {
           <PrProse>
             Initialize a room and invite your counsel. At the start of closing, either party may engage legal counsel — or both may agree to proceed without. Either way, the decision is recorded.{" "}
             <Link to="/tools/safe-note" style={{ color: "var(--v2-accent)" }}>Model your SAFE conversion before your next round →</Link>
-            {" "}From there the room guides both parties through NDA, Diligence, Terms, and Conditions in strict sequence, then Close. Add your own conditions precedent and assign each to a named owner — neither side can advance to Close until every condition is marked satisfied.
+            {" "}From there the room guides both parties through Conditions, then Close — neither side can advance until every condition is marked satisfied. Add your own conditions precedent and assign each to a named owner.
           </PrProse>
         </PrSection>
 
