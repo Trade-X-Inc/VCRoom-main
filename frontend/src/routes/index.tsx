@@ -796,7 +796,7 @@ function ProcessSection() {
                 role="button"
                 tabIndex={0}
                 aria-expanded={isOpen}
-                aria-label={`Gate ${phase.num}: ${phase.title}`}
+                aria-label={`Step ${phase.num}: ${phase.title}`}
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(phase.num); } }}
               >
                 <div className="h-[90px] flex items-center px-8 lg:px-12 gap-6 select-none relative overflow-hidden">
@@ -859,7 +859,7 @@ function ProcessSection() {
                       <div className="flex items-center gap-3">
                         <div className="w-4 h-px bg-white/50" />
                         <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[10px] tracking-[2px] uppercase">
-                          Gate {phase.num} of 06
+                          Step {phase.num}
                         </span>
                       </div>
 
