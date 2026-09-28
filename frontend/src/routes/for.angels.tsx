@@ -19,7 +19,7 @@ export const Route = createFileRoute("/for/angels")({
   head: () => ({
     meta: [
       { title: "For angel investors — the same close, at any size — Lengdon" },
-      { name: "description", content: "Run a personal angel investment on the same six-gate sequence funds use. A checklist, one term sheet, a closing record." },
+      { name: "description", content: "Run a personal angel investment on the same seven-stage sequence funds use. A checklist, one term sheet, a closing record." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/angels" }],
   }),
