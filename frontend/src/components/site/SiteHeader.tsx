@@ -199,7 +199,7 @@ export function SiteHeader() {
               onClick={() => setMobileMenuOpen((v) => !v)}
               className="md:hidden"
               aria-label="Toggle menu"
-              style={{ display: "grid", placeItems: "center", height: "32px", width: "32px", border: `1px solid ${RULE}`, background: PANEL, color: INK_SECONDARY }}
+              style={{ display: "grid", placeItems: "center", minHeight: "44px", minWidth: "44px", border: `1px solid ${RULE}`, background: PANEL, color: INK_SECONDARY }}
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
