@@ -150,7 +150,7 @@ function SignUp() {
 
         <div className="relative z-10 border-t border-white/10 pt-8 flex flex-col gap-4">
           {[
-            { label: 'Seven-stage closing sequence', detail: 'Brief through Close, enforced by the system, not by convention' },
+            { label: 'Structured closing sequence', detail: 'Brief through Close, enforced by the system, not by convention' },
             { label: 'Per-person NDA', detail: 'Individual, not company-level' },
             { label: 'Append-only audit record', detail: 'Every action recorded, permanently' },
           ].map((f) => (

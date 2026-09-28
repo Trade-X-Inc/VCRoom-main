@@ -59,7 +59,7 @@ function Registry() {
                 A REFERENCE.<br />NOT THE DEAL.
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75]">
-                When a deal room reaches Gate 6 and both parties confirm close, Lengdon generates a unique reference number for the complete deal record. That reference identifies the record. It carries no deal terms, no party identities, no document content.
+                When a deal room reaches Close and both parties confirm, Lengdon generates a unique reference number for the complete deal record. That reference identifies the record. It carries no deal terms, no party identities, no document content.
               </p>
             </div>
             <div className="p-10">
@@ -87,8 +87,8 @@ function Registry() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#e6e9ef]">
             {[
-              { num: "01", title: "Room reaches Gate 6", body: "Both parties confirm close. The gate sequence is complete." },
-              { num: "02", title: "The record stays sealed", body: "The complete gate log, documents, and confirmations are locked in place — append-only, nothing further can be edited or removed." },
+              { num: "01", title: "Room reaches Close", body: "Both parties confirm close. The closing sequence is complete." },
+              { num: "02", title: "The record stays sealed", body: "The complete stage log, documents, and confirmations are locked in place — append-only, nothing further can be edited or removed." },
               { num: "03", title: "A reference number is assigned", body: "A unique reference for the closed record is generated and attached to the room, timestamped, checkable by both parties." },
             ].map((s, i) => (
               <div key={s.num} className={`p-8 ${i < 2 ? "border-r border-[#e6e9ef]" : ""}`}>

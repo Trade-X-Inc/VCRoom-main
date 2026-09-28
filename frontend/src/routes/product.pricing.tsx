@@ -125,10 +125,10 @@ const PLANS = [
     name: "Direct",
     price: "—",
     period: "once, at first close",
-    desc: "One transaction. One room. Full six-gate sequence and append-only record, billed once the deal closes.",
+    desc: "One transaction. One room. Full enforced closing sequence and append-only record, billed once the deal closes.",
     features: [
       "One deal room",
-      "Six-gate enforced sequence",
+      "Enforced closing sequence",
       "Per-person NDA enforcement",
       "Append-only audit record",
       "Billed only on close — nothing due until then",
@@ -193,7 +193,7 @@ const PLANS = [
       "Custom compliance requirements, discussed directly",
     ],
     roadmapFeatures: [
-      "Monthly money-report system of record, planned for this tier — a standing report of cash, runway, burn, and gate status, visible to committed investors after close",
+      "Monthly money-report system of record, planned for this tier — a standing report of cash, runway, burn, and stage status, visible to committed investors after close",
       "Auto-assembled second-raise data room, planned for this tier — built from a founder's own reporting history",
       "API access for portfolio companies, planned for this tier — pulling out cap table state, verification tier, and report history",
       "Execution-layer API integration for third-party platforms, planned for this tier",
@@ -207,7 +207,7 @@ const PLANS = [
 const FAQS = [
   {
     q: "Is there a free trial?",
-    a: "During beta, everything is free — join the waitlist and use the platform at no cost. The Direct plan's own free step (setting up a room and completing the Counsel gate before anything is billed) is what carries forward once general availability opens.",
+    a: "During beta, everything is free — join the waitlist and use the platform at no cost. The Direct plan's own free step (setting up a room and completing the Counsel stage before anything is billed) is what carries forward once general availability opens.",
   },
   {
     q: "What happens to the room if the transaction falls through?",

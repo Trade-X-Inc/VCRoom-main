@@ -89,7 +89,7 @@ function RunwayCalculator() {
           ? { months: Math.floor(adjustedMonths), cashOutLabel: outDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) }
           : null
       }
-      ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full seven-stage sequence."
+      ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full closing sequence."
       ctaLabel="Join the waitlist"
       belowCalculator={
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[var(--v2-rule)]">

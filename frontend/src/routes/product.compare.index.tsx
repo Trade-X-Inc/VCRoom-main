@@ -33,7 +33,7 @@ const COMPARISON = [
     feature: "Enforced closing sequence",
     lengdon: true,
     dataRoom: false,
-    note: "Traditional data rooms have no concept of gates — parties can access anything at any time.",
+    note: "Traditional data rooms have no concept of a closing sequence — parties can access anything at any time.",
   },
   {
     feature: "Per-person NDA enforcement",
@@ -51,13 +51,13 @@ const COMPARISON = [
     feature: "Dual-party confirmation required",
     lengdon: true,
     dataRoom: false,
-    note: "Data rooms are passive repositories. Lengdon actively requires both parties to confirm at each gate.",
+    note: "Data rooms are passive repositories. Lengdon actively requires both parties to confirm at each step.",
   },
   {
     feature: "Payment confirmation workflow",
     lengdon: true,
     dataRoom: false,
-    note: "No traditional data room includes a payment confirmation gate.",
+    note: "No traditional data room includes a payment confirmation step.",
   },
   {
     feature: "Document storage and sharing",
@@ -69,7 +69,7 @@ const COMPARISON = [
     feature: "Access permissions",
     lengdon: true,
     dataRoom: true,
-    note: "Data rooms offer company-level permissions. Lengdon offers per-person, per-gate permissions.",
+    note: "Data rooms offer company-level permissions. Lengdon offers per-person permissions tied to the closing sequence.",
   },
   {
     feature: "Activity logging",
@@ -199,7 +199,7 @@ function Compare() {
                 See it in a live room.
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px]">
-                30 minutes. We'll show you the six-gate sequence from setup to close.
+                30 minutes. We'll show you the sequence from setup to close.
               </p>
             </div>
             <div className="flex gap-3 shrink-0">

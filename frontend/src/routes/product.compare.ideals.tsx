@@ -13,7 +13,7 @@ export const Route = createFileRoute("/product/compare/ideals")({
   head: () => ({
     meta: [
       { title: "Lengdon vs iDeals — closing infrastructure vs a virtual data room — Lengdon" },
-      { name: "description", content: "iDeals is a virtual data room with no enforced transaction sequence. Compare it to Lengdon's six-gate close." },
+      { name: "description", content: "iDeals is a virtual data room with no enforced transaction sequence. Compare it to Lengdon's enforced close." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/ideals" }],
   }),
@@ -21,13 +21,13 @@ export const Route = createFileRoute("/product/compare/ideals")({
 });
 
 const ROWS = [
-  { feature: "Enforced six-gate closing sequence", lengdon: true, them: false, note: "iDeals provides a virtual data room for document sharing — no enforced transaction sequence." },
+  { feature: "Enforced closing sequence", lengdon: true, them: false, note: "iDeals provides a virtual data room for document sharing — no enforced transaction sequence." },
   { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "iDeals NDA workflow is typically document-based rather than identity-bound to each participant." },
-  { feature: "Dual-party confirmation at every gate", lengdon: true, them: false, note: "Bilateral confirmation per gate isn't a standard data room concept." },
+  { feature: "Dual-party confirmation at every step", lengdon: true, them: false, note: "Bilateral confirmation at each step isn't a standard data room concept." },
   { feature: "Append-only audit trail", lengdon: true, them: false, note: "iDeals activity logs are standard access logs — not append-only or tamper-evident by design." },
-  { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
+  { feature: "Payment confirmation step", lengdon: true, them: false, note: "" },
   { feature: "Document storage", lengdon: true, them: true, note: "" },
-  { feature: "Bulk upload and folder structure", lengdon: false, them: true, note: "Lengdon is not a general document repository. Documents are tied to gates." },
+  { feature: "Bulk upload and folder structure", lengdon: false, them: true, note: "Lengdon is not a general document repository. Documents are tied to the closing sequence." },
   { feature: "Q&A module", lengdon: false, them: true, note: "" },
   { feature: "Watermarking", lengdon: false, them: true, note: "" },
 ];
@@ -53,7 +53,7 @@ function CompareIdeals() {
       competitorBlurbTitle="Virtual data room for M&A due diligence"
       competitorBlurb="iDeals manages document sharing, Q&A, and access permissions during the diligence phase. It's designed for the exploration and negotiation stages of a transaction, not the closing sequence."
       lengdonBlurbTitle="Closing infrastructure for private capital transactions"
-      lengdonBlurb="Lengdon begins after terms are agreed. Six gates, two parties, one append-only record. No general document storage, no Q&A module — just the close, done properly."
+      lengdonBlurb="Lengdon begins after terms are agreed. Two parties, one append-only record. No general document storage, no Q&A module — just the close, done properly."
       rows={ROWS}
       ctaTitle="Diligence done. Now close."
       ctaSubtitle="After iDeals, use Lengdon to close with a permanent record."

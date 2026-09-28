@@ -25,7 +25,7 @@ const PANEL = "var(--pub-n-00)";
 type NavLink = { label: string; to: string; desc: string };
 
 const PRODUCT_LINKS: NavLink[] = [
-  { label: "How Lengdon Works", to: "/product/how-it-works", desc: "The six-gate closing sequence" },
+  { label: "How Lengdon Works", to: "/product/how-it-works", desc: "The structured closing sequence" },
   { label: "Pricing", to: "/product/pricing", desc: "Simple, transparent plans" },
   { label: "Security & Trust", to: "/product/security", desc: "Encryption, NDAs, audit records" },
   { label: "Compare", to: "/product/compare", desc: "Lengdon vs traditional data rooms" },

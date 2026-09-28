@@ -10,7 +10,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 export const Route = createFileRoute("/product/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How it works — the seven-state closing lifecycle — Lengdon" },
+      { title: "How it works — the closing lifecycle — Lengdon" },
       { name: "description", content: "Brief, present, NDA, diligence, terms, conditions, close. One recorded spine for every private-capital raise. See the full lifecycle." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/how-it-works" }],
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/product/how-it-works")({
 });
 
 // SEO-011: rewritten from the stale six-gate vocabulary (Counsel,
-// Agreement, Conditions, Signing, Payment, Close) to the real seven-stage
+// Agreement, Conditions, Signing, Payment, Close) to the real stage
 // model already live in this page's own head() description and the
 // SEO-007 blog posts (Brief, Present, NDA, Diligence, Terms, Conditions,
 // Close) — the two had diverged (flagged in SEO-010) since this array
@@ -29,6 +29,10 @@ export const Route = createFileRoute("/product/how-it-works")({
 // SEO-007 post "The 7 Stages Every Private Deal Goes Through" already
 // describes Close ("Signatures happen, funds move, and the record...
 // is preserved"), not invented here.
+// SEO-016: no gate/stage COUNT stated in rendered copy — named stages
+// only. The six closing gates and the seven lifecycle stages are two
+// separate real things; a count of either goes stale and invites
+// confusion, so public copy never states one.
 const GATES = [
   {
     num: "01", title: "Brief",
@@ -64,7 +68,7 @@ const GATES = [
     num: "06", title: "Conditions",
     party: "Tracked to satisfaction",
     desc: "Every condition precedent — regulatory approval, board consent, financing confirmations, whatever the deal requires — is added to the room and tracked until satisfied. The room cannot advance to Close until every condition is marked complete. Which party clears which condition is a matter both parties agree on directly — Lengdon enforces the boundary, not the internal workflow.",
-    detail: "The gate is enforced. Condition-by-condition sequencing inside it is not — that's between the parties.",
+    detail: "The step is enforced. Condition-by-condition sequencing inside it is not — that's between the parties.",
   },
   {
     num: "07", title: "Close",
@@ -82,18 +86,18 @@ const PRINCIPLES = [
 ];
 
 // SEO-011: rewritten from the stale six-gate FAQ (Counsel, Agreement,
-// Conditions, Signing, Payment, Close) to match the seven-stage GATES
-// array above — the mismatch SEO-010 flagged (this page's own meta
-// description already said "Brief, present, NDA, diligence, terms,
-// conditions, close" while the body and this FAQ both said six gates)
-// is now closed on both sides at once.
+// Conditions, Signing, Payment, Close) to match the GATES array above —
+// the mismatch SEO-010 flagged (this page's own meta description already
+// said "Brief, present, NDA, diligence, terms, conditions, close" while
+// the body and this FAQ both said six gates) is now closed on both sides
+// at once. SEO-016: stage count dropped from the rendered question text.
 const HOW_IT_WORKS_FAQ_JSON_LD = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
     {
       "@type": "Question",
-      name: "What are the seven stages in Lengdon's closing process?",
+      name: "What are the stages in Lengdon's closing process?",
       acceptedAnswer: { "@type": "Answer", text: "Brief, Present, NDA, Diligence, Terms, Conditions, and Close. Each stage must be completed before the next opens — the sequence is enforced by the system, not left to convention." },
     },
     {
@@ -150,7 +154,7 @@ function HowItWorks() {
       <main id="main-content">
         <PageHero
           eyebrow="Product · How It Works"
-          title="SEVEN STAGES."
+          title="THE SEQUENCE."
           titleOutline="ONE CLOSE."
           subtitle="Every private capital transaction follows the same sequence. Lengdon enforces it — not by convention, but by the system itself. No stage can be opened until the one before it is complete."
         />
@@ -166,7 +170,7 @@ function HowItWorks() {
                 THE STAGES
               </h2>
               <p id="mechanism-explanation" style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.7]">
-                Seven stages. Each requires the one before it. The system enforces the order — neither party can advance alone.
+                Each stage requires the one before it. The system enforces the order — neither party can advance alone.
               </p>
             </div>
 
@@ -228,7 +232,7 @@ function HowItWorks() {
                 Ready to run the sequence?
               </h2>
               <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/55 text-[15px] leading-[1.6]">
-                Initialize a room and begin the seven-stage process today.
+                Initialize a room and begin the closing sequence today.
               </p>
             </div>
             <div className="flex gap-4 shrink-0">

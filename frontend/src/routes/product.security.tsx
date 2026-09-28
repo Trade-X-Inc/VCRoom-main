@@ -151,7 +151,7 @@ const PILLARS = [
   },
   {
     title: "Role-scoped access",
-    body: "Each participant receives only the access their role requires for the current gate. Documents not yet released at the current gate are inaccessible — not hidden, not locked — simply not visible to the other party.",
+    body: "Each participant receives only the access their role requires for the current stage. Documents not yet released at the current stage are inaccessible — not hidden, not locked — simply not visible to the other party.",
   },
   {
     title: "No money movement",
@@ -163,7 +163,7 @@ const PILLARS = [
   },
   {
     title: "Independent record",
-    body: "The full audit trail is preserved after close, unchanged, for both parties. It documents exactly what happened — every gate, confirmation, and signature — for as long as the deal room exists.",
+    body: "The full audit trail is preserved after close, unchanged, for both parties. It documents exactly what happened — every step, confirmation, and signature — for as long as the deal room exists.",
   },
 ];
 

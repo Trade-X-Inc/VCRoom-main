@@ -27,7 +27,7 @@ export const Route = createFileRoute("/product/compare/firmex")({
   head: () => ({
     meta: [
       { title: "Lengdon vs Firmex — closing infrastructure vs a virtual data room — Lengdon" },
-      { name: "description", content: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced six-gate closing sequence." },
+      { name: "description", content: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced closing sequence." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/firmex" }],
   }),
@@ -35,13 +35,13 @@ export const Route = createFileRoute("/product/compare/firmex")({
 });
 
 const ROWS = [
-  { feature: "Six-gate enforced close sequence", lengdon: true, them: false, note: "Firmex has no transaction sequencing. It's a document management platform." },
+  { feature: "Enforced close sequence", lengdon: true, them: false, note: "Firmex has no transaction sequencing. It's a document management platform." },
   { feature: "Per-person NDA, individually bound", lengdon: true, them: false, note: "Firmex NDA management is typically document-centric rather than identity-level access binding." },
-  { feature: "Bilateral confirmation per gate", lengdon: true, them: false, note: "Firmex is built around document upload and access grants, not a two-party confirmation requirement." },
+  { feature: "Bilateral confirmation at each step", lengdon: true, them: false, note: "Firmex is built around document upload and access grants, not a two-party confirmation requirement." },
   { feature: "Append-only audit log", lengdon: true, them: false, note: "Firmex activity logs are standard records — not append-only or tamper-evident." },
-  { feature: "Payment gate confirmation", lengdon: true, them: false, note: "" },
+  { feature: "Payment confirmation step", lengdon: true, them: false, note: "" },
   { feature: "Document hosting", lengdon: true, them: true, note: "" },
-  { feature: "Permission groups", lengdon: true, them: true, note: "Firmex permissions are group-based. Lengdon's are per-person and gate-scoped." },
+  { feature: "Permission groups", lengdon: true, them: true, note: "Firmex permissions are group-based. Lengdon's are per-person and tied to the closing sequence." },
   { feature: "Bulk file management", lengdon: false, them: true, note: "" },
   { feature: "M&A diligence workflow", lengdon: false, them: true, note: "Lengdon begins after diligence." },
 ];
@@ -72,7 +72,7 @@ function CompareFirmex() {
             {[
               { label: "Firmex says", text: "\"Done\" means the documents are uploaded and the deal team has access.", dim: true },
               { label: "Most people think", text: "\"Done\" means both parties reviewed, confirmed, signed, paid, and closed.", dim: false },
-              { label: "Lengdon delivers", text: "Both parties confirmed, signed, paid, and closed — with every gate action permanently on record.", dim: false, dark: true },
+              { label: "Lengdon delivers", text: "Both parties confirmed, signed, paid, and closed — with every step permanently on record.", dim: false, dark: true },
             ].map((c, i) => (
               <div key={i} className={`p-10 ${i < 2 ? "border-r border-[#e6e9ef]" : ""} ${c.dark ? "bg-[#0a2540]" : ""}`}>
                 <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className={`text-[11px] tracking-[2px] uppercase mb-4 ${c.dark ? "text-white/50" : "text-[#64748b]"}`}>{c.label}</div>

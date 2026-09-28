@@ -70,10 +70,10 @@ We do not collect payment card data. We do not handle, process, or store financi
     title: "How we use your data",
     content: `We use personal data for the following purposes:
 
-To operate the Lengdon platform: Providing the deal room infrastructure, enforcing the six-gate closing sequence, and generating the append-only audit record.
+To operate the Lengdon platform: Providing the deal room infrastructure, enforcing the closing sequence, and generating the append-only audit record.
 To comply with legal obligations: Maintaining records as required under applicable law, including data protection law, anti-money laundering regulations, and contract law.
 To protect the security of the platform: Detecting and preventing fraud, unauthorised access, and abuse.
-To communicate with you: Responding to enquiries, sending transactional notifications (gate status, signatures required), and, where you have consented, sending product updates.
+To communicate with you: Responding to enquiries, sending transactional notifications (stage status, signatures required), and, where you have consented, sending product updates.
 
 We do not use personal data for advertising. We do not sell personal data to third parties.`,
   },

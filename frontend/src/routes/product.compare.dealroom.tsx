@@ -20,7 +20,7 @@ export const Route = createFileRoute("/product/compare/dealroom")({
   head: () => ({
     meta: [
       { title: "Lengdon vs Dealroom — closing infrastructure vs deal pipeline software — Lengdon" },
-      { name: "description", content: "Dealroom is a deal pipeline and portfolio tool with no closing sequence. Compare it to Lengdon's enforced six-gate close." },
+      { name: "description", content: "Dealroom is a deal pipeline and portfolio tool with no closing sequence. Compare it to Lengdon's enforced closing sequence." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/dealroom" }],
   }),
@@ -30,13 +30,13 @@ export const Route = createFileRoute("/product/compare/dealroom")({
 const ROWS = [
   { feature: "Transaction closing sequence", lengdon: true, them: false, note: "Dealroom is a deal pipeline and portfolio management tool. It has no closing sequence." },
   { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "Dealroom is built for deal flow and pipeline management, not identity-bound NDAs in a transaction context." },
-  { feature: "Gate-by-gate dual confirmation", lengdon: true, them: false, note: "Dealroom tracks pipeline stages; bilateral confirmation at each gate is not its model." },
+  { feature: "Step-by-step dual confirmation", lengdon: true, them: false, note: "Dealroom tracks pipeline stages; bilateral confirmation at each step is not its model." },
   { feature: "Append-only close record", lengdon: true, them: false, note: "Dealroom is CRM-style pipeline tracking. Lengdon's record is append-only." },
-  { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
+  { feature: "Payment confirmation step", lengdon: true, them: false, note: "" },
   { feature: "Deal pipeline tracking", lengdon: false, them: true, note: "Lengdon is not a CRM or pipeline tool." },
   { feature: "Investor database and discovery", lengdon: false, them: true, note: "" },
   { feature: "Portfolio analytics", lengdon: false, them: true, note: "" },
-  { feature: "Document sharing", lengdon: true, them: true, note: "Lengdon's documents are gate-scoped. Dealroom's are unstructured." },
+  { feature: "Document sharing", lengdon: true, them: true, note: "Lengdon's documents are tied to the closing sequence. Dealroom's are unstructured." },
 ];
 
 // SEO-010 (AEO pass): BreadcrumbList JSON-LD.

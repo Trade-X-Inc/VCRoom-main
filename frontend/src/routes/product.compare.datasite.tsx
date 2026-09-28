@@ -16,7 +16,7 @@ export const Route = createFileRoute("/product/compare/datasite")({
   head: () => ({
     meta: [
       { title: "Lengdon vs Datasite — closing infrastructure vs a document repository — Lengdon" },
-      { name: "description", content: "Datasite is a document repository with no enforced closing sequence. See how Lengdon's six-gate process and per-person NDAs compare." },
+      { name: "description", content: "Datasite is a document repository with no enforced closing sequence. See how Lengdon's closing process and per-person NDAs compare." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/datasite" }],
   }),
@@ -24,11 +24,11 @@ export const Route = createFileRoute("/product/compare/datasite")({
 });
 
 const ROWS = [
-  { feature: "Enforced six-gate closing sequence", lengdon: true, them: false, note: "Datasite is a document repository with no enforced transaction sequence." },
+  { feature: "Enforced closing sequence", lengdon: true, them: false, note: "Datasite is a document repository with no enforced transaction sequence." },
   { feature: "Per-person NDA — individual, not company-level", lengdon: true, them: false, note: "Datasite access is typically granted at group/company level. Lengdon binds access to the individual." },
-  { feature: "Dual-party confirmation at every gate", lengdon: true, them: false, note: "Datasite is built around single-party document upload, not dual confirmation. Lengdon requires both parties to confirm at each gate." },
+  { feature: "Dual-party confirmation at every step", lengdon: true, them: false, note: "Datasite is built around single-party document upload, not dual confirmation. Lengdon requires both parties to confirm at each step." },
   { feature: "Append-only audit log", lengdon: true, them: false, note: "Datasite logs, like most data room logs, are admin-editable. Lengdon's log is append-only." },
-  { feature: "Payment confirmation gate", lengdon: true, them: false, note: "No data room product includes a payment confirmation gate." },
+  { feature: "Payment confirmation step", lengdon: true, them: false, note: "No data room product includes a payment confirmation step." },
   { feature: "Document storage and sharing", lengdon: true, them: true, note: "" },
   { feature: "Q&A and redline workflow", lengdon: false, them: true, note: "Lengdon is closing infrastructure, not a diligence platform. It begins after terms are agreed." },
   { feature: "Enterprise AI and search", lengdon: false, them: true, note: "" },
@@ -56,7 +56,7 @@ function CompareDatasite() {
       competitorBlurbTitle="Document access control for M&A diligence"
       competitorBlurb="Datasite manages who can view which documents during the exploration and diligence phases. It's a repository with permissions. It doesn't know what phase of a deal you're in, doesn't enforce sequence, and doesn't produce a closing record."
       lengdonBlurbTitle="Sequenced closing infrastructure for private capital"
-      lengdonBlurb="Lengdon begins after diligence is complete and terms are agreed. It enforces the six-gate sequence that takes two parties from agreement to close — producing an append-only record that both parties own permanently."
+      lengdonBlurb="Lengdon begins after diligence is complete and terms are agreed. It enforces the sequence that takes two parties from agreement to close — producing an append-only record that both parties own permanently."
       rows={ROWS}
       ctaTitle="Use both. Sequence matters."
       ctaSubtitle="Datasite for diligence. Lengdon for close. They serve different phases."
