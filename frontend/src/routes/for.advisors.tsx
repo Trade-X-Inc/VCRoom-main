@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconEye, PrIconFile, PrIconShield, PrIconLink,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -64,12 +65,22 @@ function Advisors() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Your portfolio view" activeFrom="Brief" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconEye />} title="Read-only, scoped to your rooms" body="You see what's been confirmed, which conditions remain outstanding, and what's been signed — without the ability to change anything." />
+            <PrCard icon={<PrIconLink />} title="Involvement on the record" body="You're added to a room the same way any other party is — your presence, and what you saw, is timestamped and recorded." />
+            <PrCard icon={<PrIconFile />} title="Every gate, visible" body="See exactly which stage each founder's room has reached — no status update to chase from either side." />
+            <PrCard icon={<PrIconShield />} title="No hidden brokerage" body="Advisors mediate and are recorded. We don't pay referral fees or act as a broker of record — your involvement is what it is, on the record." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Your involvement lives in an inbox.</PrTitle>
           <PrProse>You're running several founder raises out of one inbox. There's no way to sit between founder and investor with any real visibility into the deal, and no way to show, afterward, exactly what you disclosed and to whom.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for advisors</PrEyebrow>
           <PrTitle>Read-only access, scoped to your rooms.</PrTitle>
           <PrProse>
@@ -79,13 +90,13 @@ function Advisors() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>Reputational collateral, written down.</PrTitle>
           <PrProse>A warm introduction is reputational collateral with nothing written down. A record that shows you were in the room, at which gates, changes what your involvement is worth the next time you make one.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We don't broker the deal.</PrTitle>
           <PrProse>Advisors mediate and are recorded. We do not pay referral fees, take a percentage of the round, or act as a broker of record.</PrProse>

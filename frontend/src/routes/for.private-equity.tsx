@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLayers, PrIconCheck, PrIconFile, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -62,12 +63,22 @@ function PrivateEquity() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Where you enter" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLayers />} title="Multi-party rooms" body="Counsel, the principal, and the counterparty in one room — set up once, not reconfigured every deal." />
+            <PrCard icon={<PrIconCheck />} title="Conditions register" body="Every condition tracked to satisfaction, timestamped and attributed to the confirming party — not just agreed terms." />
+            <PrCard icon={<PrIconFile />} title="One record per deal" body="Every document, term, and condition referenced to a single deal ID — a clean close, not a disputed one later." />
+            <PrCard icon={<PrIconShield />} title="One region, stated honestly" body="We run one region today. No per-room data residency selection exists, and we don't claim one." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>No published number, and the invoice never matches.</PrTitle>
           <PrProse>The enterprise data room vendors price at enterprise scale with no published number, and the invoice rarely matches the quote you were given. Setting up a room for counsel, the principal, and the counterparty at once is its own configuration project every time.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for private equity</PrEyebrow>
           <PrTitle>Multi-party rooms, one conditions register.</PrTitle>
           <PrProse>
@@ -76,13 +87,13 @@ function PrivateEquity() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>PE closes on conditions, not just terms.</PrTitle>
           <PrProse>The structural difference is the conditions register. PE closes on conditions, not just agreed terms. A record of each condition and exactly when it was satisfied — referenced, timestamped — is the difference between a clean close and a disputed one later.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>One region. No legal opinions.</PrTitle>
           <PrProse>We do not advise on deal structure, provide legal opinions, or act as counsel. We run one region today — there is no per-room data residency selection, and we don't claim one.</PrProse>

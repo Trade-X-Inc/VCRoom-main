@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLayers, PrIconFile, PrIconEye, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -55,12 +56,22 @@ function VentureCapital() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Where you enter" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLayers />} title="Lifecycle, not pipeline" body="Deals organized by diligence-and-terms state, not a sales pipeline stage a CRM was never built to track." />
+            <PrCard icon={<PrIconFile />} title="One record per close" body="The record produced at close stays attached to the deal, visible across your active portfolio — not scattered across email." />
+            <PrCard icon={<PrIconEye />} title="House diligence, on schedule" body="House diligence items sit alongside whatever a sector's own schedule already asks for — nothing rebuilt per deal." />
+            <PrCard icon={<PrIconShield />} title="Your pipeline stays yours" body="We do not source or rank deals. We run the transaction once you've found it, and hold the record after." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Nothing tracks a deal the way you need.</PrTitle>
           <PrProse>You're too small a customer for the enterprise vendors and too active a shop for a generic virtual data room. A CRM was never built to track a deal by diligence-and-terms state. House diligence items don't fit anyone's generic template, and once a deal closes, the record lives wherever the last email landed.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for venture capital</PrEyebrow>
           <PrTitle>Deals by lifecycle state, not pipeline stage.</PrTitle>
           <PrProse>
@@ -69,13 +80,13 @@ function VentureCapital() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>You need the record three times over.</PrTitle>
           <PrProse>A fund doing four to eight deals a year needs the record again at the next round, at LP reporting, and at exit. Rebuilding it from email each time costs real weeks. Having it already costs one seat.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>Your pipeline stays yours.</PrTitle>
           <PrProse>We do not source or rank deals — your pipeline is your own. We run the transaction once you've found it, and we hold the record after.</PrProse>

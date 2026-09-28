@@ -213,7 +213,7 @@ export function SiteHeader() {
                 key={l.to}
                 to={l.to as any}
                 onClick={() => setMobileMenuOpen(false)}
-                style={{ fontFamily: FONT_UI, fontSize: "13.5px", color: INK_SECONDARY, padding: "10px 0", textDecoration: "none", display: "block" }}
+                style={{ fontFamily: FONT_UI, fontSize: "13.5px", color: INK_SECONDARY, minHeight: "44px", display: "flex", alignItems: "center", textDecoration: "none" }}
               >
                 {l.label}
               </Link>

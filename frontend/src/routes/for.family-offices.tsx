@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconLayers, PrIconFile, PrIconEye,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -58,12 +59,22 @@ function FamilyOffices() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Where you enter" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLock />} title="Nothing before the NDA" body="No data room, no materials — nothing is shown to your side until an NDA is signed and countersigned." />
+            <PrCard icon={<PrIconLayers />} title="Diligence, batched by stage" body="Requests arrive batched by stage, not drip-fed one at a time — the same discipline an institution runs, without institutional tooling." />
+            <PrCard icon={<PrIconFile />} title="Conditions register" body="Every outstanding condition tracked to satisfaction, timestamped and attributed — a defensible record, not a forwarded-email folder." />
+            <PrCard icon={<PrIconEye />} title="Seat pricing, principal-approved" body="A principal can approve access directly — no procurement process, no enterprise sales cycle." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Deep diligence, no dedicated tooling.</PrTitle>
           <PrProse>Family offices bring a deep diligence culture with no dedicated tooling to match it. The enterprise data room vendors require a procurement process; the boutique platforms are too light for what you actually check. Everything ends up back in email and attached PDFs.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for family offices</PrEyebrow>
           <PrTitle>A full room, batched by stage.</PrTitle>
           <PrProse>
@@ -73,13 +84,13 @@ function FamilyOffices() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>Defensible to the next generation.</PrTitle>
           <PrProse>A family office that ran diligence on a structured record can defend every decision to the next generation of principals. A closed folder of forwarded emails cannot.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We're the room, not the advisor.</PrTitle>
           <PrProse>We do not provide investment advice, manage assets, or act as custodian of anything. We are the room the deal closes inside.</PrProse>

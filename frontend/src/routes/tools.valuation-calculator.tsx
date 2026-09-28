@@ -145,6 +145,18 @@ function ValuationCalculator() {
                     : `At this valuation, new investors own ${pct(investorPct)} of the company and existing shareholders retain ${pct(founderPct)}.`}
                 </p>
               </div>
+              {!hasZeroDivision && (
+                <div className="p-6 bg-[var(--v2-panel)] border border-[var(--v2-rule)]" role="img" aria-label={`Ownership split: investor ${pct(investorPct)}, founder ${pct(founderPct)}`}>
+                  <svg viewBox="0 0 400 48" width="100%" height="48" preserveAspectRatio="none" aria-hidden="true">
+                    <rect x="0" y="0" width={400 * investorPct} height="48" fill="var(--v2-accent)" />
+                    <rect x={400 * investorPct} y="0" width={400 * founderPct} height="48" fill="var(--v2-ink-muted)" />
+                  </svg>
+                  <div className="flex items-center justify-between mt-2">
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[12px]">Investor {pct(investorPct)}</span>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px]">Founder {pct(founderPct)}</span>
+                  </div>
+                </div>
+              )}
               <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)]">
                 {[
                   { label: "Pre-money valuation", value: fmt(preMoney), accent: false },

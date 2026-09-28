@@ -60,10 +60,55 @@ export interface ToolCalculatorPageProps {
   // an input is invalid (negative, or would divide by zero). Results
   // still render below it using safety-clamped values, never NaN.
   errorMessage?: string;
+  // SEO-012 Phase 3 — a horizontal runway timeline from "today" to the
+  // computed cash-out date, shared by burn-rate.tsx and runway.tsx (the
+  // two ToolCalculatorPage consumers with a runway/cash-out concept).
+  // Factored into the wrapper's results slot rather than duplicated JSX
+  // per file, per instruction. Rendered only when the caller has valid,
+  // finite input (months !== null) — an infinite/profitable runway has
+  // no cash-out date to plot.
+  runwayTimeline?: { months: number; cashOutLabel: string } | null;
+}
+
+// SEO-012 Phase 3 — pure function of (months, cashOutLabel): true SVG,
+// no external chart library. Divided into up to 12 monthly segments
+// (more than that and individual segments stop being legible at 100%
+// width), fill warms from --v2-accent toward --v2-adverse as the
+// remaining bar empties — closer to zero reads as more urgent.
+function RunwayTimeline({ months, cashOutLabel }: { months: number; cashOutLabel: string }) {
+  const segments = Math.max(1, Math.min(12, months));
+  const width = 100 / segments;
+  return (
+    <div className="flex flex-col gap-2" role="img" aria-label={`Runway timeline: ${months} months from today to ${cashOutLabel}`}>
+      <div className="flex items-center justify-between">
+        <span className="font-v2-ui text-v2-ink-muted text-[11px] tracking-[0.02em] uppercase">Today</span>
+        <span className="font-v2-data text-v2-ink-muted text-[11px] tracking-[0.02em]">{cashOutLabel}</span>
+      </div>
+      <svg viewBox="0 0 400 32" width="100%" height="32" preserveAspectRatio="none" aria-hidden="true">
+        {Array.from({ length: segments }, (_, i) => {
+          const t = segments === 1 ? 0 : i / (segments - 1);
+          // Interpolate accent (#1B3A63) -> adverse (#7A2E2A) as segments approach the cash-out date.
+          const r = Math.round(0x1b + (0x7a - 0x1b) * t);
+          const g = Math.round(0x3a + (0x2e - 0x3a) * t);
+          const b = Math.round(0x63 + (0x2a - 0x63) * t);
+          return (
+            <rect
+              key={i}
+              x={(i * 400) / segments + 1}
+              y={0}
+              width={400 / segments - 2}
+              height={32}
+              fill={`rgb(${r},${g},${b})`}
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
 }
 
 export function ToolCalculatorPage({
-  toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel, belowCalculator, primaryResult, errorMessage,
+  toolLabel, titleLine1, titleLine2Outline, subtitle, fields, results, ctaText, ctaLabel, belowCalculator, primaryResult, errorMessage, runwayTimeline,
 }: ToolCalculatorPageProps) {
   return (
     <div className="min-h-screen bg-v2-surface">
@@ -115,6 +160,11 @@ export function ToolCalculatorPage({
                   <span className="font-v2-ui text-v2-ink-muted text-[13px] tracking-[0.02em]">{primaryResult.label}</span>
                   <div className="pub-title font-v2-data text-v2-accent">{primaryResult.value}</div>
                   <p className="font-v2-doc text-v2-ink-secondary text-[15px] leading-[1.6] mt-1">{primaryResult.explanation}</p>
+                </div>
+              )}
+              {runwayTimeline && (
+                <div className="p-6 bg-v2-panel border border-v2-rule">
+                  <RunwayTimeline months={runwayTimeline.months} cashOutLabel={runwayTimeline.cashOutLabel} />
                 </div>
               )}
               <div className="flex flex-col gap-0 border border-v2-rule divide-y divide-v2-rule">

@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
   PrCommercialLine, PrCrossLinks, PrQuietLink, PR_BASE, PR_PANEL, PR_RECESSED, PR_INK, PR_INK_3, PR_RULE,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconEye, PrIconFile, PrIconCheck,
 } from "@/components/site/PublicRegisterPrimitives";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
@@ -96,12 +97,22 @@ function Investors() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Your entry point" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLock />} title="NDA before data" body="Access is gated. You sign your own individual NDA before any sensitive document unlocks — not a company-wide agreement." />
+            <PrCard icon={<PrIconEye />} title="Full stage visibility" body="You see exactly which stage a deal has reached — NDA, diligence, terms, conditions, close — without asking the founder for a status update." />
+            <PrCard icon={<PrIconFile />} title="One record per deal" body="Every document, term, and confirmation is referenced to a single deal ID — the record you can point back to after close." />
+            <PrCard icon={<PrIconCheck />} title="Decision recorded" body="Your decision to proceed, hold, or pass on a deal is timestamped and part of that room's permanent record." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Diligence rarely leaves a record worth keeping.</PrTitle>
           <PrProse>Founders send materials over email and a shared folder, with no enforced order and no signed confirmation of what was actually disclosed under what terms. Six months on, if a number in the deck ever becomes disputed, there's nothing to point to that shows what you saw and when.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for investors</PrEyebrow>
           <PrTitle>A structured room, from invitation to close.</PrTitle>
           <PrProse>
@@ -111,19 +122,19 @@ function Investors() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>A permanent audit record.</PrTitle>
           <PrProse>At close, the full deal record locks in place — append-only, nothing further can be edited or removed by either party. It's the same record the founder sees, not a summary reconstructed afterward, and it survives long after the wire clears.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We don't recommend deals.</PrTitle>
           <PrProse>There is no matching, no scoring, no deal-flow feed to browse. You decide who to fund; the room runs what happens after that decision, not before it.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_BASE}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>By investor type</PrEyebrow>
           <PrTitle>Find your profile.</PrTitle>
           <div className="grid grid-cols-2 md:grid-cols-3" style={{ gap: "1px", background: PR_RULE, border: `1px solid ${PR_RULE}`, marginTop: "8px" }}>

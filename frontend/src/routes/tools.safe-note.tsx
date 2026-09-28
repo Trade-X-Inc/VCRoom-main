@@ -162,6 +162,33 @@ function SafeNote() {
                   </div>
                 ))}
               </div>
+              {capType === "capped" && Number.isFinite(capPrice) && (
+                <div className="flex flex-col gap-3 p-6 bg-[var(--v2-panel)] border border-[var(--v2-rule)]" role="img" aria-label={`SAFE conversion price comparison: via cap ${(capPrice * 100).toFixed(1)}%, via discount ${(discountPrice * 100).toFixed(1)}%. Investor gets the lower price.`}>
+                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[13px] tracking-[0.02em]">Cap vs. discount — investor gets the lower price</span>
+                  <div className="flex items-end gap-6 h-[80px]">
+                    {[
+                      { label: "Via cap", price: capPrice, fill: "var(--v2-accent)" },
+                      { label: "Via discount", price: discountPrice, fill: "var(--v2-ink-muted)" },
+                    ].map((bar) => {
+                      const isLower = bar.price === conversionPrice;
+                      const maxPrice = Math.max(capPrice, discountPrice);
+                      const heightPct = maxPrice > 0 ? (bar.price / maxPrice) * 100 : 0;
+                      return (
+                        <div key={bar.label} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                          <div
+                            style={{
+                              width: "100%", height: `${heightPct}%`, background: bar.fill,
+                              outline: isLower ? "2px solid var(--v2-satisfied)" : "none", outlineOffset: "2px",
+                            }}
+                          />
+                          <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[11px]">{bar.label}</span>
+                          <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] font-semibold">{(bar.price * 100).toFixed(1)}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>

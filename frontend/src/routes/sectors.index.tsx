@@ -30,51 +30,149 @@ export const Route = createFileRoute("/sectors/")({
   component: Sectors,
 });
 
+// SEO-012 Phase 2 — one inline-SVG icon per sector, 20x20 viewBox, 2px
+// stroke, no fills, matching this file's own #0a2540 ink (this route
+// predates the --v2-* token system per the header comment above, so
+// icons match its existing surrounding color rather than introducing a
+// token mismatch mid-file). Mapped to the real, live 8-sector array
+// below, not the deleted sectors.energy.tsx-style names.
+function IconChip() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="5" width="10" height="10" />
+      <circle cx="8" cy="8" r="0.6" fill="#0a2540" stroke="none" />
+      <circle cx="12" cy="8" r="0.6" fill="#0a2540" stroke="none" />
+      <circle cx="8" cy="12" r="0.6" fill="#0a2540" stroke="none" />
+      <circle cx="12" cy="12" r="0.6" fill="#0a2540" stroke="none" />
+      <path d="M7.5 2v3M12.5 2v3M7.5 15v3M12.5 15v3M2 7.5h3M2 12.5h3M15 7.5h3M15 12.5h3" />
+    </svg>
+  );
+}
+
+function IconTrajectory() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 15c3-1 5-3 6.5-6S13 4 17 3" />
+      <path d="M12.5 3H17v4.5" />
+    </svg>
+  );
+}
+
+function IconHelix() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2.5c0 5 8 5.5 8 10.5s-8 5-8 4.5" />
+      <path d="M14 2.5c0 5-8 5.5-8 10.5s8 5 8 4.5" />
+      <path d="M6.7 6h6.6M6.4 10h7.2M6.7 14h6.6" />
+    </svg>
+  );
+}
+
+function IconFacade() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 17V6l7-3.5L17 6v11" />
+      <path d="M3 17h14" />
+      <rect x="5.5" y="8" width="2.4" height="2.4" />
+      <rect x="8.8" y="8" width="2.4" height="2.4" />
+      <rect x="12.1" y="8" width="2.4" height="2.4" />
+    </svg>
+  );
+}
+
+function IconBriefcase() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2.5" y="7" width="15" height="9.5" />
+      <path d="M7 7V4.5h6V7" />
+      <path d="M2.5 11.5h15" />
+    </svg>
+  );
+}
+
+function IconShield() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 2.5l6.5 2.5v4.5c0 4-2.7 6.8-6.5 8-3.8-1.2-6.5-4-6.5-8V5z" />
+    </svg>
+  );
+}
+
+function IconNetwork() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 14l4-9 4 9" />
+      <path d="M6 14h8" />
+      <circle cx="10" cy="5" r="1.4" fill="#0a2540" stroke="none" />
+      <circle cx="6" cy="14" r="1.4" fill="#0a2540" stroke="none" />
+      <circle cx="14" cy="14" r="1.4" fill="#0a2540" stroke="none" />
+    </svg>
+  );
+}
+
+function IconGlobe() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="#0a2540" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="10" cy="10" r="7" />
+      <path d="M3 10h14" />
+      <path d="M10 3c2.4 2 2.4 12 0 14M10 3c-2.4 2-2.4 12 0 14" />
+    </svg>
+  );
+}
+
 const SECTORS = [
   {
     name: "Technology & SaaS",
+    icon: IconChip,
     tag: "Most common",
     desc: "Software companies raising seed through growth rounds. Typical use cases: priced equity rounds, SAFE conversions, bridge notes.",
     examples: ["Seed equity close", "Series A / B priced round", "SAFE conversion at priced round", "Bridge note conversion"],
   },
   {
     name: "Venture-Backed Startups",
+    icon: IconTrajectory,
     tag: "",
     desc: "Early-stage companies with institutional investors managing cap table complexity across multiple instrument types and investor classes.",
     examples: ["Multi-investor round close", "Pro-rata exercise", "Bridge note conversion", "First institutional round"],
   },
   {
     name: "Life Sciences & Biotech",
+    icon: IconHelix,
     tag: "",
     desc: "Companies with regulatory-dependent milestones and complex condition precedents tied to FDA approvals, clinical trial results, and IP licensing.",
     examples: ["Milestone-triggered tranche close", "Out-licensing agreement", "IND-dependent financing", "Co-development agreement"],
   },
   {
     name: "Real Assets & Infrastructure",
+    icon: IconFacade,
     tag: "",
     desc: "Hard asset transactions requiring multi-party consent, regulatory approvals, and extended condition periods before capital deployment.",
     examples: ["Property acquisition close", "Infrastructure fund drawdown", "Development financing", "Joint venture formation"],
   },
   {
     name: "Private Equity Buyouts",
+    icon: IconBriefcase,
     tag: "",
     desc: "Control transactions requiring rigorous documentation across multiple principals, counsel teams, and regulatory bodies.",
     examples: ["Lower middle-market buyout", "Carve-out transaction", "Management buyout", "Add-on acquisition"],
   },
   {
     name: "Family Office Direct Investments",
+    icon: IconShield,
     tag: "",
     desc: "Principal-only investments where the family office acts as the sole decision-maker and requires a permanent, portable record independent of fund manager systems.",
     examples: ["Co-investment alongside VC", "Direct equity stake", "Convertible investment", "Club deal participation"],
   },
   {
     name: "SPV & Syndicate Vehicles",
+    icon: IconNetwork,
     tag: "",
     desc: "Multi-LP vehicles closing into a single investment. Each LP signs individually; each LP can reference their own record at close by its own number.",
     examples: ["AngelList-style SPV close", "Scout fund investment", "Syndicate formation", "Multi-LP commitment close"],
   },
   {
     name: "Emerging Markets",
+    icon: IconGlobe,
     tag: "",
     desc: "Transactions requiring heightened documentation standards, multi-jurisdiction regulatory conditions, and cross-border counsel coordination.",
     examples: ["Cross-border venture investment", "Regional fund close", "Multi-currency transaction", "Dual-jurisdiction condition management"],
@@ -101,7 +199,10 @@ function Sectors() {
                 className={`p-8 ${i % 2 === 0 ? "border-r border-[#e6e9ef]" : ""} ${i < SECTORS.length - 2 ? "border-b border-[#e6e9ef]" : ""}`}
               >
                 <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="w-2 h-2 bg-[#d4af37] mt-0.5 shrink-0" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 shrink-0"><s.icon /></div>
+                    <div className="w-2 h-2 bg-[#d4af37] mt-0.5 shrink-0" />
+                  </div>
                   {s.tag && (
                     <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[10px] tracking-[2px] uppercase text-[#d4af37]/80 bg-[#d4af37]/10 px-2 py-0.5">
                       {s.tag}

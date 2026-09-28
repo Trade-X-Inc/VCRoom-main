@@ -86,6 +86,11 @@ function BurnRate() {
         { label: "Net burn / month", value: fmtMoney(netBurn), accent: true },
         { label: "Cash out date", value: runway >= 999 ? "Profitable" : runoutDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
       ]}
+      runwayTimeline={
+        !hasInvalidInput && runway < 999
+          ? { months: runway, cashOutLabel: runoutDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) }
+          : null
+      }
       ctaText="Planning your next raise? Lengdon closes the round once terms are agreed — sequenced, documented, permanently recorded."
       ctaLabel="Join the waitlist"
       belowCalculator={
