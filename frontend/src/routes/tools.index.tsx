@@ -137,7 +137,7 @@ function ToolsIndex() {
               </p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <Link to="/sign-up" style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
+              <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-8 py-3.5 transition-colors duration-200">
                 Join the waitlist
               </Link>
               <Link to="/product/how-it-works" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] hover:border-[var(--v2-accent)]/30 text-[var(--v2-ink-secondary)] text-[13px] px-8 py-3.5 transition-all duration-200">

@@ -1152,15 +1152,15 @@ function CTASection() {
               </div>
 
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[440px]">
-                Initialize a room, invite both parties, and begin the six-gate process today. No integration, no setup call, no consultant required.
+                Initialize a room, invite both parties, and begin the seven-stage process today. No integration, no setup call, no consultant required.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/sign-up" search={{ role: "founder" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-white hover:bg-v2-surface text-[var(--v2-accent)] font-semibold text-[14px] px-10 py-4 transition-all duration-200 active:scale-95">
-                  Join the waitlist
+                  Join as a founder
                 </Link>
-                <Link to="/sign-in" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
-                  Sign in →
+                <Link to="/sign-up" search={{ role: "investor" } as any} style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-[14px] px-10 py-4 transition-all duration-200">
+                  Join as an investor
                 </Link>
               </div>
 

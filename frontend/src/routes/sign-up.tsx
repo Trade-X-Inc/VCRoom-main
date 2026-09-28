@@ -42,7 +42,7 @@ const ROLE_OPTIONS: { id: Role; label: string; desc: string }[] = [
 
 function SignUp() {
   const search = useSearch({ from: '/sign-up' })
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2>(search.role ? 2 : 1)
   const [role, setRole] = useState<Role>(search.role ?? '')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -144,13 +144,13 @@ function SignUp() {
           </h2>
 
           <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-white/50 text-[15px] leading-[1.75] max-w-[340px]">
-            We're not onboarding new accounts right now. Join the waitlist and we'll reach out when it's your turn.
+            Lengdon runs a private-capital raise end to end — deal room, diligence, term sheet, and a closing record that holds. We're onboarding in stages. Tell us how you'd use it and we'll reach out.
           </p>
         </div>
 
         <div className="relative z-10 border-t border-white/10 pt-8 flex flex-col gap-4">
           {[
-            { label: 'Six-gate closing sequence', detail: 'Enforced by the system, not by convention' },
+            { label: 'Seven-stage closing sequence', detail: 'Brief through Close, enforced by the system, not by convention' },
             { label: 'Per-person NDA', detail: 'Individual, not company-level' },
             { label: 'Append-only audit record', detail: 'Every action recorded, permanently' },
           ].map((f) => (
@@ -253,11 +253,27 @@ function SignUp() {
                     </span>
                   </div>
                   <h1 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[32px] leading-[1.0] tracking-[-1.5px] mb-2">
-                    We're not onboarding new accounts right now
+                    Join the waitlist for closing infrastructure built for private capital
                   </h1>
                   <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[14px]">
-                    Join the waitlist and we'll reach out. Tell us how you'd use Lengdon.
+                    Lengdon runs a private-capital raise end to end — deal room, diligence, term sheet, and a closing record that holds. We're onboarding in stages. Tell us how you'd use it and we'll reach out.
                   </p>
+                </div>
+
+                <div className="lg:hidden flex flex-col gap-3 mb-8 pb-8 border-b border-[#e6e9ef]">
+                  {[
+                    { label: 'Per-room NDA gating', detail: 'Access unlocks per person, not per link' },
+                    { label: 'One referenced record per deal', detail: 'Every document and term tied to a single deal ID' },
+                    { label: 'Published pricing', detail: 'No quote-only tiers, no hidden fees' },
+                  ].map((f) => (
+                    <div key={f.label} className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-[#d4af37]/60 mt-1.5 shrink-0" />
+                      <div>
+                        <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#0a2540] text-[13px]">{f.label}</div>
+                        <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[12px]">{f.detail}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <form onSubmit={handleStep1} className="flex flex-col gap-3">

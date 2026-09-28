@@ -163,7 +163,7 @@ function TemplatesIndex() {
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <PrTitle>Running a real process needs more than a template.</PrTitle>
             <div>
-              <PrAction to="/sign-up">Join the waitlist</PrAction>
+              <PrAction to="/sign-up" search={{ role: "founder" }}>Join the waitlist</PrAction>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
               <PrQuietLink to="/resources/blog/nda-before-pitch-deck-order-matters-2026">NDA Before Pitch Deck</PrQuietLink>
