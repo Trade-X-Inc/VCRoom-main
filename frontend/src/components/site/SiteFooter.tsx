@@ -139,7 +139,7 @@ function NewsletterBar() {
             placeholder="you@email.com"
             className="flex-1 min-w-0"
             style={{
-              height: "32px", padding: "0 10px", border: `1px solid ${RULE}`,
+              minHeight: "44px", padding: "0 10px", border: `1px solid ${RULE}`,
               background: PANEL, color: INK, fontFamily: FONT_UI, fontSize: "12.5px", outline: "none",
             }}
           />
@@ -147,7 +147,7 @@ function NewsletterBar() {
             onClick={handleSubscribe}
             disabled={state === "loading"}
             style={{
-              flexShrink: 0, height: "32px", padding: "0 12px",
+              flexShrink: 0, minHeight: "44px", padding: "0 16px",
               background: ACCENT, color: "#fff", border: `1px solid ${ACCENT}`,
               fontFamily: FONT_UI, fontWeight: 500, fontSize: "12.5px",
               opacity: state === "loading" ? 0.6 : 1,

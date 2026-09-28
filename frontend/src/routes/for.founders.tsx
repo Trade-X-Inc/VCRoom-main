@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
   PrCommercialLine, PrQuietLink, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconCheck, PrIconFile, PrIconTimer,
 } from "@/components/site/PublicRegisterPrimitives";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 
@@ -93,12 +94,22 @@ function Founders() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Your raise spine" activeFrom="Brief" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLock />} title="Counsel confirmed first" body="Neither side gets access to shared data until both legal teams are confirmed in the room — no gate can be skipped." />
+            <PrCard icon={<PrIconCheck />} title="Conditions you can enforce" body="Add your own conditions precedent and assign each to a named owner. The room won't advance to signing until every one is marked satisfied." />
+            <PrCard icon={<PrIconFile />} title="One record per raise" body="Every document, term, and confirmation is referenced to a single deal ID — not scattered across email threads and shared folders." />
+            <PrCard icon={<PrIconTimer />} title="Billed on the raise" body="No cost to founders for a Standard room. Billing is monthly and tied to an active raise, not a flat annual license." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Every commitment needs to be in the record.</PrTitle>
           <PrProse>A raise runs on verbal commitments and scattered email threads. Nothing forces the sequence both sides implicitly agree to — conditions get skipped, signing happens before conditions clear, payments are confirmed on trust. Lengdon captures every action taken by both parties from the moment counsel is confirmed to the moment the room closes.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for founders</PrEyebrow>
           <PrTitle>From first call to sealed close.</PrTitle>
           <PrProse>
@@ -108,13 +119,13 @@ function Founders() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>Protected. Documented. Yours.</PrTitle>
           <PrProse>Every participant on the investor side signs their own NDA — not a company-level agreement, a named individual one. If someone leaves the firm, their access ends with them. At close, the full audit trail seals: append-only, unchanged from that point on. It belongs to you and the investor jointly, not the platform, and it stays permanent for the life of the room — the document the next round's counsel actually wants to see.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We don't draft your documents.</PrTitle>
           <PrProse>Your counsel drafts and negotiates the term sheet and the NDA. Lengdon enforces the sequence they agree to and keeps the record of what was agreed and when — it is not a substitute for legal advice.</PrProse>

@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLayers, PrIconFile, PrIconEye, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -51,12 +52,22 @@ function SPVs() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Where you enter" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLayers />} title="Vehicle holds, participants sit beneath" body="The vehicle sits in the room as holder of record; underlying participants sit in a permissioned layer beneath it." />
+            <PrCard icon={<PrIconFile />} title="One ownership record" body="A beneficial-ownership schedule built once, referenced to the deal ID — not re-created from a spreadsheet at the next round." />
+            <PrCard icon={<PrIconEye />} title="Visible to who needs it" body="Underlying participants are visible to the parties who need to see them, and no one else." />
+            <PrCard icon={<PrIconShield />} title="We don't form the vehicle" body="We're the record and process layer for the vehicle's transactions. Formation and banking stay with your administrator." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Ownership lives in a spreadsheet, not the deal.</PrTitle>
           <PrProse>Beneficial ownership across a vehicle is maintained in a spreadsheet somewhere, not in the deal itself. The underlying participants are invisible to the company being invested in. At the next round, re-onboarding the same vehicle costs everyone weeks.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for SPVs</PrEyebrow>
           <PrTitle>The vehicle holds. Participants sit beneath it.</PrTitle>
           <PrProse>
@@ -66,13 +77,13 @@ function SPVs() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>Later rounds stall on unclear ownership.</PrTitle>
           <PrProse>The single most common cause of a delayed later round is an ownership structure nobody can explain quickly. A beneficial-ownership schedule that already exists, and travels with the deal, removes that delay before it starts.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We don't form the vehicle.</PrTitle>
           <PrProse>We are the record and process layer for the vehicle's transactions. Formation, banking, and moving the actual funds stay with your registered administrator.</PrProse>

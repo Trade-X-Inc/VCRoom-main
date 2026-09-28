@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconFile, PrIconCheck, PrIconEye, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -51,12 +52,22 @@ function Syndicates() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Your lead sequence" activeFrom="Brief" leadStages={["Brief", "Present"]} />
+          <PrCardGrid>
+            <PrCard icon={<PrIconFile />} title="Publish your commitment" body="Your own committed amount, disclosed formally as lead — not described on a call, published to the room." />
+            <PrCard icon={<PrIconEye />} title="Every follower, one record" body="Followers soft-circle and commit individually, each on their own NDA — allocation tracked against the room, not a side spreadsheet." />
+            <PrCard icon={<PrIconCheck />} title="Decision recorded" body="Each follower's commitment is timestamped and part of the same deal record every member can see." />
+            <PrCard icon={<PrIconShield />} title="We don't form the vehicle" body="We record the syndicate and every commitment inside it. Vehicle formation and moving funds stay with your counsel and bank." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Allocation is a conversation, not a record.</PrTitle>
           <PrProse>The lead's commitment is the strongest signal in the deal, but there's nowhere to publish it formally. Followers track interest in spreadsheets and group chats. Final allocation is a conversation, not something either side can point back to afterward.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for syndicate leads</PrEyebrow>
           <PrTitle>Publish the package. Track every follower.</PrTitle>
           <PrProse>
@@ -66,13 +77,13 @@ function Syndicates() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>A badge stakes nothing. A cheque does.</PrTitle>
           <PrProse>A badge or a title stakes nothing. A disclosed, committed amount on a record is money a lead could lose — that's why followers weight it the way they do. Publishing it formally, instead of describing it on a call, is the difference.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We don't form the vehicle.</PrTitle>
           <PrProse>We record the syndicate and every commitment inside it. We do not form the special purpose vehicle and we do not move funds — that stays with your counsel and your bank.</PrProse>

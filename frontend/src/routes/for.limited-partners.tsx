@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection, PrPill,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconEye, PrIconFile, PrIconLock, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -58,12 +59,22 @@ function LimitedPartners() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Where you enter" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconEye />} title="Read access to the original" body="The same structured fields the deal was built on — not a summary written for you, where the vehicle you back permissions it." />
+            <PrCard icon={<PrIconFile />} title="One record per deal" body="Each disclosed item, with its evidence tier shown — referenced to a single deal ID, not a repackaged quarterly letter." />
+            <PrCard icon={<PrIconLock />} title="Permissioned by your GP" body="Access is granted by the vehicle that backs you, not by us — read-side only, scoped to what's been shared with you." />
+            <PrCard icon={<PrIconShield />} title="No solicitation, no advice" body="We do not solicit LPs, offer securities, or provide investment advice — this is a record layer, not a placement channel." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>You never see the original.</PrTitle>
           <PrProse>Disclosure from a GP arrives as a repackaged summary — a PDF, a slide, a quarterly letter. There's no way to check what the underlying deal actually disclosed, no structured fields, nothing you can reference back to a specific record.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for limited partners</PrEyebrow>
           <PrTitle>The same fields the deal was built on.</PrTitle>
           <PrProse>
@@ -73,13 +84,13 @@ function LimitedPartners() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>The original, not someone's account of it.</PrTitle>
           <PrProse>LP diligence on a GP has historically meant trusting the summary. A structured, referenced closing record gives you the original the deal actually produced, not someone's account of it.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>Read-side only, through your vehicle.</PrTitle>
           <PrProse>We do not solicit LPs, offer securities, or provide investment advice. Access is read-side only, and only through the vehicle that backs you.</PrProse>

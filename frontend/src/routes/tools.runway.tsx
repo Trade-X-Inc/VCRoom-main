@@ -84,6 +84,11 @@ function RunwayCalculator() {
         { label: "Adjusted monthly burn", value: fmtMoney(adjustedBurn), accent: true },
         { label: "Projected cash-out date", value: adjustedMonths >= 999 ? "N/A" : outDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
       ]}
+      runwayTimeline={
+        !hasInvalidInput && adjustedMonths < 999
+          ? { months: Math.floor(adjustedMonths), cashOutLabel: outDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) }
+          : null
+      }
       ctaText="Know your raise timeline. When you're ready to close, Lengdon handles the full seven-stage sequence."
       ctaLabel="Join the waitlist"
       belowCalculator={

@@ -199,7 +199,7 @@ export function SiteHeader() {
               onClick={() => setMobileMenuOpen((v) => !v)}
               className="md:hidden"
               aria-label="Toggle menu"
-              style={{ display: "grid", placeItems: "center", height: "32px", width: "32px", border: `1px solid ${RULE}`, background: PANEL, color: INK_SECONDARY }}
+              style={{ display: "grid", placeItems: "center", minHeight: "44px", minWidth: "44px", border: `1px solid ${RULE}`, background: PANEL, color: INK_SECONDARY }}
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -213,7 +213,7 @@ export function SiteHeader() {
                 key={l.to}
                 to={l.to as any}
                 onClick={() => setMobileMenuOpen(false)}
-                style={{ fontFamily: FONT_UI, fontSize: "13.5px", color: INK_SECONDARY, padding: "10px 0", textDecoration: "none", display: "block" }}
+                style={{ fontFamily: FONT_UI, fontSize: "13.5px", color: INK_SECONDARY, minHeight: "44px", display: "flex", alignItems: "center", textDecoration: "none" }}
               >
                 {l.label}
               </Link>

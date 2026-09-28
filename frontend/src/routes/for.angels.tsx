@@ -5,6 +5,7 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrProse, PrAction, PrSection,
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
+  PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconCheck, PrIconFile, PrIconTimer,
 } from "@/components/site/PublicRegisterPrimitives";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
@@ -50,12 +51,22 @@ function Angels() {
         </section>
 
         <PrSection ground={PR_RECESSED}>
+          <PrStageStrip label="Your deal checklist" activeFrom="NDA" />
+          <PrCardGrid>
+            <PrCard icon={<PrIconLock />} title="NDA before data" body="Access is gated. No investor sees the data room until the NDA is countersigned." />
+            <PrCard icon={<PrIconCheck />} title="Decision recorded" body="Your decision to proceed, hold, or pass is timestamped and part of the deal record." />
+            <PrCard icon={<PrIconFile />} title="One record per deal" body="Every document, every exchange, every condition — referenced to a single deal ID." />
+            <PrCard icon={<PrIconTimer />} title="Billed once, at close" body="No upfront cost. A Direct-tier room bills once, at first close, not a recurring subscription." />
+          </PrCardGrid>
+        </PrSection>
+
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>The problem we solve</PrEyebrow>
           <PrTitle>Every round starts from zero.</PrTitle>
           <PrProse>A deal you fund personally runs on email threads and a shared drive. Nothing forces a structured sequence, so the next investor down the line asks the same questions the first one did. A messy signing order follows the company onto its cap table.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>How it works for angels</PrEyebrow>
           <PrTitle>One direct spine. No added steps.</PrTitle>
           <PrProse>
@@ -65,13 +76,13 @@ function Angels() {
           </PrProse>
         </PrSection>
 
-        <PrSection ground={PR_RECESSED}>
+        <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>The next round asks first.</PrTitle>
           <PrProse>At the next priced round, the incoming lead's counsel reviews the cap table. A referenced closing record for your angel round answers most of what they'd otherwise have to ask. A folder of forwarded emails does not.</PrProse>
         </PrSection>
 
-        <PrSection ground={PR_PANEL}>
+        <PrSection ground={PR_RECESSED}>
           <PrEyebrow>What we don't do</PrEyebrow>
           <PrTitle>We don't find you deals.</PrTitle>
           <PrProse>There is no directory, no matching, no deal-flow feed to browse. You bring the deal; the room runs the close.</PrProse>
