@@ -234,7 +234,7 @@ function Sectors() {
               THE CLOSE IS<br />THE SAME.
             </h2>
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#425466] text-[15px] leading-[1.75]">
-              Regardless of sector, asset class, or transaction type, the fundamental requirement is identical: both parties need to formally agree, confirm, sign, pay, and close — with a record that proves it happened. Lengdon's six-gate sequence applies universally.
+              Regardless of sector, asset class, or transaction type, the fundamental requirement is identical: both parties need to formally agree, confirm, sign, pay, and close — with a record that proves it happened. Lengdon's enforced closing sequence applies universally.
             </p>
           </div>
         </section>

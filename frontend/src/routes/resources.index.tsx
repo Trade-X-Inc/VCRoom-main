@@ -21,8 +21,8 @@ const HUBS = [
     label: "Documentation",
     path: "/docs",
     tag: "Platform",
-    desc: "Getting started guides, gate sequence reference, API docs, and security controls. Everything needed to deploy and build on Lengdon.",
-    items: ["Getting started", "Gate sequence reference", "Audit & records", "API & webhooks"],
+    desc: "Getting started guides, closing sequence reference, API docs, and security controls. Everything needed to deploy and build on Lengdon.",
+    items: ["Getting started", "Closing sequence reference", "Audit & records", "API & webhooks"],
   },
   {
     label: "Blog",
@@ -43,7 +43,7 @@ const HUBS = [
     path: "/glossary",
     tag: "Reference",
     desc: "Definitions of key terms in private capital transactions, closing infrastructure, and Lengdon's platform. Updated as the platform evolves.",
-    items: ["Transaction terms", "Gate definitions", "Investor categories", "Platform concepts"],
+    items: ["Transaction terms", "Closing sequence terms", "Investor categories", "Platform concepts"],
   },
   {
     label: "Tools",

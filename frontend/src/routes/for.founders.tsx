@@ -65,7 +65,7 @@ const FOUNDERS_FAQ_JSON_LD = JSON.stringify({
     {
       "@type": "Question",
       name: "When should I start a data room?",
-      acceptedAnswer: { "@type": "Answer", text: "Before the first pitch deck goes out, not after an investor asks for one. Setting up the room's tiers upfront — what's visible pre-NDA, what unlocks after signature, what's reserved for active diligence — means every subsequent investor conversation reuses the same structure instead of being decided fresh each time, and the NDA gate is already in place before anything sensitive is shared." },
+      acceptedAnswer: { "@type": "Answer", text: "Before the first pitch deck goes out, not after an investor asks for one. Setting up the room's tiers upfront — what's visible pre-NDA, what unlocks after signature, what's reserved for active diligence — means every subsequent investor conversation reuses the same structure instead of being decided fresh each time, and the NDA step is already in place before anything sensitive is shared." },
     },
   ],
 });
@@ -96,7 +96,7 @@ function Founders() {
         <PrSection ground={PR_RECESSED}>
           <PrStageStrip label="Your raise spine" activeFrom="Brief" />
           <PrCardGrid>
-            <PrCard icon={<PrIconLock />} title="Counsel confirmed first" body="Neither side gets access to shared data until both legal teams are confirmed in the room — no gate can be skipped." />
+            <PrCard icon={<PrIconLock />} title="Counsel confirmed first" body="Neither side gets access to shared data until both legal teams are confirmed in the room — no step can be skipped." />
             <PrCard icon={<PrIconCheck />} title="Conditions you can enforce" body="Add your own conditions precedent and assign each to a named owner. The room won't advance to signing until every one is marked satisfied." />
             <PrCard icon={<PrIconFile />} title="One record per raise" body="Every document, term, and confirmation is referenced to a single deal ID — not scattered across email threads and shared folders." />
             <PrCard icon={<PrIconTimer />} title="Billed on the raise" body="No cost to founders for a Standard room. Billing is monthly and tied to an active raise, not a flat annual license." />
@@ -134,12 +134,12 @@ function Founders() {
         <PrSection ground={PR_BASE}>
           <PrCommercialLine tier="Standard" cadence="Billed monthly, active raise only." />
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
-            <PrTitle>Initialize a room and begin the seven-stage process.</PrTitle>
+            <PrTitle>Initialize a room and begin the closing sequence.</PrTitle>
             <div>
               <PrAction to="/sign-up" search={{ role: "founder" }}>Initialize a room</PrAction>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-              <PrQuietLink to="/product/how-it-works">The seven-stage sequence</PrQuietLink>
+              <PrQuietLink to="/product/how-it-works">The closing sequence</PrQuietLink>
               <PrQuietLink to="/product/pricing">Pricing</PrQuietLink>
               <PrQuietLink to="/for/investors">The investor side</PrQuietLink>
               <PrQuietLink to="/tools">Free tools</PrQuietLink>

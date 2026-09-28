@@ -43,7 +43,7 @@ function Invite() {
   }, [ref]);
 
   const properties = [
-    { label: "Six-gate closing sequence", detail: "Enforced by the system, not by convention" },
+    { label: "Structured closing sequence", detail: "Enforced by the system, not by convention" },
     { label: "Per-person NDA", detail: "Individual, not company-level" },
     { label: "Append-only audit record", detail: "Every action recorded, permanently" },
   ];

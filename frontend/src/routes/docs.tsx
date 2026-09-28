@@ -26,10 +26,10 @@ const SECTIONS = [
     slug: "getting-started",
     icon: "01",
     articles: [
-      { title: "What is Lengdon?", desc: "The six-gate closing infrastructure explained." },
+      { title: "What is Lengdon?", desc: "The closing infrastructure explained." },
       { title: "Creating your account", desc: "Founder vs investor accounts, and what changes." },
-      { title: "Your first deal room", desc: "Step-by-step: room setup, inviting the other party, and gate 1." },
-      { title: "Understanding the six-gate sequence", desc: "What each gate requires and why the order matters." },
+      { title: "Your first deal room", desc: "Step-by-step: room setup, inviting the other party, and the NDA stage." },
+      { title: "Understanding the closing sequence", desc: "What each stage requires and why the order matters." },
     ],
   },
   {
@@ -39,21 +39,21 @@ const SECTIONS = [
     articles: [
       { title: "Room types and use cases", desc: "SAFE, Equity, Debt, and Company Sale instruments." },
       { title: "Inviting the other party", desc: "How access starts, and how per-person NDA acceptance works." },
-      { title: "Document management by gate", desc: "Which documents attach to which gates and why." },
+      { title: "Document management by stage", desc: "Which documents attach to which stage and why." },
       { title: "Condition management", desc: "Defining and confirming condition precedents within a room." },
     ],
   },
   {
-    title: "Gate sequence",
+    title: "Closing sequence",
     slug: "gates",
     icon: "03",
     articles: [
-      { title: "Gate 1: Counsel", desc: "Legal review confirmation by both parties." },
-      { title: "Gate 2: Agreement", desc: "Term acceptance and document execution." },
-      { title: "Gate 3: Conditions", desc: "Condition precedent tracking. The gate itself is enforced; which party clears which condition is agreed between them directly." },
-      { title: "Gate 4: Signing", desc: "Formal execution of transaction documents." },
-      { title: "Gate 5: Payment", desc: "Investor confirms transfer, founder confirms receipt." },
-      { title: "Gate 6: Close", desc: "Mutual confirmation seals the record permanently." },
+      { title: "Counsel", desc: "Legal review confirmation by both parties." },
+      { title: "Agreement", desc: "Term acceptance and document execution." },
+      { title: "Conditions", desc: "Condition precedent tracking. The step itself is enforced; which party clears which condition is agreed between them directly." },
+      { title: "Signing", desc: "Formal execution of transaction documents." },
+      { title: "Payment", desc: "Investor confirms transfer, founder confirms receipt." },
+      { title: "Close", desc: "Mutual confirmation seals the record permanently." },
     ],
   },
   {

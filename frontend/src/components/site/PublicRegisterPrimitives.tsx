@@ -322,8 +322,8 @@ export function PrIconLink() {
 export function PrCrossLinks({ founderTo }: { founderTo?: string }) {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-      {/* SEO-011: "six-gate" -> "seven-stage", matching product.how-it-works.tsx's rewritten vocabulary. */}
-      <PrQuietLink to="/product/how-it-works">The seven-stage sequence</PrQuietLink>
+      {/* SEO-016: no gate/stage count in public copy — qualitative vocabulary only. */}
+      <PrQuietLink to="/product/how-it-works">The closing sequence</PrQuietLink>
       <PrQuietLink to="/product/pricing">Pricing</PrQuietLink>
       <PrQuietLink to={founderTo ?? "/for/founders"}>The founder side</PrQuietLink>
     </div>

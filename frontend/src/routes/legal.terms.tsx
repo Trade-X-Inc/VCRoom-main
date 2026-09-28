@@ -95,7 +95,7 @@ You must provide accurate information when creating your account. Providing fals
   },
   {
     title: "Deal rooms",
-    content: `A deal room ("Room") is a structured environment in which two or more parties conduct the six-gate closing sequence.
+    content: `A deal room ("Room") is a structured environment in which two or more parties conduct the closing sequence.
 
 Each Room is created by a room initiator and exists until the transaction closes, is terminated by mutual agreement, or is terminated by Lengdon for violation of these Terms.
 

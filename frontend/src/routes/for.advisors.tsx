@@ -30,7 +30,7 @@ export const Route = createFileRoute("/for/advisors")({
   head: () => ({
     meta: [
       { title: "For advisors — mediate the raise, stay on the record — Lengdon" },
-      { name: "description", content: "Join a founder's room with scoped, read-only access. See every gate, every condition, every signature — without holding the data." },
+      { name: "description", content: "Join a founder's room with scoped, read-only access. See every step, every condition, every signature — without holding the data." },
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/advisors" }],
   }),
@@ -69,7 +69,7 @@ function Advisors() {
           <PrCardGrid>
             <PrCard icon={<PrIconEye />} title="Read-only, scoped to your rooms" body="You see what's been confirmed, which conditions remain outstanding, and what's been signed — without the ability to change anything." />
             <PrCard icon={<PrIconLink />} title="Involvement on the record" body="You're added to a room the same way any other party is — your presence, and what you saw, is timestamped and recorded." />
-            <PrCard icon={<PrIconFile />} title="Every gate, visible" body="See exactly which stage each founder's room has reached — no status update to chase from either side." />
+            <PrCard icon={<PrIconFile />} title="Every step, visible" body="See exactly which stage each founder's room has reached — no status update to chase from either side." />
             <PrCard icon={<PrIconShield />} title="No hidden brokerage" body="Advisors mediate and are recorded. We don't pay referral fees or act as a broker of record — your involvement is what it is, on the record." />
           </PrCardGrid>
         </PrSection>
@@ -84,7 +84,7 @@ function Advisors() {
           <PrEyebrow>How it works for advisors</PrEyebrow>
           <PrTitle>Read-only access, scoped to your rooms.</PrTitle>
           <PrProse>
-            Advisors join a deal room with the read-only role — access scoped to the specific rooms you're added to. You see what's been confirmed, which conditions remain outstanding, and what's been signed, at every gate, without the ability to change anything.{" "}
+            Advisors join a deal room with the read-only role — access scoped to the specific rooms you're added to. You see what's been confirmed, which conditions remain outstanding, and what's been signed, at every step, without the ability to change anything.{" "}
             <Link to="/tools/burn-rate" style={{ color: "var(--v2-accent)" }}>Check burn rate before advising on runway →</Link>
             {" "}Your involvement is recorded the same way every other party's is.
           </PrProse>
@@ -93,7 +93,7 @@ function Advisors() {
         <PrSection ground={PR_PANEL}>
           <PrEyebrow>Why the record matters</PrEyebrow>
           <PrTitle>Reputational collateral, written down.</PrTitle>
-          <PrProse>A warm introduction is reputational collateral with nothing written down. A record that shows you were in the room, at which gates, changes what your involvement is worth the next time you make one.</PrProse>
+          <PrProse>A warm introduction is reputational collateral with nothing written down. A record that shows you were in the room, at which stage, changes what your involvement is worth the next time you make one.</PrProse>
         </PrSection>
 
         <PrSection ground={PR_RECESSED}>

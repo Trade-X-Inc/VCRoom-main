@@ -36,7 +36,7 @@ export const Route = createFileRoute("/company/about")({
 
 const PRINCIPLES = [
   { num: "01", title: "Infrastructure, not participant", body: "Lengdon never takes a side. It doesn't advise, negotiate, or facilitate. It records — and the record belongs to both parties." },
-  { num: "02", title: "Sequence before convenience", body: "The six-gate sequence exists because private capital transactions go wrong when steps are skipped or done out of order. We enforce the sequence because convention doesn't." },
+  { num: "02", title: "Sequence before convenience", body: "The closing sequence exists because private capital transactions go wrong when steps are skipped or done out of order. We enforce the sequence because convention doesn't." },
   { num: "03", title: "Both parties leave with a record", body: "Traditional data rooms are controlled by one party. At close, the full audit trail stays permanent and accessible to both parties — neither can edit, delete, or revoke the other's view of it." },
   { num: "04", title: "Per-person, not per-company", body: "Every NDA, every access grant, every signature is tied to a named individual. Not a company, not a team, not a role. When someone leaves, their access ends with them." },
 ];

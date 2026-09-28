@@ -695,7 +695,7 @@ const PROCESS_PHASES_V2 = [
   {
     num: "02", title: "AGREEMENT",
     party: "Both parties, independently",
-    desc: "Each party independently confirms their intent to proceed. No single confirmation can trigger the next gate. Both must act; neither can force the other forward.",
+    desc: "Each party independently confirms their intent to proceed. No single confirmation can trigger the next step. Both must act; neither can force the other forward.",
     img: "/images/homepage/process-agreement.webp",
     imgAlt: "Two people shaking hands over a signed document",
     bg: "var(--pub-n-0d)",
@@ -703,7 +703,7 @@ const PROCESS_PHASES_V2 = [
   {
     num: "03", title: "CONDITIONS",
     party: "Tracked to satisfaction",
-    desc: "Each condition precedent is added to the checklist and tracked until satisfied. The gate itself is enforced — the transaction cannot advance to Signing until every condition is marked complete.",
+    desc: "Each condition precedent is added to the checklist and tracked until satisfied. The step itself is enforced — the transaction cannot advance to Signing until every condition is marked complete.",
     img: "/images/homepage/process-conditions.webp",
     imgAlt: "Compliance checklist documentation",
     bg: "var(--v2-accent)",
@@ -751,7 +751,7 @@ function ProcessSection() {
             </h2>
 
             <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.75] max-w-[320px]">
-              Six sequential gates. Each requires the one before it. The order is enforced by the system — not by convention.
+              An enforced closing sequence. Each step requires the one before it. The order is enforced by the system — not by convention.
             </p>
 
             <div className="mt-6 flex flex-col gap-3">
@@ -778,7 +778,7 @@ function ProcessSection() {
             <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
               <path d="M1 4H15M15 4L12 1M15 4L12 7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span>Click a gate to expand</span>
+            <span>Click a step to expand</span>
           </div>
         </div>
 
@@ -968,20 +968,20 @@ const AUDIENCES = [
   {
     role: "VC Firm",
     tag: "VENTURE CAPITAL",
-    desc: "You deploy capital across a portfolio. You need closing infrastructure your legal, compliance, and operations teams can rely on — consistent room structure, an enforced gate sequence, and a record that stays intact for the life of each room.",
-    uses: ["Portfolio-wide room consistency", "Append-only audit record per transaction", "Enforced gate sequence, not convention", "Record persists after close"],
+    desc: "You deploy capital across a portfolio. You need closing infrastructure your legal, compliance, and operations teams can rely on — consistent room structure, an enforced closing sequence, and a record that stays intact for the life of each room.",
+    uses: ["Portfolio-wide room consistency", "Append-only audit record per transaction", "Enforced closing sequence, not convention", "Record persists after close"],
   },
   {
     role: "PE Firm",
     tag: "PRIVATE EQUITY",
-    desc: "Your transactions are complex and multi-party. Lengdon enforces the same gate sequence regardless of transaction size — conditions, signatures, and payment confirmation, each recorded independently by the parties who confirm them.",
+    desc: "Your transactions are complex and multi-party. Lengdon enforces the same closing sequence regardless of transaction size — conditions, signatures, and payment confirmation, each recorded independently by the parties who confirm them.",
     uses: ["Enforced closing sequence", "Multi-party NDA, per person", "Independent payment confirmation", "Permanent record per closing"],
   },
   {
     role: "Syndicate Lead",
     tag: "INVESTOR COORDINATION",
-    desc: "You coordinate a group of investors into a single closing. Each investor in the room follows the same gate sequence, and each payment confirmation is recorded individually — so the record shows exactly who confirmed what, not just that the round closed.",
-    uses: ["Multi-investor room", "Per-investor payment confirmation", "Shared gate sequence for the group", "Individually attributed record"],
+    desc: "You coordinate a group of investors into a single closing. Each investor in the room follows the same closing sequence, and each payment confirmation is recorded individually — so the record shows exactly who confirmed what, not just that the round closed.",
+    uses: ["Multi-investor room", "Per-investor payment confirmation", "Shared closing sequence for the group", "Individually attributed record"],
   },
   {
     role: "Angels",
@@ -998,8 +998,8 @@ const AUDIENCES = [
   {
     role: "Legal",
     tag: "COUNSEL & COMPLIANCE",
-    desc: "Your clients are on both sides of the transaction. Lengdon gives each counsel team a separate, encrypted view of the record — with no shared data room and no cross-party exposure before each gate is met.",
-    uses: ["Per-party confidentiality", "Gate-by-gate document release", "Append-only legal audit trail", "Per-party access separation"],
+    desc: "Your clients are on both sides of the transaction. Lengdon gives each counsel team a separate, encrypted view of the record — with no shared data room and no cross-party exposure before each step is met.",
+    uses: ["Per-party confidentiality", "Step-by-step document release", "Append-only legal audit trail", "Per-party access separation"],
   },
   {
     role: "Analyst",
@@ -1011,7 +1011,7 @@ const AUDIENCES = [
     role: "Founder",
     tag: "RAISING CAPITAL",
     desc: "You're raising from angels, syndicates, or funds. You need a sequenced process that treats you and your investor equally — and a permanent record of every commitment made, on both sides.",
-    uses: ["Structured room by gate", "Per-person NDA enforcement", "Condition checklist tracked to satisfaction", "Permanent record of every close"],
+    uses: ["Structured room by stage", "Per-person NDA enforcement", "Condition checklist tracked to satisfaction", "Permanent record of every close"],
   },
 ];
 
@@ -1152,7 +1152,7 @@ function CTASection() {
               </div>
 
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[440px]">
-                Initialize a room, invite both parties, and begin the seven-stage process today. No integration, no setup call, no consultant required.
+                Initialize a room, invite both parties, and begin the closing sequence today. No integration, no setup call, no consultant required.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -1166,7 +1166,7 @@ function CTASection() {
 
               <div className="flex flex-wrap gap-6 pt-2 border-t border-white/8">
                 {[
-                  "6-gate enforced sequence",
+                  "Enforced closing sequence",
                   "Per-room encryption",
                   "Permanent audit record",
                   "Per-person NDA, not per company",
@@ -1197,14 +1197,14 @@ function CTASection() {
               <div className="absolute bottom-6 left-8 right-8">
                 <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
                 <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/80 text-[13px] tracking-[-0.2px]">
-                  000042 · Conditions gate — 5 of 6 satisfied
+                  000042 · Conditions — 5 of 6 satisfied
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 border-t border-[var(--v2-rule)]">
               {[
-                { val: "6",     label: "Sequential gates",        accent: false },
+                { val: "→",     label: "Enforced closing sequence", accent: false },
                 { val: "1:1",   label: "Per-person confidentiality", accent: true  },
                 { val: "100%",  label: "Append-only record",      accent: false },
                 { val: "∞",     label: "Sealed at every close",   accent: true  },

@@ -21,11 +21,11 @@ export const Route = createFileRoute("/product/compare/docsend")({
 });
 
 const ROWS = [
-  { feature: "Enforced closing sequence (6 gates)", lengdon: true, them: false, note: "DocSend is a document analytics and sharing tool. It has no closing infrastructure." },
+  { feature: "Enforced closing sequence", lengdon: true, them: false, note: "DocSend is a document analytics and sharing tool. It has no closing infrastructure." },
   { feature: "Per-person NDA enforcement", lengdon: true, them: false, note: "DocSend tracks who viewed a document. It does not enforce individual NDAs in a transaction context." },
-  { feature: "Dual-party confirmation gate logic", lengdon: true, them: false, note: "DocSend is built for one-directional sharing — sender sends, receiver views. Bilateral confirmation isn't its model." },
+  { feature: "Dual-party confirmation logic", lengdon: true, them: false, note: "DocSend is built for one-directional sharing — sender sends, receiver views. Bilateral confirmation isn't its model." },
   { feature: "Append-only audit trail", lengdon: true, them: false, note: "DocSend analytics show views and time spent — not a transaction audit record." },
-  { feature: "Payment confirmation gate", lengdon: true, them: false, note: "" },
+  { feature: "Payment confirmation step", lengdon: true, them: false, note: "" },
   { feature: "Document sharing with view tracking", lengdon: false, them: true, note: "DocSend excels at controlled document distribution with analytics." },
   { feature: "Pitch deck delivery and tracking", lengdon: false, them: true, note: "Lengdon is post-term-sheet infrastructure — not for early-stage pitching." },
   { feature: "NDA gating on documents", lengdon: true, them: true, note: "DocSend NDA gating is form-based. Lengdon's is identity-bound and sequence-enforced." },
@@ -52,8 +52,8 @@ function CompareDocsend() {
       competitorName="DocSend"
       competitorBlurbTitle={'"They spent 4 minutes on your financials slide."'}
       competitorBlurb="DocSend is optimized for the pre-deal phase — getting your documents in front of investors, understanding engagement, and controlling who can access what before terms are agreed. It's a distribution and analytics tool."
-      lengdonBlurbTitle={'"Gate 4 confirmed. Both parties have signed."'}
-      lengdonBlurb="Lengdon begins after DocSend's work is done. Once terms are agreed and both parties are committed, Lengdon sequences the close, enforces each gate, and keeps an append-only record of every action."
+      lengdonBlurbTitle={'"Signing confirmed. Both parties have signed."'}
+      lengdonBlurb="Lengdon begins after DocSend's work is done. Once terms are agreed and both parties are committed, Lengdon sequences the close, enforces each step, and keeps an append-only record of every action."
       rows={ROWS}
       ctaTitle="They said yes. Now close it."
       ctaSubtitle="DocSend got you to term sheet. Lengdon closes it, with a record."
