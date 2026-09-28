@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import {
-  PrEyebrow, PrDisplay, PrLead, PrTitle, PrAction, PrSection,
+  PrEyebrow, PrDisplay, PrLead, PrTitle, PrAction, PrSection, PrQuietLink,
   PR_BASE, PR_PANEL, PR_RECESSED, PR_ACCENT, PR_INK, PR_INK_2, PR_RULE,
 } from "@/components/site/PublicRegisterPrimitives";
 
@@ -164,6 +164,10 @@ function TemplatesIndex() {
             <PrTitle>Running a real process needs more than a template.</PrTitle>
             <div>
               <PrAction to="/sign-up">Join the waitlist</PrAction>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+              <PrQuietLink to="/resources/blog/nda-before-pitch-deck-order-matters-2026">NDA Before Pitch Deck</PrQuietLink>
+              <PrQuietLink to="/resources/blog/what-is-a-deal-room-vs-dropbox-folder-2026">What Is a Deal Room?</PrQuietLink>
             </div>
           </div>
         </PrSection>

@@ -165,7 +165,8 @@ export function PrCommercialLine({ tier, cadence }: { tier: string; cadence: str
 export function PrCrossLinks({ founderTo }: { founderTo?: string }) {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-      <PrQuietLink to="/product/how-it-works">The six-gate sequence</PrQuietLink>
+      {/* SEO-011: "six-gate" -> "seven-stage", matching product.how-it-works.tsx's rewritten vocabulary. */}
+      <PrQuietLink to="/product/how-it-works">The seven-stage sequence</PrQuietLink>
       <PrQuietLink to="/product/pricing">Pricing</PrQuietLink>
       <PrQuietLink to={founderTo ?? "/for/founders"}>The founder side</PrQuietLink>
     </div>

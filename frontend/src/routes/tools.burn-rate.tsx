@@ -43,9 +43,19 @@ function BurnRate() {
   const [monthlyRevenue, setMonthlyRevenue] = useState(80_000);
   const [monthlyExpenses, setMonthlyExpenses] = useState(300_000);
 
-  const netBurn = Math.max(0, monthlyExpenses - monthlyRevenue);
-  const grossBurn = monthlyExpenses;
-  const runway = netBurn > 0 ? Math.floor(cashBalance / netBurn) : 999;
+  // SEO-011: cashBalance/monthlyRevenue previously had no clamp at all —
+  // a typed negative value flowed straight into netBurn/runway with no
+  // warning. Results below use the clamped-safe values (never NaN or
+  // negative); the raw values are what's checked for the error message,
+  // so the input itself isn't silently overwritten while typing.
+  const hasInvalidInput = cashBalance < 0 || monthlyRevenue < 0 || monthlyExpenses < 0;
+  const safeCash = Math.max(0, cashBalance);
+  const safeRevenue = Math.max(0, monthlyRevenue);
+  const safeExpenses = Math.max(0, monthlyExpenses);
+
+  const netBurn = Math.max(0, safeExpenses - safeRevenue);
+  const grossBurn = safeExpenses;
+  const runway = netBurn > 0 ? Math.floor(safeCash / netBurn) : 999;
   const runoutDate = new Date();
   runoutDate.setMonth(runoutDate.getMonth() + runway);
 
@@ -61,12 +71,19 @@ function BurnRate() {
       fields={[
         { label: "Cash balance", value: cashBalance, set: setCashBalance, min: 0, max: 20_000_000, step: 100_000 },
         { label: "Monthly revenue", value: monthlyRevenue, set: setMonthlyRevenue, min: 0, max: 2_000_000, step: 10_000 },
-        { label: "Monthly expenses (total)", value: monthlyExpenses, set: (v) => setMonthlyExpenses(Math.max(0, v)), min: 10_000, max: 3_000_000, step: 10_000 },
+        { label: "Monthly expenses (total)", value: monthlyExpenses, set: setMonthlyExpenses, min: 10_000, max: 3_000_000, step: 10_000 },
       ]}
+      errorMessage={hasInvalidInput ? "Cash balance, revenue and expenses can't be negative — enter zero or a positive number." : undefined}
+      primaryResult={{
+        label: "Runway",
+        value: runway >= 999 ? "∞" : `${runway} months`,
+        explanation: runway >= 999
+          ? "At your current revenue, expenses aren't outpacing income — there's no cash-out date to project."
+          : `At this burn rate, you have ${runway} month${runway === 1 ? "" : "s"} before you need to raise or become profitable.`,
+      }}
       results={[
         { label: "Gross burn / month", value: fmtMoney(grossBurn) },
         { label: "Net burn / month", value: fmtMoney(netBurn), accent: true },
-        { label: "Runway (months)", value: runway >= 999 ? "∞" : `${runway}mo` },
         { label: "Cash out date", value: runway >= 999 ? "Profitable" : runoutDate.toLocaleDateString("en-US", { month: "short", year: "numeric" }) },
       ]}
       ctaText="Planning your next raise? Lengdon closes the round once terms are agreed — sequenced, documented, permanently recorded."
@@ -94,9 +111,13 @@ function BurnRate() {
               <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Investors will ask for your net burn figure in the first meeting. Having it pre-calculated and attached to your deal room means you are not estimating in the room — you are referencing a number that is already in the data room and consistent with your financial exhibits.</p>
             </div>
-            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
-              <Link to="/tools/runway" className="underline hover:opacity-70 transition-opacity">Calculate your runway from this burn rate →</Link>
-            </p>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Related tools</h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link to="/tools/runway" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Runway Calculator</Link>
+                <Link to="/tools/valuation-calculator" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Valuation Calculator</Link>
+              </div>
+            </div>
           </div>
         </section>
       }

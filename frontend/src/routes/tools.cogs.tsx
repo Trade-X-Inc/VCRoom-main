@@ -85,41 +85,51 @@ function CogsCalculator() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
             <div className="flex flex-col gap-6">
               {[
-                { label: "Annual recurring revenue (ARR)", value: revenue, set: setRevenue, note: "" },
-                { label: "Hosting & infrastructure", value: hosting, set: setHosting, note: "Cloud, CDN, databases" },
-                { label: "Customer support staff (COGS-attributed)", value: supportStaff, set: setSupportStaff, note: "Portion of support team costs in COGS" },
-                { label: "Third-party licenses & APIs", value: thirdPartyLicenses, set: setThirdPartyLicenses, note: "" },
-                { label: "Payment processing fees", value: paymentProcessing, set: setPaymentProcessing, note: "" },
-                { label: "Other direct costs", value: other, set: setOther, note: "" },
+                { label: "Annual recurring revenue (ARR)", value: revenue, set: setRevenue, note: "", placeholder: "e.g. 1,200,000" },
+                { label: "Hosting & infrastructure", value: hosting, set: setHosting, note: "Cloud, CDN, databases", placeholder: "e.g. 80,000" },
+                { label: "Customer support staff (COGS-attributed)", value: supportStaff, set: setSupportStaff, note: "Portion of support team costs in COGS", placeholder: "e.g. 120,000" },
+                { label: "Third-party licenses & APIs", value: thirdPartyLicenses, set: setThirdPartyLicenses, note: "", placeholder: "e.g. 30,000" },
+                { label: "Payment processing fees", value: paymentProcessing, set: setPaymentProcessing, note: "", placeholder: "e.g. 24,000" },
+                { label: "Other direct costs", value: other, set: setOther, note: "", placeholder: "e.g. 10,000" },
               ].map((field) => (
                 <div key={field.label} className="flex flex-col gap-1.5">
                   <div className="flex items-baseline gap-2">
                     <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">{field.label}</label>
                     {field.note && <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px]">{field.note}</span>}
                   </div>
-                  <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors">
-                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
-                    <input type="number" value={field.value} onChange={(e) => field.set(Math.max(0, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="flex-1 px-4 py-3 text-[14px] text-[var(--v2-accent)] focus:outline-none" />
+                  <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                    <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
+                    <input type="number" value={field.value} onChange={(e) => field.set(Math.max(0, Number(e.target.value)))} placeholder={field.placeholder} style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)] h-fit">
-              {[
-                { label: "Total COGS", value: fmt(totalCogs), accent: false },
-                { label: "Gross profit", value: fmt(grossProfit), accent: true },
-                { label: "Gross margin", value: pct(grossMargin), accent: false },
-                { label: "COGS as % of revenue", value: pct(totalCogs / (revenue || 1)), accent: false },
-              ].map((r) => (
-                <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-[var(--v2-accent)]" : ""}`}>
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[14px] ${r.accent ? "text-white/60" : "text-[var(--v2-ink-secondary)]"}`}>{r.label}</span>
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`font-semibold text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : grossProfit < 0 && r.label === "Gross profit" ? "text-v2-adverse" : "text-[var(--v2-accent)]"}`}>{r.value}</span>
-                </div>
-              ))}
-              <div className="px-6 py-5">
-                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px] leading-[1.6]">
-                  SaaS benchmarks: Strong &gt;70% gross margin, average 60–70%, below 50% indicates infrastructure cost issues.
+            <div className="flex flex-col gap-4 h-fit">
+              <div className="flex flex-col gap-2 p-6 bg-[var(--v2-panel)] border border-[var(--v2-rule)]">
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[13px] tracking-[0.02em]">Gross margin</span>
+                <div className="pub-title" style={{ fontFamily: "var(--font-v2-data)", color: grossProfit < 0 ? "var(--v2-adverse)" : "var(--v2-accent)" }}>{pct(grossMargin)}</div>
+                <p style={{ fontFamily: "var(--font-v2-doc)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.6] mt-1">
+                  {grossProfit < 0
+                    ? "Direct costs exceed revenue — gross profit is negative at this input mix."
+                    : "This is the percentage of revenue left after direct costs, before operating expenses like sales, marketing, and R&D are subtracted."}
+                </p>
+              </div>
+              <div className="flex flex-col gap-0 border border-[var(--v2-rule)] divide-y divide-[var(--v2-rule)]">
+                {[
+                  { label: "Total COGS", value: fmt(totalCogs), accent: false },
+                  { label: "Gross profit", value: fmt(grossProfit), accent: true },
+                  { label: "COGS as % of revenue", value: pct(totalCogs / (revenue || 1)), accent: false },
+                ].map((r) => (
+                  <div key={r.label} className={`flex items-center justify-between px-6 py-5 ${r.accent ? "bg-[var(--v2-accent)]" : ""}`}>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[14px] ${r.accent ? "text-white/60" : "text-[var(--v2-ink-secondary)]"}`}>{r.label}</span>
+                    <span style={{ fontFamily: "var(--font-v2-data)" }} className={`font-semibold text-[18px] tracking-[-0.5px] ${r.accent ? "text-white" : grossProfit < 0 && r.label === "Gross profit" ? "text-v2-adverse" : "text-[var(--v2-accent)]"}`}>{r.value}</span>
+                  </div>
+                ))}
+                <div className="px-6 py-5">
+                  <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px] leading-[1.6]">
+                    SaaS benchmarks: Strong &gt;70% gross margin, average 60–70%, below 50% indicates infrastructure cost issues.
+                  </div>
                 </div>
               </div>
             </div>
@@ -148,9 +158,13 @@ function CogsCalculator() {
               <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">How to use this in a deal room</h2>
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Your gross margin percentage determines how investors benchmark you against sector peers. In a Lengdon deal room, your P&L summary is part of the diligence checklist — COGS and gross margin appear as confirmed line items, not a slide deck approximation.</p>
             </div>
-            <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px]">
-              <Link to="/tools/valuation-calculator" className="underline hover:opacity-70 transition-opacity">Use your gross margin in the valuation calculator →</Link>
-            </p>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Related tools</h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link to="/tools/valuation-calculator" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Valuation Calculator</Link>
+                <Link to="/tools/burn-rate" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Burn Rate Calculator</Link>
+              </div>
+            </div>
           </div>
         </section>
 

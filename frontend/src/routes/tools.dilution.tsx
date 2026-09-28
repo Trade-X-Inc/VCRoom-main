@@ -56,12 +56,20 @@ function Dilution() {
   const [founderShares] = useState(10_000_000);
   const [rounds, setRounds] = useState<Round[]>(DEFAULT_ROUNDS);
 
+  // SEO-011: preVal was already clamped to >=1 on entry (below), but
+  // raise had no clamp at all — a negative raise would produce a
+  // negative investorPct and push founderPctAfter outside [0,1]. Checked
+  // here rather than silently clamped at entry, since a negative raise
+  // is the kind of typo worth surfacing, not quietly overwriting.
+  const hasInvalidInput = rounds.some((r) => r.raise < 0);
+
   let remaining = founderShares;
   const totalShares = founderShares;
 
   const roundResults = rounds.map((r) => {
-    const newShares = (r.raise / r.preVal) * totalShares;
-    const investorPct = r.raise / (r.preVal + r.raise);
+    const safeRaise = Math.max(0, r.raise);
+    const newShares = (safeRaise / r.preVal) * totalShares;
+    const investorPct = safeRaise / (r.preVal + safeRaise);
     remaining = remaining * (1 - investorPct);
     return { ...r, investorPct, founderPctAfter: remaining / (totalShares + newShares) };
   });
@@ -107,11 +115,11 @@ function Dilution() {
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1">
                         <label style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Raise amount ($)</label>
-                        <input type="number" value={r.raise} onChange={(e) => updateRound(i, "raise", Number(e.target.value))} style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)]" />
+                        <input type="number" value={r.raise} onChange={(e) => updateRound(i, "raise", Number(e.target.value))} placeholder="e.g. 2,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] bg-[var(--v2-panel)]" />
                       </div>
                       <div className="flex flex-col gap-1">
                         <label style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Pre-money valuation ($)</label>
-                        <input type="number" value={r.preVal} onChange={(e) => updateRound(i, "preVal", Math.max(1, Number(e.target.value)))} style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)]" />
+                        <input type="number" value={r.preVal} onChange={(e) => updateRound(i, "preVal", Math.max(1, Number(e.target.value)))} placeholder="e.g. 10,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] bg-[var(--v2-panel)]" />
                       </div>
                     </div>
                   </div>
@@ -126,12 +134,24 @@ function Dilution() {
               </div>
             </div>
 
-            <div>
-              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px] mb-6">Founder ownership over time</h2>
+            <div className="flex flex-col gap-4">
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px]">Founder ownership over time</h2>
+              {hasInvalidInput && (
+                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3 text-v2-adverse text-[13px] leading-[1.5]">
+                  Raise amount can't be negative — enter zero or a positive number for each round.
+                </div>
+              )}
+              <div className="flex flex-col gap-2 p-6 bg-[var(--v2-panel)] border border-[var(--v2-rule)]">
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[13px] tracking-[0.02em]">Final founder ownership</span>
+                <div className="pub-title" style={{ fontFamily: "var(--font-v2-data)", color: "var(--v2-accent)" }}>{pct(founderFinal)}</div>
+                <p style={{ fontFamily: "var(--font-v2-doc)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.6] mt-1">
+                  After all {rounds.length} round{rounds.length === 1 ? "" : "s"} modeled above, this is what the founder retains — down from 100% before any raise.
+                </p>
+              </div>
               <div className="border border-[var(--v2-rule)] overflow-hidden">
                 <div className="bg-[var(--v2-accent)] px-6 py-4 flex justify-between">
                   <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[1px] uppercase">Before any raise</span>
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[15px]">100.0%</span>
+                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="font-semibold text-white text-[15px]">100.0%</span>
                 </div>
                 {roundResults.map((r, i) => (
                   <div key={i} className="px-6 py-5 flex items-center justify-between border-t border-[var(--v2-rule)]">
@@ -139,15 +159,31 @@ function Dilution() {
                       <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] mb-0.5">{r.name}</div>
                       <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px]">{pct(r.investorPct)} new investor ownership</div>
                     </div>
-                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.5px]">
+                    <span style={{ fontFamily: "var(--font-v2-data)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.5px]">
                       {pct(r.founderPctAfter)}
                     </span>
                   </div>
                 ))}
-                <div className="bg-[var(--v2-surface)] px-6 py-4 border-t border-[var(--v2-rule)] flex justify-between">
-                  <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px]">Final founder ownership</span>
-                  <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.5px]">{pct(founderFinal)}</span>
-                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16 border-t border-[var(--v2-rule)]">
+          <div className="max-w-[720px] flex flex-col gap-10">
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">What this calculator does</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Every priced funding round issues new shares to new investors, which reduces — dilutes — the percentage every existing shareholder owns, even though their share count doesn't change. This calculator models founder ownership across a sequence of rounds you define, showing the dilution at each stage and the cumulative result.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Key terms</h2>
+              <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.7]">Pre-money valuation: the company's value before the new round's capital is added. Dilution: the reduction in an existing shareholder's ownership percentage caused by new shares being issued, regardless of whether they sell any shares themselves.</p>
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] tracking-[-0.3px] mb-3">Related tools</h2>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <Link to="/tools/cap-table" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Cap Table Builder</Link>
+                <Link to="/tools/valuation-calculator" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-accent)] text-[14px] underline hover:opacity-70 transition-opacity">Valuation Calculator</Link>
               </div>
             </div>
           </div>
