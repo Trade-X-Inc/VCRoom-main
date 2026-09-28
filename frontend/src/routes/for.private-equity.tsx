@@ -82,7 +82,7 @@ function PrivateEquity() {
           <PrEyebrow>How it works for private equity</PrEyebrow>
           <PrTitle>Multi-party rooms, one conditions register.</PrTitle>
           <PrProse>
-            PE runs on the same six-gate spine — counsel, agreement, conditions, signing, payment, close — extended for multiple parties in one room, with a full conditions register tracking every item to satisfaction, each with a timestamp and the confirming party's identity. Counsel is scoped in from the terms stage forward.{" "}
+            PE runs on the same seven-stage spine — Brief, Present, NDA, Diligence, Terms, Conditions, Close — extended for multiple parties in one room, with a full conditions register tracking every item to satisfaction, each with a timestamp and the confirming party's identity. Counsel is scoped in from the Terms stage forward.{" "}
             <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model the post-close cap table →</Link>
           </PrProse>
         </PrSection>
