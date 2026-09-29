@@ -393,6 +393,21 @@ async function fetchPostBySlugFromNotion(key: string, slug: string): Promise<Blo
   }
 }
 
+// TEMPORARY, SEO-017 Phase 1 verification only — proves the fresh/stale/
+// miss branches actually fire on the deployed worker, independent of
+// Cloudflare's anycast colo-bouncing making wall-clock TTFB alone
+// unreliable to interpret from outside the network. Removed before the
+// final PR commit; not shipped.
+async function setDiagnosticCacheHeader(state: "fresh" | "stale" | "miss"): Promise<void> {
+  try {
+    if (!import.meta.env.SSR) return;
+    const { setResponseHeader } = await import("@tanstack/react-start/server");
+    setResponseHeader("x-notion-cache", state);
+  } catch {
+    // Best-effort diagnostic only — never let this affect the real response.
+  }
+}
+
 export const getPostBySlug = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => d as { slug: string })
   .handler(async ({ data }): Promise<BlogPostWithContent | null> => {
@@ -402,12 +417,15 @@ export const getPostBySlug = createServerFn({ method: "GET" })
 
     const cached = await readCache<BlogPostWithContent>(postCachePath(data.slug));
     if (cached?.state === "fresh") {
+      await setDiagnosticCacheHeader("fresh");
       return cached.value;
     }
     if (cached?.state === "stale") {
+      await setDiagnosticCacheHeader("stale");
       waitUntil(fetchPostBySlugFromNotion(key, data.slug));
       return cached.value;
     }
 
+    await setDiagnosticCacheHeader("miss");
     return fetchPostBySlugFromNotion(key, data.slug);
   });
