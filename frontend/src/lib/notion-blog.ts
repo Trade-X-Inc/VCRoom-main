@@ -397,15 +397,13 @@ async function fetchPostBySlugFromNotion(key: string, slug: string): Promise<Blo
 // miss branches actually fire on the deployed worker, independent of
 // Cloudflare's anycast colo-bouncing making wall-clock TTFB alone
 // unreliable to interpret from outside the network. Removed before the
-// final PR commit; not shipped.
-async function setDiagnosticCacheHeader(state: "fresh" | "stale" | "miss"): Promise<void> {
-  try {
-    if (!import.meta.env.SSR) return;
-    const { setResponseHeader } = await import("@tanstack/react-start/server");
-    setResponseHeader("x-notion-cache", state);
-  } catch {
-    // Best-effort diagnostic only — never let this affect the real response.
-  }
+// final PR commit; not shipped. Logs via console.error (visible in
+// `wrangler pages deployment tail` / the CF dashboard's real-time logs)
+// rather than only a response header, since a header set mid-handler
+// during streaming SSR may not land if headers were already flushed —
+// a server-side log is unambiguous regardless of that timing question.
+async function logDiagnosticCacheState(fn: string, slug: string, state: "fresh" | "stale" | "miss"): Promise<void> {
+  console.error(`[SEO-017-DIAG] ${fn} slug=${slug} state=${state}`);
 }
 
 export const getPostBySlug = createServerFn({ method: "GET" })
@@ -417,15 +415,15 @@ export const getPostBySlug = createServerFn({ method: "GET" })
 
     const cached = await readCache<BlogPostWithContent>(postCachePath(data.slug));
     if (cached?.state === "fresh") {
-      await setDiagnosticCacheHeader("fresh");
+      await logDiagnosticCacheState("getPostBySlug", data.slug, "fresh");
       return cached.value;
     }
     if (cached?.state === "stale") {
-      await setDiagnosticCacheHeader("stale");
+      await logDiagnosticCacheState("getPostBySlug", data.slug, "stale");
       waitUntil(fetchPostBySlugFromNotion(key, data.slug));
       return cached.value;
     }
 
-    await setDiagnosticCacheHeader("miss");
+    await logDiagnosticCacheState("getPostBySlug", data.slug, "miss");
     return fetchPostBySlugFromNotion(key, data.slug);
   });
