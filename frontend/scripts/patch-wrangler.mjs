@@ -735,15 +735,6 @@ ${sitemapInjectionSnippet}
 const __origServer = server;
 const __patchedServer = {
   async fetch(request, env, ctx) {
-    // TEMPORARY DIAGNOSTIC, SEO-017 Phase 1 gap — raw Object.keys(env) as
-    // handed to the worker by Cloudflare, before __checkRedirect or any
-    // other logic runs, before the __cf_env stash. Answers: does the raw
-    // binding contain NOTION_API_KEY at all? Remove after one check.
-    try {
-      console.log('[SEO-017-DIAG] raw env keys:', Object.keys(env || {}));
-    } catch (e) {
-      console.error('[SEO-017-DIAG] raw env read failed:', e);
-    }
     const __redirect = __checkRedirect(request);
     if (__redirect) return __redirect;
     // SEO-017: expose ctx alongside env, same pattern, so server functions
