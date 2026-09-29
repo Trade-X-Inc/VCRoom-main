@@ -67,14 +67,20 @@ export const Route = createFileRoute("/resources/blog/$slug")({
     };
   },
   loader: async ({ params }) => {
-    const post = await getPostBySlug({ data: { slug: params.slug } });
+    // SEO-017 Phase 1: these two Notion calls have no data dependency on
+    // each other at the fetch level (the related-post filter only needs
+    // post.slug/post.tags to SELECT from the already-fetched list, not to
+    // fetch it) — run them concurrently instead of one after the other.
+    const [post, allPosts] = await Promise.all([
+      getPostBySlug({ data: { slug: params.slug } }),
+      getPublishedPosts(),
+    ]);
     if (!post) return { post: null, related: null };
     // SEO-003 — tag-based related post, computed here rather than hand-
     // authored per post: content lives in Notion, not in this repo, so
     // there is no file to add per-post cross-links to. First other
     // published post sharing at least one tag; null (render nothing) if
     // none match, per instruction ("don't force it").
-    const allPosts = await getPublishedPosts();
     const related: BlogPost | null =
       allPosts.find((p) => p.slug !== post.slug && p.tags.some((t) => post.tags.includes(t))) ?? null;
     return { post, related };
