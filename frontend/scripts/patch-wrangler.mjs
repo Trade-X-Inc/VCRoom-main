@@ -735,6 +735,15 @@ ${sitemapInjectionSnippet}
 const __origServer = server;
 const __patchedServer = {
   async fetch(request, env, ctx) {
+    // TEMPORARY DIAGNOSTIC — re-verifying NOTION_API_KEY now that it's
+    // been added to Preview (previously Production-only). Same one-line
+    // check as before: raw Object.keys(env), before any other logic.
+    // Remove after this one check.
+    try {
+      console.log('[SEO-017-DIAG-2] raw env keys:', Object.keys(env || {}));
+    } catch (e) {
+      console.error('[SEO-017-DIAG-2] raw env read failed:', e);
+    }
     const __redirect = __checkRedirect(request);
     if (__redirect) return __redirect;
     // SEO-017: expose ctx alongside env, same pattern, so server functions
