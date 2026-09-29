@@ -7,10 +7,6 @@ import type {
 
 const DB_ID = "8a99a69aa1a2422d81fe4b9149a68024";
 
-// Force a fresh CI build (not a no-op redeploy) so this branch preview
-// picks up the current Preview-environment secrets, per SEO-017 Phase 1
-// verification.
-
 // SEO-017 Phase 1 — Cache API layer, no new wrangler bindings. caches.default
 // is a Workers-global, not a bound resource, so this needs no wrangler.toml
 // change. Keyed by a synthetic same-origin URL (Cache API only keys on
@@ -397,19 +393,6 @@ async function fetchPostBySlugFromNotion(key: string, slug: string): Promise<Blo
   }
 }
 
-// TEMPORARY, SEO-017 Phase 1 verification only — proves the fresh/stale/
-// miss branches actually fire on the deployed worker, independent of
-// Cloudflare's anycast colo-bouncing making wall-clock TTFB alone
-// unreliable to interpret from outside the network. Removed before the
-// final PR commit; not shipped. Logs via console.error (visible in
-// `wrangler pages deployment tail` / the CF dashboard's real-time logs)
-// rather than only a response header, since a header set mid-handler
-// during streaming SSR may not land if headers were already flushed —
-// a server-side log is unambiguous regardless of that timing question.
-async function logDiagnosticCacheState(fn: string, slug: string, state: "fresh" | "stale" | "miss"): Promise<void> {
-  console.error(`[SEO-017-DIAG] ${fn} slug=${slug} state=${state}`);
-}
-
 export const getPostBySlug = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => d as { slug: string })
   .handler(async ({ data }): Promise<BlogPostWithContent | null> => {
@@ -419,15 +402,12 @@ export const getPostBySlug = createServerFn({ method: "GET" })
 
     const cached = await readCache<BlogPostWithContent>(postCachePath(data.slug));
     if (cached?.state === "fresh") {
-      await logDiagnosticCacheState("getPostBySlug", data.slug, "fresh");
       return cached.value;
     }
     if (cached?.state === "stale") {
-      await logDiagnosticCacheState("getPostBySlug", data.slug, "stale");
       waitUntil(fetchPostBySlugFromNotion(key, data.slug));
       return cached.value;
     }
 
-    await logDiagnosticCacheState("getPostBySlug", data.slug, "miss");
     return fetchPostBySlugFromNotion(key, data.slug);
   });
