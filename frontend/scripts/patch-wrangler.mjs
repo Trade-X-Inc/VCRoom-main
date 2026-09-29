@@ -737,6 +737,14 @@ const __patchedServer = {
   async fetch(request, env, ctx) {
     const __redirect = __checkRedirect(request);
     if (__redirect) return __redirect;
+    // SEO-017: expose ctx alongside env, same pattern, so server functions
+    // (notion-blog.ts) can hand a cache refresh to ctx.waitUntil() instead
+    // of blocking the response on it. ctx is real here (already used for
+    // the CSP-report write below) — it was just never stashed anywhere
+    // reachable from a createServerFn handler until now.
+    if (ctx && typeof ctx.waitUntil === 'function') {
+      globalThis.__cf_ctx = ctx;
+    }
     if (env && typeof env === 'object') {
       try {
         globalThis.__cf_env = { ...env };

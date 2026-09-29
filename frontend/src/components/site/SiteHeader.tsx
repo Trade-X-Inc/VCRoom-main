@@ -151,7 +151,7 @@ export function SiteHeader() {
         <div className="max-w-[1280px] mx-auto px-10 h-16 flex items-center justify-between">
           <Link to="/" className="shrink-0" style={{ textDecoration: "none" }}>
             <img
-              src="/lengdon-logo-full.webp"
+              src="/lengdon-logo-header.webp"
               alt="Lengdon"
               width={159}
               height={36}

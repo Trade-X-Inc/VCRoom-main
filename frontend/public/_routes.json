@@ -1,5 +1,5 @@
 {
   "version": 1,
   "include": ["/*"],
-  "exclude": ["/assets/*", "/marketing/*", "/images/*", "/templates/*.pdf", "/.well-known/*", "/favicon.ico", "/favicon-16x16.png", "/favicon-32x32.png", "/favicon-192x192.png", "/favicon-512x512.png", "/apple-touch-icon.png", "/lengdon-logo-full.png", "/lengdon-logo-icon.png", "/lengdon-logo-full.webp", "/lengdon-logo-icon.webp", "/_routes.json", "/robots.txt", "/llms.txt", "/og-image.png"]
+  "exclude": ["/assets/*", "/marketing/*", "/images/*", "/templates/*.pdf", "/.well-known/*", "/favicon.ico", "/favicon-16x16.png", "/favicon-32x32.png", "/favicon-192x192.png", "/favicon-512x512.png", "/apple-touch-icon.png", "/lengdon-logo-full.png", "/lengdon-logo-icon.png", "/lengdon-logo-full.webp", "/lengdon-logo-icon.webp", "/lengdon-logo-header.webp", "/_routes.json", "/robots.txt", "/llms.txt", "/og-image.png"]
 }
