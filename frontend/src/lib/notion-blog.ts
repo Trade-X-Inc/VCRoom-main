@@ -7,6 +7,10 @@ import type {
 
 const DB_ID = "8a99a69aa1a2422d81fe4b9149a68024";
 
+// Force a fresh CI build (not a no-op redeploy) so this branch preview
+// picks up the current Preview-environment secrets, per SEO-017 Phase 1
+// verification.
+
 // SEO-017 Phase 1 — Cache API layer, no new wrangler bindings. caches.default
 // is a Workers-global, not a bound resource, so this needs no wrangler.toml
 // change. Keyed by a synthetic same-origin URL (Cache API only keys on
