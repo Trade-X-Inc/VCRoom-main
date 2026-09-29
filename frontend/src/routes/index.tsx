@@ -524,9 +524,13 @@ function DemoSection() {
             >
               <img
                 src="/images/homepage/demo-video-poster.webp"
+                srcSet="/images/homepage/demo-video-poster-640w.webp 640w, /images/homepage/demo-video-poster-960w.webp 960w"
+                sizes="(min-width: 1024px) 800px, 100vw"
                 alt="Lengdon product walkthrough"
                 width={800}
                 height={533}
+                loading="lazy"
+                decoding="async"
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
                   playing ? "opacity-20 scale-105" : "opacity-50 group-hover:opacity-60"
                 }`}
@@ -682,6 +686,15 @@ function DemoSection() {
 // Confirmed by reading App() and ProcessSection() — neither references
 // them. Not ported, since porting dead code is not "pixel-exact
 // reproduction of what renders," it's reproducing an unused artifact.)
+
+// SEO-017 Phase 2c — all 6 process images share the same generated-variant
+// naming convention (scripts/generate-responsive-variants.mjs), so the
+// srcset is derived from the base path here rather than hand-repeated per
+// phase entry.
+function processImageSrcSet(basePath: string): string {
+  const base = basePath.replace(/\.webp$/, "");
+  return `${base}-640w.webp 640w, ${base}-960w.webp 960w, ${base}-1400w.webp 1400w`;
+}
 
 const PROCESS_PHASES_V2 = [
   {
@@ -839,9 +852,13 @@ function ProcessSection() {
                   <div className="w-[55%] lg:w-[58%] shrink-0 overflow-hidden relative bg-[var(--v2-accent)]">
                     <img
                       src={phase.img}
+                      srcSet={processImageSrcSet(phase.img)}
+                      sizes="(min-width: 1024px) 522px, 58vw"
                       alt={phase.imgAlt}
                       width={522}
                       height={336}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                       style={{ opacity: 0.88 }}
                     />
@@ -952,9 +969,13 @@ function SecuritySection() {
         <Reveal delay={150} className="flex-1 overflow-hidden">
           <img
             src="/images/homepage/security-infrastructure.webp"
+            srcSet="/images/homepage/security-infrastructure-640w.webp 640w, /images/homepage/security-infrastructure-960w.webp 960w"
+            sizes="(min-width: 1024px) 50vw, 100vw"
             alt="Security infrastructure"
             width={656}
             height={510}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover min-h-[400px]"
           />
         </Reveal>
@@ -1188,9 +1209,13 @@ function CTASection() {
             <div className="flex-1 relative overflow-hidden bg-[var(--pub-n-0d)] min-h-[320px]">
               <img
                 src="/images/homepage/cta-transaction.webp"
+                srcSet="/images/homepage/cta-transaction-640w.webp 640w, /images/homepage/cta-transaction-960w.webp 960w"
+                sizes="(min-width: 1280px) 480px, (min-width: 1024px) 420px, 100vw"
                 alt="Two parties completing a private capital transaction"
                 width={480}
                 height={450}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover opacity-70"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[var(--v2-accent)]/60 to-transparent pointer-events-none" />

@@ -172,7 +172,7 @@ export function SiteFooter() {
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-10 mb-12 pb-12 border-b" style={{ borderColor: RULE }}>
         <div className="col-span-2 lg:col-span-1">
           <img
-            src="/lengdon-logo-full.webp"
+            src="/lengdon-logo-header.webp"
             alt="Lengdon"
             width={132}
             height={30}
