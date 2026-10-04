@@ -476,6 +476,109 @@ function AppendOnlyRecordSection() {
   );
 }
 
+// ── DEMO TILE: in-code preview, not a photo ────────────────
+// SEO-020 Phase 1 — replaces the old demo-video-poster.* <img> (there was
+// never a real video behind it, see the SEO-018 Phase 4d comment above).
+// A fictional "Acme Co" deal room, same visual language as the hero's
+// ProductCard (GATE_ROWS, REF-#### style), built from existing tokens
+// only — no new colors, no stock photography. Same h-full min-h-[420px]
+// w-full container footprint as the old <img> wrapper it replaces, so
+// layout is unchanged at every breakpoint.
+const PREVIEW_STAGES = [
+  { label: "Counsel", done: true },
+  { label: "Agreement", done: true },
+  { label: "Conditions", done: true },
+  { label: "Signing", done: false },
+  { label: "Payment", done: false },
+  { label: "Close", done: false },
+];
+
+const PREVIEW_ACTIVITY = [
+  { time: "09:14", text: "Condition met: Cap table confirmed" },
+  { time: "11:02", text: "Document released: Draft agreement" },
+  { time: "14:47", text: "Term accepted: Board observer seat" },
+];
+
+function ProductPreviewTile() {
+  const descriptionId = "demo-preview-tile-desc";
+  return (
+    <div
+      className="relative bg-[var(--v2-accent)] overflow-hidden h-full min-h-[420px] w-full block"
+      role="img"
+      aria-labelledby={descriptionId}
+    >
+      {/* Decorative grid, same treatment as the hero ProductCard's own backdrop */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div aria-hidden="true" className="relative z-10 flex flex-col h-full p-7">
+        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/75 text-[11px] tracking-[1px] uppercase mb-1">
+          Illustrative example
+        </div>
+        <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[22px] tracking-[-0.5px] mb-1">
+          Acme Co — Deal Room
+        </div>
+        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[11px] tracking-[0.3px] mb-6">
+          REF-ACME-0001
+        </div>
+
+        <div className="flex flex-col gap-0 border-t border-white/10">
+          {PREVIEW_STAGES.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex items-center justify-between py-2.5 ${i < PREVIEW_STAGES.length - 1 ? "border-b border-white/10" : ""}`}
+            >
+              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/75 text-[13px]">
+                {s.label}
+              </span>
+              {s.done ? (
+                <div className="w-4 h-4 rounded-full bg-v2-satisfied flex items-center justify-center shrink-0">
+                  <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                    <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              ) : (
+                <div className="w-4 h-4 rounded-full border-2 border-white/30 shrink-0" />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-auto pt-6 border-t border-white/10">
+          <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[10px] tracking-[1.5px] uppercase mb-2">
+            Latest activity
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {PREVIEW_ACTIVITY.map((a) => (
+              <div key={a.time} className="flex items-center gap-3">
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/70 text-[10px] w-10 shrink-0">
+                  {a.time}
+                </span>
+                <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/75 text-[11px]">
+                  {a.text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <span id={descriptionId} className="sr-only">
+        Illustrative example of a Lengdon deal room for a fictional company, Acme Co, showing the closing sequence
+        (Counsel and Agreement and Conditions complete; Signing, Payment, and Close pending) and recent activity
+        entries. Not a real transaction.
+      </span>
+    </div>
+  );
+}
+
 // ── DEMO SECTION ──────────────────────────────────────────
 function DemoSection() {
   const [formData, setFormData] = useState({ name: "", email: "", company: "", slot: "" });
@@ -530,42 +633,7 @@ function DemoSection() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <Reveal className="flex-1">
-            <div className="relative bg-[var(--v2-accent)] overflow-hidden h-full min-h-[420px] w-full block">
-              <img
-                src="/images/homepage/demo-video-poster.webp"
-                srcSet="/images/homepage/demo-video-poster-640w.webp 640w, /images/homepage/demo-video-poster-960w.webp 960w"
-                sizes="(min-width: 1024px) 800px, 100vw"
-                alt="Lengdon product walkthrough"
-                width={800}
-                height={533}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover opacity-50"
-              />
-              <div className="absolute inset-0 opacity-10"
-                style={{
-                  backgroundImage: "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-                  backgroundSize: "40px 40px"
-                }} />
-
-              <div className="absolute bottom-0 left-0 right-0 p-7">
-                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/75 text-[11px] tracking-[1px] mb-2">
-                  Illustrative example
-                </div>
-                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[22px] tracking-[-0.5px]">
-                  The full transaction lifecycle
-                </div>
-              </div>
-
-              <div className="absolute top-5 right-5 flex flex-col gap-2">
-                {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch) => (
-                  <div key={ch} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
-                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/75 text-[10px] tracking-[0.5px]">{ch}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ProductPreviewTile />
           </Reveal>
 
           <Reveal delay={150} className="flex-1 max-w-[480px]">
