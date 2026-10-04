@@ -12,7 +12,7 @@ export const submitWaitlistEntry = createServerFn({ method: "POST" })
     name: string;
     email: string;
     role?: "founder" | "investor" | "";
-    source: "sign-up page" | "footer newsletter";
+    source: "sign-up page" | "footer newsletter" | "popup";
   })
   .handler(async ({ data }) => {
     const cfEnv = (globalThis as any).__cf_env || {};
