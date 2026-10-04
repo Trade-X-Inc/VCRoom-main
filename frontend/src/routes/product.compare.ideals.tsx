@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — "Sealed dual-party export at close" row
 // and "sealed" prose claims removed/reworded (not a live capability,
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/product/compare/ideals")({
     meta: [
       { title: "Lengdon vs iDeals — closing infrastructure vs a virtual data room — Lengdon" },
       { name: "description", content: "iDeals is a virtual data room with no enforced transaction sequence. Compare it to Lengdon's enforced close." },
+      ...socialMeta({ title: "Lengdon vs iDeals — closing infrastructure vs a virtual data room — Lengdon", description: "iDeals is a virtual data room with no enforced transaction sequence. Compare it to Lengdon's enforced close.", path: "/product/compare/ideals" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/ideals" }],
   }),

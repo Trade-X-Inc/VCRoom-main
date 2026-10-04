@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — rewrite of the pixel-exact port of
 // LENGDONPUBLIC-NEW's About.tsx. Per direct instruction: removed the
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/company/about")({
     meta: [
       { title: "About — closing infrastructure for private capital — Lengdon" },
       { name: "description", content: "What we build, the principle that governs it, where we are. DIFC FinTech Hive, Dubai. We record who asserted what. Parties judge." },
+      ...socialMeta({ title: "About — closing infrastructure for private capital — Lengdon", description: "What we build, the principle that governs it, where we are. DIFC FinTech Hive, Dubai. We record who asserted what. Parties judge.", path: "/company/about" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/company/about" }],
   }),

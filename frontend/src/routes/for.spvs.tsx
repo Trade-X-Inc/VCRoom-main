@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconLayers, PrIconFile, PrIconEye, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // EARLY ACCESS: the beneficial-ownership schedule / permissioned
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/for/spvs")({
     meta: [
       { title: "For SPVs — one ownership record that carries forward — Lengdon" },
       { name: "description", content: "A beneficial-ownership schedule for the vehicle and its underlying participants, built once and carried into the next round." },
+      ...socialMeta({ title: "For SPVs — one ownership record that carries forward — Lengdon", description: "A beneficial-ownership schedule for the vehicle and its underlying participants, built once and carried into the next round.", path: "/for/spvs" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/spvs" }],
   }),

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/AcceptableUse.tsx.
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/legal/acceptable-use")({
     meta: [
       { title: "Acceptable use policy — Lengdon" },
       { name: "description", content: "What the Lengdon platform may and may not be used for. Prohibited conduct and enforcement." },
+      ...socialMeta({ title: "Acceptable use policy — Lengdon", description: "What the Lengdon platform may and may not be used for. Prohibited conduct and enforcement.", path: "/legal/acceptable-use" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/acceptable-use" }],
   }),

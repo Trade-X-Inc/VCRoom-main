@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconLayers, PrIconFile, PrIconEye, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // Replaces the prior custom PageHero-based build entirely. "Firm-grade"
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/for/venture-capital")({
     meta: [
       { title: "For venture capital — a lifecycle view, not a CRM — Lengdon" },
       { name: "description", content: "Deploying seats. Deals organized by lifecycle state, house diligence on the sector schedule, one record per close." },
+      ...socialMeta({ title: "For venture capital — a lifecycle view, not a CRM — Lengdon", description: "Deploying seats. Deals organized by lifecycle state, house diligence on the sector schedule, one record per close.", path: "/for/venture-capital" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/venture-capital" }],
   }),

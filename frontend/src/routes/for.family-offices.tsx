@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconLayers, PrIconFile, PrIconEye,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // Replaces the prior custom PageHero-based build entirely.
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/for/family-offices")({
     meta: [
       { title: "For family offices — real diligence, no procurement — Lengdon" },
       { name: "description", content: "A full room, staged diligence, a conditions register. Seat pricing a principal can approve directly — no enterprise contract." },
+      ...socialMeta({ title: "For family offices — real diligence, no procurement — Lengdon", description: "A full room, staged diligence, a conditions register. Seat pricing a principal can approve directly — no enterprise contract.", path: "/for/family-offices" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/family-offices" }],
   }),

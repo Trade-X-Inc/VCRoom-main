@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/ValuationCalculator.tsx.
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/tools/valuation-calculator")({
     meta: [
       { title: "Startup valuation calculator — pre-money and post-money — Lengdon" },
       { name: "description", content: "Calculate pre-money and post-money valuation from investment amount and equity percentage. Understand what a term sheet implies." },
+      ...socialMeta({ title: "Startup valuation calculator — pre-money and post-money — Lengdon", description: "Calculate pre-money and post-money valuation from investment amount and equity percentage. Understand what a term sheet implies.", path: "/tools/valuation-calculator" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/valuation-calculator" }],
   }),

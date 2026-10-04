@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconFile, PrIconCheck, PrIconEye, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // EARLY ACCESS: no syndicate-specific mechanic (lead package, disclosed
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/for/syndicates")({
     meta: [
       { title: "For syndicate leads — a disclosed commitment, a shared record — Lengdon" },
       { name: "description", content: "Publish your commitment, let followers soft-circle and commit individually, and close on one record every member can see." },
+      ...socialMeta({ title: "For syndicate leads — a disclosed commitment, a shared record — Lengdon", description: "Publish your commitment, let followers soft-circle and commit individually, and close on one record every member can see.", path: "/for/syndicates" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/syndicates" }],
   }),

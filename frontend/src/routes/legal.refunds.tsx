@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // New document, 22 Sep 2026. Written against a real recon finding, not
 // an assumed payment flow: no payment processor is wired up anywhere in
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/legal/refunds")({
     meta: [
       { title: "Refund terms — Lengdon" },
       { name: "description", content: "Lengdon's refund policy, conditions and process." },
+      ...socialMeta({ title: "Refund terms — Lengdon", description: "Lengdon's refund policy, conditions and process.", path: "/legal/refunds" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/refunds" }],
   }),

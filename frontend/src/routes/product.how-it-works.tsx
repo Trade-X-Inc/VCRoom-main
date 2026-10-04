@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/product/HowItWorks.tsx.
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/product/how-it-works")({
     meta: [
       { title: "How it works — the closing lifecycle — Lengdon" },
       { name: "description", content: "Brief, present, NDA, diligence, terms, conditions, close. One recorded spine for every private-capital raise. See the full lifecycle." },
+      ...socialMeta({ title: "How it works — the closing lifecycle — Lengdon", description: "Brief, present, NDA, diligence, terms, conditions, close. One recorded spine for every private-capital raise. See the full lifecycle.", path: "/product/how-it-works" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/how-it-works" }],
   }),

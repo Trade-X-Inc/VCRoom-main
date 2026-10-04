@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/SubProcessors.tsx.
@@ -52,6 +53,7 @@ export const Route = createFileRoute("/legal/sub-processors")({
     meta: [
       { title: "Sub-processors — Lengdon" },
       { name: "description", content: "A maintained list of third-party sub-processors used by Lengdon, their purpose and data region." },
+      ...socialMeta({ title: "Sub-processors — Lengdon", description: "A maintained list of third-party sub-processors used by Lengdon, their purpose and data region.", path: "/legal/sub-processors" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/sub-processors" }],
   }),

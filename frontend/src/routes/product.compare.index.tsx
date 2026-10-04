@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — applies the same standard CLAUDE.md §12
 // (Group 4) already used once: "sealed export" as a live, user-facing
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/product/compare/")({
     meta: [
       { title: "Compare — closing infrastructure vs virtual data rooms — Lengdon" },
       { name: "description", content: "An honest comparison against DocSend, Notion and Google Drive on pricing, transaction record, diligence discipline and sector coverage." },
+      ...socialMeta({ title: "Compare — closing infrastructure vs virtual data rooms — Lengdon", description: "An honest comparison against DocSend, Notion and Google Drive on pricing, transaction record, diligence discipline and sector coverage.", path: "/product/compare" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare" }],
   }),

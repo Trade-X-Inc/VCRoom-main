@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — "Sealed dual-party export" row removed
 // (not a live capability, same standard as CLAUDE.md §12 Group 4).
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/product/compare/dealroom")({
     meta: [
       { title: "Lengdon vs Dealroom — closing infrastructure vs deal pipeline software — Lengdon" },
       { name: "description", content: "Dealroom is a deal pipeline and portfolio tool with no closing sequence. Compare it to Lengdon's enforced closing sequence." },
+      ...socialMeta({ title: "Lengdon vs Dealroom — closing infrastructure vs deal pipeline software — Lengdon", description: "Dealroom is a deal pipeline and portfolio tool with no closing sequence. Compare it to Lengdon's enforced closing sequence.", path: "/product/compare/dealroom" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/dealroom" }],
   }),

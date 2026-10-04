@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { syncContactToHubSpot } from "@/lib/hubspot";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
 // LENGDONPUBLIC-NEW's src/App.tsx (the founder's Figma Make export,
@@ -48,6 +49,11 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Closing infrastructure for private capital — Lengdon" },
       { name: "description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
+      ...socialMeta({
+        title: "Closing infrastructure for private capital — Lengdon",
+        description: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room.",
+        path: "/",
+      }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/" }],
   }),

@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — replaces the prior three-tier scheme
 // (£499/room, £2,400/month, custom) with the real four-tier fee-by-
@@ -114,6 +115,7 @@ export const Route = createFileRoute("/product/pricing")({
     meta: [
       { title: "Pricing — published, flat, event-tied — Lengdon" },
       { name: "description", content: "Four tiers from deferred founder fee to institutional. Every price on the page. No percentage of the round, no invoice shock." },
+      ...socialMeta({ title: "Pricing — published, flat, event-tied — Lengdon", description: "Four tiers from deferred founder fee to institutional. Every price on the page. No percentage of the round, no invoice shock.", path: "/product/pricing" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/pricing" }],
   }),

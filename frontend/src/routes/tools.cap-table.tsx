@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/CapTable.tsx. Standalone: unique
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/tools/cap-table")({
     meta: [
       { title: "Cap table builder — model your ownership structure — Lengdon" },
       { name: "description", content: "Build a startup cap table with founders, investors and options pool. See percentage ownership before and after each funding round." },
+      ...socialMeta({ title: "Cap table builder — model your ownership structure — Lengdon", description: "Build a startup cap table with founders, investors and options pool. See percentage ownership before and after each funding round.", path: "/tools/cap-table" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/cap-table" }],
   }),

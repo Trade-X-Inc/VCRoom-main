@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { syncContactToHubSpot } from "@/lib/hubspot";
+import { socialMeta } from "@/lib/social-meta";
 
 // Wiring pass, 31 Aug 2026 — pixel-exact port of LENGDONPUBLIC-NEW's
 // src/pages/company/Contact.tsx, form now wired to HubSpot (portal
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/company/contact")({
     meta: [
       { title: "Contact — reach the people who built it — Lengdon" },
       { name: "description", content: "Access requests, security disclosures and general enquiries. DIFC FinTech Hive, Dubai." },
+      ...socialMeta({ title: "Contact — reach the people who built it — Lengdon", description: "Access requests, security disclosures and general enquiries. DIFC FinTech Hive, Dubai.", path: "/company/contact" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/company/contact" }],
   }),

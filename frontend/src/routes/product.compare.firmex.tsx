@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/product/compare/Firmex.tsx.
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/product/compare/firmex")({
     meta: [
       { title: "Lengdon vs Firmex — closing infrastructure vs a virtual data room — Lengdon" },
       { name: "description", content: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced closing sequence." },
+      ...socialMeta({ title: "Lengdon vs Firmex — closing infrastructure vs a virtual data room — Lengdon", description: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced closing sequence.", path: "/product/compare/firmex" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/firmex" }],
   }),

@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // New document, 22 Sep 2026. Content sourced entirely from a live recon
 // pass, not assumed "standard" cookie-policy boilerplate:
@@ -47,6 +48,7 @@ export const Route = createFileRoute("/legal/cookies")({
     meta: [
       { title: "Cookie policy — Lengdon" },
       { name: "description", content: "What cookies Lengdon uses, why, and how to control them." },
+      ...socialMeta({ title: "Cookie policy — Lengdon", description: "What cookies Lengdon uses, why, and how to control them.", path: "/legal/cookies" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/cookies" }],
   }),

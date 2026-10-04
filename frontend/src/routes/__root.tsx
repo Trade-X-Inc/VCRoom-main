@@ -161,29 +161,33 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Lengdon — Every deal leaves a record that holds" },
-      { name: "description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
+      { title: "Closing infrastructure for private capital — Lengdon" },
+      { name: "description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
       { name: "author", content: "Lengdon" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#F5F4F1" },
-      // Open Graph — root-level fallback. Individual routes (the homepage,
-      // /pricing) override og:title/og:description in their own head(); this
-      // is what unmatched routes and social crawlers see if they don't.
+      { name: "msvalidate.01", content: "E38A70B2CBC2FEDB464EDAE730D5F9DA" },
+      // Open Graph — root-level fallback, now matched to the homepage's own
+      // title/description (SEO-018) so an unmatched route or a route that
+      // hasn't been wired to src/lib/social-meta.ts yet falls back to
+      // something true, not a retired tagline. Every route named in
+      // SEO-018 Phase 1 now sets its own og:*/twitter:* via socialMeta() in
+      // its own head() — this is the fallback for whatever's left over.
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Lengdon — Every deal leaves a record that holds" },
-      { property: "og:description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
+      { property: "og:title", content: "Closing infrastructure for private capital — Lengdon" },
+      { property: "og:description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
       { property: "og:url", content: "https://lengdon.com" },
       { property: "og:site_name", content: "Lengdon" },
       { property: "og:image", content: "https://lengdon.com/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Lengdon — every deal leaves a record that holds." },
+      { property: "og:image:alt", content: "Lengdon — closing infrastructure for private capital." },
       // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@lengdondotcom" },
-      { name: "twitter:title", content: "Lengdon — Every deal leaves a record that holds" },
-      { name: "twitter:description", content: "A deal room, a diligence checklist, and a term sheet that all point to the same reference number." },
+      { name: "twitter:title", content: "Closing infrastructure for private capital — Lengdon" },
+      { name: "twitter:description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
       { name: "twitter:image", content: "https://lengdon.com/og-image.png" },
     ],
     links: [

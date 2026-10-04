@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { getPublishedPosts, type BlogPost } from "@/lib/notion-blog";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact LAYOUT port of
 // LENGDONPUBLIC-NEW's src/pages/resources/Blog.tsx, WIRED TO REAL DATA.
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/resources/blog/")({
     meta: [
       { title: "Blog — insights on private capital and closing — Lengdon" },
       { name: "description", content: "Analysis and notes on fundraising, diligence, deal structure and the record. Written for founders and investors in private markets." },
+      ...socialMeta({ title: "Blog — insights on private capital and closing — Lengdon", description: "Analysis and notes on fundraising, diligence, deal structure and the record. Written for founders and investors in private markets.", path: "/resources/blog" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/resources/blog" }],
   }),

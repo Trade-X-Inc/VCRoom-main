@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconLayers, PrIconCheck, PrIconFile, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // Replaces the prior custom PageHero-based build entirely. "Acquisition-
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/for/private-equity")({
     meta: [
       { title: "For private equity — the conditions register, one region — Lengdon" },
       { name: "description", content: "Multi-party rooms and a full conditions register, each item timestamped and attributed. No published data residency claim — one region, honestly." },
+      ...socialMeta({ title: "For private equity — the conditions register, one region — Lengdon", description: "Multi-party rooms and a full conditions register, each item timestamped and attributed. No published data residency claim — one region, honestly.", path: "/for/private-equity" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/private-equity" }],
   }),

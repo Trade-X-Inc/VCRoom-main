@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — rewrite of the pixel-exact port of
 // LENGDONPUBLIC-NEW's Security.tsx. Per direct instruction: removed
@@ -126,6 +127,7 @@ export const Route = createFileRoute("/product/security")({
     meta: [
       { title: "Trust and security — built to be examined — Lengdon" },
       { name: "description", content: "Mandatory MFA, TLS 1.3, encryption at rest, NDA-gated rooms, hash-chained audit record. SOC 2 in progress. No custody, no money movement." },
+      ...socialMeta({ title: "Trust and security — built to be examined — Lengdon", description: "Mandatory MFA, TLS 1.3, encryption at rest, NDA-gated rooms, hash-chained audit record. SOC 2 in progress. No custody, no money movement.", path: "/product/security" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/security" }],
   }),

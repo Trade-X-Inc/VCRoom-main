@@ -7,6 +7,7 @@ import {
   PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconCheck, PrIconFile, PrIconTimer,
 } from "@/components/site/PublicRegisterPrimitives";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-009 Phase 3 — bespoke rebuild on PUBLIC-REGISTER.md v2.0 tokens,
 // same pattern as the 8 SEO-006 /for/* pages (PublicRegisterPrimitives,
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/for/founders")({
     meta: [
       { title: "For founders — close the round, keep the record clean — Lengdon" },
       { name: "description", content: "A fixed raise spine, conditions you can enforce, and a permanent record that carries to the next round. No sequence you have to police yourself." },
+      ...socialMeta({ title: "For founders — close the round, keep the record clean — Lengdon", description: "A fixed raise spine, conditions you can enforce, and a permanent record that carries to the next round. No sequence you have to police yourself.", path: "/for/founders" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/founders" }],
   }),

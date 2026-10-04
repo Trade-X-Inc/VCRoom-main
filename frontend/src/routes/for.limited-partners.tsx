@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconEye, PrIconFile, PrIconLock, PrIconShield,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // Replaces the prior custom PageHero-based build entirely.
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/for/limited-partners")({
     meta: [
       { title: "For limited partners — the original record, not the repackage — Lengdon" },
       { name: "description", content: "Read the same structured fields the deal was built on, permissioned by the vehicle you back. No repackaged summary." },
+      ...socialMeta({ title: "For limited partners — the original record, not the repackage — Lengdon", description: "Read the same structured fields the deal was built on, permissioned by the vehicle you back. No repackaged summary.", path: "/for/limited-partners" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/limited-partners" }],
   }),

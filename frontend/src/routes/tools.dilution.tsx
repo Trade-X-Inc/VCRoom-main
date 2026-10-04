@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/Dilution.tsx. Standalone: unique
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/tools/dilution")({
     meta: [
       { title: "Dilution modeller — model equity dilution across funding rounds — Lengdon" },
       { name: "description", content: "See how your ownership stake changes across seed, Series A and later rounds. Model new shares, options pool and investor dilution." },
+      ...socialMeta({ title: "Dilution modeller — model equity dilution across funding rounds — Lengdon", description: "See how your ownership stake changes across seed, Series A and later rounds. Model new shares, options pool and investor dilution.", path: "/tools/dilution" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/dilution" }],
   }),
