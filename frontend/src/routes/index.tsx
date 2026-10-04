@@ -162,13 +162,13 @@ function ProductCard() {
 
         <div className="bg-[var(--v2-accent)] px-5 py-4 flex items-center justify-between">
           <div>
-            <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/40 text-[9px] tracking-[1px] uppercase mb-1">
+            <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/75 text-[9px] tracking-[1px] uppercase mb-1">
               Illustrative example
             </div>
             <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[14px] tracking-[-0.2px]">
               Deal Room #000042
             </div>
-            <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[11px] mt-0.5 tracking-[0.3px]">
+            <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/75 text-[11px] mt-0.5 tracking-[0.3px]">
               ROM Capital · Technology Sector
             </div>
           </div>
@@ -226,12 +226,11 @@ function ProductCard() {
         </div>
       </div>
 
-      <div className="absolute -right-2 top-[30%] bg-[var(--v2-accent)] px-3 py-2 shadow-lg"
-        style={{ animation: "pub-card-float 7s ease-in-out infinite 1.5s" }}>
+      <div className="pub-card-float-delayed absolute -right-2 top-[30%] bg-[var(--v2-accent)] px-3 py-2 shadow-lg">
         <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[9px] text-white/70 tracking-[1px] mb-1">AUDIT LOG</div>
         <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-white/60 font-mono">REF-0017</div>
         <div className="w-px h-3 bg-white/20 mx-auto my-0.5" />
-        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-white/50 font-mono">REF-0018</div>
+        <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-[10px] text-white/75 font-mono">REF-0018</div>
       </div>
     </div>
   );
@@ -312,8 +311,8 @@ function HeroSection() {
               "000021 · Payment Proof Uploaded · 9d4c...6b7a",
               "000022 · Close Confirmed: Both Parties · 2e5f...0c9d",
             ]).map((ev, i) => (
-              <span key={i} style={{ fontFamily: "var(--font-v2-data)" }} className="text-[11px] text-white/50 tracking-[0.5px] mx-8">
-                <span className="text-white/20 mr-2">▸</span>{ev}
+              <span key={i} style={{ fontFamily: "var(--font-v2-data)" }} className="text-[11px] text-white/75 tracking-[0.5px] mx-8">
+                <span aria-hidden="true" className="text-white/20 mr-2">▸</span>{ev}
               </span>
             ))}
           </div>
@@ -397,8 +396,9 @@ function AppendOnlyRecordSection() {
             <div className="flex-1 min-w-0">
               <div className="relative">
                 <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-                  <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--v2-accent)]/20 to-transparent"
-                    style={{ animation: "pub-scan-verify 4s ease-in-out infinite" }} />
+                  <div className="pub-scan-verify absolute inset-0 left-0 right-0">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--v2-accent)]/20 to-transparent" />
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-0">
@@ -549,7 +549,7 @@ function DemoSection() {
                 }} />
 
               <div className="absolute bottom-0 left-0 right-0 p-7">
-                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[1px] mb-2">
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/75 text-[11px] tracking-[1px] mb-2">
                   Illustrative example
                 </div>
                 <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[22px] tracking-[-0.5px]">
@@ -561,7 +561,7 @@ function DemoSection() {
                 {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch) => (
                   <div key={ch} className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
-                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[10px] tracking-[0.5px]">{ch}</span>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/75 text-[10px] tracking-[0.5px]">{ch}</span>
                   </div>
                 ))}
               </div>
@@ -851,7 +851,7 @@ function ProcessSection() {
                       style={{ opacity: 0.88 }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[var(--v2-accent)]/30 pointer-events-none" />
-                    <div style={{ fontFamily: "var(--font-v2-ui)" }} className="absolute bottom-6 left-8 font-semibold text-white/12 text-[120px] leading-none tracking-[-5px] select-none pointer-events-none">
+                    <div aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className="absolute bottom-6 left-8 font-semibold text-white/12 text-[120px] leading-none tracking-[-5px] select-none pointer-events-none">
                       {phase.num}
                     </div>
                   </div>
@@ -874,7 +874,7 @@ function ProcessSection() {
 
                       <div className="inline-flex items-center gap-2 border border-white/10 px-3.5 py-1.5 w-fit">
                         <div className="w-1.5 h-1.5 rounded-full bg-v2-satisfied/70" />
-                        <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[0.8px] uppercase">
+                        <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/75 text-[11px] tracking-[0.8px] uppercase">
                           {phase.party}
                         </span>
                       </div>
@@ -897,7 +897,7 @@ function ProcessSection() {
                           }`}
                         />
                       ))}
-                      <span style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
+                      <span aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
                         {phase.num}
                       </span>
                     </div>
@@ -1059,7 +1059,7 @@ function AudienceSection() {
               }`}
             >
               <div className="flex items-center gap-3">
-                <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[var(--v2-ink-muted)]"}`}>
+                <span aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[var(--v2-ink-muted)]"}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[15px] tracking-[-0.2px] transition-colors ${active === i ? "text-white" : "text-[var(--v2-accent)] group-hover:text-[var(--v2-accent)]"}`}>
@@ -1102,16 +1102,6 @@ function AudienceSection() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-2 pt-8">
-              {AUDIENCES.map((a, i) => (
-                <button key={i} onClick={() => setActive(i)}
-                  aria-label={`View ${a.role}`} aria-current={i === active ? "true" : undefined}
-                  className={`transition-all duration-300 ${i === active ? "w-5 h-1.5 bg-[var(--v2-accent)]" : "w-1.5 h-1.5 rounded-full bg-[var(--v2-rule)] hover:bg-[var(--v2-rule)]"}`} />
-              ))}
-              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-[var(--v2-ink-muted)] text-[11px] tracking-[0.5px]">
-                {String(active + 1).padStart(2, "0")}
-              </span>
-            </div>
           </div>
 
           <div className="hidden xl:flex w-[280px] shrink-0 border-l border-[var(--v2-rule)] bg-[var(--v2-surface)] flex-col items-center justify-center relative overflow-hidden">
@@ -1147,7 +1137,7 @@ function CTASection() {
               }} />
             <div className="relative z-10 flex flex-col gap-10">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-v2-satisfied" style={{ animation: "pub-pulse-glow 2s ease-in-out infinite" }} />
+                <div className="w-2 h-2 rounded-full bg-v2-satisfied pub-pulse-glow" />
                 <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[11px] tracking-[2px] uppercase">
                   Private beta — onboarding in stages
                 </span>
@@ -1181,7 +1171,7 @@ function CTASection() {
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <div className="w-1 h-1 rounded-full bg-white/60" />
-                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[12px] tracking-[0.3px]">{item}</span>
+                    <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/75 text-[12px] tracking-[0.3px]">{item}</span>
                   </div>
                 ))}
               </div>
@@ -1203,7 +1193,7 @@ function CTASection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[var(--v2-accent)]/60 to-transparent pointer-events-none" />
               <div className="absolute bottom-6 left-8 right-8">
-                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
+                <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/75 text-[10px] tracking-[1.5px] uppercase mb-1">Current activity</div>
                 <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/80 text-[13px] tracking-[-0.2px]">
                   000042 · Conditions — 5 of 6 satisfied
                 </div>

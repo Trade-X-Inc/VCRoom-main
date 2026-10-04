@@ -792,10 +792,26 @@ body.lengdon-cookie-banner-visible { padding-bottom: 96px; }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes pub-pulse-glow {
-  0%, 100% { opacity: 0.5; box-shadow: 0 0 4px currentColor; }
-  50%       { opacity: 1;   box-shadow: 0 0 10px currentColor; }
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
 }
-.pub-pulse-glow { animation: pub-pulse-glow 2s ease-in-out infinite; }
+@keyframes pub-pulse-glow-ring {
+  0%, 100% { transform: scale(1);   opacity: 0.35; }
+  50%       { transform: scale(2.2); opacity: 0.08; }
+}
+.pub-pulse-glow {
+  position: relative;
+  animation: pub-pulse-glow 2s ease-in-out infinite;
+}
+.pub-pulse-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  animation: pub-pulse-glow-ring 2s ease-in-out infinite;
+  pointer-events: none;
+}
 
 @keyframes pub-bar-grow {
   from { transform: scaleX(0); }
@@ -820,16 +836,33 @@ body.lengdon-cookie-banner-visible { padding-bottom: 96px; }
   50%       { opacity: 1; }
 }
 @keyframes pub-scan-verify {
-  0%   { top: 0%;   opacity: 0; }
+  0%   { transform: translateY(0%);   opacity: 0; }
   5%   { opacity: 1; }
   95%  { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  100% { transform: translateY(100%); opacity: 0; }
 }
 
 .pub-card-float { animation: pub-card-float 6s ease-in-out infinite; }
+.pub-card-float-delayed { animation: pub-card-float 7s ease-in-out infinite 1.5s; }
+.pub-scan-verify { animation: pub-scan-verify 4s ease-in-out infinite; }
 
 .pub-ticker-wrap { overflow: hidden; }
 .pub-ticker-inner { display: flex; animation: pub-ticker-x 36s linear infinite; white-space: nowrap; }
+
+/* SEO-019 Phase 3: these four run continuously and indefinitely (the
+   ticker and card float loop forever; the scan line and pulse glow repeat
+   every few seconds) — exactly the class of motion prefers-reduced-motion
+   exists for, unlike the one-shot entrance animations guarded above. */
+@media (prefers-reduced-motion: reduce) {
+  .pub-scan-verify,
+  .pub-pulse-glow,
+  .pub-pulse-glow::after,
+  .pub-ticker-inner,
+  .pub-card-float,
+  .pub-card-float-delayed {
+    animation: none;
+  }
+}
 
 .pub-reveal {
   transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
