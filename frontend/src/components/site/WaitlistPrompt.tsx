@@ -118,6 +118,22 @@ export function WaitlistPrompt() {
     // before this is even eligible to appear, per spec. Polled rather
     // than event-driven since CookieConsentBanner exposes no event/context
     // for this — the body class is the only observable signal it provides.
+    //
+    // The first check deliberately waits two animation frames before
+    // reading anything, rather than checking synchronously. Found live:
+    // CookieConsentBanner's own visibility starts false on its first
+    // render and only becomes true (adding BODY_PADDING_CLASS) after ITS
+    // OWN first effect fires and triggers a second render + a second
+    // effect. Both components mount in the same tick, so a synchronous
+    // first check here ran before that two-step process had added the
+    // class — reading "banner not visible" when the banner was in fact
+    // about to render, for a reason that had nothing to do with consent
+    // actually being resolved (reproduced live: popup opened while the
+    // banner was still showing, unanswered, on a fresh profile). Two
+    // rAF callbacks guarantee at least two full paint cycles have
+    // elapsed — matching the two-render sequence CookieConsentBanner
+    // itself needs — before this component trusts what it reads, which
+    // a fixed millisecond delay would only approximate.
     let cancelled = false;
     const waitForBanner = () =>
       new Promise<void>((resolve) => {
@@ -129,7 +145,7 @@ export function WaitlistPrompt() {
             setTimeout(check, 500);
           }
         };
-        check();
+        requestAnimationFrame(() => requestAnimationFrame(check));
       });
 
     let timeTrigger = false;
