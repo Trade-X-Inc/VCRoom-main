@@ -312,7 +312,7 @@ function HeroSection() {
               "000022 · Close Confirmed: Both Parties · 2e5f...0c9d",
             ]).map((ev, i) => (
               <span key={i} style={{ fontFamily: "var(--font-v2-data)" }} className="text-[11px] text-white/75 tracking-[0.5px] mx-8">
-                <span aria-hidden="true" className="text-white/20 mr-2">▸</span>{ev}
+                <span aria-hidden="true" className="text-white/75 mr-2">▸</span>{ev}
               </span>
             ))}
           </div>
@@ -897,7 +897,7 @@ function ProcessSection() {
                           }`}
                         />
                       ))}
-                      <span aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
+                      <span aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-white/75 text-[11px] tracking-[0.5px]">
                         {phase.num}
                       </span>
                     </div>
@@ -1059,7 +1059,7 @@ function AudienceSection() {
               }`}
             >
               <div className="flex items-center gap-3">
-                <span aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/30" : "text-[var(--v2-ink-muted)]"}`}>
+                <span aria-hidden="true" style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[10px] tracking-[1.5px] w-5 shrink-0 ${active === i ? "text-white/75" : "text-[var(--v2-ink-muted)]"}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span style={{ fontFamily: "var(--font-v2-ui)" }} className={`text-[15px] tracking-[-0.2px] transition-colors ${active === i ? "text-white" : "text-[var(--v2-accent)] group-hover:text-[var(--v2-accent)]"}`}>
