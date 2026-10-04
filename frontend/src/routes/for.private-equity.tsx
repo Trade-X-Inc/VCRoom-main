@@ -85,7 +85,7 @@ function PrivateEquity() {
           <PrTitle>Multi-party rooms, one conditions register.</PrTitle>
           <PrProse>
             PE runs on the same closing sequence — Brief, Present, NDA, Diligence, Terms, Conditions, Close — extended for multiple parties in one room, with a full conditions register tracking every item to satisfaction, each with a timestamp and the confirming party's identity. Counsel is scoped in from the Terms stage forward.{" "}
-            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model the post-close cap table →</Link>
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Model the post-close cap table →</Link>
           </PrProse>
         </PrSection>
 

@@ -143,12 +143,12 @@ function CapTable() {
           )}
           <div className="flex gap-3 items-end">
             <div className="flex-1 flex flex-col gap-1.5">
-              <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Name</label>
-              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. New Series A investor" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]" />
+              <label htmlFor="cap-table-new-name" style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Name</label>
+              <input id="cap-table-new-name" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. New Series A investor" style={{ fontFamily: "var(--font-v2-ui)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]" />
             </div>
             <div className="w-40 flex flex-col gap-1.5">
-              <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Shares</label>
-              <input type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="e.g. 1,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]" />
+              <label htmlFor="cap-table-new-shares" style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Shares</label>
+              <input id="cap-table-new-shares" type="number" value={newShares} onChange={(e) => setNewShares(e.target.value)} placeholder="e.g. 1,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]" />
             </div>
             <button onClick={addHolder} style={{ fontFamily: "var(--font-v2-ui)" }} className="bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[13px] px-6 py-3 transition-colors duration-200">
               Add

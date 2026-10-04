@@ -87,7 +87,7 @@ function Advisors() {
           <PrTitle>Read-only access, scoped to your rooms.</PrTitle>
           <PrProse>
             Advisors join a deal room with the read-only role — access scoped to the specific rooms you're added to. You see what's been confirmed, which conditions remain outstanding, and what's been signed, at every step, without the ability to change anything.{" "}
-            <Link to="/tools/burn-rate" style={{ color: "var(--v2-accent)" }}>Check burn rate before advising on runway →</Link>
+            <Link to="/tools/burn-rate" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Check burn rate before advising on runway →</Link>
             {" "}Your involvement is recorded the same way every other party's is.
           </PrProse>
         </PrSection>

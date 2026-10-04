@@ -19,6 +19,15 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 // otherwise ("Standalone (not built from ToolCalculatorPage)"), and its
 // source confirms that's the true one — it renders SiteHeader/SiteFooter
 // and its own JSX directly, never imports this component.
+//
+// Re-corrected 4 Oct 2026 (SEO-019b) — this comment's "dilution.tsx
+// (the third consumer of this component)" line at ToolResult/belowCalculator
+// above was also wrong, same class of drift as the valuation-calculator
+// correction directly above: a grep for the literal import confirms the
+// real consumer count is 2 (burn-rate, runway), not 3. dilution.tsx is
+// fully standalone, same as the other 4. Not re-verified against every
+// other claim in this header — fixed only the one checked while adding
+// id/htmlFor pairing to the fields loop below.
 
 export interface ToolField {
   label: string;
@@ -47,9 +56,13 @@ export interface ToolCalculatorPageProps {
   ctaText: string;
   ctaLabel: string;
   // SEO-002 — optional per-tool body-copy section (H2s + prose), rendered
-  // between the calculator grid and the footer CTA. Only burn-rate.tsx and
-  // runway.tsx pass this; dilution.tsx (the third consumer of this
-  // component) intentionally does not, and its render is unchanged.
+  // between the calculator grid and the footer CTA. burn-rate.tsx and
+  // runway.tsx — the only 2 real consumers of this component (see the
+  // header comment's 4 Oct 2026 correction) — both pass this prop,
+  // confirmed by grep rather than assumed from the prior comment's
+  // "dilution.tsx (the third consumer)" claim, which was wrong on two
+  // counts: dilution.tsx doesn't use this component at all, and there
+  // were never 3 real consumers to begin with.
   belowCalculator?: ReactNode;
   // SEO-011 — the single most important output, rendered large and
   // prominent above the results list, with a one-line plain-English
@@ -132,21 +145,34 @@ export function ToolCalculatorPage({
         <section className="max-w-[1440px] mx-auto px-12 lg:px-16 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
             <div className="flex flex-col gap-8">
-              {fields.map((field) => (
-                <div key={field.label} className="flex flex-col gap-3">
-                  <label className="font-v2-ui text-v2-ink text-[13px] tracking-[0.02em]">{field.label}</label>
-                  <div className="flex items-center border border-v2-rule focus-within:border-v2-accent transition-colors bg-v2-panel">
-                    <span className="font-v2-data px-4 text-v2-ink-muted text-[14px] border-r border-v2-rule">{field.prefix ?? "$"}</span>
+              {fields.map((field) => {
+                const fieldId = `tool-field-${field.label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
+                return (
+                  <div key={field.label} className="flex flex-col gap-3">
+                    <label htmlFor={fieldId} className="font-v2-ui text-v2-ink text-[13px] tracking-[0.02em]">{field.label}</label>
+                    <div className="flex items-center border border-v2-rule focus-within:border-v2-accent transition-colors bg-v2-panel">
+                      <span className="font-v2-data px-4 text-v2-ink-muted text-[14px] border-r border-v2-rule">{field.prefix ?? "$"}</span>
+                      <input
+                        id={fieldId}
+                        type="number"
+                        value={field.value}
+                        onChange={(e) => field.set(Number(e.target.value))}
+                        className="font-v2-data flex-1 px-4 py-3.5 text-[14px] text-v2-ink focus:outline-none bg-v2-panel"
+                      />
+                    </div>
                     <input
-                      type="number"
+                      type="range"
+                      aria-label={field.label}
+                      min={field.min}
+                      max={field.max}
+                      step={field.step}
                       value={field.value}
                       onChange={(e) => field.set(Number(e.target.value))}
-                      className="font-v2-data flex-1 px-4 py-3.5 text-[14px] text-v2-ink focus:outline-none bg-v2-panel"
+                      className="w-full accent-v2-accent"
                     />
                   </div>
-                  <input type="range" min={field.min} max={field.max} step={field.step} value={field.value} onChange={(e) => field.set(Number(e.target.value))} className="w-full accent-v2-accent" />
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex flex-col gap-4 h-fit">

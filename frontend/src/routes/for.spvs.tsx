@@ -74,7 +74,7 @@ function SPVs() {
           <PrTitle>The vehicle holds. Participants sit beneath it.</PrTitle>
           <PrProse>
             The vehicle sits in the room as the holder of record; its underlying participants sit in a permissioned layer beneath it, visible to the parties who need to see them and no one else. Where an institutional anchor exists, its co-investment sits on the same record.{" "}
-            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model the vehicle's ownership structure →</Link>
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Model the vehicle's ownership structure →</Link>
             {" "}None of this needs rebuilding at the next round — it carries forward.
           </PrProse>
         </PrSection>

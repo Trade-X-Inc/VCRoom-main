@@ -94,10 +94,11 @@ function ValuationCalculator() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
             <div className="flex flex-col gap-8">
               <div className="flex flex-col gap-3">
-                <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Pre-money valuation</label>
+                <label htmlFor="valuation-pre-money" style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Pre-money valuation</label>
                 <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
                   <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
                   <input
+                    id="valuation-pre-money"
                     type="number"
                     value={preMoney}
                     onChange={(e) => setPreMoney(Math.max(0, Number(e.target.value)))}
@@ -106,17 +107,18 @@ function ValuationCalculator() {
                     className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]"
                   />
                 </div>
-                <input type="range" min={500_000} max={100_000_000} step={500_000} value={preMoney} onChange={(e) => setPreMoney(Number(e.target.value))} className="w-full accent-[var(--v2-accent)]" />
+                <input type="range" aria-label="Pre-money valuation" min={500_000} max={100_000_000} step={500_000} value={preMoney} onChange={(e) => setPreMoney(Number(e.target.value))} className="w-full accent-[var(--v2-accent)]" />
                 <div style={{ fontFamily: "var(--font-v2-data)" }} className="flex justify-between text-[var(--v2-ink-muted)] text-[11px]">
                   <span>$500K</span><span>$100M</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-3">
-                <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Round size (investment amount)</label>
+                <label htmlFor="valuation-raise" style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">Round size (investment amount)</label>
                 <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
                   <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
                   <input
+                    id="valuation-raise"
                     type="number"
                     value={raise}
                     onChange={(e) => setRaise(Math.max(0, Number(e.target.value)))}
@@ -125,7 +127,7 @@ function ValuationCalculator() {
                     className="flex-1 px-4 py-3.5 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]"
                   />
                 </div>
-                <input type="range" min={100_000} max={20_000_000} step={100_000} value={raise} onChange={(e) => setRaise(Number(e.target.value))} className="w-full accent-[var(--v2-accent)]" />
+                <input type="range" aria-label="Round size (investment amount)" min={100_000} max={20_000_000} step={100_000} value={raise} onChange={(e) => setRaise(Number(e.target.value))} className="w-full accent-[var(--v2-accent)]" />
                 <div style={{ fontFamily: "var(--font-v2-data)" }} className="flex justify-between text-[var(--v2-ink-muted)] text-[11px]">
                   <span>$100K</span><span>$20M</span>
                 </div>

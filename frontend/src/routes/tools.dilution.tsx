@@ -108,24 +108,28 @@ function Dilution() {
             <div>
               <h2 style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[18px] tracking-[-0.4px] mb-6">Funding rounds</h2>
               <div className="flex flex-col gap-4">
-                {rounds.map((r, i) => (
-                  <div key={i} className="border border-[var(--v2-rule)] p-5 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <input value={r.name} onChange={(e) => updateRound(i, "name", e.target.value)} style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[15px] tracking-[-0.3px] focus:outline-none border-b border-transparent focus:border-[var(--v2-rule)] pb-0.5" />
-                      <button onClick={() => setRounds((p) => p.filter((_, idx) => idx !== i))} className="text-[var(--v2-ink-muted)] hover:text-v2-adverse text-[18px] transition-colors">×</button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex flex-col gap-1">
-                        <label style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Raise amount ($)</label>
-                        <input type="number" value={r.raise} onChange={(e) => updateRound(i, "raise", Number(e.target.value))} placeholder="e.g. 2,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] bg-[var(--v2-panel)]" />
+                {rounds.map((r, i) => {
+                  const raiseId = `dilution-round-${i}-raise`;
+                  const preValId = `dilution-round-${i}-preval`;
+                  return (
+                    <div key={i} className="border border-[var(--v2-rule)] p-5 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <input value={r.name} onChange={(e) => updateRound(i, "name", e.target.value)} aria-label={`Round ${i + 1} name`} style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[15px] tracking-[-0.3px] focus:outline-none border-b border-transparent focus:border-[var(--v2-rule)] pb-0.5" />
+                        <button onClick={() => setRounds((p) => p.filter((_, idx) => idx !== i))} aria-label={`Remove ${r.name || `round ${i + 1}`}`} className="text-[var(--v2-ink-muted)] hover:text-v2-adverse text-[18px] transition-colors">×</button>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <label style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Pre-money valuation ($)</label>
-                        <input type="number" value={r.preVal} onChange={(e) => updateRound(i, "preVal", Math.max(1, Number(e.target.value)))} placeholder="e.g. 10,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] bg-[var(--v2-panel)]" />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor={raiseId} style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Raise amount ($)</label>
+                          <input id={raiseId} type="number" value={r.raise} onChange={(e) => updateRound(i, "raise", Number(e.target.value))} placeholder="e.g. 2,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] bg-[var(--v2-panel)]" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor={preValId} style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[0.3px]">Pre-money valuation ($)</label>
+                          <input id={preValId} type="number" value={r.preVal} onChange={(e) => updateRound(i, "preVal", Math.max(1, Number(e.target.value)))} placeholder="e.g. 10,000,000" style={{ fontFamily: "var(--font-v2-data)" }} className="border border-[var(--v2-rule)] px-3 py-2 text-[13px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] bg-[var(--v2-panel)]" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <button
                   onClick={() => setRounds((p) => [...p, { name: `Round ${p.length + 1}`, raise: 5_000_000, preVal: 20_000_000 }])}
                   style={{ fontFamily: "var(--font-v2-ui)" }}

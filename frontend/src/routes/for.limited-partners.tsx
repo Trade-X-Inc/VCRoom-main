@@ -81,7 +81,7 @@ function LimitedPartners() {
           <PrTitle>The same fields the deal was built on.</PrTitle>
           <PrProse>
             Where the vehicle you back permissions it, you get read access to the same structured fields the deal was built on — the beneficial-ownership schedule, the closing record, each disclosed item with its evidence tier shown, not summarized away.{" "}
-            <Link to="/tools/valuation-calculator" style={{ color: "var(--v2-accent)" }}>Check the valuation the round was priced at →</Link>
+            <Link to="/tools/valuation-calculator" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Check the valuation the round was priced at →</Link>
             {" "}Access is granted by the party you back, not by us.
           </PrProse>
         </PrSection>

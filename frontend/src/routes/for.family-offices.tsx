@@ -81,7 +81,7 @@ function FamilyOffices() {
           <PrTitle>A full room, batched by stage.</PrTitle>
           <PrProse>
             A full deal room, diligence requests batched by stage rather than drip-fed one at a time, a conditions register tracking what's outstanding, and a permanent, inspectable record at close. Nothing is shown to the other side until an NDA is signed.{" "}
-            <Link to="/tools/valuation-calculator" style={{ color: "var(--v2-accent)" }}>Run a valuation check before term sheet →</Link>
+            <Link to="/tools/valuation-calculator" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Run a valuation check before term sheet →</Link>
             {" "}Seat pricing is something a principal approves directly — no procurement process required.
           </PrProse>
         </PrSection>
