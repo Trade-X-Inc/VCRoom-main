@@ -628,8 +628,9 @@ function DemoSection() {
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Preferred time</label>
+                      <label htmlFor="demo-preferred-time" style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Preferred time</label>
                       <select
+                        id="demo-preferred-time"
                         value={formData.slot}
                         onChange={e => setFormData(p => ({ ...p, slot: e.target.value }))}
                         style={{ fontFamily: "var(--font-v2-ui)" }}
