@@ -59,6 +59,7 @@ function CompareIdeals() {
       rows={ROWS}
       ctaTitle="Diligence done. Now close."
       ctaSubtitle="After iDeals, use Lengdon to close with a permanent record."
+      currentPath="/product/compare/ideals"
     />
     </>
   );

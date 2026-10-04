@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { RelatedComparisons } from "@/components/site/RelatedComparisons";
 
 // Public site rebuild, 31 Aug 2026 — shared shape for the 5
 // /product/compare/* competitor pages, ported pixel-exact from
@@ -71,13 +72,14 @@ export interface CompetitorComparePageProps {
   rows: CompareRow[];
   ctaTitle: string;
   ctaSubtitle: string;
+  currentPath: string;
 }
 
 export function CompetitorComparePage({
   eyebrow, title, titleOutline, subtitle,
   competitorName, competitorBlurbTitle, competitorBlurb,
   lengdonBlurbTitle, lengdonBlurb,
-  rows, ctaTitle, ctaSubtitle,
+  rows, ctaTitle, ctaSubtitle, currentPath,
 }: CompetitorComparePageProps) {
   return (
     <div className="min-h-screen bg-v2-surface">
@@ -149,6 +151,8 @@ export function CompetitorComparePage({
             ))}
           </div>
         </section>
+
+        <RelatedComparisons currentPath={currentPath} />
 
         <section className="bg-v2-accent max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">

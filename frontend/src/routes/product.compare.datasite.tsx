@@ -62,6 +62,7 @@ function CompareDatasite() {
       rows={ROWS}
       ctaTitle="Use both. Sequence matters."
       ctaSubtitle="Datasite for diligence. Lengdon for close. They serve different phases."
+      currentPath="/product/compare/datasite"
     />
     </>
   );

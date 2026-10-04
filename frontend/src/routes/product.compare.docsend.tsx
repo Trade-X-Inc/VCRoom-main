@@ -59,6 +59,7 @@ function CompareDocsend() {
       rows={ROWS}
       ctaTitle="They said yes. Now close it."
       ctaSubtitle="DocSend got you to term sheet. Lengdon closes it, with a record."
+      currentPath="/product/compare/docsend"
     />
     </>
   );
