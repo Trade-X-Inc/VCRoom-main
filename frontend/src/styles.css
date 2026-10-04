@@ -52,6 +52,19 @@ img { max-width: 100%; height: auto; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
+/* SEO-018 Phase 5 — reserves room at the bottom of the page while
+   CookieConsentBanner.tsx is visible (fixed bottom-0), so the banner
+   never overlaps real page content underneath it. Two tiers matching
+   the banner's own responsive text/padding sizing (12px text + tight
+   padding below 640px vs 13px + looser padding at 640px+) — the banner
+   is taller at the larger breakpoint. Both values are deliberately
+   generous estimates checked live against the real rendered banner
+   height at 375/640/1440, not computed from first principles. */
+body.lengdon-cookie-banner-visible { padding-bottom: 96px; }
+@media (min-width: 640px) {
+  body.lengdon-cookie-banner-visible { padding-bottom: 88px; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

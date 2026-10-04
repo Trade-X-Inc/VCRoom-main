@@ -48,12 +48,32 @@ export function hasNonEssentialConsent(): boolean {
   return readConsent() === "all";
 }
 
+// SEO-018 Phase 5 — layout only, consent logic below is unchanged (same
+// CONSENT_KEY read/write, same fail-closed hasNonEssentialConsent()).
+// Reserves room at the bottom of the page while the banner is visible so
+// a fixed-position banner never overlaps page content underneath it
+// (confirmed live at 375px: the hero's "Join the waitlist" CTA was
+// reachable without the banner covering it once this padding landed).
+// Scoped to this component's own lifetime via a body class rather than a
+// new context/prop — nothing else in the app needs to know the banner
+// exists.
+const BODY_PADDING_CLASS = "lengdon-cookie-banner-visible";
+
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     setVisible(readConsent() === null);
   }, []);
+
+  useEffect(() => {
+    if (visible) {
+      document.body.classList.add(BODY_PADDING_CLASS);
+    } else {
+      document.body.classList.remove(BODY_PADDING_CLASS);
+    }
+    return () => document.body.classList.remove(BODY_PADDING_CLASS);
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -69,10 +89,10 @@ export function CookieConsentBanner() {
       className="fixed bottom-0 inset-x-0 z-[200] border-t border-[#e6e9ef] bg-white"
       style={{ boxShadow: "0 -4px 24px rgba(10,37,64,0.08)" }}
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-16 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+      <div className="max-w-[1440px] mx-auto px-4 py-3 sm:px-12 sm:py-5 lg:px-16 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-8">
         <p
           style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-          className="text-[#425466] text-[13px] leading-[1.6] flex-1"
+          className="text-[#425466] text-[12px] sm:text-[13px] leading-[1.5] sm:leading-[1.6] flex-1"
         >
           We use strictly necessary cookies to run Lengdon (sign-in, session security). We do not use advertising or
           tracking cookies today. If that changes, this choice will control it.{" "}
@@ -81,12 +101,12 @@ export function CookieConsentBanner() {
           </Link>
           .
         </p>
-        <div className="flex gap-3 shrink-0 w-full sm:w-auto">
+        <div className="flex gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => choose("essential-only")}
             style={{ fontFamily: "'Inter:Medium', sans-serif" }}
-            className="flex-1 sm:flex-none border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[13px] px-5 py-2.5 transition-colors"
+            className="flex-1 sm:flex-none border border-[#e6e9ef] hover:border-[#0a2540]/30 text-[#425466] text-[12px] sm:text-[13px] px-3 sm:px-5 py-2 sm:py-2.5 transition-colors"
           >
             Essential only
           </button>
@@ -94,7 +114,7 @@ export function CookieConsentBanner() {
             type="button"
             onClick={() => choose("all")}
             style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
-            className="flex-1 sm:flex-none bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[13px] px-5 py-2.5 transition-colors"
+            className="flex-1 sm:flex-none bg-[#0a2540] hover:bg-[#13233a] text-white font-semibold text-[12px] sm:text-[13px] px-3 sm:px-5 py-2 sm:py-2.5 transition-colors"
           >
             Accept all
           </button>

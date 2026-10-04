@@ -162,6 +162,9 @@ function ProductCard() {
 
         <div className="bg-[var(--v2-accent)] px-5 py-4 flex items-center justify-between">
           <div>
+            <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/40 text-[9px] tracking-[1px] uppercase mb-1">
+              Illustrative example
+            </div>
             <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[14px] tracking-[-0.2px]">
               Deal Room #000042
             </div>
@@ -472,14 +475,13 @@ function DemoSection() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [playing, setPlaying] = useState(false);
 
-  const slots = [
-    "Tomorrow, 10:00 AM GMT",
-    "Tomorrow, 3:00 PM GMT",
-    "Thursday, 9:00 AM GMT",
-    "Thursday, 2:00 PM GMT",
-  ];
+  // SEO-018 Phase 4d: no fixed time slots — there is no live calendar
+  // behind this. A qualitative daypart (Gulf time, since that's the
+  // team's actual timezone) plus "we will confirm by email" is honest
+  // about what actually happens: a human reads the HubSpot lead and
+  // replies, not an automated booking confirmation.
+  const slots = ["Morning (Gulf time)", "Afternoon (Gulf time)", "Evening (Gulf time)"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -521,13 +523,7 @@ function DemoSection() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <Reveal className="flex-1">
-            <button
-              type="button"
-              className="relative bg-[var(--v2-accent)] overflow-hidden cursor-pointer group h-full min-h-[420px] w-full text-left block"
-              onClick={() => setPlaying(!playing)}
-              aria-label={playing ? "Pause product walkthrough video" : "Play product walkthrough video"}
-              aria-pressed={playing}
-            >
+            <div className="relative bg-[var(--v2-accent)] overflow-hidden h-full min-h-[420px] w-full block">
               <img
                 src="/images/homepage/demo-video-poster.webp"
                 srcSet="/images/homepage/demo-video-poster-640w.webp 640w, /images/homepage/demo-video-poster-960w.webp 960w"
@@ -537,9 +533,7 @@ function DemoSection() {
                 height={533}
                 loading="lazy"
                 decoding="async"
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                  playing ? "opacity-20 scale-105" : "opacity-50 group-hover:opacity-60"
-                }`}
+                className="absolute inset-0 w-full h-full object-cover opacity-50"
               />
               <div className="absolute inset-0 opacity-10"
                 style={{
@@ -547,44 +541,24 @@ function DemoSection() {
                   backgroundSize: "40px 40px"
                 }} />
 
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className={`w-20 h-20 rounded-full border-2 border-white/60 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:border-white ${
-                  playing ? "bg-white/20" : "bg-white/10"
-                }`}>
-                  {playing ? (
-                    <div className="flex gap-1.5">
-                      <div className="w-1.5 h-6 bg-white rounded-sm" />
-                      <div className="w-1.5 h-6 bg-white rounded-sm" />
-                    </div>
-                  ) : (
-                    <svg width="22" height="24" viewBox="0 0 22 24" fill="none" className="ml-1">
-                      <path d="M2 2L20 12L2 22V2Z" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                </div>
-              </div>
-
               <div className="absolute bottom-0 left-0 right-0 p-7">
                 <div style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/50 text-[11px] tracking-[1px] mb-2">
-                  3:24 MIN
+                  Illustrative example
                 </div>
                 <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-white text-[22px] tracking-[-0.5px]">
                   The full transaction lifecycle
                 </div>
-                <div style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/60 text-[14px] mt-1">
-                  Room setup → Engage → Close. No narration, just the product.
-                </div>
               </div>
 
               <div className="absolute top-5 right-5 flex flex-col gap-2">
-                {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch, i) => (
+                {["Room setup", "Diligence", "Conditions", "Signing", "Close"].map((ch) => (
                   <div key={ch} className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${playing && i === 2 ? "bg-white" : "bg-white/30"}`} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
                     <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/50 text-[10px] tracking-[0.5px]">{ch}</span>
                   </div>
                 ))}
               </div>
-            </button>
+            </div>
           </Reveal>
 
           <Reveal delay={150} className="flex-1 max-w-[480px]">
@@ -597,10 +571,10 @@ function DemoSection() {
                     </svg>
                   </div>
                   <div>
-                    <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] mb-2">Confirmed</div>
+                    <div style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[22px] mb-2">Request received</div>
                     <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[15px] leading-[1.6]">
-                      Your demo is booked for <strong>{formData.slot}</strong>.<br />
-                      Expect a calendar invite at {formData.email}.
+                      Preferred time: <strong>{formData.slot}</strong>.<br />
+                      We will confirm a time by email at {formData.email}.
                     </p>
                   </div>
                 </div>
@@ -646,21 +620,22 @@ function DemoSection() {
                         className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors"
                       />
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Select a time</label>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1.5">
+                      <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[12px] tracking-[0.3px]">Preferred time</label>
+                      <select
+                        value={formData.slot}
+                        onChange={e => setFormData(p => ({ ...p, slot: e.target.value }))}
+                        style={{ fontFamily: "var(--font-v2-ui)" }}
+                        className="border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors bg-white"
+                      >
+                        <option value="" disabled>Choose a time of day</option>
                         {slots.map(slot => (
-                          <button type="button" key={slot}
-                            onClick={() => setFormData(p => ({ ...p, slot }))}
-                            className={`border px-3 py-2.5 text-left transition-all duration-150 ${
-                              formData.slot === slot
-                                ? "border-[var(--v2-accent)] bg-[var(--v2-accent)] text-white"
-                                : "border-[var(--v2-rule)] text-[var(--v2-ink-secondary)] hover:border-[var(--v2-accent)]/30"
-                            }`}>
-                            <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[12px] leading-[1.4]">{slot}</span>
-                          </button>
+                          <option key={slot} value={slot}>{slot}</option>
                         ))}
-                      </div>
+                      </select>
+                      <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px]">
+                        We will confirm a time by email.
+                      </span>
                     </div>
                     {submitError && (
                       <div className="border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3">
@@ -671,7 +646,7 @@ function DemoSection() {
                       style={{ fontFamily: "var(--font-v2-ui)" }}
                       className="mt-auto bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 text-white font-semibold text-[14px] py-4 transition-colors duration-200 disabled:opacity-40"
                       disabled={!formData.name || !formData.email || !formData.slot || submitting}>
-                      {submitting ? "Booking…" : "Confirm booking"}
+                      {submitting ? "Sending…" : "Request a demo"}
                     </button>
                   </form>
                 </>
@@ -706,7 +681,7 @@ const PROCESS_PHASES_V2 = [
   {
     num: "01", title: "COUNSEL",
     party: "Both parties",
-    desc: "Both legal teams are brought in. Transaction parameters are formally established before any data is shared. No term sheet, no data room — only counsel.",
+    desc: "At the start of closing, either party may bring in legal counsel, or both may agree to proceed without. Either way, the decision is recorded.",
     img: "/images/homepage/process-counsel.webp",
     imgAlt: "Formal boardroom with long conference table and chairs",
     bg: "var(--v2-accent)",
@@ -916,7 +891,7 @@ function ProcessSection() {
                         />
                       ))}
                       <span style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-white/20 text-[11px] tracking-[0.5px]">
-                        {phase.num} / 06
+                        {phase.num}
                       </span>
                     </div>
                   </div>
@@ -1127,7 +1102,7 @@ function AudienceSection() {
                   className={`transition-all duration-300 ${i === active ? "w-5 h-1.5 bg-[var(--v2-accent)]" : "w-1.5 h-1.5 rounded-full bg-[var(--v2-rule)] hover:bg-[var(--v2-rule)]"}`} />
               ))}
               <span style={{ fontFamily: "var(--font-v2-ui)" }} className="ml-auto text-[var(--v2-ink-muted)] text-[11px] tracking-[0.5px]">
-                {String(active + 1).padStart(2, "0")} / {String(AUDIENCES.length).padStart(2, "0")}
+                {String(active + 1).padStart(2, "0")}
               </span>
             </div>
           </div>
@@ -1143,7 +1118,6 @@ function AudienceSection() {
               <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[clamp(36px,7vw,56px)] leading-none tracking-[-2px]">
                 {String(active + 1).padStart(2, "0")}
               </span>
-              <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[12px] tracking-[0.5px]">of {AUDIENCES.length}</span>
             </div>
           </div>
         </div>
@@ -1168,7 +1142,7 @@ function CTASection() {
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-v2-satisfied" style={{ animation: "pub-pulse-glow 2s ease-in-out infinite" }} />
                 <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-white/70 text-[11px] tracking-[2px] uppercase">
-                  Infrastructure live
+                  Private beta — onboarding in stages
                 </span>
               </div>
 
@@ -1179,7 +1153,7 @@ function CTASection() {
               </div>
 
               <p style={{ fontFamily: "var(--font-v2-ui)" }} className="text-white/55 text-[16px] leading-[1.7] max-w-[440px]">
-                Initialize a room, invite both parties, and begin the closing sequence today. No integration, no setup call, no consultant required.
+                Join the waitlist and we will reach out as onboarding opens.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -1204,10 +1178,6 @@ function CTASection() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div style={{ fontFamily: "var(--font-v2-ui)", fontSize: "clamp(120px, 18vw, 260px)" }} className="absolute bottom-0 right-0 font-semibold text-white/4 leading-none tracking-[-8px] select-none pointer-events-none">
-              06
             </div>
           </div>
 
@@ -1237,10 +1207,8 @@ function CTASection() {
               {[
                 { val: "→",     label: "Enforced closing sequence", accent: false },
                 { val: "1:1",   label: "Per-person confidentiality", accent: true  },
-                { val: "100%",  label: "Append-only record",      accent: false },
-                { val: "∞",     label: "Sealed at every close",   accent: true  },
               ].map((s, i) => (
-                <div key={i} className={`px-8 py-7 flex flex-col gap-1 border-[var(--v2-rule)] ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b" : ""}`}>
+                <div key={i} className={`px-8 py-7 flex flex-col gap-1 border-[var(--v2-rule)] ${i % 2 === 0 ? "border-r" : ""}`}>
                   <span style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold text-[var(--v2-accent)] text-[36px] leading-none tracking-[-1.5px]">
                     {s.val}
                   </span>
