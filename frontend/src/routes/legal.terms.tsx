@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026. Entity mismatch fixed, same correction as
 // legal/privacy: "Lengdon Limited... incorporated in England and Wales
@@ -58,6 +59,7 @@ export const Route = createFileRoute("/legal/terms")({
     meta: [
       { title: "Terms of service — Lengdon" },
       { name: "description", content: "Terms governing use of the Lengdon platform and closing infrastructure services." },
+      ...socialMeta({ title: "Terms of service — Lengdon", description: "Terms governing use of the Lengdon platform and closing infrastructure services.", path: "/legal/terms" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/terms" }],
   }),

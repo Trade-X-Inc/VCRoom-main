@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/resources/index.tsx.
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/resources/")({
     meta: [
       { title: "Resources — guides, tools and reference for private capital — Lengdon" },
       { name: "description", content: "Free tools, blog posts, templates and reference material for founders raising and investors deploying capital." },
+      ...socialMeta({ title: "Resources — guides, tools and reference for private capital — Lengdon", description: "Free tools, blog posts, templates and reference material for founders raising and investors deploying capital.", path: "/resources" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/resources" }],
   }),

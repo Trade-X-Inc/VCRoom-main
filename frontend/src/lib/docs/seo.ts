@@ -9,8 +9,15 @@ export function docCanonicalUrl(slug: string): string {
 /** head() payload for a docs page: title, description, canonical, and Open Graph. */
 export function docHead(slug: string) {
   const page = getDocPage(slug);
+  // SEO-018 Phase 8: noindex — this whole tree is staged at /docs-v2,
+  // not linked from anywhere live, and not in the sitemap (confirmed:
+  // STATIC_SITEMAP_ENTRIES in patch-wrangler.mjs has no /docs-v2 entry,
+  // and blog posts are the only dynamic entries it adds). Coexistence
+  // with the real flat /docs route is still an open, undecided question
+  // per CLAUDE.md's docs-v2 note — noindex keeps it out of search while
+  // that's unresolved, without touching any of its content.
   if (!page) {
-    return { meta: [{ title: "Not found — Lengdon Documentation" }] };
+    return { meta: [{ title: "Not found — Lengdon Documentation" }, { name: "robots", content: "noindex" }] };
   }
   const url = docCanonicalUrl(slug);
   const title = `${page.meta.title} — Lengdon Documentation`;
@@ -18,6 +25,7 @@ export function docHead(slug: string) {
     meta: [
       { title },
       { name: "description", content: page.meta.description },
+      { name: "robots", content: "noindex" },
       { property: "og:title", content: title },
       { property: "og:description", content: page.meta.description },
       { property: "og:type", content: "article" },

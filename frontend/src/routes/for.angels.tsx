@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconCheck, PrIconFile, PrIconTimer,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 // No EARLY ACCESS pill: the generic investor deal-room flow genuinely IS
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/for/angels")({
     meta: [
       { title: "For angel investors — the same close, at any size — Lengdon" },
       { name: "description", content: "Run a personal angel investment on the same closing sequence funds use. A checklist, one term sheet, a closing record." },
+      ...socialMeta({ title: "For angel investors — the same close, at any size — Lengdon", description: "Run a personal angel investment on the same closing sequence funds use. A checklist, one term sheet, a closing record.", path: "/for/angels" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/angels" }],
   }),

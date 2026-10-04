@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/company/Careers.tsx.
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/company/careers")({
     meta: [
       { title: "Careers — build the infrastructure — Lengdon" },
       { name: "description", content: "How we work and the roles we are building for. Private capital infrastructure, DIFC, Dubai." },
+      ...socialMeta({ title: "Careers — build the infrastructure — Lengdon", description: "How we work and the roles we are building for. Private capital infrastructure, DIFC, Dubai.", path: "/company/careers" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/company/careers" }],
   }),

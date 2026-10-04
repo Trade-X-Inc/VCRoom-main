@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/Docs.tsx. This is a single flat route
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/docs")({
     meta: [
       { title: "Documentation — how the record is built, in the open — Lengdon" },
       { name: "description", content: "Open documentation for the disclosure standard, reference numbering, record integrity and security posture." },
+      ...socialMeta({ title: "Documentation — how the record is built, in the open — Lengdon", description: "Open documentation for the disclosure standard, reference numbering, record integrity and security posture.", path: "/docs" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/docs" }],
   }),

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/index.tsx.
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/tools/")({
     meta: [
       { title: "Free tools for founders — calculators and modellers — Lengdon" },
       { name: "description", content: "SAFE note calculator, burn rate, runway, dilution, cap table, COGS and valuation tools. Free, no account required." },
+      ...socialMeta({ title: "Free tools for founders — calculators and modellers — Lengdon", description: "SAFE note calculator, burn rate, runway, dilution, cap table, COGS and valuation tools. Free, no account required.", path: "/tools" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools" }],
   }),

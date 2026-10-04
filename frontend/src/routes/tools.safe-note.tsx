@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/SafeNote.tsx. Standalone: unique
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/tools/safe-note")({
     meta: [
       { title: "SAFE note calculator — convert your SAFE at any valuation — Lengdon" },
       { name: "description", content: "Model how a SAFE converts at different valuations and round sizes. See dilution, ownership percentage and post-money cap table." },
+      ...socialMeta({ title: "SAFE note calculator — convert your SAFE at any valuation — Lengdon", description: "Model how a SAFE converts at different valuations and round sizes. See dilution, ownership percentage and post-money cap table.", path: "/tools/safe-note" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/safe-note" }],
   }),

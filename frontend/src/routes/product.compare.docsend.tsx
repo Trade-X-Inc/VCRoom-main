@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — "Sealed dual-party export" row and the
 // "seal the record" prose claims removed/reworded (not a live
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/product/compare/docsend")({
     meta: [
       { title: "Lengdon vs DocSend — closing infrastructure vs document sharing — Lengdon" },
       { name: "description", content: "DocSend tracks document views and engagement. Compare it to Lengdon's enforced closing sequence and append-only audit trail." },
+      ...socialMeta({ title: "Lengdon vs DocSend — closing infrastructure vs document sharing — Lengdon", description: "DocSend tracks document views and engagement. Compare it to Lengdon's enforced closing sequence and append-only audit trail.", path: "/product/compare/docsend" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/docsend" }],
   }),
@@ -57,6 +59,7 @@ function CompareDocsend() {
       rows={ROWS}
       ctaTitle="They said yes. Now close it."
       ctaSubtitle="DocSend got you to term sheet. Lengdon closes it, with a record."
+      currentPath="/product/compare/docsend"
     />
     </>
   );

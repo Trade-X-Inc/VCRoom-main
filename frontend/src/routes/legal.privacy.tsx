@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026. Entity mismatch fixed: the source's
 // "Lengdon Limited, a company incorporated in England and Wales
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/legal/privacy")({
     meta: [
       { title: "Privacy policy — Lengdon" },
       { name: "description", content: "How Lengdon collects, processes and protects personal data. DIFC data protection law." },
+      ...socialMeta({ title: "Privacy policy — Lengdon", description: "How Lengdon collects, processes and protects personal data. DIFC data protection law.", path: "/legal/privacy" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/privacy" }],
   }),

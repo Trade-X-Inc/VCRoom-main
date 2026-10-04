@@ -3,6 +3,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
+import { COMPARE_PAGES } from "@/components/site/RelatedComparisons";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/product/compare/Firmex.tsx.
@@ -28,6 +30,7 @@ export const Route = createFileRoute("/product/compare/firmex")({
     meta: [
       { title: "Lengdon vs Firmex — closing infrastructure vs a virtual data room — Lengdon" },
       { name: "description", content: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced closing sequence." },
+      ...socialMeta({ title: "Lengdon vs Firmex — closing infrastructure vs a virtual data room — Lengdon", description: "Firmex is a virtual data room for document sharing. Compare it to Lengdon's enforced closing sequence.", path: "/product/compare/firmex" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/firmex" }],
   }),
@@ -118,6 +121,24 @@ function CompareFirmex() {
                   )}
                 </div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-16 border-b border-[#e6e9ef]">
+          <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-6">
+            Related comparisons
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {COMPARE_PAGES.filter(p => p.path !== "/product/compare/firmex").map(p => (
+              <Link
+                key={p.path}
+                to={p.path as any}
+                style={{ fontFamily: "'Inter:Regular', sans-serif" }}
+                className="text-[#0a2540] text-[13px] border border-[#e6e9ef] hover:border-[#0a2540]/30 px-5 py-2.5 transition-colors"
+              >
+                Lengdon vs {p.name}
+              </Link>
             ))}
           </div>
         </section>

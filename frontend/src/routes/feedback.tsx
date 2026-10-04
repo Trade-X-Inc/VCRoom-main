@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/Feedback.tsx. Form is intentionally
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/feedback")({
     meta: [
       { title: "Feedback — tell us directly — Lengdon" },
       { name: "description", content: "Share what is working, what is not, and what you need. Direct line to the team building the platform." },
+      ...socialMeta({ title: "Feedback — tell us directly — Lengdon", description: "Share what is working, what is not, and what you need. Direct line to the team building the platform.", path: "/feedback" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/feedback" }],
   }),

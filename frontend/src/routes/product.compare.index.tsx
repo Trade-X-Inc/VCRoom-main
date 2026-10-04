@@ -3,6 +3,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
+import { COMPARE_PAGES } from "@/components/site/RelatedComparisons";
 
 // Content pass, 31 Aug 2026 — applies the same standard CLAUDE.md §12
 // (Group 4) already used once: "sealed export" as a live, user-facing
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/product/compare/")({
     meta: [
       { title: "Compare — closing infrastructure vs virtual data rooms — Lengdon" },
       { name: "description", content: "An honest comparison against DocSend, Notion and Google Drive on pricing, transaction record, diligence discipline and sector coverage." },
+      ...socialMeta({ title: "Compare — closing infrastructure vs virtual data rooms — Lengdon", description: "An honest comparison against DocSend, Notion and Google Drive on pricing, transaction record, diligence discipline and sector coverage.", path: "/product/compare" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare" }],
   }),
@@ -188,6 +191,31 @@ function Compare() {
                   )}
                 </div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto w-full px-12 lg:px-16 py-24 border-b border-[#e6e9ef]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-5 h-px bg-[#0a2540]/30" />
+            <span style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[10px] tracking-[2px] uppercase">Named comparisons</span>
+          </div>
+          <h2 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[clamp(32px,6vw,48px)] leading-[0.9] tracking-[-2px] mb-12">
+            VS THE SPECIFIC TOOLS
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border border-[#e6e9ef]">
+            {COMPARE_PAGES.map((p, i) => (
+              <Link
+                key={p.path}
+                to={p.path as any}
+                className={`p-8 group transition-colors hover:bg-[#fafbfc] ${i % 3 !== 2 ? "lg:border-r" : ""} ${i % 2 === 0 ? "sm:border-r lg:border-r-0" : ""} border-b border-[#e6e9ef]`}
+              >
+                <div style={{ fontFamily: "'Inter:Medium', sans-serif" }} className="text-[#64748b] text-[11px] tracking-[1px] uppercase mb-2">Compare</div>
+                <div style={{ fontFamily: "'Geist:SemiBold', sans-serif" }} className="font-semibold text-[#0a2540] text-[20px] tracking-[-0.4px] mb-1 group-hover:underline">
+                  Lengdon vs {p.name}
+                </div>
+                <div style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-[#64748b] text-[13px]">See the detailed comparison →</div>
+              </Link>
             ))}
           </div>
         </section>

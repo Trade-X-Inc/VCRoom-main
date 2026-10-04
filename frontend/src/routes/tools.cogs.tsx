@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/Cogs.tsx. Standalone: this tool's
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/tools/cogs")({
     meta: [
       { title: "COGS calculator — cost of goods sold for your business — Lengdon" },
       { name: "description", content: "Calculate cost of goods sold and gross margin. Model how pricing, volume and direct costs affect your unit economics." },
+      ...socialMeta({ title: "COGS calculator — cost of goods sold for your business — Lengdon", description: "Calculate cost of goods sold and gross margin. Model how pricing, volume and direct costs affect your unit economics.", path: "/tools/cogs" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/cogs" }],
   }),

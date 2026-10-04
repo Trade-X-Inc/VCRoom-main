@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CompetitorComparePage } from "@/components/site/CompetitorComparePage";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — "sealed dual-copy export at close" row
 // removed (not a live capability — CLAUDE.md §12/§20.6, the append-only
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/product/compare/datasite")({
     meta: [
       { title: "Lengdon vs Datasite — closing infrastructure vs a document repository — Lengdon" },
       { name: "description", content: "Datasite is a document repository with no enforced closing sequence. See how Lengdon's closing process and per-person NDAs compare." },
+      ...socialMeta({ title: "Lengdon vs Datasite — closing infrastructure vs a document repository — Lengdon", description: "Datasite is a document repository with no enforced closing sequence. See how Lengdon's closing process and per-person NDAs compare.", path: "/product/compare/datasite" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/product/compare/datasite" }],
   }),
@@ -60,6 +62,7 @@ function CompareDatasite() {
       rows={ROWS}
       ctaTitle="Use both. Sequence matters."
       ctaSubtitle="Datasite for diligence. Lengdon for close. They serve different phases."
+      currentPath="/product/compare/datasite"
     />
     </>
   );

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // Content pass, 31 Aug 2026 — word-level rewrite only. Per the sitewide
 // crypto/blockchain vocabulary rule: "hash" and "cryptographic" removed
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/registry")({
     meta: [
       { title: "The close reference — deal records and transaction registry — Lengdon" },
       { name: "description", content: "A referenced, searchable record of closed deals and disclosed transactions on the Lengdon platform." },
+      ...socialMeta({ title: "The close reference — deal records and transaction registry — Lengdon", description: "A referenced, searchable record of closed deals and disclosed transactions on the Lengdon platform.", path: "/registry" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/registry" }],
   }),

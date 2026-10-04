@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPage";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/BurnRate.tsx. Calculation logic
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/tools/burn-rate")({
     meta: [
       { title: "Burn rate calculator — monthly cash burn and runway — Lengdon" },
       { name: "description", content: "Calculate your monthly burn rate from revenue and expenses. See how long your cash lasts and what changes extend runway." },
+      ...socialMeta({ title: "Burn rate calculator — monthly cash burn and runway — Lengdon", description: "Calculate your monthly burn rate from revenue and expenses. See how long your cash lasts and what changes extend runway.", path: "/tools/burn-rate" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/burn-rate" }],
   }),

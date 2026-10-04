@@ -53,6 +53,10 @@ const PANEL = "var(--pub-n-00)";
 const SURFACE = "var(--pub-n-06)";
 
 export const Route = createFileRoute("/docs-v2")({
+  // SEO-018 Phase 8: noindex at the layout level too, as defense-in-depth
+  // alongside docHead()'s own noindex (src/lib/docs/seo.ts) — this tree
+  // is staged, not linked, not in the sitemap, content untouched.
+  head: () => ({ meta: [{ name: "robots", content: "noindex" }] }),
   component: DocsLayout,
 });
 

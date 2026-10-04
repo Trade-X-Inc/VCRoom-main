@@ -5,6 +5,7 @@ import {
   PrEyebrow, PrDisplay, PrLead, PrTitle, PrAction, PrSection, PrQuietLink,
   PR_BASE, PR_PANEL, PR_RECESSED, PR_ACCENT, PR_INK, PR_INK_2, PR_RULE,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-008 — Templates library. PUBLIC-REGISTER.md v2.0 tokens throughout,
 // matching the SEO-006 /for/* rewrite. Top-level route (not nested under
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/templates/")({
     meta: [
       { title: "Templates — Working documents for founders and investors | Lengdon" },
       { name: "description", content: "Ten annotated templates for private fundraising — convertible notes, SAFE, due diligence, data room, NDA, investment memo, LP updates, and more." },
+      ...socialMeta({ title: "Templates — Working documents for founders and investors | Lengdon", description: "Ten annotated templates for private fundraising — convertible notes, SAFE, due diligence, data room, NDA, investment memo, LP updates, and more.", path: "/templates" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/templates" }],
   }),

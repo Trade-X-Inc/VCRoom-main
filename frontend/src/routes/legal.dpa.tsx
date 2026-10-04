@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/Dpa.tsx. This page inlines its own
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/legal/dpa")({
     meta: [
       { title: "Data processing agreement — Lengdon" },
       { name: "description", content: "The data processing agreement between Lengdon and its customers covering sub-processors, retention and data subject rights." },
+      ...socialMeta({ title: "Data processing agreement — Lengdon", description: "The data processing agreement between Lengdon and its customers covering sub-processors, retention and data subject rights.", path: "/legal/dpa" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal/dpa" }],
   }),

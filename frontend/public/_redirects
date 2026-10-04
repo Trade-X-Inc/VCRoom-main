@@ -8,11 +8,17 @@
 /app/leads /app 301
 /app/reports /app 301
 /app/accelerators /app 301
-/docs/security/rls /docs/security/access-control 301
-/docs/founders/verification /docs/founders 301
-/docs/ai/verification /docs/ai 301
-/docs/investors/intake /docs/investors 301
-/docs/ai/deal-brief /docs/ai 301
+# SEO-018 Phase 7 audit (curled every target in this file against
+# production): the 5 rules previously here (/docs/security/rls,
+# /docs/founders/verification, /docs/ai/verification,
+# /docs/investors/intake, /docs/ai/deal-brief) all pointed at
+# /docs/founders, /docs/ai, /docs/investors, and /docs/security/access-
+# control — every one of those targets is itself a 404. /docs is a flat
+# single-page route today (no sub-paths at all); the real multi-page
+# docs system lives at /docs-v2/* (noindex per SEO-018 Phase 8, not yet
+# linked/promoted — see CLAUDE.md's docs-v2 coexistence note). Removed
+# rather than repointed: there is no live /docs/* sub-path to send these
+# to, and chaining a 301 to a 404 is worse than not redirecting at all.
 /trust / 301
 
 # /founders and /investors carried live deleted-feature claims (scored/
@@ -21,8 +27,15 @@
 # Deleted rather than edited, since both are being replaced by /for-founders
 # and /for-investors. Repointed to the real pages now that Step 5 has
 # shipped them (previously redirected to / as an interim target).
-/founders /for-founders 301
-/investors /for-investors 301
+#
+# SEO-018 Phase 7 correction: /for-founders and /for-investors (hyphen,
+# no leading sector segment) are themselves 404 — confirmed by curling
+# production. The real, live routes are /for/founders and /for/investors
+# (a genuine path segment, not a hyphenated slug) — the public-site
+# rebuild changed this shape after the comment above was written and
+# this file was never updated to match. All 4 rules below repointed.
+/founders /for/founders 301
+/investors /for/investors 301
 /solutions/due-diligence / 301
 /solutions/fundraising-crm / 301
 /solutions/investor-pipeline / 301
@@ -34,21 +47,75 @@
 # for the same audiences /for-founders and /for-investors already serve,
 # shipped and register-compliant (PUBLIC-REGISTER.md v2.0, 23 Aug 2026).
 # Redirected rather than duplicated, per the confirmed integration decision.
-/solutions/founders /for-founders 301
-/solutions/investors /for-investors 301
+# SEO-018 Phase 7: same /for-founders -> /for/founders correction as above.
+/solutions/founders /for/founders 301
+/solutions/investors /for/investors 301
 
 # Public-site migration Group 3 (25 Aug 2026) — /sectors/technology is the
 # public-site-spec.html slug for the same content /resources/schedule
 # already serves in full (the real technology/seed disclosure schedule,
 # CLAUDE.md §20.1 step 2d — only schedule that exists). Redirected rather
 # than building a second, thinner technology page.
-/sectors/technology /resources/schedule 301
+#
+# SEO-018 Phase 7 correction: /resources/schedule no longer exists
+# (confirmed 404 live, and no schedule route file exists in src/routes/
+# at all) — it was removed sometime after this rule was written and this
+# file was never updated. /sectors (the real, current live sector-
+# schedule hub, confirmed 200) is the closest equivalent destination.
+/sectors/technology /sectors 301
 
 # Public-site migration Group 5 (25 Aug 2026) — same reasoning as
 # /sectors/technology above: /schedules/technology-seed is the
 # public-site-spec.html slug for the same one real published schedule.
 # Redirected rather than duplicating /resources/schedule a third time.
-/schedules/technology-seed /resources/schedule 301
+# SEO-018 Phase 7: same /resources/schedule -> /sectors correction as above.
+/schedules/technology-seed /sectors 301
+
+# SEO-018 Phase 7 — new rules. Every target curled 200 against production
+# before being added here (not assumed from a route file existing).
+# /solutions/* audience slugs -> the real /for/* pages (8 audiences; the
+# founders/investors pair above already covers that pattern, these are
+# the remaining 8 named in the task).
+/solutions/venture-capital /for/venture-capital 301
+/solutions/private-equity /for/private-equity 301
+/solutions/family-offices /for/family-offices 301
+/solutions/syndicates /for/syndicates 301
+/solutions/angels /for/angels 301
+/solutions/spvs /for/spvs 301
+/solutions/limited-partners /for/limited-partners 301
+/solutions/advisors /for/advisors 301
+
+# /compare/* short slugs -> the real /product/compare/* paths.
+/compare /product/compare 301
+/compare/dealroom /product/compare/dealroom 301
+/compare/ideals /product/compare/ideals 301
+
+# /blog/* short slugs -> the real /resources/blog/* paths.
+# deal-room-after-investor-pass-2026 is not a real published post slug
+# (confirmed: not in the 18-post list from the SEO-017 sitemap audit) —
+# falls back to the blog hub rather than chaining to another dead page.
+/blog /resources/blog 301
+/blog/warm-intro-losing-power-fundraising-2026 /resources/blog/warm-intro-losing-power-fundraising-2026 301
+/blog/deal-room-after-investor-pass-2026 /resources/blog 301
+
+# Short legal/tool slugs -> real paths.
+/dpa /legal/dpa 301
+/sub-processors /legal/sub-processors 301
+/tools/valuation /tools/valuation-calculator 301
+
+# /sectors/manufacturing and /sectors/healthcare are not real per-sector
+# routes (confirmed 404 in the SEO-017 addendum audit) — fall back to the
+# /sectors hub rather than chain to another dead page.
+/sectors/manufacturing /sectors 301
+/sectors/healthcare /sectors 301
+
+# /glossary/$term deep paths are not real routes — /glossary is a single
+# flat page with no per-term routing (confirmed in the SEO-017 addendum
+# audit). Only these 2 specific terms get a rule, per instruction; every
+# other /glossary/* and all /docs/* deep paths are deliberately left as
+# 404, not redirected.
+/glossary/beneficial-ownership /glossary 301
+/glossary/condition-precedent /glossary 301
 
 # P4: founder nav restructure — old pages consolidated into /app/prepare
 /app/profile      /app/prepare#profile        301

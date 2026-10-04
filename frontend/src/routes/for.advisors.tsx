@@ -7,6 +7,7 @@ import {
   PrCommercialLine, PrCrossLinks, PR_BASE, PR_PANEL, PR_RECESSED,
   PrStageStrip, PrCard, PrCardGrid, PrIconEye, PrIconFile, PrIconShield, PrIconLink,
 } from "@/components/site/PublicRegisterPrimitives";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-006 — full structural rework, PUBLIC-REGISTER.md v2.0 tokens.
 //
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/for/advisors")({
     meta: [
       { title: "For advisors — mediate the raise, stay on the record — Lengdon" },
       { name: "description", content: "Join a founder's room with scoped, read-only access. See every step, every condition, every signature — without holding the data." },
+      ...socialMeta({ title: "For advisors — mediate the raise, stay on the record — Lengdon", description: "Join a founder's room with scoped, read-only access. See every step, every condition, every signature — without holding the data.", path: "/for/advisors" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/advisors" }],
   }),

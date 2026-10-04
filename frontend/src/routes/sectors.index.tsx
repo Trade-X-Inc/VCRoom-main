@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/Sectors.tsx. Note: LENGDONPUBLIC-NEW
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/sectors/")({
     meta: [
       { title: "Sector schedules — diligence built for the sector, not just tech — Lengdon" },
       { name: "description", content: "Field sets and checklists for technology, manufacturing, property, healthcare and energy deals. One engine, different fields, three evidence tiers." },
+      ...socialMeta({ title: "Sector schedules — diligence built for the sector, not just tech — Lengdon", description: "Field sets and checklists for technology, manufacturing, property, healthcare and energy deals. One engine, different fields, three evidence tiers.", path: "/sectors" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/sectors" }],
   }),

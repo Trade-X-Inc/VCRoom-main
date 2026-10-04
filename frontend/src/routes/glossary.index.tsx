@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/Glossary.tsx. Search + letter-filter
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/glossary/")({
     meta: [
       { title: "Private capital glossary — terms of art, defined plainly — Lengdon" },
       { name: "description", content: "Accurate definitions of disclosure, diligence and closing terms used in private-capital transactions. Disclosure pack to sealed export." },
+      ...socialMeta({ title: "Private capital glossary — terms of art, defined plainly — Lengdon", description: "Accurate definitions of disclosure, diligence and closing terms used in private-capital transactions. Disclosure pack to sealed export.", path: "/glossary" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/glossary" }],
   }),

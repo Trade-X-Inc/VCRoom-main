@@ -7,6 +7,7 @@ import {
   PrStageStrip, PrCard, PrCardGrid, PrIconLock, PrIconEye, PrIconFile, PrIconCheck,
 } from "@/components/site/PublicRegisterPrimitives";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // SEO-009 Phase 3 — bespoke rebuild on PUBLIC-REGISTER.md v2.0 tokens,
 // same pattern as for.founders.tsx (see that file's header comment for
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/for/investors")({
     meta: [
       { title: "For investors — diligence and close on a defensible record — Lengdon" },
       { name: "description", content: "Angels to institutions. One disciplined deal spine, condition visibility in real time, and a permanent audit record you keep." },
+      ...socialMeta({ title: "For investors — diligence and close on a defensible record — Lengdon", description: "Angels to institutions. One disciplined deal spine, condition visibility in real time, and a permanent audit record you keep.", path: "/for/investors" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/for/investors" }],
   }),

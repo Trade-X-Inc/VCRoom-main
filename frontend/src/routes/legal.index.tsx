@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/legal/index.tsx.
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/legal/")({
     meta: [
       { title: "Legal — terms, privacy, DPA and sub-processors — Lengdon" },
       { name: "description", content: "The complete legal surface for Lengdon, dated and versioned. Terms of service, privacy policy, data processing agreement." },
+      ...socialMeta({ title: "Legal — terms, privacy, DPA and sub-processors — Lengdon", description: "The complete legal surface for Lengdon, dated and versioned. Terms of service, privacy policy, data processing agreement.", path: "/legal" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/legal" }],
   }),

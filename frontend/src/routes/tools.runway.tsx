@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ToolCalculatorPage, fmtMoney } from "@/components/site/ToolCalculatorPage";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/tools/Runway.tsx. Calculation logic is
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/tools/runway")({
     meta: [
       { title: "Runway calculator — how long does your cash last — Lengdon" },
       { name: "description", content: "Enter your cash balance and monthly burn to see your runway in months. Model scenarios to extend it before your next raise." },
+      ...socialMeta({ title: "Runway calculator — how long does your cash last — Lengdon", description: "Enter your cash balance and monthly burn to see your runway in months. Model scenarios to extend it before your next raise.", path: "/tools/runway" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/tools/runway" }],
   }),

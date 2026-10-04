@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { CHANGELOG } from "@/lib/docs/content/changelog";
+import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact port of
 // LENGDONPUBLIC-NEW's src/pages/resources/Changelog.tsx, then REWIRED
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/resources/changelog")({
     meta: [
       { title: "Changelog — what changed, when and why — Lengdon" },
       { name: "description", content: "A dated, referenced record of the Lengdon product. What shipped, what changed, what was corrected." },
+      ...socialMeta({ title: "Changelog — what changed, when and why — Lengdon", description: "A dated, referenced record of the Lengdon product. What shipped, what changed, what was corrected.", path: "/resources/changelog" }),
     ],
     links: [{ rel: "canonical", href: "https://lengdon.com/resources/changelog" }],
   }),

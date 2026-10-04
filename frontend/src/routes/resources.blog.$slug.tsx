@@ -29,36 +29,66 @@ import { breadcrumbJsonLd } from "@/lib/breadcrumb";
 // and Notion content stays untouched either way), but this override is
 // new code being written, not existing content being left alone — so it
 // doesn't reproduce that phrase.
-const META_OVERRIDES: Record<string, string> = {
-  "investor-grade-data-room-2026":
-    "An investor-grade data room in 2026 has six non-negotiable elements and a staged disclosure structure. Here's exactly what to include.",
-  "how-investors-make-funding-decisions-stages-2026":
-    "Investors make funding decisions in four distinct stages, each with different information requirements and thresholds.",
-  "why-ai-pitch-ignored-investors-2026":
-    "85% of VCs now use AI tools daily, and 33% of all pitches call themselves AI-powered. Here's what investors are screening for in 2026.",
-  "lengdon-vs-docsend-notion-google-drive-2026":
-    "DocSend, Notion, and Google Drive each solve part of the fundraising process. Lengdon was built for all of it.",
-  "warm-intro-losing-power-fundraising-2026":
-    "Warm introductions to VCs still convert at 40% vs 0.5% for cold email. But the information gap that made them necessary is closing.",
-  "5-minute-investor-check-before-pitching-2026":
-    "After every good VC meeting, investors run a silent 5-minute background check. Most founders fail it without knowing.",
-  "lengdon-beta-features-deal-room-2026":
-    "Lengdon is live in beta. Explore the deal room features helping founders close rounds faster — AI summaries, investor signals, and due diligence.",
-  "remote-investor-trust-deal-room-2026":
-    "Physical meetings no longer determine who gets funded. Discover how deal rooms build investor trust and close rounds faster.",
+//
+// SEO-018 Phase 2: widened to carry an optional title override alongside
+// description. Two posts' real Notion titles are too long for a search
+// result once " — Lengdon Blog" is appended (92 and 83 chars) — title
+// override shortens those two specifically. Everything else still gets
+// the generic strip-then-append treatment below; H1s and the Notion
+// content itself are untouched either way — this only ever changes the
+// <title> tag and og:title/twitter:title.
+const META_OVERRIDES: Record<string, { description?: string; title?: string }> = {
+  "investor-grade-data-room-2026": {
+    description: "An investor-grade data room in 2026 has six non-negotiable elements and a staged disclosure structure. Here's exactly what to include.",
+  },
+  "how-investors-make-funding-decisions-stages-2026": {
+    description: "Investors make funding decisions in four distinct stages, each with different information requirements and thresholds.",
+  },
+  "why-ai-pitch-ignored-investors-2026": {
+    description: "85% of VCs now use AI tools daily, and 33% of all pitches call themselves AI-powered. Here's what investors are screening for in 2026.",
+  },
+  "lengdon-vs-docsend-notion-google-drive-2026": {
+    description: "DocSend, Notion, and Google Drive each solve part of the fundraising process. Lengdon was built for all of it.",
+    title: "Lengdon vs DocSend vs Notion vs Drive — Lengdon Blog",
+  },
+  "warm-intro-losing-power-fundraising-2026": {
+    description: "Warm introductions to VCs still convert at 40% vs 0.5% for cold email. But the information gap that made them necessary is closing.",
+  },
+  "5-minute-investor-check-before-pitching-2026": {
+    description: "After every good VC meeting, investors run a silent 5-minute background check. Most founders fail it without knowing.",
+    title: "The 5-Minute Investor Check Before You Pitch — Lengdon Blog",
+  },
+  "lengdon-beta-features-deal-room-2026": {
+    description: "Lengdon is live in beta. Explore the deal room features helping founders close rounds faster — AI summaries, investor signals, and due diligence.",
+  },
+  "remote-investor-trust-deal-room-2026": {
+    description: "Physical meetings no longer determine who gets funded. Discover how deal rooms build investor trust and close rounds faster.",
+  },
 };
+
+// Strips a trailing "— Lengdon" the Notion-authored title/SEO-title may
+// already carry (5 published posts do) before "— Lengdon Blog" is
+// appended below — without this, those 5 render "... — Lengdon — Lengdon
+// Blog". Generic by construction so it self-heals for any future post
+// with the same pattern, not just the 5 found live.
+function stripTrailingLengdon(title: string): string {
+  return title.replace(/\s*—\s*Lengdon\s*$/i, "");
+}
 
 export const Route = createFileRoute("/resources/blog/$slug")({
   head: ({ loaderData, params }) => {
     const { post } = (loaderData ?? {}) as { post: BlogPostWithContent | null };
     if (!post) return { meta: [{ title: "Post not found — Lengdon Blog" }] };
     const url = `https://lengdon.com/resources/blog/${params.slug}`;
-    const description = META_OVERRIDES[post.slug] ?? (post.seoDescription || post.excerpt);
+    const override = META_OVERRIDES[post.slug];
+    const description = override?.description ?? (post.seoDescription || post.excerpt);
+    const rawTitle = post.seoTitle || post.title;
+    const title = override?.title ?? `${stripTrailingLengdon(rawTitle)} — Lengdon Blog`;
     return {
       meta: [
-        { title: `${post.seoTitle || post.title} — Lengdon Blog` },
+        { title },
         { name: "description", content: description },
-        { property: "og:title", content: post.seoTitle || post.title },
+        { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         ...(post.coverImage ? [{ property: "og:image", content: post.coverImage }] : []),
