@@ -240,7 +240,7 @@ function ProductCard() {
 // ── Hero Section ──────────────────────────────────────────
 function HeroSection() {
   return (
-    <section className="bg-white min-h-screen flex flex-col relative overflow-hidden border-b border-[var(--v2-rule)]">
+    <section className="bg-white lg:min-h-screen flex flex-col relative overflow-hidden border-b border-[var(--v2-rule)]">
       <div className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: "linear-gradient(transparent calc(100% - 1px), var(--v2-rule-light) calc(100% - 1px))",
@@ -248,9 +248,16 @@ function HeroSection() {
           opacity: 0.5
         }} />
 
-      <div className="relative z-10 flex-1 flex items-center max-w-[1280px] mx-auto w-full px-10 pt-28 pb-12">
+      {/* SEO-018 Phase 5: mobile-only spacing reduction so the hero's own
+          CTA fits in the first viewport at 375/390px alongside the cookie
+          banner — min-h-screen dropped below lg (kept at lg+), top
+          padding and the headline-block gap reduced below sm, headline
+          clamp's lower bound reduced below sm. Headline/subhead TEXT
+          unchanged; ≥640px layout confirmed unchanged (every change
+          below is bare or sm:-prefixed only, nothing removed at sm+). */}
+      <div className="relative z-10 flex-1 flex items-center max-w-[1280px] mx-auto w-full px-10 pt-14 sm:pt-28 pb-12">
         <div className="flex items-start justify-between gap-8 w-full">
-          <div className="flex flex-col gap-8 max-w-[600px] min-w-0">
+          <div className="flex flex-col gap-5 sm:gap-8 max-w-[600px] min-w-0">
             <div className="flex items-center gap-3">
               <div className="w-4 h-px bg-[var(--v2-accent)]/40" />
               <span style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-ink-muted)] text-[11px] tracking-[2px] uppercase">
@@ -259,9 +266,9 @@ function HeroSection() {
             </div>
 
             <h1 id="hero-headline" style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
-              <span className="block text-[var(--v2-accent)] text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
-              <span className="block text-[var(--v2-accent)] text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
-              <span className="block text-[clamp(64px,8vw,120px)]"
+              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)]">PRIVATE CAPITAL</span>
+              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)]">NEEDS A BETTER</span>
+              <span className="block text-[clamp(44px,8vw,120px)]"
                 style={{ WebkitTextStroke: "2px var(--v2-accent)", color: "transparent" }}>
                 WAY TO CLOSE
               </span>
