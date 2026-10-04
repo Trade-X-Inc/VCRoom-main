@@ -266,9 +266,9 @@ function HeroSection() {
             </div>
 
             <h1 id="hero-headline" style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
-              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)]">PRIVATE CAPITAL</span>
-              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)]">NEEDS A BETTER</span>
-              <span className="block text-[clamp(44px,8vw,120px)]"
+              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
+              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
+              <span className="block text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]"
                 style={{ WebkitTextStroke: "2px var(--v2-accent)", color: "transparent" }}>
                 WAY TO CLOSE
               </span>
