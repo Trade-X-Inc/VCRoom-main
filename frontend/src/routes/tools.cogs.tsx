@@ -93,18 +93,21 @@ function CogsCalculator() {
                 { label: "Third-party licenses & APIs", value: thirdPartyLicenses, set: setThirdPartyLicenses, note: "", placeholder: "e.g. 30,000" },
                 { label: "Payment processing fees", value: paymentProcessing, set: setPaymentProcessing, note: "", placeholder: "e.g. 24,000" },
                 { label: "Other direct costs", value: other, set: setOther, note: "", placeholder: "e.g. 10,000" },
-              ].map((field) => (
-                <div key={field.label} className="flex flex-col gap-1.5">
-                  <div className="flex items-baseline gap-2">
-                    <label style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">{field.label}</label>
-                    {field.note && <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px]">{field.note}</span>}
+              ].map((field) => {
+                const fieldId = `cogs-${field.label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
+                return (
+                  <div key={field.label} className="flex flex-col gap-1.5">
+                    <div className="flex items-baseline gap-2">
+                      <label htmlFor={fieldId} style={{ fontFamily: "var(--font-v2-data)" }} className="text-[var(--v2-accent)] text-[13px] tracking-[0.3px]">{field.label}</label>
+                      {field.note && <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-muted)] text-[11px]">{field.note}</span>}
+                    </div>
+                    <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
+                      <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
+                      <input id={fieldId} type="number" value={field.value} onChange={(e) => field.set(Math.max(0, Number(e.target.value)))} placeholder={field.placeholder} style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
+                    </div>
                   </div>
-                  <div className="flex items-center border border-[var(--v2-rule)] focus-within:border-[var(--v2-accent)] transition-colors bg-[var(--v2-panel)]">
-                    <span style={{ fontFamily: "var(--font-v2-data)" }} className="px-4 text-[var(--v2-ink-muted)] text-[14px] border-r border-[var(--v2-rule)]">$</span>
-                    <input type="number" value={field.value} onChange={(e) => field.set(Math.max(0, Number(e.target.value)))} placeholder={field.placeholder} style={{ fontFamily: "var(--font-v2-data)" }} className="flex-1 px-4 py-3 text-[14px] text-[var(--v2-accent)] focus:outline-none bg-[var(--v2-panel)]" />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex flex-col gap-4 h-fit">

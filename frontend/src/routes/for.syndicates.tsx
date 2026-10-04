@@ -74,7 +74,7 @@ function Syndicates() {
           <PrTitle>Publish the package. Track every follower.</PrTitle>
           <PrProse>
             As lead, you publish a lead package with your own committed amount disclosed. Followers review it, soft-circle their interest, and commit individually — each on their own NDA, each with their own signature.{" "}
-            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model the cap table across your syndicate →</Link>
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Model the cap table across your syndicate →</Link>
             {" "}Allocation is tracked against the room itself, not a side spreadsheet, and every follower keeps a view onto the same record.
           </PrProse>
         </PrSection>

@@ -78,7 +78,7 @@ function VentureCapital() {
           <PrTitle>Deals by lifecycle state, not pipeline stage.</PrTitle>
           <PrProse>
             Each seat sees deals organized by lifecycle state, not a sales pipeline stage. House diligence items sit alongside whatever a sector's own schedule already asks for. Diligence, terms, and closing run through the same room, and the record produced at close stays attached to the deal, visible across your active portfolio.{" "}
-            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Model a deal's cap table before term sheet →</Link>
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Model a deal's cap table before term sheet →</Link>
           </PrProse>
         </PrSection>
 

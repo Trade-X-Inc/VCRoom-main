@@ -119,7 +119,7 @@ function Investors() {
           <PrTitle>A structured room, from invitation to close.</PrTitle>
           <PrProse>
             Founders invite you into a sequenced deal room. Every step is enforced — you see exactly what stage the deal is at and what remains before close.{" "}
-            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)" }}>Run the cap table before you commit →</Link>
+            <Link to="/tools/cap-table" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Run the cap table before you commit →</Link>
             {" "}You sign your own NDA, not a catch-all company-level agreement — your access is individually logged and keyed to your identity. Every outstanding condition is tracked in real time: regulatory approvals, board consents, third-party sign-offs, all mapped against the close sequence.
           </PrProse>
         </PrSection>

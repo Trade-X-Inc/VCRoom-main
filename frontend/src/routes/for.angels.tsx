@@ -73,7 +73,7 @@ function Angels() {
           <PrTitle>One direct spine. No added steps.</PrTitle>
           <PrProse>
             Angels use the same direct spine as any single-cheque investor: a brief, an NDA, a short, fixed checklist rather than an open-ended back-and-forth, one term sheet, signing, a payment confirmation, then close.{" "}
-            <Link to="/tools/safe-note" style={{ color: "var(--v2-accent)" }}>Model how your SAFE converts before the next round →</Link>
+            <Link to="/tools/safe-note" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Model how your SAFE converts before the next round →</Link>
             {" "}Nothing scales up for size — a modest cheque runs the identical sequence as a large one.
           </PrProse>
         </PrSection>

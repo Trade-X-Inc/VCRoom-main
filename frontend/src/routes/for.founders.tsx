@@ -116,7 +116,7 @@ function Founders() {
           <PrTitle>From first call to sealed close.</PrTitle>
           <PrProse>
             Initialize a room and invite your counsel. At the start of closing, either party may engage legal counsel — or both may agree to proceed without. Either way, the decision is recorded.{" "}
-            <Link to="/tools/safe-note" style={{ color: "var(--v2-accent)" }}>Model your SAFE conversion before your next round →</Link>
+            <Link to="/tools/safe-note" style={{ color: "var(--v2-accent)", textDecoration: "underline" }}>Model your SAFE conversion before your next round →</Link>
             {" "}From there the room guides both parties through Conditions, then Close — neither side can advance until every condition is marked satisfied. Add your own conditions precedent and assign each to a named owner.
           </PrProse>
         </PrSection>
