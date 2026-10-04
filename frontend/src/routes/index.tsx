@@ -47,11 +47,11 @@ import { socialMeta } from "@/lib/social-meta";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Closing infrastructure for private capital — Lengdon" },
-      { name: "description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
+      { title: "Nobody should have to ask where the deal stands — Lengdon" },
+      { name: "description", content: "Every document, condition and signature, visible to both sides in one room. Private beta, onboarding in stages." },
       ...socialMeta({
-        title: "Closing infrastructure for private capital — Lengdon",
-        description: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room.",
+        title: "Nobody should have to ask where the deal stands — Lengdon",
+        description: "Every document, condition and signature, visible to both sides in one room. Private beta, onboarding in stages.",
         path: "/",
       }),
     ],
@@ -265,16 +265,16 @@ function HeroSection() {
             </div>
 
             <h1 id="hero-headline" style={{ fontFamily: "var(--font-v2-ui)" }} className="font-semibold leading-[0.88] tracking-[-3.5px]">
-              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]">PRIVATE CAPITAL</span>
-              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]">NEEDS A BETTER</span>
+              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]">NOBODY SHOULD</span>
+              <span className="block text-[var(--v2-accent)] text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]">HAVE TO ASK</span>
               <span className="block text-[clamp(44px,8vw,120px)] sm:text-[clamp(64px,8vw,120px)]"
                 style={{ WebkitTextStroke: "2px var(--v2-accent)", color: "transparent" }}>
-                WAY TO CLOSE
+                WHERE THE DEAL STANDS
               </span>
             </h1>
 
             <p id="hero-value-prop" style={{ fontFamily: "var(--font-v2-ui)" }} className="text-[var(--v2-ink-secondary)] text-[18px] leading-[1.6] max-w-[480px] tracking-[-0.2px]">
-              Lengdon structures the transaction between the term sheet and the close — giving founders and investors one shared environment to manage diligence, documentation, approvals, and execution.
+              Every document, condition and signature, visible to both sides in one room. Private beta.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">

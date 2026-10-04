@@ -162,8 +162,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Closing infrastructure for private capital — Lengdon" },
-      { name: "description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
+      { title: "Nobody should have to ask where the deal stands — Lengdon" },
+      { name: "description", content: "Every document, condition and signature, visible to both sides in one room. Private beta, onboarding in stages." },
       { name: "author", content: "Lengdon" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#F5F4F1" },
@@ -175,8 +175,8 @@ export const Route = createRootRoute({
       // SEO-018 Phase 1 now sets its own og:*/twitter:* via socialMeta() in
       // its own head() — this is the fallback for whatever's left over.
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Closing infrastructure for private capital — Lengdon" },
-      { property: "og:description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
+      { property: "og:title", content: "Nobody should have to ask where the deal stands — Lengdon" },
+      { property: "og:description", content: "Every document, condition and signature, visible to both sides in one room. Private beta, onboarding in stages." },
       { property: "og:url", content: "https://lengdon.com" },
       { property: "og:site_name", content: "Lengdon" },
       { property: "og:image", content: "https://lengdon.com/og-image.png" },
@@ -187,8 +187,8 @@ export const Route = createRootRoute({
       // Twitter / X
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@lengdondotcom" },
-      { name: "twitter:title", content: "Closing infrastructure for private capital — Lengdon" },
-      { name: "twitter:description", content: "Run a private-capital raise end to end. Deal room, single-notice diligence, sealed record at close. Published pricing. Not just a data room." },
+      { name: "twitter:title", content: "Nobody should have to ask where the deal stands — Lengdon" },
+      { name: "twitter:description", content: "Every document, condition and signature, visible to both sides in one room. Private beta, onboarding in stages." },
       { name: "twitter:image", content: "https://lengdon.com/og-image.png" },
     ],
     links: [
