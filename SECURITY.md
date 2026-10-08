@@ -134,9 +134,11 @@ this checklist is a requirement, not a status report.
 
 1. **Mandatory MFA for every account**; admin/support/lawyer accounts
    require phishing-resistant MFA (passkeys/WebAuthn). **REQUIRED – NOT YET
-   BUILT.** `CLAUDE.md` §11.1 currently lists "Mandatory MFA" under
-   "Controls built from day one" — that claim conflicts with this item's
-   status and is flagged separately below, not resolved here.
+   BUILT.** Confirmed against live evidence, 8 Oct 2026: 0 MFA factors
+   across 14 users. `CLAUDE.md` §11.1 previously listed "Mandatory MFA"
+   under "Controls built from day one" — corrected in that section on the
+   same date to match this evidence, annotated in place rather than
+   silently rewritten.
 2. Passkeys (WebAuthn) are the fingerprint/face answer: biometrics stay on
    the user's device; we store only a public key. We do NOT collect or
    store raw fingerprints. **REQUIRED – NOT YET BUILT.**
