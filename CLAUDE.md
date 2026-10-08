@@ -116,6 +116,7 @@ This rule exists because of a real incident (24 Aug 2026, `lengdon-public-site/`
 - Report `tsc` error count and gzip bundle size before and after every branch.
 - **After any change touching secrets, build configuration, or a key rotation: grep the BUILT ARTIFACT for the secret's format, not the source.** Client, server and worker output, plus the deployed bundle where a deploy has happened (a local build and a CI build can differ in env). Source-level greps and removed call sites prove nothing about what the bundler emits — see §19e, where a correct source-level remediation left a live API key in the production bundle for eleven weeks.
 - A security gap found mid-phase is never "out of scope". Stop and report it.
+- **Every PR must pass `security-rules.md` §13's pre-merge gate** (`SECURITY.md`'s "Master Security Rules" §13) before merge.
 
 ### Baselines
 

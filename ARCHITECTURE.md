@@ -429,6 +429,10 @@ function is a live HTTP endpoint until it is made inert.
 byte-identical copies of `_shared/auth.ts` live inside each consuming function. Any edit
 must be applied to all copies and re-verified identical.
 
+See `SECURITY.md`'s "Master Security Rules" for the full pre-merge security checklist
+(§0–§13), including the data-layer, authentication, and edge-function-adjacent rules
+that supplement the identity-derivation requirement above.
+
 ---
 
 ## 12. Security posture
