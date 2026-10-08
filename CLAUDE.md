@@ -311,11 +311,12 @@ Do not touch public-facing surfaces during application work.
 - TLS 1.3 enforced, legacy versions blocked
 - Signed, short-lived URLs for every document. No persistent public URL.
 - Tenant isolation at the action layer. No identifier in a request may widen access.
+- **Mandatory MFA** — **REQUIRED – NOT YET BUILT (live DB: 0 MFA factors / 14 users)**
 - Immutable hash-chained audit log recording actor, action, object, timestamp, source address
 - Automated dependency scanning from the first commit
 - Explicit recorded consent at onboarding per processing purpose
 
-**Corrected 8 Oct 2026 — "Mandatory MFA — required, not a settings toggle" previously sat in the list above, asserting it was already built. It is not. Live database evidence: 0 MFA factors across 14 users.** MFA is **REQUIRED — NOT YET BUILT**, tracked alongside the rest of the not-yet-built authentication controls in `SECURITY.md`'s Master Security Rules §2. Moved out of "built from day one" rather than silently deleted — annotated per this file's own §19-established convention of correcting a wrong record in place, not erasing it.
+**Corrected 8 Oct 2026** — this list previously asserted "Mandatory MFA — required, not a settings toggle" as already built, alongside controls that genuinely are. It was not built. Live database evidence: 0 MFA factors across 14 users. Left in the list above rather than moved out, annotated with its real status in place — this is a "controls built from day one" list with one confirmed exception, not a list MFA was ever absent from. Tracked alongside the rest of the not-yet-built authentication controls in `SECURITY.md`'s Master Security Rules §2.
 
 ### 11.2 Erasure versus retention — unresolved
 
