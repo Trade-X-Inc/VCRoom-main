@@ -116,6 +116,7 @@ This rule exists because of a real incident (24 Aug 2026, `lengdon-public-site/`
 - Report `tsc` error count and gzip bundle size before and after every branch.
 - **After any change touching secrets, build configuration, or a key rotation: grep the BUILT ARTIFACT for the secret's format, not the source.** Client, server and worker output, plus the deployed bundle where a deploy has happened (a local build and a CI build can differ in env). Source-level greps and removed call sites prove nothing about what the bundler emits — see §19e, where a correct source-level remediation left a live API key in the production bundle for eleven weeks.
 - A security gap found mid-phase is never "out of scope". Stop and report it.
+- **Every PR must pass `security-rules.md` §13's pre-merge gate** (`SECURITY.md`'s "Master Security Rules" §13) before merge.
 
 ### Baselines
 
@@ -310,10 +311,12 @@ Do not touch public-facing surfaces during application work.
 - TLS 1.3 enforced, legacy versions blocked
 - Signed, short-lived URLs for every document. No persistent public URL.
 - Tenant isolation at the action layer. No identifier in a request may widen access.
-- **Mandatory MFA** — required, not a settings toggle
+- **Mandatory MFA** — **REQUIRED – NOT YET BUILT (live DB: 0 MFA factors / 14 users)**
 - Immutable hash-chained audit log recording actor, action, object, timestamp, source address
 - Automated dependency scanning from the first commit
 - Explicit recorded consent at onboarding per processing purpose
+
+**Corrected 8 Oct 2026** — this list previously asserted "Mandatory MFA — required, not a settings toggle" as already built, alongside controls that genuinely are. It was not built. Live database evidence: 0 MFA factors across 14 users. Left in the list above rather than moved out, annotated with its real status in place — this is a "controls built from day one" list with one confirmed exception, not a list MFA was ever absent from. Tracked alongside the rest of the not-yet-built authentication controls in `SECURITY.md`'s Master Security Rules §2.
 
 ### 11.2 Erasure versus retention — unresolved
 
