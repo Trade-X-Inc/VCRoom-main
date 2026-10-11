@@ -55,9 +55,11 @@ function InvestorMeetingsCalendar() {
     enabled: rooms.length > 0,
     queryFn: async () => {
       const { getDealRoomWorkflow } = await import("@/lib/deal-room-workflow-fn");
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token ?? "";
       const results = await Promise.all(
         rooms.map(async (r) => {
-          const { data } = await getDealRoomWorkflow({ data: { deal_room_id: r.id } });
+          const { data } = await getDealRoomWorkflow({ data: { deal_room_id: r.id, accessToken } });
           return { room: r, workflow: data };
         }),
       );

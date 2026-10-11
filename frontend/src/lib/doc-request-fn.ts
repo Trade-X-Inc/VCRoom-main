@@ -129,21 +129,57 @@ export const fulfillDocRequest = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!member) return { success: false, error: "Unauthorized" };
 
-    const { error } = await sb
+    // Fix, 11 Oct 2026 — three gaps, all in this one function: (1) the
+    // UPDATE below was `id=eq.requestId` only, with no deal_room_id
+    // filter, despite only dealRoomId being validated above; a member
+    // of any room could fulfill/mutate any document_requests.id
+    // system-wide. (2) data.documentId was written straight into
+    // document_id with no check it belongs to this room. (3)
+    // data.requestedBy was trusted outright as the notification
+    // recipient — a caller could redirect the "document uploaded"
+    // notification to an arbitrary user_id. Fetch the real request row
+    // scoped to THIS room first; derive requestedBy from it, never the
+    // client value; and if a documentId is supplied, confirm that
+    // document's own deal_room_id matches before accepting it.
+    const { data: request } = await sb
+      .from("document_requests")
+      .select("id, requested_by")
+      .eq("id", data.requestId)
+      .eq("deal_room_id", data.dealRoomId)
+      .maybeSingle();
+    if (!request) return { success: false, error: "not_found" };
+
+    let verifiedDocumentId: string | null = null;
+    if (data.documentId) {
+      const { data: doc } = await sb
+        .from("documents")
+        .select("id")
+        .eq("id", data.documentId)
+        .eq("deal_room_id", data.dealRoomId)
+        .maybeSingle();
+      if (!doc) return { success: false, error: "document_not_in_room" };
+      verifiedDocumentId = doc.id;
+    }
+
+    const { data: updated, error } = await sb
       .from("document_requests")
       .update({
-        status: data.documentId ? "fulfilled" : "uploaded",
-        document_id: data.documentId ?? null,
+        status: verifiedDocumentId ? "fulfilled" : "uploaded",
+        document_id: verifiedDocumentId,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", data.requestId);
+      .eq("id", data.requestId)
+      .eq("deal_room_id", data.dealRoomId)
+      .select("id");
 
     if (error) return { success: false, error: error.message };
+    if (!updated || updated.length !== 1) return { success: false, error: "not_found" };
 
-    // Notify investor
+    // Notify investor — requestedBy derived from the request row itself,
+    // never the client-supplied field.
     try {
       const { error: n2 } = await sb.from("notifications").insert({
-        user_id: data.requestedBy,
+        user_id: request.requested_by,
         kind: "document_request",
         title: "Document uploaded",
         body: `The founder uploaded a document.`,

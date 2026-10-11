@@ -63,6 +63,12 @@ async function sbFetch(
   path: string,
   method: string,
   body?: unknown,
+  // Optional Prefer-header override, added 11 Oct 2026 for
+  // respondToDocumentRequest's row-count check. Defaults to undefined
+  // so every existing call site (20 others in this file) keeps its
+  // exact current behavior (return=minimal on PATCH) unchanged — this
+  // is purely additive, not a change to the shared default.
+  preferOverride?: string,
 ) {
   const resp = await fetch(`${url}/rest/v1/${path}`, {
     method,
@@ -70,7 +76,7 @@ async function sbFetch(
       "Content-Type": "application/json",
       apikey: key,
       Authorization: `Bearer ${key}`,
-      Prefer: method === "POST" ? "return=representation" : "return=minimal",
+      Prefer: preferOverride ?? (method === "POST" ? "return=representation" : "return=minimal"),
     },
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -438,7 +444,27 @@ export const respondToDocumentRequest = createServerFn({ method: "POST" })
       patch.partial_explanation = data.partial_explanation;
     }
 
-    await sbFetch(url, key, `deal_room_document_requests?id=eq.${data.request_id}`, "PATCH", patch);
+    // Fix, 11 Oct 2026, REVISED same day per review — this PATCH was
+    // `id=eq.${data.request_id}` only, with no deal_room_id filter,
+    // despite the membership check above only validating deal_room_id:
+    // a member of room A could pass a request_id belonging to room B
+    // and mutate it. The first version of this fix added a pre-check
+    // GET to confirm ownership before patching, then fired the PATCH
+    // with sbFetch's default return=minimal — which verifies ownership
+    // at read time but never confirms the PATCH itself actually
+    // affected a row, and leaves a (small, but real) TOCTOU window
+    // between the two requests. Fixed properly: the PATCH itself now
+    // requests return=representation via sbFetch's new preferOverride
+    // param, and its own response is checked for exactly one affected
+    // row — the single request that both scopes AND verifies the
+    // write, with no separate pre-check and no gap between a read and
+    // a write.
+    const patched: any[] = await sbFetch(
+      url, key,
+      `deal_room_document_requests?id=eq.${data.request_id}&deal_room_id=eq.${data.deal_room_id}`,
+      "PATCH", patch, "return=representation",
+    ).catch(() => []);
+    if (!patched || patched.length !== 1) return { ok: false, error: "not_found" };
     await logActivity(
       url,
       key,

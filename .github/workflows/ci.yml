@@ -25,6 +25,36 @@ defaults:
     working-directory: frontend
 
 jobs:
+  serverfn-authz-guard:
+    name: Server-fn service-role auth guard
+    runs-on: ubuntu-latest
+    steps:
+      # Added 11 Oct 2026 after an audit found five createServerFn
+      # handlers in src/lib using the service-role client (which
+      # bypasses RLS entirely, CLAUDE.md §7.1) while trusting a
+      # client-supplied id with no identity cross-check — one of them
+      # (deal-room-workflow-fn.ts's getDealRoomWorkflow) had NO identity
+      # derivation at all: any caller, authenticated or not, got any
+      # deal room's full term-sheet state. Fixed same session; this
+      # guard is the regression gate. Uses the real TypeScript compiler
+      # API (not regex) to find every exported createServerFn(...)
+      # .handler(...) in src/lib (excluding src/lib/actions/, which has
+      # its own separate chokepoint guarantee enforced by
+      # check-action-split.mjs below) and fails if a handler uses a
+      # service-role client with no call to a recognised auth helper
+      # anywhere in its body. See scripts/check-serverfn-authz.mjs's own
+      # header for exactly what this can and cannot prove — it is a
+      # structural "is there an auth call at all" check, not a full
+      # per-id cross-check audit.
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: node scripts/check-serverfn-authz.mjs
+
   typecheck:
     name: Type check
     runs-on: ubuntu-latest

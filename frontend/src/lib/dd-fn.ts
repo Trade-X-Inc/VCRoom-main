@@ -182,11 +182,25 @@ export const toggleChecklistItem = createServerFn({ method: "POST" })
       return { success: false, error: "Unauthorized" };
     }
 
-    const { error } = await sb
+    // Fix, 11 Oct 2026 — this update was a bare .eq("id", data.itemId),
+    // with no deal_room_id filter, despite the membership check above
+    // only validating dealRoomId: any founder/investor member of ANY
+    // deal room could flip `checked` on any dd_checklist_items.id
+    // system-wide, regardless of which room it actually belonged to.
+    // Compound-filtering on both id AND deal_room_id makes a cross-room
+    // itemId a genuine no-op (0 rows matched) instead of a silent
+    // cross-tenant write — and .select() + a row-count check turns that
+    // no-op into a real error instead of a false { success: true }
+    // (the §7.4 "0-row UPDATE is indistinguishable from success unless
+    // you check" defect, applied here deliberately).
+    const { data: updated, error } = await sb
       .from("dd_checklist_items")
       .update({ checked: data.checked })
-      .eq("id", data.itemId);
+      .eq("id", data.itemId)
+      .eq("deal_room_id", data.dealRoomId)
+      .select("id");
     if (error) return { success: false, error: error.message };
+    if (!updated || updated.length !== 1) return { success: false, error: "not_found" };
     return { success: true };
   });
 
@@ -214,11 +228,17 @@ export const overrideAutoDetectedItem = createServerFn({ method: "POST" })
       return { success: false, error: "Unauthorized" };
     }
 
-    const { error } = await sb
+    // Fix, 11 Oct 2026 — same gap and same fix as toggleChecklistItem
+    // immediately above: compound-filter id + deal_room_id, verify the
+    // update actually matched exactly one row before reporting success.
+    const { data: updated, error } = await sb
       .from("dd_checklist_items")
       .update({ checked: data.checked, manually_overridden: true })
-      .eq("id", data.itemId);
+      .eq("id", data.itemId)
+      .eq("deal_room_id", data.dealRoomId)
+      .select("id");
     if (error) return { success: false, error: error.message };
+    if (!updated || updated.length !== 1) return { success: false, error: "not_found" };
     return { success: true };
   });
 
@@ -358,6 +378,23 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
       return { ok: false, error: "not_authorized" };
     }
 
+    // Fix, 11 Oct 2026 — data.startupId was CLIENT-SUPPLIED and used
+    // directly to scope the founder_documents/startup_claims/startups/
+    // roast_sessions reads below, with no check that it actually belongs
+    // to dealRoomId. The membership check above only validates
+    // dealRoomId; a legitimate member of room A could pass an arbitrary
+    // startupId for an unrelated startup B and this function would mint
+    // signed URLs, fetch B's document bytes server-side, and feed them
+    // into the prompt whose findings render to both parties. Derive the
+    // real startup_id from deal_rooms server-side instead — the client
+    // value is never trusted again below, no matter what the caller
+    // sends for it.
+    const { data: room } = await sb
+      .from("deal_rooms").select("startup_id")
+      .eq("id", data.dealRoomId).maybeSingle();
+    if (!room?.startup_id) return { ok: false, error: "room_not_found" };
+    const startupId = room.startup_id;
+
     const usageCheck = await checkUsageCap(uid, "dd_confrontational");
     if (!usageCheck.allowed) return { ok: false, error: "usage_limit" };
 
@@ -373,7 +410,7 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
         // stale wide select is one refactor away from leaking it into
         // investor-facing findings. §19f: exposure is what you QUERY.
         .select("title, template_slug, status, file_name, file_path")
-        .eq("startup_id", data.startupId),
+        .eq("startup_id", startupId),
       sb.from("documents")
         .select("file_name, category, storage_path, ai_summary")
         .eq("deal_room_id", data.dealRoomId),
@@ -426,13 +463,13 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
     const { data: claims } = await sb
       .from("startup_claims")
       .select("claim_type, claim_label, claim_value, claim_category, proof_status")
-      .eq("startup_id", data.startupId);
+      .eq("startup_id", startupId);
 
     // 3. Stated metrics from the profile
     const { data: startup } = await sb
       .from("startups")
       .select("company_name, stage, sector, mrr_usd, revenue, growth_rate, runway_months, burn_rate, team_size, founded_year, funding_target, traction, one_liner, investor_narrative, legal_entity_name, incorporated_in")
-      .eq("id", data.startupId)
+      .eq("id", startupId)
       .maybeSingle();
 
     // 4. Existing DD goals + status
@@ -447,7 +484,7 @@ export const runConfrontationalAnalysis = createServerFn({ method: "POST" })
     const { data: roasts, error: roastErr } = await sb
       .from("roast_sessions")
       .select("id, level, status, badge_awarded, report, round_closed_at")
-      .eq("startup_id", data.startupId)
+      .eq("startup_id", startupId)
       .in("status", ["completed", "expired"]);
     if (roastErr) console.error("[dd] roast record fetch failed:", roastErr);
     const roastSections = (roasts ?? []).map((r) => {

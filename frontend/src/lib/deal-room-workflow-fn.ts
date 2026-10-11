@@ -152,7 +152,7 @@ export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
 
 // ── Server fn: get full workflow state ────────────────────────────────────────
 
-type GetWorkflowInput = { deal_room_id: string };
+type GetWorkflowInput = { deal_room_id: string; accessToken: string };
 
 export type WorkflowState = {
   workflow_stage: string | null;
@@ -192,6 +192,20 @@ export const getDealRoomWorkflow = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ data: WorkflowState | null }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { data: null };
+
+    // Fix, 11 Oct 2026 — this handler had NO identity derivation at all:
+    // any caller, authenticated or not, supplying any deal_room_id got
+    // the room's full term-sheet state (valuation, investment amount,
+    // equity %, pro rata, board seat) back. requireRoomMember is the
+    // same helper upsertDealRoomMeeting already uses in this file —
+    // derives uid from the caller's own token, never a client-supplied
+    // id, and checks deal_room_members before any read proceeds.
+    // Unauthenticated and non-member both collapse to the same
+    // { data: null } the function already returns when the room
+    // itself doesn't exist, so a caller cannot distinguish "you are not
+    // a member" from "this room does not exist" — no existence leak.
+    const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
+    if (!auth.ok) return { data: null };
 
     const [rooms, meetings] = await Promise.all([
       sbFetch(url, key,
