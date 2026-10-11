@@ -118,9 +118,102 @@ this checklist is a requirement, not a status report.
    schema-qualified names, explicit `REVOKE FROM PUBLIC/anon`, validated
    inputs, identity from `auth.uid()` only.
 7. **CI guard: fail build on any new grant to anon/authenticated not on the
-   allowlist** (like `check-action-split.mjs`). **REQUIRED – NOT YET BUILT**
-   — no such CI guard exists in this repo today; `check-action-split.mjs`
-   is a real, existing precedent for the mechanism, not the guard itself.
+   allowlist** (like `check-action-split.mjs`). **BUILT 9 Oct 2026, rebuilt
+   same day on parser-based detection after a first regex version was found
+   under adversarial review to miss most of its own required cases** —
+   `frontend/scripts/check-grants.mjs` (CLI entry point) +
+   `frontend/scripts/check-grants-core.mjs` (shared detection logic, also
+   imported by the self-test suite so tests exercise the real code path,
+   not a copy), wired as its own CI job (`grant-guard` in
+   `.github/workflows/ci.yml`). Parses every migration with `libpg-query`
+   (a WASM build of the real PostgreSQL grammar, not regex) and inspects
+   the resulting AST — `GrantStmt`, `AlterDefaultPrivilegesStmt`,
+   `CreateFunctionStmt`, `CreatePolicyStmt` — directly. Ten rules (R1-R10):
+   `GRANT` to `anon` (any privilege/object); `GRANT` to `PUBLIC` or any
+   grantee list containing `public`/`anon`/`authenticated`; `GRANT ALL`/
+   `ALL PRIVILEGES` on tables; table-level `INSERT`/`UPDATE` with no column
+   list to `authenticated` (`DELETE` deliberately excluded — Postgres has
+   no column-scoped `DELETE` grant, so a bare `GRANT DELETE` is the only
+   valid form); `GRANT ... ON ALL TABLES/FUNCTIONS/SEQUENCES IN SCHEMA`;
+   `ALTER DEFAULT PRIVILEGES ... GRANT` to a client role, as its own
+   dedicated rule (not folded into the anon/public rule — an
+   `AlterDefaultPrivilegesStmt` wraps its grant in a differently-shaped
+   nested node, invisible to a plain `GrantStmt` walk); `CREATE FUNCTION`
+   with no matching, same-signature `REVOKE` in the same file — the prior
+   version's file-wide `ALTER DEFAULT PRIVILEGES` exemption (any such
+   statement anywhere in a file silently covered every function in it,
+   regardless of schema) is REMOVED entirely; `CREATE POLICY` with
+   `USING (true)`/`WITH CHECK (true)` on a table not in
+   `grant-allowlist.json`'s `public_data_tables`; `UPDATE`/`ALL` policies
+   with no `WITH CHECK` at all (Postgres silently reuses `USING` as the
+   write-time check when omitted); `SECURITY DEFINER` functions with no
+   `SET search_path` ending in `pg_temp`.
+   **Scans the WHOLE `supabase/migrations` directory on every run, not a
+   git diff** — diff-scoping was found to make the guard provably
+   ineffective on a direct push to `main` (`HEAD==origin/main` means an
+   empty diff, so a push-triggered run checked nothing).
+   **CUTOFF MODEL, not a baseline (redesigned 9 Oct 2026, same day,
+   replacing an earlier whole-history-baseline design before it was ever
+   committed).** A real whole-history scan under that earlier design
+   found 213 pre-existing findings (89×R7, 72×R10, 24×R9, 21×R1, 3×R8,
+   2×R4) across 108 files — auto-accepting all 213 into a baseline with
+   invented reasons would have made the baseline a rubber stamp, not a
+   record of real review, so per explicit instruction the baseline
+   approach was dropped for a cutoff instead:
+   - **LEGACY** — a migration whose 14-digit timestamp prefix is
+     `< 20261008000000` (the date the lockdown first landed) is **not
+     scanned by this guard at all**. It is governed by **live-database
+     audit** instead — the Phase 4 inventory and this file's own
+     per-table findings reflect the schema's actual current grant state,
+     which is what matters; a legacy migration's original `GRANT`
+     statements may have already been superseded by a later migration
+     (confirmed true for at least one 213-finding instance — a 27 Jul
+     2026 migration's `GRANT UPDATE ON deal_room_members TO anon` no
+     longer reflects live state, since the Phase 4 inventory independently
+     found that table currently has no UPDATE grant for either role at
+     all), so re-deriving a static finding from old SQL text would
+     misrepresent risk in either direction.
+   - **IN-SCOPE** — a migration timestamped `>= 20261008000000` must
+     produce **zero findings**, full stop. No baseline exception exists
+     for an in-scope file; `grant-allowlist.json`'s two narrow buckets
+     (R7's genuinely-public functions, R8's genuinely-public tables) are
+     the only exception path, and both require a reviewed `reason` +
+     `evidence`.
+   - **UNPARSEABLE** — a filename not matching `^\d{14}_.+\.sql$` is a
+     **hard build failure on its own**, regardless of its SQL content. A
+     file with no verifiable timestamp cannot be classified either
+     direction, and guessing (treat as legacy, or treat as in-scope)
+     would be a silent decision dressed as a null result. Confirmed live
+     against this exact repo: three untracked `DRAFT_*.sql` scratch files
+     from earlier session phases currently fail the build under this
+     rule — real, expected, not a guard bug — pending either a rename
+     into the real convention or deletion, neither decided here.
+   `frontend/scripts/grant-baseline.json` remains present and loaded (so
+   the guard fails loudly if it's ever missing) but is **not consulted**
+   to suppress any in-scope finding under this model, and must stay
+   empty — a non-empty baseline file now fails the build itself, as a
+   signal that something is using a mechanism the current design doesn't
+   support. **Self-test suite** (`check-grants.test.mjs` +
+   `scripts/fixtures/*.sql`): **32/32 pass** — 20 rule-pair tests
+   (R1–R10, one bad + one good fixture each), the R7 file-wide-exemption
+   regression test, two allowlist-suppression tests, the `DELETE`
+   column-list exclusion test, six cutoff-classification tests (legacy,
+   in-scope, the exact cutoff boundary treated as in-scope since the
+   comparison is `>=` not `>`, unparseable, and two content-based proofs
+   that the legacy/in-scope split is genuinely about the filename and not
+   about the SQL being coincidentally clean), an orphaned-fixture check,
+   and one end-to-end integration test proving the real `scanFiles` path
+   excludes a legacy-dated fixture entirely. Run in CI *before* the real
+   guard. **Still does not check**: `WITH CHECK` *correctness* (only its
+   presence/absence per R9, and the literal `true` case per R8), RLS
+   enablement, or whether a granted column should be writable at all —
+   human judgment calls, not static-analysis questions. **Branch
+   protection: `main` has none configured** (`gh api
+   .../branches/main/protection` → `404 Branch not protected`) — this
+   guard is not yet a required status check and cannot yet block a merge;
+   anyone with write access can push past a red CI run today. Flagged,
+   not fixed, as part of this build — a repository-settings change, not a
+   code change.
 8. Every migration ships with a dry-run (`BEGIN`/`ROLLBACK`,
    `SET LOCAL ROLE`) asserting `SQLSTATE 42501` for each attack and a
    positive control for each legitimate flow, plus a real-HTTP smoke test
@@ -346,9 +439,10 @@ grant-allowlist guard; secret scan; dependency audit; migration dry-run
 with `42501` assertions plus real-HTTP smoke; adversarial test as a
 no-access account; rate-limit and cost impact stated.
 
-**Status note:** several of the checks this gate requires are themselves
-marked REQUIRED – NOT YET BUILT above (the grant-allowlist guard, §1.7;
-the CI red-team injection suite, §6.7). This gate cannot be fully enforced
-until those exist. The checks that do exist today (`tsc` baseline,
-`check-action-split`, build, gzip) are already run on every branch per
-`CLAUDE.md` §5.
+**Status note, updated 9 Oct 2026:** the grant-allowlist guard (§1.7) is
+now built and wired (`check-grants.mjs`, the `grant-guard` CI job) — one
+of the two items this gate previously listed as blocking is closed. The
+CI red-team injection suite (§6.7) remains REQUIRED – NOT YET BUILT; this
+gate cannot be fully enforced until that exists too. The checks that do
+exist today (`tsc` baseline, `check-action-split`, `check-grants`, build,
+gzip) are already run on every branch per `CLAUDE.md` §5.
