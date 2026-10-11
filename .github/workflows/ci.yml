@@ -25,6 +25,32 @@ defaults:
     working-directory: frontend
 
 jobs:
+  grant-guard:
+    name: Migration grant guard
+    runs-on: ubuntu-latest
+    steps:
+      # No longer needs fetch-depth: 0 — this guard scans the WHOLE
+      # supabase/migrations directory every run (see
+      # frontend/scripts/check-grants.mjs's header for why diff-scoping
+      # was dropped on 9 Oct 2026: a direct push to main has
+      # HEAD==origin/main, so a diff-scoped scan found nothing to check
+      # on exactly the trigger meant to catch a post-merge regression).
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      # Self-tests run BEFORE the real guard — a guard whose own
+      # detection rules are unproven is not something to gate a build
+      # on. One bad + one good fixture per rule (R1-R10), plus a named
+      # regression test for the file-wide-ALTER-DEFAULT-PRIVILEGES false
+      # negative this guard's prior version shipped with on its very
+      # first adversarial review.
+      - run: node scripts/check-grants.test.mjs
+      - run: node scripts/check-grants.mjs
+
   serverfn-authz-guard:
     name: Server-fn service-role auth guard
     runs-on: ubuntu-latest

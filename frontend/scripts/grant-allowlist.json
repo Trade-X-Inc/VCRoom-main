@@ -1,0 +1,5 @@
+{
+  "_comment": "Allowlist for scripts/check-grants.mjs (SECURITY.md §1.7). Two buckets only — GRANT-to-anon/public, GRANT ALL, schema-wide grants, unscoped INSERT/UPDATE, and ALTER DEFAULT PRIVILEGES grants to client roles (R1-R6) have NO allowlist: they always fail the build, by design, per explicit instruction. Only R8 (USING/WITH CHECK (true)) and R7 (an intentionally public-executable function) are allowlistable, because both have a legitimate use case this codebase already relies on (public founder/investor profile pages; anonymous invite-token preview functions). Every entry must carry 'reason' and 'evidence' except plain table names in public_data_tables, which are self-evidently public by nature (a published, intentionally-public-facing table) — add a reason there too if the table's public status is not obvious from its name.",
+  "public_data_tables": [],
+  "function_execute_without_revoke": []
+}

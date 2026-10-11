@@ -1,0 +1,4 @@
+{
+  "_comment": "Baseline of known findings in supabase/migrations as of the whole-directory scan that built this file. Each entry is {file, rule, detail, reason} — the (file, rule, detail) triple must match exactly what check-grants.mjs reports for the finding to be matched and treated as known rather than new. A finding not in this file always fails the build; adding a finding here requires stating why it's accepted, not just suppressing it. See scripts/check-grants.mjs's own header for the rule numbers (R1-R10).",
+  "findings": []
+}
