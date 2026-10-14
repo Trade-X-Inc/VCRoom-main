@@ -12,6 +12,23 @@ function getAdmin() {
   return { url, key };
 }
 
+// Added 11 Oct 2026, same follow-up hardening as deal-room-fn.ts (see
+// that file's own header comment for the full rationale): every
+// function below interpolates client-supplied ids raw into a
+// PostgREST path string via sbFetch — a malformed id containing `&`
+// or `=` could inject an additional filter clause into the request.
+// A strict UUID check before interpolation closes it.
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isValidUuid(v: unknown): v is string {
+  return typeof v === "string" && UUID_RE.test(v);
+}
+// Same adjacent finding as deal-room-fn.ts: meeting_number is also
+// interpolated raw, same injection class, different value type.
+function isValidMeetingNumber(v: unknown): v is number {
+  return typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= 5;
+}
+
 async function sbFetch(url: string, key: string, path: string, method: string, body?: unknown) {
   const resp = await fetch(`${url}/rest/v1/${path}`, {
     method,
@@ -38,6 +55,14 @@ async function requireRoomMember(
   dealRoomId: string,
   accessToken: string | undefined,
 ): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  // Helper-level guard, added per review 11 Oct 2026 — same reasoning as
+  // deal-room-fn.ts's identical helper: every current call site already
+  // validates dealRoomId first, but this helper interpolates it raw into
+  // a PostgREST path two lines below regardless, so it checks for
+  // itself rather than trusting every current and future caller.
+  if (!isValidUuid(dealRoomId)) {
+    return { ok: false, error: "invalid_deal_room_id" };
+  }
   const auth = await requireUser(accessToken);
   if (!auth.ok) return { ok: false, error: auth.error };
   const rows: any[] = await sbFetch(
@@ -79,6 +104,12 @@ export const upsertDealRoomMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    if (!isValidUuid(data.deal_room_id)) {
+      return { ok: false, error: "invalid_deal_room_id" };
+    }
+    if (!isValidMeetingNumber(data.meeting_number)) {
+      return { ok: false, error: "invalid_meeting_number" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
@@ -192,6 +223,7 @@ export const getDealRoomWorkflow = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ data: WorkflowState | null }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { data: null };
+    if (!isValidUuid(data.deal_room_id)) return { data: null };
 
     // Fix, 11 Oct 2026 — this handler had NO identity derivation at all:
     // any caller, authenticated or not, supplying any deal_room_id got

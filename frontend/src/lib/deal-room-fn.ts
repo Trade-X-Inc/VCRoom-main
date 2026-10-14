@@ -57,6 +57,40 @@ function getAdmin() {
   return { url, key };
 }
 
+// Added 11 Oct 2026 (follow-up hardening after the 5 authz fixes in
+// this session). Every function below builds its PostgREST request
+// path via raw template-literal interpolation into sbFetch's `path`
+// argument — NOT the Supabase JS client's parameterized `.eq()` (that
+// shape lives in doc-request-fn.ts instead, which is not affected by
+// this class of issue at all: the JS client encodes filter values
+// safely regardless of content). A client-supplied id containing `&`,
+// `=`, or a PostgREST operator syntax, interpolated into
+// `...?id=eq.${data.someId}&...`, can inject an ADDITIONAL filter
+// clause into the request — e.g. a deal_room_id of
+// "X&visibility=eq.public" turns one filter into two. This is not
+// classic SQL injection (PostgREST parameterizes the real SQL itself,
+// downstream of this string), but it is a real PostgREST query-string
+// injection surface on every path built this way. A strict UUID check
+// before interpolation closes it: every one of this file's UUID-typed
+// client-supplied ids (deal_room_id, request_id, granted_to) is now
+// rejected outright if it isn't a well-formed UUID, before any fetch.
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isValidUuid(v: unknown): v is string {
+  return typeof v === "string" && UUID_RE.test(v);
+}
+
+// Adjacent finding, same injection class, flagged separately from the
+// UUID task since it's a different value type: meeting_number is also
+// interpolated raw into a URL (`meeting_number=eq.${data.meeting_number}`)
+// in skipMeeting/completeMeeting/updateMeetingNotes, with no bound
+// check at all before this fix. Range matches STAGE_SLUG_BY_NUMBER's
+// own 5-element bound (the array this value indexes into elsewhere in
+// this file).
+function isValidMeetingNumber(v: unknown): v is number {
+  return typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= 5;
+}
+
 async function sbFetch(
   url: string,
   key: string,
@@ -113,6 +147,16 @@ async function requireRoomMember(
   dealRoomId: string,
   accessToken: string | undefined,
 ): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  // Helper-level guard, added per review 11 Oct 2026 — every call site
+  // already validates dealRoomId before calling this helper (see each
+  // handler above), but grantSectionAccess didn't, until that was found
+  // and fixed separately. Defense in depth: this helper interpolates
+  // dealRoomId raw into a PostgREST path two lines below, so it checks
+  // for itself rather than trusting every current and future caller to
+  // remember to validate first.
+  if (!isValidUuid(dealRoomId)) {
+    return { ok: false, error: "invalid_deal_room_id" };
+  }
   const auth = await requireUser(accessToken);
   if (!auth.ok) return { ok: false, error: auth.error };
   const rows: any[] = await sbFetch(
@@ -137,6 +181,10 @@ async function principalRoomMember(
   dealRoomId: string,
   accessToken: string | undefined,
 ): Promise<{ ok: true; uid: string } | { ok: false; error: string }> {
+  // Helper-level guard, same reasoning as requireRoomMember above.
+  if (!isValidUuid(dealRoomId)) {
+    return { ok: false, error: "invalid_deal_room_id" };
+  }
   const auth = await requireUser(accessToken);
   if (!auth.ok) return { ok: false, error: auth.error };
   const rows: any[] = await sbFetch(
@@ -175,6 +223,12 @@ export const skipMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    if (!isValidUuid(data.deal_room_id)) {
+      return { ok: false, error: "invalid_deal_room_id" };
+    }
+    if (!isValidMeetingNumber(data.meeting_number)) {
+      return { ok: false, error: "invalid_meeting_number" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
@@ -234,6 +288,12 @@ export const completeMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    if (!isValidUuid(data.deal_room_id)) {
+      return { ok: false, error: "invalid_deal_room_id" };
+    }
+    if (!isValidMeetingNumber(data.meeting_number)) {
+      return { ok: false, error: "invalid_meeting_number" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
@@ -311,6 +371,12 @@ export const updateMeetingNotes = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    if (!isValidUuid(data.deal_room_id)) {
+      return { ok: false, error: "invalid_deal_room_id" };
+    }
+    if (!isValidMeetingNumber(data.meeting_number)) {
+      return { ok: false, error: "invalid_meeting_number" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
 
@@ -366,6 +432,9 @@ export const createDocumentRequest = createServerFn({ method: "POST" })
     async ({ data }): Promise<{ ok: boolean; blocked: boolean; blocked_reason?: string; id?: string; error?: string }> => {
       const { url, key } = getAdmin();
       if (!url || !key) return { ok: false, blocked: false, error: "db_unavailable" };
+      if (!isValidUuid(data.deal_room_id)) {
+        return { ok: false, blocked: false, error: "invalid_deal_room_id" };
+      }
       const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
       if (!auth.ok) return { ok: false, blocked: false, error: auth.error };
 
@@ -423,6 +492,9 @@ export const respondToDocumentRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    if (!isValidUuid(data.deal_room_id) || !isValidUuid(data.request_id)) {
+      return { ok: false, error: "invalid_id" };
+    }
     const auth = await requireRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
@@ -490,6 +562,24 @@ export const grantSectionAccess = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; id?: string; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    // Found during the Fix 5 exhaustive interpolation sweep — this
+    // function was the one call site in this file reaching
+    // principalRoomMember() (and therefore its own raw deal_room_id
+    // interpolation, see that function's definition above) with zero
+    // prior validation. granted_to/section are written into the POST
+    // body, not path-interpolated, so they're not vulnerable to the
+    // same query-string-injection class — but deal_room_id is, via
+    // principalRoomMember, so it's validated the same as every sibling
+    // function in this file.
+    if (!isValidUuid(data.deal_room_id) || !isValidUuid(data.granted_to)) {
+      return { ok: false, error: "invalid_id" };
+    }
+    if (
+      typeof data.section !== "string" ||
+      !/^[a-zA-Z0-9_]{1,64}$/.test(data.section)
+    ) {
+      return { ok: false, error: "invalid_section" };
+    }
     const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();
@@ -521,6 +611,22 @@ export const revokeSectionAccess = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+    if (!isValidUuid(data.deal_room_id) || !isValidUuid(data.granted_to)) {
+      return { ok: false, error: "invalid_id" };
+    }
+    // section is not a UUID but is ALSO interpolated raw into the URL
+    // below (same injection class) — this function has zero real
+    // callers today (confirmed by grep, flagged separately), so no
+    // real section value set exists to validate against; this is a
+    // conservative slug-shape check (alphanumeric/underscore only, no
+    // DB CHECK constraint exists for this column either) rather than
+    // a specific enum, pending that enum being decided.
+    if (
+      typeof data.section !== "string" ||
+      !/^[a-zA-Z0-9_]{1,64}$/.test(data.section)
+    ) {
+      return { ok: false, error: "invalid_section" };
+    }
     const auth = await principalRoomMember(url, key, data.deal_room_id, data.accessToken);
     if (!auth.ok) return { ok: false, error: auth.error };
     const now = new Date().toISOString();

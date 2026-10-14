@@ -11,6 +11,23 @@ function getAdminClient(url?: string, key?: string) {
   return createClient(resolvedUrl, resolvedKey, { auth: { persistSession: false } });
 }
 
+// Added 11 Oct 2026, same follow-up hardening pass as deal-room-fn.ts /
+// deal-room-workflow-fn.ts. UNLIKE those two files, this one builds every
+// query through the Supabase JS client's `.eq()` chain (confirmed by grep:
+// zero raw-string path interpolation anywhere in this file) — so it is NOT
+// vulnerable to the PostgREST query-string injection class that motivated
+// those files' checks; the JS client parameterizes filter values regardless
+// of content. This validation is purely defensive: a malformed id reaching
+// `.eq()` here just produces a confusing zero-row "not_found"/"Unauthorized"
+// result today. A format check up front gives a clearer invalid_id error
+// instead of a misleading one, and keeps this file's id handling consistent
+// with the other two in this same pass.
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isValidUuid(v: unknown): v is string {
+  return typeof v === "string" && UUID_RE.test(v);
+}
+
 // ─── getDocRequests ───────────────────────────────────────────────────────────
 export const getDocRequests = createServerFn({ method: "POST" })
   .inputValidator(
@@ -21,6 +38,10 @@ export const getDocRequests = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+
+    if (!isValidUuid(data.dealRoomId)) {
+      return { requests: [], error: "invalid_id" };
+    }
 
     // Identity from the token — the userAccessToken field previously existed
     // but was never checked; the membership check ran against a raw userId
@@ -57,6 +78,10 @@ export const createDocRequest = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+
+    if (!isValidUuid(data.dealRoomId) || !isValidUuid(data.forUserId)) {
+      return { success: false, error: "invalid_id" };
+    }
 
     // Identity from the token — never trust a client-supplied requestedBy.
     // See CLAUDE.md §51.
@@ -114,6 +139,16 @@ export const fulfillDocRequest = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sb = getAdminClient(data.supabaseUrl, data.supabaseKey);
+
+    if (
+      !isValidUuid(data.dealRoomId) ||
+      !isValidUuid(data.requestId) ||
+      (data.documentId !== undefined &&
+        data.documentId !== null &&
+        !isValidUuid(data.documentId))
+    ) {
+      return { success: false, error: "invalid_id" };
+    }
 
     // Identity from the token — never trust a client-supplied userId.
     // See CLAUDE.md §51.
