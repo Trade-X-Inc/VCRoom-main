@@ -24,16 +24,25 @@
  * reasoning as deleting triggerDeskCron). The retired batch logic remains in
  * git history; it is not shipped.
  *
- * PARTIAL FIX, NOT CLOSED — see CLAUDE.md §7.1: founder_id/startup_id still
- * arrive as query params with no in-function identity derivation, mitigated
- * only by the CALLER (seedFounderPlaybook) checking ownership before invoking.
- * Any authenticated principal can still target another founder's ids. Full fix
- * (requireUser + ownership check INSIDE this function) is scoped for this
- * function's rebuild.
+ * IN-FUNCTION IDENTITY (11 Oct 2026) — closes the PARTIAL FIX gap above.
+ * founder_id/startup_id were query params with no in-function identity
+ * derivation, mitigated only by the CALLER (seedFounderPlaybook) checking
+ * ownership before invoking — the exact "caller-checked, not function-
+ * enforced" shape CLAUDE.md §7.1 already warns about generally. Any
+ * authenticated principal (including an anon-key holder, since verify_jwt
+ * alone does not exclude it — CLAUDE.md §7.1/§19d.1) could target another
+ * founder's ids. Fixed: resolveUid() derives the caller's own uid from
+ * their bearer token (same helper as ai-router/extract-pitch-deck/
+ * review-document, CLAUDE.md §19d.1), and the fast path now additionally
+ * requires startups.founder_id === uid before generating anything — a
+ * caller who is a real, authenticated user but not this startup's founder
+ * is rejected in-function, not merely by the one known caller's own
+ * pre-check. Source change only; not deployed as part of this edit.
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveUid } from "./_shared/auth.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -467,9 +476,32 @@ serve(async (req) => {
     const singleFounderId = url.searchParams.get("founder_id");
     const singleStartupId = url.searchParams.get("startup_id");
     if (singleFounderId && singleStartupId) {
-      const pb = await generateFounderPlaybookTasks(admin, singleFounderId, singleStartupId);
+      // Identity from the caller's own token — never trust founder_id as
+      // given. See the file header note above and CLAUDE.md §7.1/§19d.1.
+      const uid = await resolveUid(req, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      if (!uid) {
+        return new Response(JSON.stringify({ error: "not_authenticated" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Ownership: the caller must actually be this startup's founder.
+      // founder_id in the query string is informational only from here on —
+      // it is never used to establish identity or authorization, only uid is.
+      const { data: startup, error: startupErr } = await admin
+        .from("startups")
+        .select("founder_id")
+        .eq("id", singleStartupId)
+        .maybeSingle();
+      if (startupErr || !startup || startup.founder_id !== uid) {
+        return new Response(JSON.stringify({ error: "not_authorized" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const pb = await generateFounderPlaybookTasks(admin, uid, singleStartupId);
       return new Response(
-        JSON.stringify({ ok: true, playbook_tasks_generated: pb, founder_id: singleFounderId }),
+        JSON.stringify({ ok: true, playbook_tasks_generated: pb, founder_id: uid }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

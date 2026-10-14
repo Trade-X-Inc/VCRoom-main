@@ -322,8 +322,18 @@ export const seedFounderPlaybook = createServerFn({ method: "POST" })
   .inputValidator((d: unknown): SeedInput => d as SeedInput)
   .handler(async ({ data }): Promise<{ ok: boolean; tasksGenerated?: number; error?: string }> => {
     const supabaseUrl = getEnvVar("SUPABASE_URL") || getEnvVar("VITE_SUPABASE_URL");
-    const supabaseKey = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
-    if (!supabaseUrl || !supabaseKey) return { ok: false, error: "Missing config" };
+    // Presence-only check, per the Fix 8 review: the service-role key is
+    // never forwarded from this function any more (see the 11 Oct 2026
+    // comment below on the Authorization header) — daily-desk-cron needs
+    // its own copy of this key configured in ITS OWN environment to do
+    // its privileged writes, so this gate stays as a config sanity check,
+    // not because the value is used here.
+    const hasServiceRoleKeyConfigured = !!getEnvVar(
+      "SUPABASE_SERVICE_ROLE_KEY",
+    );
+    if (!supabaseUrl || !hasServiceRoleKeyConfigured) {
+      return { ok: false, error: "Missing config" };
+    }
 
     // Identity from the token — never trust a client-supplied founderId.
     // See CLAUDE.md §51.
@@ -334,12 +344,24 @@ export const seedFounderPlaybook = createServerFn({ method: "POST" })
     if (!owned) return { ok: false, error: "not_authorized" };
 
     try {
+      // Fix, 11 Oct 2026 — this used to send the SERVICE-ROLE key as the
+      // bearer token. daily-desk-cron's fast path now derives identity via
+      // resolveUid(), which verifies the bearer against /auth/v1/user — a
+      // service-role key has no `sub` claim and would be rejected outright,
+      // breaking this exact call. Forward the caller's OWN access token
+      // instead (already verified above via requireUser, and the
+      // founder_id query param is now purely informational — the edge
+      // function derives its own uid from this same token and ignores the
+      // query param for identity purposes). The service-role key stays out
+      // of this request entirely; the edge function still writes with its
+      // own privileged client, built from its own env var, independent of
+      // whatever bearer token arrives.
       const resp = await fetch(
         `${supabaseUrl}/functions/v1/daily-desk-cron?founder_id=${encodeURIComponent(auth.uid)}&startup_id=${encodeURIComponent(data.startupId)}`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${supabaseKey}`,
+            Authorization: `Bearer ${data.accessToken}`,
             "Content-Type": "application/json",
           },
         },
