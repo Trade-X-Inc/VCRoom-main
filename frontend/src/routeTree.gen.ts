@@ -28,6 +28,7 @@ import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
+import { Route as PackIndexRouteImport } from './routes/pack.index'
 import { Route as LegalIndexRouteImport } from './routes/legal.index'
 import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
 import { Route as DocsV2IndexRouteImport } from './routes/docs-v2.index'
@@ -44,6 +45,7 @@ import { Route as ResourcesChangelogRouteImport } from './routes/resources.chang
 import { Route as ProductSecurityRouteImport } from './routes/product.security'
 import { Route as ProductPricingRouteImport } from './routes/product.pricing'
 import { Route as ProductHowItWorksRouteImport } from './routes/product.how-it-works'
+import { Route as PackPackIdRouteImport } from './routes/pack.$packId'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalSubProcessorsRouteImport } from './routes/legal.sub-processors'
@@ -114,6 +116,7 @@ import { Route as ProductCompareFirmexRouteImport } from './routes/product.compa
 import { Route as ProductCompareDocsendRouteImport } from './routes/product.compare.docsend'
 import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
 import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
+import { Route as PackPackIdMissingRouteImport } from './routes/pack.$packId_.missing'
 import { Route as DealsPreviewProfileThesisRouteImport } from './routes/deals-preview.profile_.thesis'
 import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-preview.profile_.team'
 import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
@@ -287,6 +290,11 @@ const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
   path: '/resources/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PackIndexRoute = PackIndexRouteImport.update({
+  id: '/pack/',
+  path: '/pack/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalIndexRoute = LegalIndexRouteImport.update({
   id: '/legal/',
   path: '/legal/',
@@ -366,6 +374,11 @@ const ProductPricingRoute = ProductPricingRouteImport.update({
 const ProductHowItWorksRoute = ProductHowItWorksRouteImport.update({
   id: '/product/how-it-works',
   path: '/product/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackPackIdRoute = PackPackIdRouteImport.update({
+  id: '/pack/$packId',
+  path: '/pack/$packId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PSlugRoute = PSlugRouteImport.update({
@@ -716,6 +729,11 @@ const ProductCompareDealroomRoute = ProductCompareDealroomRouteImport.update({
 const ProductCompareDatasiteRoute = ProductCompareDatasiteRouteImport.update({
   id: '/product/compare/datasite',
   path: '/product/compare/datasite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackPackIdMissingRoute = PackPackIdMissingRouteImport.update({
+  id: '/pack/$packId_/missing',
+  path: '/pack/$packId/missing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealsPreviewProfileThesisRoute =
@@ -1218,6 +1236,7 @@ export interface FileRoutesByFullPath {
   '/legal/sub-processors': typeof LegalSubProcessorsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
+  '/pack/$packId': typeof PackPackIdRoute
   '/product/how-it-works': typeof ProductHowItWorksRoute
   '/product/pricing': typeof ProductPricingRoute
   '/product/security': typeof ProductSecurityRoute
@@ -1234,6 +1253,7 @@ export interface FileRoutesByFullPath {
   '/docs-v2/': typeof DocsV2IndexRoute
   '/glossary/': typeof GlossaryIndexRoute
   '/legal/': typeof LegalIndexRoute
+  '/pack/': typeof PackIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
   '/templates/': typeof TemplatesIndexRoute
@@ -1273,6 +1293,7 @@ export interface FileRoutesByFullPath {
   '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
   '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
   '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
+  '/pack/$packId/missing': typeof PackPackIdMissingRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
   '/product/compare/docsend': typeof ProductCompareDocsendRoute
@@ -1399,6 +1420,7 @@ export interface FileRoutesByTo {
   '/legal/sub-processors': typeof LegalSubProcessorsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
+  '/pack/$packId': typeof PackPackIdRoute
   '/product/how-it-works': typeof ProductHowItWorksRoute
   '/product/pricing': typeof ProductPricingRoute
   '/product/security': typeof ProductSecurityRoute
@@ -1415,6 +1437,7 @@ export interface FileRoutesByTo {
   '/docs-v2': typeof DocsV2IndexRoute
   '/glossary': typeof GlossaryIndexRoute
   '/legal': typeof LegalIndexRoute
+  '/pack': typeof PackIndexRoute
   '/resources': typeof ResourcesIndexRoute
   '/sectors': typeof SectorsIndexRoute
   '/templates': typeof TemplatesIndexRoute
@@ -1454,6 +1477,7 @@ export interface FileRoutesByTo {
   '/deals-preview/profile/full': typeof DealsPreviewProfileFullRoute
   '/deals-preview/profile/team': typeof DealsPreviewProfileTeamRoute
   '/deals-preview/profile/thesis': typeof DealsPreviewProfileThesisRoute
+  '/pack/$packId/missing': typeof PackPackIdMissingRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
   '/product/compare/docsend': typeof ProductCompareDocsendRoute
@@ -1584,6 +1608,7 @@ export interface FileRoutesById {
   '/legal/sub-processors': typeof LegalSubProcessorsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/p/$slug': typeof PSlugRoute
+  '/pack/$packId': typeof PackPackIdRoute
   '/product/how-it-works': typeof ProductHowItWorksRoute
   '/product/pricing': typeof ProductPricingRoute
   '/product/security': typeof ProductSecurityRoute
@@ -1600,6 +1625,7 @@ export interface FileRoutesById {
   '/docs-v2/': typeof DocsV2IndexRoute
   '/glossary/': typeof GlossaryIndexRoute
   '/legal/': typeof LegalIndexRoute
+  '/pack/': typeof PackIndexRoute
   '/resources/': typeof ResourcesIndexRoute
   '/sectors/': typeof SectorsIndexRoute
   '/templates/': typeof TemplatesIndexRoute
@@ -1639,6 +1665,7 @@ export interface FileRoutesById {
   '/deals-preview/profile_/full': typeof DealsPreviewProfileFullRoute
   '/deals-preview/profile_/team': typeof DealsPreviewProfileTeamRoute
   '/deals-preview/profile_/thesis': typeof DealsPreviewProfileThesisRoute
+  '/pack/$packId_/missing': typeof PackPackIdMissingRoute
   '/product/compare/datasite': typeof ProductCompareDatasiteRoute
   '/product/compare/dealroom': typeof ProductCompareDealroomRoute
   '/product/compare/docsend': typeof ProductCompareDocsendRoute
@@ -1770,6 +1797,7 @@ export interface FileRouteTypes {
     | '/legal/sub-processors'
     | '/legal/terms'
     | '/p/$slug'
+    | '/pack/$packId'
     | '/product/how-it-works'
     | '/product/pricing'
     | '/product/security'
@@ -1786,6 +1814,7 @@ export interface FileRouteTypes {
     | '/docs-v2/'
     | '/glossary/'
     | '/legal/'
+    | '/pack/'
     | '/resources/'
     | '/sectors/'
     | '/templates/'
@@ -1825,6 +1854,7 @@ export interface FileRouteTypes {
     | '/deals-preview/profile/full'
     | '/deals-preview/profile/team'
     | '/deals-preview/profile/thesis'
+    | '/pack/$packId/missing'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
     | '/product/compare/docsend'
@@ -1951,6 +1981,7 @@ export interface FileRouteTypes {
     | '/legal/sub-processors'
     | '/legal/terms'
     | '/p/$slug'
+    | '/pack/$packId'
     | '/product/how-it-works'
     | '/product/pricing'
     | '/product/security'
@@ -1967,6 +1998,7 @@ export interface FileRouteTypes {
     | '/docs-v2'
     | '/glossary'
     | '/legal'
+    | '/pack'
     | '/resources'
     | '/sectors'
     | '/templates'
@@ -2006,6 +2038,7 @@ export interface FileRouteTypes {
     | '/deals-preview/profile/full'
     | '/deals-preview/profile/team'
     | '/deals-preview/profile/thesis'
+    | '/pack/$packId/missing'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
     | '/product/compare/docsend'
@@ -2135,6 +2168,7 @@ export interface FileRouteTypes {
     | '/legal/sub-processors'
     | '/legal/terms'
     | '/p/$slug'
+    | '/pack/$packId'
     | '/product/how-it-works'
     | '/product/pricing'
     | '/product/security'
@@ -2151,6 +2185,7 @@ export interface FileRouteTypes {
     | '/docs-v2/'
     | '/glossary/'
     | '/legal/'
+    | '/pack/'
     | '/resources/'
     | '/sectors/'
     | '/templates/'
@@ -2190,6 +2225,7 @@ export interface FileRouteTypes {
     | '/deals-preview/profile_/full'
     | '/deals-preview/profile_/team'
     | '/deals-preview/profile_/thesis'
+    | '/pack/$packId_/missing'
     | '/product/compare/datasite'
     | '/product/compare/dealroom'
     | '/product/compare/docsend'
@@ -2302,6 +2338,7 @@ export interface RootRouteChildren {
   LegalSubProcessorsRoute: typeof LegalSubProcessorsRoute
   LegalTermsRoute: typeof LegalTermsRoute
   PSlugRoute: typeof PSlugRoute
+  PackPackIdRoute: typeof PackPackIdRoute
   ProductHowItWorksRoute: typeof ProductHowItWorksRoute
   ProductPricingRoute: typeof ProductPricingRoute
   ProductSecurityRoute: typeof ProductSecurityRoute
@@ -2316,6 +2353,7 @@ export interface RootRouteChildren {
   DealsPreviewIndexRoute: typeof DealsPreviewIndexRoute
   GlossaryIndexRoute: typeof GlossaryIndexRoute
   LegalIndexRoute: typeof LegalIndexRoute
+  PackIndexRoute: typeof PackIndexRoute
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   SectorsIndexRoute: typeof SectorsIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
@@ -2327,6 +2365,7 @@ export interface RootRouteChildren {
   DealsPreviewProfileFullRoute: typeof DealsPreviewProfileFullRoute
   DealsPreviewProfileTeamRoute: typeof DealsPreviewProfileTeamRoute
   DealsPreviewProfileThesisRoute: typeof DealsPreviewProfileThesisRoute
+  PackPackIdMissingRoute: typeof PackPackIdMissingRoute
   ProductCompareDatasiteRoute: typeof ProductCompareDatasiteRoute
   ProductCompareDealroomRoute: typeof ProductCompareDealroomRoute
   ProductCompareDocsendRoute: typeof ProductCompareDocsendRoute
@@ -2474,6 +2513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResourcesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pack/': {
+      id: '/pack/'
+      path: '/pack'
+      fullPath: '/pack/'
+      preLoaderRoute: typeof PackIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/': {
       id: '/legal/'
       path: '/legal'
@@ -2584,6 +2630,13 @@ declare module '@tanstack/react-router' {
       path: '/product/how-it-works'
       fullPath: '/product/how-it-works'
       preLoaderRoute: typeof ProductHowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pack/$packId': {
+      id: '/pack/$packId'
+      path: '/pack/$packId'
+      fullPath: '/pack/$packId'
+      preLoaderRoute: typeof PackPackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/p/$slug': {
@@ -3074,6 +3127,13 @@ declare module '@tanstack/react-router' {
       path: '/product/compare/datasite'
       fullPath: '/product/compare/datasite'
       preLoaderRoute: typeof ProductCompareDatasiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pack/$packId_/missing': {
+      id: '/pack/$packId_/missing'
+      path: '/pack/$packId/missing'
+      fullPath: '/pack/$packId/missing'
+      preLoaderRoute: typeof PackPackIdMissingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deals-preview/profile_/thesis': {
@@ -3927,6 +3987,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalSubProcessorsRoute: LegalSubProcessorsRoute,
   LegalTermsRoute: LegalTermsRoute,
   PSlugRoute: PSlugRoute,
+  PackPackIdRoute: PackPackIdRoute,
   ProductHowItWorksRoute: ProductHowItWorksRoute,
   ProductPricingRoute: ProductPricingRoute,
   ProductSecurityRoute: ProductSecurityRoute,
@@ -3941,6 +4002,7 @@ const rootRouteChildren: RootRouteChildren = {
   DealsPreviewIndexRoute: DealsPreviewIndexRoute,
   GlossaryIndexRoute: GlossaryIndexRoute,
   LegalIndexRoute: LegalIndexRoute,
+  PackIndexRoute: PackIndexRoute,
   ResourcesIndexRoute: ResourcesIndexRoute,
   SectorsIndexRoute: SectorsIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
@@ -3952,6 +4014,7 @@ const rootRouteChildren: RootRouteChildren = {
   DealsPreviewProfileFullRoute: DealsPreviewProfileFullRoute,
   DealsPreviewProfileTeamRoute: DealsPreviewProfileTeamRoute,
   DealsPreviewProfileThesisRoute: DealsPreviewProfileThesisRoute,
+  PackPackIdMissingRoute: PackPackIdMissingRoute,
   ProductCompareDatasiteRoute: ProductCompareDatasiteRoute,
   ProductCompareDealroomRoute: ProductCompareDealroomRoute,
   ProductCompareDocsendRoute: ProductCompareDocsendRoute,
