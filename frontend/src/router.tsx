@@ -1,4 +1,5 @@
 import { createRouter, useRouter } from "@tanstack/react-router";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import { routeTree } from "./routeTree.gen";
 
 function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
@@ -66,16 +67,24 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
 // (renderRouterToStream.js), so every inline script we emit carries it.
 //
 // Server-only by construction. getRouter() runs on both client and server,
-// but the import below is inside the server branch so the server entry
-// never reaches the client bundle. On the client this is a no-op — the
-// nonce is already baked into the HTML the server sent, and the client
+// so the server-only header read lives in readCspNonce, wrapped in
+// createServerOnlyFn: TanStack Start's own transform compiles that wrapper
+// (body and its dynamic import included) away in the client environment, which
+// is what keeps Vite's dev import-protection from rejecting
+// @tanstack/react-start/server in the client module graph (it cannot see that
+// the import.meta.env.SSR branch below is dead code in dev). In the
+// production build, import.meta.env.SSR is replaced with a literal, so the
+// call site is also statically eliminated from the client bundle — a runtime
+// `typeof window` check would NOT achieve that. On the client this is a no-op:
+// the nonce is already baked into the HTML the server sent, and the client
 // re-reads it from <meta property="csp-nonce"> via the framework's own
 // ssr-client hydration path.
-// import.meta.env.SSR is replaced with a literal by Vite at build time, so
-// this whole branch — and the server-only import it guards — is statically
-// eliminated from the client bundle. A runtime `typeof window` check would
-// NOT achieve that: the import would still be emitted and bundled.
 // Verified after build by grepping dist/client for getRequestHeader.
+const readCspNonce = createServerOnlyFn(async () => {
+  const { getRequestHeader } = await import("@tanstack/react-start/server");
+  return getRequestHeader("x-csp-nonce") || undefined;
+});
+
 // async is safe and intentional: the framework's server entry does
 // `router = await entries.routerEntry.getRouter()`, so returning a promise
 // is part of the supported contract (verified in the built server output).
@@ -83,8 +92,7 @@ export const getRouter = async () => {
   let nonce: string | undefined;
   if (import.meta.env.SSR) {
     try {
-      const { getRequestHeader } = await import("@tanstack/react-start/server");
-      nonce = getRequestHeader("x-csp-nonce") || undefined;
+      nonce = await readCspNonce();
     } catch {
       // Never throw out of router construction over a header read — a
       // missing nonce yields a page whose inline script is blocked (fails

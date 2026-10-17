@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAuth } from "@/lib/auth";
 import { useAuthStore } from "@/lib/auth-store";
-import { supabase } from "@/lib/supabase";
+import { useFounderStartup } from "@/lib/pack/useFounderStartup";
 import { callAction } from "@/lib/actions/call";
 import { packMissingFields } from "@/lib/actions/pack-prepare";
 import {
@@ -59,30 +59,32 @@ function PackMissingPage() {
   const { packId } = Route.useParams();
   const { user } = useAuth();
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["pack-missing", packId],
-    enabled: UUID_RE.test(packId),
-    queryFn: async () => {
-      // packMissingFields' own pack_api function self-authorizes via
-      // authz_is_startup_founder against the pack's own subject_ref —
-      // scopeId is not an authorization input (see pack-prepare.ts's own
-      // header), so the founder's startup id is used here purely by the
-      // slice's shared convention, resolved the same existing,
-      // unmodified way every other screen in this slice does.
-      const { data: startupRow, error: startupErr } = await supabase
-        .from("startups")
-        .select("id")
-        .eq("founder_id", user!.id)
-        .maybeSingle();
-      if (startupErr || !startupRow?.id) throw new Error("not_found");
+  const {
+    startup,
+    isLoading: startupLoading,
+    error: startupError,
+    message: startupMessage,
+  } = useFounderStartup();
 
-      const result = await callAction<{
-        ok: true;
-        missing_fields: MissingField[];
-      }>(packMissingFields, startupRow.id, { packId });
-      return result;
-    },
+  // packMissingFields self-authorizes via authz_is_startup_founder against
+  // the pack's own subject_ref; the startup id is only the action scopeId.
+  // The query does not run until the startup (and so the user) is loaded.
+  const {
+    data,
+    isLoading: dataLoading,
+    error: dataError,
+  } = useQuery({
+    queryKey: ["pack-missing", packId, startup?.id],
+    enabled: UUID_RE.test(packId) && !!startup?.id,
+    queryFn: () =>
+      callAction<{ ok: true; missing_fields: MissingField[] }>(
+        packMissingFields,
+        startup!.id,
+        { packId },
+      ),
   });
+  const isLoading = startupLoading || dataLoading;
+  const error = startupMessage ? null : startupError || dataError;
 
   const grouped = useMemo(() => {
     const bySection = new Map<string, MissingField[]>();
@@ -133,7 +135,14 @@ function PackMissingPage() {
         }
       />
 
-      {isLoading ? (
+      {!UUID_RE.test(packId) ? (
+        <LcsEmptyState
+          title="Could not load this pack"
+          text="This pack link isn't valid."
+        />
+      ) : startupMessage ? (
+        <LcsEmptyState title="Can't open this pack" text={startupMessage} />
+      ) : isLoading ? (
         <LcsSkeletonRows rows={5} columns={2} />
       ) : error ? (
         <LcsEmptyState

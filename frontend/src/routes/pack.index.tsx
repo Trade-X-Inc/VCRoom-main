@@ -2,8 +2,8 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
+import { useFounderStartup } from "@/lib/pack/useFounderStartup";
 import { useAuthStore } from "@/lib/auth-store";
 import { callAction } from "@/lib/actions/call";
 import { scheduleGet, packCreate } from "@/lib/actions/pack-prepare";
@@ -34,13 +34,9 @@ import {
 // (CLAUDE.md §8.3) — not promoted to public, but every write from this
 // screen is a genuine write to those tables, not a mock.
 //
-// The founder's own startup is loaded via the EXISTING, UNMODIFIED read
-// path already used throughout app.profile.tsx — direct
-// supabase.from("startups").select(...).eq("founder_id", user.id) — per
-// instruction, not reinvented here. That pattern resolves to
-// zero-or-one row per founder (every existing call site uses
-// .maybeSingle(), never a multi-row .select()), so "startup(s)" in
-// practice today is zero-or-one.
+// The founder's own startup is loaded via the shared useFounderStartup hook
+// (src/lib/pack/useFounderStartup.ts), so zero- and multiple-company founders
+// get the same distinct message on every /pack screen.
 //
 // Hardcoded sector/stage: "technology"/"seed" — the one published
 // schedule that exists today (CLAUDE.md §8.4's single seeded schedule).
@@ -71,38 +67,18 @@ export const Route = createFileRoute("/pack/")({
   component: PackIndexPage,
 });
 
-async function getAccessToken(): Promise<string> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return session?.access_token ?? "";
-}
-
 function PackIndexPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
 
-  // Founder's own startup — existing, unmodified read path (not
-  // app.profile.tsx's exact query site, but the identical shape used
-  // throughout that file: direct founder_id-scoped select, RLS-governed,
-  // .maybeSingle()).
-  const { data: startup, isLoading: startupLoading } = useQuery({
-    queryKey: ["pack-startup", user?.id],
-    enabled: !!user?.id,
-    queryFn: async (): Promise<Startup | null> => {
-      const { data, error } = await supabase
-        .from("startups")
-        .select("id, company_name")
-        .eq("founder_id", user!.id)
-        .maybeSingle();
-      if (error) {
-        console.error("[pack] startup lookup failed:", error);
-        return null;
-      }
-      return (data as Startup | null) ?? null;
-    },
-  });
+  // Shared lookup — same zero/multiple-company handling on every /pack screen.
+  const {
+    startup,
+    isLoading: startupLoading,
+    error: startupError,
+    message: startupMessage,
+  } = useFounderStartup();
 
   const {
     data: schedule,
@@ -111,8 +87,6 @@ function PackIndexPage() {
   } = useQuery({
     queryKey: ["pack-schedule", "technology", "seed"],
     queryFn: async () => {
-      const token = await getAccessToken();
-      void token; // callAction resolves its own session token; kept for clarity only
       const result = await callAction<{
         ok: true;
         schedule: { id: string } & Record<string, unknown>;
@@ -194,10 +168,12 @@ function PackIndexPage() {
         description="Build your disclosure pack against the published schedule for your sector and stage."
       />
 
-      {!startupLoading && !startup ? (
+      {startupMessage ? (
+        <LcsEmptyState title="Can't open this pack" text={startupMessage} />
+      ) : startupError && !startupLoading ? (
         <LcsEmptyState
-          title="No company profile yet"
-          text="Build your company profile before starting a pack."
+          title="Could not load your company"
+          text="Something went wrong. Try again."
         />
       ) : isLoading ? (
         <LcsSkeleton />

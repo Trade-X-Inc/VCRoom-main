@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useAuthStore } from "@/lib/auth-store";
-import { supabase } from "@/lib/supabase";
+import { useFounderStartup } from "@/lib/pack/useFounderStartup";
 import { callAction } from "@/lib/actions/call";
 import {
   scheduleGet,
@@ -123,18 +123,6 @@ export const Route = createFileRoute("/pack/$packId")({
   component: PackDetailPage,
 });
 
-// Thrown from the startup-lookup query to render a clear, specific
-// message rather than a crash or a generic "could not load" — per
-// instruction, zero-or-many startups for a founder is its own case, not
-// folded into the generic error path.
-class StartupLookupError extends Error {
-  constructor(public reason: "none" | "multiple") {
-    super(
-      reason === "none" ? "startup_lookup_none" : "startup_lookup_multiple",
-    );
-  }
-}
-
 function PackDetailPage() {
   const { packId } = Route.useParams();
   const { user } = useAuth();
@@ -143,31 +131,16 @@ function PackDetailPage() {
   const packQueryKey = ["pack-detail", packId];
 
   // Founder's own startup — used ONLY as this action's scopeId (the
-  // record-chain partition key; never an authorization input, per
-  // pack-prepare.ts's own header). packFieldsGet itself takes only
-  // {packId} and is authorized entirely server-side against the real
-  // caller uid. Resolved via a plain .select() (not .maybeSingle(), which
-  // throws a real error on more than one row rather than surfacing it as
-  // a clean, distinguishable app-level case) so zero or multiple rows can
-  // each get their own clear message instead of a crash.
+  // record-chain partition key; never an authorization input). Shared
+  // with the other /pack screens so zero/multiple-company founders see the
+  // same message everywhere.
   const {
-    data: startupId,
+    startup,
     isLoading: startupLoading,
     error: startupError,
-  } = useQuery({
-    queryKey: ["pack-startup-lookup", user?.id],
-    enabled: !!user?.id,
-    queryFn: async (): Promise<string> => {
-      const { data, error } = await supabase
-        .from("startups")
-        .select("id")
-        .eq("founder_id", user!.id);
-      if (error) throw new Error("startup_lookup_failed");
-      if (!data || data.length === 0) throw new StartupLookupError("none");
-      if (data.length > 1) throw new StartupLookupError("multiple");
-      return data[0].id;
-    },
-  });
+    message: startupMessage,
+  } = useFounderStartup();
+  const startupId = startup?.id;
 
   const {
     data: packData,
@@ -222,19 +195,9 @@ function PackDetailPage() {
 
   const isPackIdValid = UUID_RE.test(packId);
   const isLoading = startupLoading || packLoading || scheduleLoading;
-  const loadError = startupError || packError || scheduleError;
-
-  // Zero/multiple-startup is its own clear message, per instruction —
-  // distinct from the generic "could not load this pack" fallback, and
-  // checked before anything else since nothing downstream can proceed
-  // without exactly one startup.
-  let startupMessage: string | null = null;
-  if (startupError instanceof StartupLookupError) {
-    startupMessage =
-      startupError.reason === "none"
-        ? "No company profile found for your account. Build your company profile before starting a pack."
-        : "Your account is linked to more than one company. This isn't supported yet — contact support.";
-  }
+  const loadError = startupMessage
+    ? null
+    : startupError || packError || scheduleError;
 
   return (
     <LcsPageShell
