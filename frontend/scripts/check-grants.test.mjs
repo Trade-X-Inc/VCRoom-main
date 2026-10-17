@@ -187,6 +187,57 @@ for (const [ruleId, fixtureBase] of RULE_FIXTURES) {
     r1Fired ? "" : `expected R1_anon_grant, got: ${JSON.stringify(findings.map((f) => f.rule))}`);
 }
 
+// ── R10 search_path forms and R7 REVOKE-inside-DO (H2 patch). Inline SQL,
+//    no fixture files. Each case asserts a specific rule fires / does not. ──
+{
+  const fn = (sp) => `create or replace function public.f_h2(p_x uuid) returns boolean language sql security definer ${sp} as $$ select true $$;
+revoke execute on function public.f_h2(uuid) from public, anon;`;
+  const rules = async (sql) => (await scanSql("inline-test", sql, TEST_ALLOWLIST)).map((f) => f.rule);
+  const has = (r, id) => r.includes(id);
+
+  let r = await rules(fn(`set search_path = ''`));
+  report("R10 (a): SECURITY DEFINER + set search_path = '' passes", !has(r, "R10_security_definer_no_searchpath"), `got ${JSON.stringify(r)}`);
+  r = await rules(fn(`set search_path to ''`));
+  report("R10 (a): SECURITY DEFINER + set search_path to '' passes", !has(r, "R10_security_definer_no_searchpath"), `got ${JSON.stringify(r)}`);
+  r = await rules(fn(`set search_path = pg_catalog, pg_temp`));
+  report("R10: set search_path = pg_catalog, pg_temp still passes", !has(r, "R10_security_definer_no_searchpath"), `got ${JSON.stringify(r)}`);
+
+  r = await rules(fn(``));
+  report("R10 (b): SECURITY DEFINER with NO search_path still FAILS", has(r, "R10_security_definer_no_searchpath"), `got ${JSON.stringify(r)}`);
+  for (const sp of [`set search_path = public`, `set search_path to public`, `set search_path = "$user", public`, `set search_path = '', public`]) {
+    r = await rules(fn(sp));
+    report(`R10 (c): ${sp} still FAILS`, has(r, "R10_security_definer_no_searchpath"), `got ${JSON.stringify(r)}`);
+  }
+
+  const createFn = `create or replace function public.g_h2(p_x uuid) returns boolean language sql security definer set search_path = '' as $$ select true $$;`;
+  r = await rules(`${createFn}
+do $$ begin revoke execute on function public.g_h2(uuid) from public, anon, authenticated; end $$;`);
+  report("R7 (d): REVOKE inside a DO block counts as a revoke", !has(r, "R7_unrevoked_function"), `got ${JSON.stringify(r)}`);
+  r = await rules(`${createFn}
+do $$ begin if true then revoke execute on function public.g_h2(uuid) from public; end if; end $$;`);
+  report("R7 (d): REVOKE nested in an IF inside a DO block counts", !has(r, "R7_unrevoked_function"), `got ${JSON.stringify(r)}`);
+  r = await rules(`${createFn}
+do $$ begin revoke execute on function public.other_fn(uuid) from public, anon; end $$;`);
+  report("R7 (d): a DO-block REVOKE for a DIFFERENT function does not count", has(r, "R7_unrevoked_function"), `got ${JSON.stringify(r)}`);
+
+  r = await rules(`${createFn}
+grant execute on function public.g_h2(uuid) to authenticated;`);
+  report("R7 (e): GRANT EXECUTE with no revoke anywhere still FAILS", has(r, "R7_unrevoked_function"), `got ${JSON.stringify(r)}`);
+
+  r = await rules(`${createFn}
+-- revoke execute on function public.g_h2(uuid) from public, anon;
+/* revoke execute on function public.g_h2(uuid) from public, anon; */`);
+  report("R7 (f): REVOKE only in SQL comments does not count", has(r, "R7_unrevoked_function"), `got ${JSON.stringify(r)}`);
+  r = await rules(`${createFn}
+do $$ begin
+  -- revoke execute on function public.g_h2(uuid) from public, anon;
+  raise notice 'revoke execute on function public.g_h2(uuid) from public, anon';
+  execute 'revoke execute on function public.g_h2(uuid) from public, anon';
+end $$;
+select 'revoke execute on function public.g_h2(uuid) from public, anon';`);
+  report("R7 (f): REVOKE only in a comment / string literal / RAISE / EXECUTE string does not count", has(r, "R7_unrevoked_function"), `got ${JSON.stringify(r)}`);
+}
+
 // ── make sure every fixture file in the directory was actually used —
 //    an orphaned fixture (added for a rule, then the rule renamed) would
 //    silently stop being tested. ───────────────────────────────────────

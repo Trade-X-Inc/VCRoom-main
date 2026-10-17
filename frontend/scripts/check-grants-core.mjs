@@ -16,7 +16,7 @@
 // actually grant, in both directions. Fails CI on any mismatch.
 
 import { readFileSync } from "fs";
-import { parse, loadModule } from "libpg-query";
+import { parse, parsePlPgSQL, loadModule } from "libpg-query";
 
 let moduleLoaded = false;
 export async function ensureModuleLoaded() {
@@ -76,12 +76,54 @@ function searchPathIsCorrect(fn) {
   if (args.length === 0) return false;
   const last = args[args.length - 1];
   const lastVal = last?.A_Const?.sval?.sval;
+  // SET search_path = '' (a sole empty string) is the strictest safe form:
+  // nothing resolves unqualified, so pg_temp cannot be searched implicitly.
+  if (args.length === 1 && lastVal === "") return true;
   return lastVal === "pg_temp";
 }
 
 function isSecurityDefiner(fn) {
   const secOpt = findFnOption(fn, "security");
   return secOpt?.DefElem?.arg?.Boolean?.boolval === true;
+}
+
+// REVOKE statements written directly inside a DO block are opaque to the
+// outer parse (the body is one string literal). Re-parse each plpgsql body
+// with the real PL/pgSQL grammar and the static SQL statements in it with the
+// real SQL grammar, so only genuine statements count: text in comments,
+// RAISE messages or EXECUTE format('...') strings is never a statement here.
+// Anything that fails to parse is simply not counted (R7 then still fires).
+function collectExecSql(node, out) {
+  if (Array.isArray(node)) return node.forEach((n) => collectExecSql(n, out));
+  if (!node || typeof node !== "object") return;
+  const q = node.PLpgSQL_stmt_execsql?.sqlstmt?.PLpgSQL_expr?.query;
+  if (typeof q === "string") out.push(q);
+  for (const v of Object.values(node)) collectExecSql(v, out);
+}
+
+async function collectDoBlockRevokes(stmts) {
+  const revokes = [];
+  for (const { stmt } of stmts) {
+    const args = stmt.DoStmt?.args || [];
+    const body = args.find((a) => a.DefElem?.defname === "as")?.DefElem?.arg?.String?.sval;
+    const lang = args.find((a) => a.DefElem?.defname === "language")?.DefElem?.arg?.String?.sval;
+    if (typeof body !== "string" || (lang && lang.toLowerCase() !== "plpgsql")) continue;
+    try {
+      const tree = await parsePlPgSQL(
+        `create function pg_temp.__guard() returns void language plpgsql as $guard_body$${body}$guard_body$;`,
+      );
+      const queries = [];
+      collectExecSql(tree, queries);
+      for (const q of queries) {
+        for (const { stmt: inner } of (await parse(q)).stmts) {
+          if (inner.GrantStmt && inner.GrantStmt.is_grant !== true) revokes.push(inner);
+        }
+      }
+    } catch {
+      /* unparseable DO body: its revokes are not counted */
+    }
+  }
+  return revokes;
 }
 
 // ── R11 helpers — self-verifying pre-flight guard. The preflight DO block
@@ -213,6 +255,8 @@ export async function scanSql(relFile, sql, allowlist) {
     }
   }
 
+  const doBlockRevokes = await collectDoBlockRevokes(parsed.stmts);
+
   for (const { stmt } of parsed.stmts) {
     // ── GrantStmt (GRANT and REVOKE both parse to this node; REVOKE
     //    statements simply lack the `is_grant` key entirely — it is never
@@ -307,7 +351,7 @@ export async function scanSql(relFile, sql, allowlist) {
       // file-wide exemption is REMOVED. A REVOKE must name THIS
       // function's own bare name with a matching argument count.
       let hasMatchingRevoke = false;
-      for (const { stmt: otherStmt } of parsed.stmts) {
+      for (const otherStmt of [...parsed.stmts.map((x) => x.stmt), ...doBlockRevokes]) {
         if (!otherStmt.GrantStmt || otherStmt.GrantStmt.is_grant === true) continue; // only REVOKE (is_grant absent)
         if (otherStmt.GrantStmt.objtype !== "OBJECT_FUNCTION") continue;
         for (const obj of otherStmt.GrantStmt.objects || []) {
