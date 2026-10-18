@@ -19,13 +19,19 @@ import { packInputStyle } from "@/components/pack/field-styles";
 import { IncorporationForm } from "@/components/pack/IncorporationForm";
 import { IncorporationSummary } from "@/components/pack/IncorporationSummary";
 import { TeamForm } from "@/components/pack/TeamForm";
-import { TeamSummary } from "@/components/pack/ListSummaries";
+import { CapTableForm } from "@/components/pack/CapTableForm";
+import { TeamSummary, CapTableSummary } from "@/components/pack/ListSummaries";
 import type { RowItem } from "@/components/pack/RepeatableRows";
 import {
   teamRowsFromValue,
   validateTeamForm,
   type TeamRow,
 } from "@/lib/pack/team-form";
+import {
+  capRowsFromValue,
+  validateCapTableForm,
+  type CapRow,
+} from "@/lib/pack/cap-table-form";
 import { sizeIndicator } from "@/lib/pack/list-form-common";
 import { FIELD_IDS, validateFieldValueDetailed } from "@/lib/pack/field-shapes";
 import {
@@ -360,9 +366,13 @@ function PackFieldCard({
   );
   // Team and Cap table: a list of rows, each with a stable key so touched/removed rows keep their own state.
   const isTeam = field.id === FIELD_IDS.team;
-  const hasForm = isIncorporation || isTeam;
+  const isCap = field.id === FIELD_IDS.capTable;
+  const hasForm = isIncorporation || isTeam || isCap;
   const [teamItems, setTeamItems] = useState<RowItem<TeamRow>[]>(() =>
     toItems(teamRowsFromValue(isTeam ? (row?.value_json ?? null) : null)),
+  );
+  const [capItems, setCapItems] = useState<RowItem<CapRow>[]>(() =>
+    toItems(capRowsFromValue(isCap ? (row?.value_json ?? null) : null)),
   );
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [attempted, setAttempted] = useState(false);
@@ -385,6 +395,9 @@ function PackFieldCard({
     setIncState(incorporationStateFromValue(row?.value_json ?? null));
     setTeamItems(
       toItems(teamRowsFromValue(isTeam ? (row?.value_json ?? null) : null)),
+    );
+    setCapItems(
+      toItems(capRowsFromValue(isCap ? (row?.value_json ?? null) : null)),
     );
     setMethodologyText(isTam ? methodologyOf(row?.value_json ?? null) : "");
     setTouched({});
@@ -419,6 +432,12 @@ function PackFieldCard({
     if (isTeam) {
       return {
         currentValue: validateTeamForm(teamItems.map((i) => i.value)).value,
+        jsonParseErrorDerived: null,
+      };
+    }
+    if (isCap) {
+      return {
+        currentValue: validateCapTableForm(capItems.map((i) => i.value)).value,
         jsonParseErrorDerived: null,
       };
     }
@@ -466,8 +485,10 @@ function PackFieldCard({
     methodologyText,
     incState,
     teamItems,
+    capItems,
     isIncorporation,
     isTeam,
+    isCap,
     isTam,
     EMPTY_VALUE,
   ]);
@@ -520,10 +541,15 @@ function PackFieldCard({
     [isIncorporation, incState],
   );
   const listValidation = useMemo(
-    () => (isTeam ? validateTeamForm(teamItems.map((i) => i.value)) : null),
-    [isTeam, teamItems],
+    () =>
+      isTeam
+        ? validateTeamForm(teamItems.map((i) => i.value))
+        : isCap
+          ? validateCapTableForm(capItems.map((i) => i.value))
+          : null,
+    [isTeam, isCap, teamItems, capItems],
   );
-  const listItems = teamItems;
+  const listItems = isTeam ? teamItems : capItems;
   // Messages beside each row's fields: all of them after a failed save attempt, before that only fields the
   // person has already left. Form-level messages (no founder, too large) follow the same rule.
   const touchedAny = Object.keys(touched).length > 0;
@@ -727,8 +753,10 @@ function PackFieldCard({
         {hasForm && row && !editing ? (
           isIncorporation ? (
             <IncorporationSummary value={row.value_json} />
-          ) : (
+          ) : isTeam ? (
             <TeamSummary value={row.value_json} />
+          ) : (
+            <CapTableSummary value={row.value_json} />
           )
         ) : isTeam ? (
           <>
@@ -741,6 +769,35 @@ function PackFieldCard({
                 setTouched((t) => ({
                   ...t,
                   [`${teamItems[r]?.key}.${k}`]: true,
+                }))
+              }
+              size={listSize}
+            />
+            {attempted && listValidation && !listValidation.valid && (
+              <div
+                role="alert"
+                className="text-sm p-3"
+                style={{
+                  background: "var(--lcs-attention-wash)",
+                  border: "1px solid var(--lcs-attention)",
+                  color: "var(--lcs-ink)",
+                }}
+              >
+                {listValidation.summary} Nothing was saved.
+              </div>
+            )}
+          </>
+        ) : isCap ? (
+          <>
+            <CapTableForm
+              items={capItems}
+              onChange={setCapItems}
+              errors={visibleListErrors}
+              formErrors={visibleFormErrors}
+              onTouch={(r, k) =>
+                setTouched((t) => ({
+                  ...t,
+                  [`${capItems[r]?.key}.${k}`]: true,
                 }))
               }
               size={listSize}
@@ -881,6 +938,9 @@ function PackFieldCard({
                       toItems(
                         teamRowsFromValue(isTeam ? row.value_json : null),
                       ),
+                    );
+                    setCapItems(
+                      toItems(capRowsFromValue(isCap ? row.value_json : null)),
                     );
                     setTouched({});
                     setAttempted(false);

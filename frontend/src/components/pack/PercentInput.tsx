@@ -12,6 +12,8 @@ export function PercentInput({
   onBlur,
   error,
   required,
+  name,
+  ariaLabel,
 }: {
   label: string;
   text: string;
@@ -19,6 +21,10 @@ export function PercentInput({
   onBlur?: () => void;
   error?: string | null;
   required?: boolean;
+  /** Name attribute, for finding the control (for example to move focus to it). */
+  name?: string;
+  /** Accessible name when the visible label needs more context (for example a row number). */
+  ariaLabel?: string;
 }) {
   const parsed = parsePercentText(text);
   const ownError =
@@ -35,6 +41,8 @@ export function PercentInput({
         <div className="relative">
           <input
             {...c}
+            name={name}
+            aria-label={ariaLabel}
             type="text"
             inputMode="decimal"
             autoComplete="off"

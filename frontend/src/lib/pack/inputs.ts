@@ -141,6 +141,26 @@ export function percentToText(value: unknown): string {
     : "";
 }
 
+// ───────── whole numbers (shares) ─────────
+export type SharesParse =
+  | { kind: "empty" }
+  | { kind: "ok"; shares: number }
+  | { kind: "invalid"; code: "bad_shares" | "invalid_shape" };
+
+// A whole number of shares, zero or more, emitted as a JSON integer. Empty is "no value" (the key is left out).
+// Digits only: "-5", "1.5" and "1e3" are bad_shares. More than 15 digits cannot be carried exactly as a JSON
+// number in a browser, so it is refused rather than rounded.
+export function parseSharesText(text: string): SharesParse {
+  const t = text.trim();
+  if (t === "") return { kind: "empty" };
+  if (/^-?\d+(\.\d+)?$/.test(t) && /^-|\./.test(t))
+    return { kind: "invalid", code: "bad_shares" };
+  if (!/^\d+$/.test(t)) return { kind: "invalid", code: "invalid_shape" };
+  const n = Number(t);
+  if (!Number.isSafeInteger(n)) return { kind: "invalid", code: "bad_shares" };
+  return { kind: "ok", shares: n };
+}
+
 // ───────── date ─────────
 // What a native date input emits is already YYYY-MM-DD or "". Anything else is treated as empty.
 export function dateFromInput(text: string): string | undefined {
