@@ -111,8 +111,14 @@ function realDate(s: string): boolean {
   return d <= dim;
 }
 
-function incorporation(v: unknown, today: string): FieldShapeResult {
-  if (!isObj(v)) return fail("invalid_shape");
+type Issue = { code: FieldShapeCode; path: string };
+
+// Every problem in an incorporation value, in the order the server would report them: the FIRST issue is exactly
+// what validateFieldValue returns. `path` is the key the problem belongs to ("" for the value as a whole), so a form
+// can show each message beside its own field.
+function incorporationIssues(v: unknown, today: string): Issue[] {
+  if (!isObj(v)) return [{ code: "invalid_shape", path: "" }];
+  const issues: Issue[] = [];
   const all = [
     "status",
     "legal_name",
@@ -123,25 +129,33 @@ function incorporation(v: unknown, today: string): FieldShapeResult {
     "registration_number",
     "registered_address",
   ];
-  if (unknownKey(v, all)) return fail("unknown_key");
-  if (!has(v, "status")) return fail("missing_required");
-  if (typeof v.status !== "string") return fail("invalid_shape");
+  for (const k of Object.keys(v))
+    if (!all.includes(k)) issues.push({ code: "unknown_key", path: k });
+  if (!has(v, "status"))
+    return [...issues, { code: "missing_required", path: "status" }];
+  if (typeof v.status !== "string")
+    return [...issues, { code: "invalid_shape", path: "status" }];
   if (v.status !== "incorporated" && v.status !== "not_yet_incorporated")
-    return fail("bad_enum");
+    return [...issues, { code: "bad_enum", path: "status" }];
   if (v.status === "not_yet_incorporated") {
-    if (
-      unknownKey(v, ["status", "jurisdiction_country", "jurisdiction_region"])
-    )
-      return fail("unknown_key");
-  } else if (
-    missingKey(v, [
+    for (const k of Object.keys(v)) {
+      if (
+        !["status", "jurisdiction_country", "jurisdiction_region"].includes(
+          k,
+        ) &&
+        all.includes(k)
+      )
+        issues.push({ code: "unknown_key", path: k });
+    }
+  } else {
+    for (const k of [
       "legal_name",
       "entity_type",
       "jurisdiction_country",
       "incorporation_date",
-    ])
-  ) {
-    return fail("missing_required");
+    ]) {
+      if (!has(v, k)) issues.push({ code: "missing_required", path: k });
+    }
   }
   const specs: [string, number | null][] = [
     ["legal_name", 200],
@@ -154,17 +168,39 @@ function incorporation(v: unknown, today: string): FieldShapeResult {
   ];
   for (const [key, max] of specs) {
     const r = checkString(v, key, max);
-    if (r) return r;
+    if (r && !r.ok) {
+      issues.push({ code: r.code, path: key });
+      continue;
+    }
     if (!has(v, key)) continue;
     const s = v[key] as string;
     if (key === "jurisdiction_country" && !/^[A-Z]{2}$/.test(s))
-      return fail("bad_country");
+      issues.push({ code: "bad_country", path: key });
     if (key === "incorporation_date") {
-      if (!realDate(s)) return fail("bad_date");
-      if (s > today) return fail("future_date");
+      if (!realDate(s)) issues.push({ code: "bad_date", path: key });
+      else if (s > today) issues.push({ code: "future_date", path: key });
     }
   }
-  return OK;
+  return issues;
+}
+
+function incorporation(v: unknown, today: string): FieldShapeResult {
+  const first = incorporationIssues(v, today)[0];
+  return first ? fail(first.code) : OK;
+}
+
+// First problem per key for an incorporation value (for showing each message beside its field). Keys the
+// whole-value checks (size, wrong top-level type) report under "".
+export function incorporationFieldErrors(
+  value: unknown,
+  opts?: { today?: string },
+): Record<string, FieldShapeCode> {
+  const out: Record<string, FieldShapeCode> = {};
+  if (valueByteLength(value) > MAX_VALUE_BYTES)
+    return { "": "value_too_large" };
+  for (const i of incorporationIssues(value, opts?.today ?? todayUtc()))
+    if (!(i.path in out)) out[i.path] = i.code;
+  return out;
 }
 
 function team(v: unknown): FieldShapeResult {
@@ -299,7 +335,7 @@ function marketSizeTam(v: unknown): FieldShapeResult {
   return OK;
 }
 
-const todayUtc = () => new Date().toISOString().slice(0, 10);
+export const todayUtc = () => new Date().toISOString().slice(0, 10);
 
 export function validateFieldValue(
   fieldId: string,
@@ -329,4 +365,37 @@ export function validateFieldValue(
       return r ?? OK;
     }
   }
+}
+
+export type FieldShapeDetail =
+  | { ok: true }
+  | { ok: false; code: FieldShapeCode; path: string };
+
+// Same verdict as validateFieldValue, plus the key the problem belongs to when the field has named keys
+// (incorporation, market size). "" means the value as a whole.
+export function validateFieldValueDetailed(
+  fieldId: string,
+  value: unknown,
+  opts?: { today?: string },
+): FieldShapeDetail {
+  const r = validateFieldValue(fieldId, value, opts);
+  if (r.ok) return r;
+  let path = "";
+  if (fieldId === FIELD_IDS.incorporation && r.code !== "value_too_large") {
+    path = incorporationIssues(value, opts?.today ?? todayUtc())[0]?.path ?? "";
+  } else if (fieldId === FIELD_IDS.marketSizeTam) {
+    if (r.code === "money_amount_negative") path = "amount";
+    else if (
+      ["blank", "too_long"].includes(r.code) ||
+      (r.code === "invalid_shape" && isObj(value) && has(value, "methodology"))
+    )
+      path = "methodology";
+    else if (
+      r.code === "expected_money_object_with_amount_and_3letter_currency" &&
+      isObj(value)
+    ) {
+      path = typeof value.amount !== "number" ? "amount" : "currency";
+    }
+  }
+  return { ok: false, code: r.code, path };
 }

@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useAuthStore } from "@/lib/auth-store";
 import { useFounderStartup } from "@/lib/pack/useFounderStartup";
@@ -13,6 +13,21 @@ import {
   packFieldConfirm,
 } from "@/lib/actions/pack-prepare";
 import { usePackAuthGate } from "@/lib/pack/usePackAuthGate";
+import { MoneyInput } from "@/components/pack/MoneyInput";
+import { PackField } from "@/components/pack/Field";
+import { packInputStyle } from "@/components/pack/field-styles";
+import { IncorporationForm } from "@/components/pack/IncorporationForm";
+import { IncorporationSummary } from "@/components/pack/IncorporationSummary";
+import { FIELD_IDS, validateFieldValueDetailed } from "@/lib/pack/field-shapes";
+import {
+  incorporationStateFromValue,
+  validateIncorporationForm,
+} from "@/lib/pack/incorporation-form";
+import {
+  moneyWithMethodology,
+  parseAmountText,
+  stableStringify,
+} from "@/lib/pack/inputs";
 import {
   choosePackScreenState,
   combineQueryStatus,
@@ -32,7 +47,6 @@ import {
   LcsStatusPill,
   LcsTextField,
   LcsTextareaField,
-  LcsSelectField,
   LcsSkeletonRows,
   LcsEmptyState,
   type LcsStatus,
@@ -77,8 +91,6 @@ type PackFieldRow = {
   warranted_by: string | null;
   warranted_at: string | null;
 };
-
-const CURRENCY_OPTIONS = ["USD", "AED", "EUR", "GBP", "INR"] as const;
 
 function fieldState(row: PackFieldRow | undefined): LcsStatus {
   if (!row) return "pending";
@@ -327,6 +339,22 @@ function PackFieldCard({
   const [lastKnownValue, setLastKnownValue] = useState<unknown>(
     row?.value_json ?? null,
   );
+  // Fields with their own form: incorporation (a form of named inputs) and market size (money plus an optional
+  // methodology note). Every other field keeps the editor it had.
+  const isIncorporation = field.id === FIELD_IDS.incorporation;
+  const isTam = field.id === FIELD_IDS.marketSizeTam;
+  const [incState, setIncState] = useState(() =>
+    incorporationStateFromValue(row?.value_json ?? null),
+  );
+  const [methodologyText, setMethodologyText] = useState<string>(() =>
+    isTam ? methodologyOf(row?.value_json ?? null) : "",
+  );
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [attempted, setAttempted] = useState(false);
+  const [editing, setEditing] = useState<boolean>(!row);
+  // An inline message for a failed save or confirm (the server's code, shown as plain English).
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   // Resync local draft + lastKnownValue whenever the server row changes
   // underneath us (e.g. after invalidation from a save elsewhere).
   useEffect(() => {
@@ -339,6 +367,12 @@ function PackFieldCard({
     }
     setShowVoidWarning(false);
     setAttemptedEmptySave(false);
+    setIncState(incorporationStateFromValue(row?.value_json ?? null));
+    setMethodologyText(isTam ? methodologyOf(row?.value_json ?? null) : "");
+    setTouched({});
+    setAttempted(false);
+    setEditing(!row);
+    setSaveError(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row?.value_json, row?.warranted_at]);
 
@@ -358,16 +392,22 @@ function PackFieldCard({
     currentValue: unknown;
     jsonParseErrorDerived: string | null;
   }>(() => {
+    if (isIncorporation) {
+      return {
+        currentValue: validateIncorporationForm(incState).value,
+        jsonParseErrorDerived: null,
+      };
+    }
     if (field.value_type === "money") {
-      if (moneyAmount.trim() === "") {
-        return { currentValue: EMPTY_VALUE, jsonParseErrorDerived: null };
-      }
-      const amt = Number(moneyAmount);
-      if (!Number.isFinite(amt)) {
+      // An empty or unusable amount is "no value", never 0 (MoneyInput shows what is wrong).
+      const p = parseAmountText(moneyAmount);
+      if (p.kind !== "ok") {
         return { currentValue: EMPTY_VALUE, jsonParseErrorDerived: null };
       }
       return {
-        currentValue: { amount: amt, currency: moneyCurrency },
+        currentValue: isTam
+          ? moneyWithMethodology(moneyAmount, moneyCurrency, methodologyText)
+          : { amount: p.amount, currency: moneyCurrency },
         jsonParseErrorDerived: null,
       };
     }
@@ -394,7 +434,17 @@ function PackFieldCard({
       }
     }
     return { currentValue: valueText, jsonParseErrorDerived: null };
-  }, [field.value_type, valueText, moneyAmount, moneyCurrency, EMPTY_VALUE]);
+  }, [
+    field.value_type,
+    valueText,
+    moneyAmount,
+    moneyCurrency,
+    methodologyText,
+    incState,
+    isIncorporation,
+    isTam,
+    EMPTY_VALUE,
+  ]);
 
   const isEmptyNumericValue = currentValue === EMPTY_VALUE;
   // Clear the "attempted empty save" message the moment the value stops
@@ -432,12 +482,43 @@ function PackFieldCard({
       return lastKnownValue !== null;
     }
     try {
-      return JSON.stringify(currentValue) !== JSON.stringify(lastKnownValue);
+      return stableStringify(currentValue) !== stableStringify(lastKnownValue);
     } catch {
       return true;
     }
   }, [currentValue, lastKnownValue, isEmptyNumericValue]);
 
+  // Client-side check before any request: the same rules the server applies (lib/pack/field-shapes.ts).
+  const incValidation = useMemo(
+    () => (isIncorporation ? validateIncorporationForm(incState) : null),
+    [isIncorporation, incState],
+  );
+  const tamDetail = useMemo(
+    () =>
+      isTam && currentValue !== EMPTY_VALUE
+        ? validateFieldValueDetailed(field.id, currentValue)
+        : null,
+    [isTam, currentValue, EMPTY_VALUE, field.id],
+  );
+  const methodologyError =
+    tamDetail && !tamDetail.ok && tamDetail.path === "methodology"
+      ? "The methodology note must be 500 characters or fewer."
+      : null;
+  const clientInvalid =
+    (isIncorporation && !incValidation?.valid) ||
+    (isTam && !!tamDetail && !tamDetail.ok);
+  // Messages shown beside each field: after a failed save attempt all of them, before that only the fields the
+  // person has already left.
+  const visibleIncorporationErrors: Record<string, string | undefined> =
+    incValidation
+      ? attempted
+        ? incValidation.fieldErrors
+        : Object.fromEntries(
+            Object.entries(incValidation.fieldErrors).filter(
+              ([k]) => touched[k],
+            ),
+          )
+      : {};
   const isConfirmed = !!row?.warranted_at;
   const canConfirm = !!row && !hasUnsavedChanges && !row.warranted_at;
   const alreadyConfirmedUnchanged = !!row?.warranted_at && !hasUnsavedChanges;
@@ -456,6 +537,23 @@ function PackFieldCard({
     // (wired to the same derived value, below) explain why. Nothing to
     // set here; the derived value already reflects the current input.
     if (field.value_type === "structured" && jsonParseErrorDerived) {
+      return;
+    }
+    if (clientInvalid) {
+      // Nothing is sent. Show every message and move to the first problem.
+      setAttempted(true);
+      setSaveError(null);
+      const first = isIncorporation ? incValidation?.invalidKeys[0] : null;
+      const sel =
+        first === "status"
+          ? "[name=incorporation-status]"
+          : first
+            ? `[name=${first}]`
+            : null;
+      if (sel)
+        requestAnimationFrame(() =>
+          cardRef.current?.querySelector<HTMLElement>(sel)?.focus(),
+        );
       return;
     }
     // Money/number: an empty box is "no value," not 0 — send nothing.
@@ -492,7 +590,13 @@ function PackFieldCard({
       setShowVoidWarning(false);
       return;
     }
+    if (clientInvalid) {
+      setShowVoidWarning(false);
+      setAttempted(true);
+      return;
+    }
     setShowVoidWarning(false);
+    setSaveError(null);
     setSaving(true);
     try {
       const result = await callAction<{
@@ -518,6 +622,7 @@ function PackFieldCard({
       }
       onSaved();
     } catch (e) {
+      setSaveError(friendlyError(e));
       toast.error(friendlyError(e));
     } finally {
       setSaving(false);
@@ -526,6 +631,7 @@ function PackFieldCard({
 
   const handleConfirm = async () => {
     if (!row) return;
+    setSaveError(null);
     setConfirming(true);
     try {
       const result = await callAction<{
@@ -545,6 +651,7 @@ function PackFieldCard({
       // already_confirmed handled quietly, per instruction.
       onSaved();
     } catch (e) {
+      setSaveError(friendlyError(e));
       toast.error(friendlyError(e));
     } finally {
       setConfirming(false);
@@ -553,7 +660,7 @@ function PackFieldCard({
 
   return (
     <LcsCard title={field.label ?? field.id}>
-      <div className="p-4 flex flex-col gap-3">
+      <div ref={cardRef} className="p-4 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           {field.help_text && (
             <div className="text-xs" style={{ color: "var(--lcs-ink-muted)" }}>
@@ -566,23 +673,69 @@ function PackFieldCard({
           />
         </div>
 
-        <FieldInput
-          field={field}
-          valueText={valueText}
-          setValueText={setValueText}
-          moneyAmount={moneyAmount}
-          setMoneyAmount={setMoneyAmount}
-          moneyCurrency={moneyCurrency}
-          setMoneyCurrency={setMoneyCurrency}
-          jsonParseError={jsonParseErrorDerived}
-          emptyNumericMessage={
-            attemptedEmptySave && isEmptyNumericValue
-              ? field.value_type === "money"
-                ? "Enter an amount."
-                : "Enter a number."
-              : null
-          }
-        />
+        {isIncorporation ? (
+          row && !editing ? (
+            <IncorporationSummary value={row.value_json} />
+          ) : (
+            <>
+              <IncorporationForm
+                state={incState}
+                onChange={setIncState}
+                errors={visibleIncorporationErrors}
+                onTouch={(k) => setTouched((t) => ({ ...t, [k]: true }))}
+              />
+              {attempted && incValidation && !incValidation.valid && (
+                <div
+                  role="alert"
+                  className="text-sm p-3"
+                  style={{
+                    background: "var(--lcs-attention-wash)",
+                    border: "1px solid var(--lcs-attention)",
+                    color: "var(--lcs-ink)",
+                  }}
+                >
+                  {incValidation.summary} Nothing was saved.
+                </div>
+              )}
+            </>
+          )
+        ) : (
+          <FieldInput
+            field={field}
+            valueText={valueText}
+            setValueText={setValueText}
+            moneyAmount={moneyAmount}
+            setMoneyAmount={setMoneyAmount}
+            moneyCurrency={moneyCurrency}
+            setMoneyCurrency={setMoneyCurrency}
+            jsonParseError={jsonParseErrorDerived}
+            emptyNumericMessage={
+              attemptedEmptySave && isEmptyNumericValue
+                ? field.value_type === "money"
+                  ? "Enter an amount."
+                  : "Enter a number."
+                : null
+            }
+            isTam={isTam}
+            methodologyText={methodologyText}
+            setMethodologyText={setMethodologyText}
+            methodologyError={methodologyError}
+          />
+        )}
+
+        {saveError && (
+          <div
+            role="alert"
+            className="text-sm p-3"
+            style={{
+              background: "var(--lcs-attention-wash)",
+              border: "1px solid var(--lcs-attention)",
+              color: "var(--lcs-ink)",
+            }}
+          >
+            {saveError}
+          </div>
+        )}
 
         {showVoidWarning && (
           // Inline two-step control, replacing window.confirm() per
@@ -620,14 +773,38 @@ function PackFieldCard({
           </div>
         )}
 
-        <div className="flex items-center gap-2 pt-1">
-          <LcsButton
-            variant="secondary"
-            disabled={saving || showVoidWarning}
-            onClick={handleSaveClick}
-          >
-            {saving ? "Saving…" : "Save draft"}
-          </LcsButton>
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {isIncorporation && row && !editing ? (
+            <LcsButton variant="secondary" onClick={() => setEditing(true)}>
+              Edit
+            </LcsButton>
+          ) : (
+            <>
+              <LcsButton
+                variant="secondary"
+                disabled={saving || showVoidWarning}
+                onClick={handleSaveClick}
+              >
+                {saving ? "Saving…" : "Save draft"}
+              </LcsButton>
+              {isIncorporation && row && (
+                <LcsButton
+                  variant="secondary"
+                  disabled={saving}
+                  onClick={() => {
+                    setIncState(
+                      incorporationStateFromValue(row.value_json ?? null),
+                    );
+                    setTouched({});
+                    setAttempted(false);
+                    setEditing(false);
+                  }}
+                >
+                  Cancel
+                </LcsButton>
+              )}
+            </>
+          )}
           <LcsButton
             variant="primary"
             disabled={!canConfirm || confirming}
@@ -661,6 +838,10 @@ function FieldInput({
   setMoneyCurrency,
   jsonParseError,
   emptyNumericMessage,
+  isTam,
+  methodologyText,
+  setMethodologyText,
+  methodologyError,
 }: {
   field: ScheduleField;
   valueText: string;
@@ -671,30 +852,47 @@ function FieldInput({
   setMoneyCurrency: (v: string) => void;
   jsonParseError: string | null;
   emptyNumericMessage: string | null;
+  isTam: boolean;
+  methodologyText: string;
+  setMethodologyText: (v: string) => void;
+  methodologyError: string | null;
 }) {
   switch (field.value_type) {
     case "money":
       return (
-        <div className="flex gap-3">
-          <LcsTextField
-            label="Amount"
-            type="number"
-            value={moneyAmount}
-            onChange={(e) => setMoneyAmount(e.target.value)}
-            error={!!emptyNumericMessage}
-            helper={emptyNumericMessage ?? undefined}
+        <div className="flex flex-col gap-3">
+          <MoneyInput
+            amountText={moneyAmount}
+            currency={moneyCurrency}
+            onAmountText={setMoneyAmount}
+            onCurrency={setMoneyCurrency}
+            error={emptyNumericMessage}
           />
-          <LcsSelectField
-            label="Currency"
-            value={moneyCurrency}
-            onChange={(e) => setMoneyCurrency(e.target.value)}
-          >
-            {CURRENCY_OPTIONS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </LcsSelectField>
+          {isTam && (
+            <PackField
+              label="Methodology (optional)"
+              hint="How you arrived at this figure"
+              error={methodologyError}
+              counter={`${[...methodologyText].length} / 500`}
+            >
+              {(c) => (
+                <textarea
+                  {...c}
+                  name="methodology"
+                  rows={3}
+                  autoComplete="off"
+                  className="w-full outline-none resize-none"
+                  style={{
+                    ...packInputStyle(!!methodologyError),
+                    height: "auto",
+                    padding: "8px 10px",
+                  }}
+                  value={methodologyText}
+                  onChange={(e) => setMethodologyText(e.target.value)}
+                />
+              )}
+            </PackField>
+          )}
         </div>
       );
     case "number":
@@ -738,6 +936,15 @@ function FieldInput({
         />
       );
   }
+}
+
+function methodologyOf(v: unknown): string {
+  return v &&
+    typeof v === "object" &&
+    !Array.isArray(v) &&
+    typeof (v as { methodology?: unknown }).methodology === "string"
+    ? (v as { methodology: string }).methodology
+    : "";
 }
 
 function isMoneyValue(v: unknown): v is { amount: number; currency: string } {

@@ -49,6 +49,19 @@ export function moneyFromInputs(
   return { amount: p.amount, currency };
 }
 
+// The market size value: money plus an optional methodology note. The note is trimmed and the key is left out when
+// the note is empty. undefined while the amount is empty or unusable.
+export function moneyWithMethodology(
+  amountText: string,
+  currency: string,
+  methodologyText: string,
+): (MoneyValue & { methodology?: string }) | undefined {
+  const m = moneyFromInputs(amountText, currency);
+  if (!m) return undefined;
+  const note = methodologyText.trim();
+  return note === "" ? m : { ...m, methodology: note };
+}
+
 export function moneyToInputs(
   value: unknown,
   fallbackCurrency = "USD",
