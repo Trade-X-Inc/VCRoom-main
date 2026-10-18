@@ -12,6 +12,8 @@ import {
   packFieldSet,
   packFieldConfirm,
 } from "@/lib/actions/pack-prepare";
+import { usePackAuthGate } from "@/lib/pack/usePackAuthGate";
+import { choosePackScreenState } from "@/lib/pack/screen-state";
 import {
   pinnedScheduleQueryKey,
   sortScheduleFields,
@@ -169,13 +171,25 @@ function PackDetailPage() {
   );
 
   const isPackIdValid = UUID_RE.test(packId);
-  const isLoading = startupLoading || packLoading || scheduleLoading;
+  const { authInitialized, hasUser } = usePackAuthGate();
   const loadError = startupMessage
     ? null
     : startupError ||
       packError ||
       scheduleError ||
       (scheduleMismatch ? new Error("schedule_mismatch") : null);
+
+  const screenState = choosePackScreenState({
+    authInitialized,
+    hasUser,
+    idValid: isPackIdValid,
+    startupLoading,
+    startupMessage,
+    dataPending: !!startupId && (packLoading || scheduleLoading),
+    hasError: !!loadError,
+    dataLoaded: !!scheduleData && !!packData,
+    isEmpty: scheduleFields.length === 0,
+  });
 
   return (
     <LcsPageShell
@@ -211,21 +225,24 @@ function PackDetailPage() {
         }
       />
 
-      {!isPackIdValid ? (
+      {screenState === "invalid" ? (
         <LcsEmptyState
           title="Could not load this pack"
           text="This pack link isn't valid."
         />
-      ) : isLoading ? (
+      ) : screenState === "loading" || screenState === "redirect" ? (
         <LcsSkeletonRows rows={6} columns={2} />
-      ) : startupMessage ? (
-        <LcsEmptyState title="Can't open this pack" text={startupMessage} />
-      ) : loadError ? (
+      ) : screenState === "startup" ? (
+        <LcsEmptyState
+          title="Can't open this pack"
+          text={startupMessage ?? ""}
+        />
+      ) : screenState === "error" ? (
         <LcsEmptyState
           title="Could not load this pack"
           text={friendlyError(loadError)}
         />
-      ) : scheduleFields.length === 0 ? (
+      ) : screenState === "empty" ? (
         <LcsEmptyState title="No fields" text="This schedule has no fields." />
       ) : (
         <div className="flex flex-col gap-4">

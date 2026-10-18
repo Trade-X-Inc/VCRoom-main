@@ -7,6 +7,8 @@ import { useFounderStartup } from "@/lib/pack/useFounderStartup";
 import { useAuthStore } from "@/lib/auth-store";
 import { callAction } from "@/lib/actions/call";
 import { scheduleGet, packCreate } from "@/lib/actions/pack-prepare";
+import { usePackAuthGate } from "@/lib/pack/usePackAuthGate";
+import { choosePackScreenState } from "@/lib/pack/screen-state";
 import {
   LcsPageShell,
   LcsPageHeader,
@@ -131,7 +133,18 @@ function PackIndexPage() {
     }
   };
 
-  const isLoading = startupLoading || scheduleLoading;
+  const { authInitialized, hasUser } = usePackAuthGate();
+  const screenState = choosePackScreenState({
+    authInitialized,
+    hasUser,
+    idValid: true,
+    startupLoading,
+    startupMessage,
+    dataPending: !!startup?.id && scheduleLoading,
+    hasError: !!startupError || !!scheduleError,
+    dataLoaded: !!schedule,
+    isEmpty: !schedule?.schedule,
+  });
 
   return (
     <LcsPageShell
@@ -168,33 +181,38 @@ function PackIndexPage() {
         description="Build your disclosure pack against the published schedule for your sector and stage."
       />
 
-      {startupMessage ? (
-        <LcsEmptyState title="Can't open this pack" text={startupMessage} />
-      ) : startupError && !startupLoading ? (
+      {screenState === "startup" ? (
         <LcsEmptyState
-          title="Could not load your company"
-          text="Something went wrong. Try again."
+          title="Can't open this pack"
+          text={startupMessage ?? ""}
         />
-      ) : isLoading ? (
+      ) : screenState === "loading" || screenState === "redirect" ? (
         <LcsSkeleton />
-      ) : scheduleError ? (
-        <LcsEmptyState
-          title="Could not load the schedule"
-          text="Something went wrong loading the published schedule. Try again."
-        />
-      ) : !schedule?.schedule ? (
+      ) : screenState === "error" ? (
+        startupError ? (
+          <LcsEmptyState
+            title="Could not load your company"
+            text="Something went wrong. Try again."
+          />
+        ) : (
+          <LcsEmptyState
+            title="Could not load the schedule"
+            text="Something went wrong loading the published schedule. Try again."
+          />
+        )
+      ) : screenState === "empty" ? (
         <LcsEmptyState
           title="No published schedule"
           text="There is no published technology/seed schedule yet."
         />
       ) : (
-        <LcsCard title="Technology · Seed" count={schedule.fields.length}>
+        <LcsCard title="Technology · Seed" count={schedule!.fields.length}>
           <div className="p-4 flex flex-col gap-4">
             <div
               className="divide-y"
               style={{ borderColor: "var(--lcs-line)" }}
             >
-              {[...schedule.fields]
+              {[...schedule!.fields]
                 .sort((a, b) => a.sort_order - b.sort_order)
                 .map((f) => (
                   <div key={f.id} className="flex flex-col gap-1 py-3">

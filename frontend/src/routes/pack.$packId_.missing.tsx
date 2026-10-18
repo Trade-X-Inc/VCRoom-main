@@ -6,6 +6,8 @@ import { useAuthStore } from "@/lib/auth-store";
 import { useFounderStartup } from "@/lib/pack/useFounderStartup";
 import { callAction } from "@/lib/actions/call";
 import { packMissingFields } from "@/lib/actions/pack-prepare";
+import { usePackAuthGate } from "@/lib/pack/usePackAuthGate";
+import { choosePackScreenState } from "@/lib/pack/screen-state";
 import {
   LcsPageShell,
   LcsPageHeader,
@@ -83,8 +85,8 @@ function PackMissingPage() {
         { packId },
       ),
   });
-  const isLoading = startupLoading || dataLoading;
   const error = startupMessage ? null : startupError || dataError;
+  const { authInitialized, hasUser } = usePackAuthGate();
 
   const grouped = useMemo(() => {
     const bySection = new Map<string, MissingField[]>();
@@ -100,6 +102,18 @@ function PackMissingPage() {
       a.localeCompare(b),
     );
   }, [data?.missing_fields]);
+
+  const screenState = choosePackScreenState({
+    authInitialized,
+    hasUser,
+    idValid: UUID_RE.test(packId),
+    startupLoading,
+    startupMessage,
+    dataPending: !!startup?.id && dataLoading,
+    hasError: !!error,
+    dataLoaded: !!data,
+    isEmpty: grouped.length === 0,
+  });
 
   return (
     <LcsPageShell
@@ -135,21 +149,24 @@ function PackMissingPage() {
         }
       />
 
-      {!UUID_RE.test(packId) ? (
+      {screenState === "invalid" ? (
         <LcsEmptyState
           title="Could not load this pack"
           text="This pack link isn't valid."
         />
-      ) : startupMessage ? (
-        <LcsEmptyState title="Can't open this pack" text={startupMessage} />
-      ) : isLoading ? (
+      ) : screenState === "startup" ? (
+        <LcsEmptyState
+          title="Can't open this pack"
+          text={startupMessage ?? ""}
+        />
+      ) : screenState === "loading" || screenState === "redirect" ? (
         <LcsSkeletonRows rows={5} columns={2} />
-      ) : error ? (
+      ) : screenState === "error" ? (
         <LcsEmptyState
           title="Could not load missing fields"
           text="Something went wrong. Try again."
         />
-      ) : grouped.length === 0 ? (
+      ) : screenState === "empty" ? (
         <LcsEmptyState text="All required fields are confirmed." />
       ) : (
         <div className="flex flex-col gap-6">
