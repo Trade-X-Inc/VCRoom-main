@@ -63,7 +63,7 @@ function PackMissingPage() {
 
   const {
     startup,
-    isLoading: startupLoading,
+    status: startupStatus,
     error: startupError,
     message: startupMessage,
   } = useFounderStartup();
@@ -73,7 +73,7 @@ function PackMissingPage() {
   // The query does not run until the startup (and so the user) is loaded.
   const {
     data,
-    isLoading: dataLoading,
+    status: dataStatus,
     error: dataError,
   } = useQuery({
     queryKey: ["pack-missing", packId, startup?.id],
@@ -107,11 +107,9 @@ function PackMissingPage() {
     authInitialized,
     hasUser,
     idValid: UUID_RE.test(packId),
-    startupLoading,
+    startupStatus,
     startupMessage,
-    dataPending: !!startup?.id && dataLoading,
-    hasError: !!error,
-    dataLoaded: !!data,
+    dataStatus,
     isEmpty: grouped.length === 0,
   });
 

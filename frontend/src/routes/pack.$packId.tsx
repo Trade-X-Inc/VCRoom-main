@@ -13,7 +13,10 @@ import {
   packFieldConfirm,
 } from "@/lib/actions/pack-prepare";
 import { usePackAuthGate } from "@/lib/pack/usePackAuthGate";
-import { choosePackScreenState } from "@/lib/pack/screen-state";
+import {
+  choosePackScreenState,
+  combineQueryStatus,
+} from "@/lib/pack/screen-state";
 import {
   pinnedScheduleQueryKey,
   sortScheduleFields,
@@ -111,7 +114,7 @@ function PackDetailPage() {
   // same message everywhere.
   const {
     startup,
-    isLoading: startupLoading,
+    status: startupStatus,
     error: startupError,
     message: startupMessage,
   } = useFounderStartup();
@@ -119,7 +122,7 @@ function PackDetailPage() {
 
   const {
     data: packData,
-    isLoading: packLoading,
+    status: packStatus,
     error: packError,
   } = useQuery({
     queryKey: packQueryKey,
@@ -136,7 +139,7 @@ function PackDetailPage() {
 
   const {
     data: scheduleData,
-    isLoading: scheduleLoading,
+    status: scheduleStatus,
     error: scheduleError,
   } = useQuery({
     // The schedule THIS pack is pinned to (pack_api.pack_schedule_get), not
@@ -183,11 +186,12 @@ function PackDetailPage() {
     authInitialized,
     hasUser,
     idValid: isPackIdValid,
-    startupLoading,
+    startupStatus,
     startupMessage,
-    dataPending: !!startupId && (packLoading || scheduleLoading),
-    hasError: !!loadError,
-    dataLoaded: !!scheduleData && !!packData,
+    // A schedule that does not belong to this pack counts as a failed load.
+    dataStatus: scheduleMismatch
+      ? "error"
+      : combineQueryStatus([packStatus, scheduleStatus]),
     isEmpty: scheduleFields.length === 0,
   });
 

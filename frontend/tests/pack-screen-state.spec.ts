@@ -2,33 +2,31 @@
 import { test, expect } from "@playwright/test";
 import {
   choosePackScreenState,
+  combineQueryStatus,
   type PackScreenInput,
 } from "../src/lib/pack/screen-state";
 
-// A fully loaded, logged-in baseline; each test overrides what it is about.
+// A fully loaded, signed-in baseline; each test overrides what it is about.
 const base: PackScreenInput = {
   authInitialized: true,
   hasUser: true,
   idValid: true,
-  startupLoading: false,
+  startupStatus: "success",
   startupMessage: null,
-  dataPending: false,
-  hasError: false,
-  dataLoaded: true,
+  dataStatus: "success",
   isEmpty: false,
 };
 const state = (o: Partial<PackScreenInput>) =>
   choosePackScreenState({ ...base, ...o });
 
 test("auth initialising shows loading, never empty or error", () => {
-  // Even with data flags that would otherwise mean empty or error.
   expect(
     state({
       authInitialized: false,
       hasUser: false,
-      dataLoaded: false,
+      startupStatus: "error",
+      dataStatus: "error",
       isEmpty: true,
-      hasError: true,
     }),
   ).toBe("loading");
 });
@@ -36,43 +34,71 @@ test("auth initialising shows loading, never empty or error", () => {
 test("no user once auth has resolved redirects, and never shows a data state", () => {
   expect(state({ hasUser: false })).toBe("redirect");
   expect(
-    state({ hasUser: false, dataLoaded: false, isEmpty: true, idValid: false }),
+    state({
+      hasUser: false,
+      startupStatus: "pending",
+      dataStatus: "error",
+      isEmpty: true,
+      idValid: false,
+    }),
   ).toBe("redirect");
 });
 
-test("schedule undefined (query never produced data) is the generic error, not empty", () => {
-  expect(state({ dataLoaded: false, isEmpty: true })).toBe("error");
-  expect(state({ dataLoaded: false })).toBe("error");
-});
-
-test("a failed query is the generic error even if it left no data", () => {
-  expect(state({ hasError: true, dataLoaded: false, isEmpty: true })).toBe(
-    "error",
-  );
-});
-
-test("empty is chosen only for a loaded schedule with zero fields", () => {
-  expect(state({ dataLoaded: true, isEmpty: true })).toBe("empty");
-  expect(state({ dataLoaded: true, isEmpty: false })).toBe("ready");
-});
-
-test("loading precedes error and empty while a query is still running", () => {
-  expect(state({ dataPending: true, dataLoaded: false, isEmpty: true })).toBe(
-    "loading",
-  );
-  expect(state({ startupLoading: true })).toBe("loading");
-});
-
-test("invalid id and startup-lookup messages keep their own states for a logged-in user", () => {
-  expect(state({ idValid: false })).toBe("invalid");
+test("REGRESSION: the auth store has a user but the startup lookup has not run yet is loading, never error", () => {
+  // The exact gap from the live L9 finding: the store says "signed in", the page's own user (and so the
+  // startup query) is not built yet, so the query is disabled with status "pending" and there is no data.
   expect(
     state({
+      authInitialized: true,
+      hasUser: true,
+      startupStatus: "pending",
+      dataStatus: "pending",
+      isEmpty: true,
+    }),
+  ).toBe("loading");
+  // Same with the data query reporting "no data": still loading, not error.
+  expect(state({ startupStatus: "pending", dataStatus: "success" })).toBe(
+    "loading",
+  );
+});
+
+test("startup lookup: idle or pending is loading; failed is the generic error; none/multiple keeps its message", () => {
+  expect(state({ startupStatus: "pending" })).toBe("loading");
+  expect(state({ startupStatus: "error" })).toBe("error");
+  expect(
+    state({
+      startupStatus: "error",
       startupMessage: "No company profile found for your account.",
-      dataLoaded: false,
     }),
   ).toBe("startup");
 });
 
+test("startup settled, schedule query pending is loading", () => {
+  expect(state({ dataStatus: "pending", isEmpty: true })).toBe("loading");
+});
+
+test("schedule query failed is the generic error, even with nothing to show", () => {
+  expect(state({ dataStatus: "error", isEmpty: true })).toBe("error");
+  expect(state({ dataStatus: "error" })).toBe("error");
+});
+
+test("empty is chosen only for a successful query with nothing to show", () => {
+  expect(state({ dataStatus: "success", isEmpty: true })).toBe("empty");
+  expect(state({ dataStatus: "success", isEmpty: false })).toBe("ready");
+});
+
+test("invalid id keeps its own state for a signed-in user", () => {
+  expect(state({ idValid: false })).toBe("invalid");
+});
+
 test("a schedule with fields is ready", () => {
   expect(state({})).toBe("ready");
+});
+
+test("combining queries: any failure fails, otherwise any pending is pending", () => {
+  expect(combineQueryStatus(["success", "success"])).toBe("success");
+  expect(combineQueryStatus(["pending", "success"])).toBe("pending");
+  expect(combineQueryStatus(["pending", "error"])).toBe("error");
+  expect(combineQueryStatus(["success", "error"])).toBe("error");
+  expect(combineQueryStatus([])).toBe("success");
 });

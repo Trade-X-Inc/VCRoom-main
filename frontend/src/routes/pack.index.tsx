@@ -77,14 +77,14 @@ function PackIndexPage() {
   // Shared lookup — same zero/multiple-company handling on every /pack screen.
   const {
     startup,
-    isLoading: startupLoading,
+    status: startupStatus,
     error: startupError,
     message: startupMessage,
   } = useFounderStartup();
 
   const {
     data: schedule,
-    isLoading: scheduleLoading,
+    status: scheduleStatus,
     error: scheduleError,
   } = useQuery({
     queryKey: ["pack-schedule", "technology", "seed"],
@@ -138,11 +138,9 @@ function PackIndexPage() {
     authInitialized,
     hasUser,
     idValid: true,
-    startupLoading,
+    startupStatus,
     startupMessage,
-    dataPending: !!startup?.id && scheduleLoading,
-    hasError: !!startupError || !!scheduleError,
-    dataLoaded: !!schedule,
+    dataStatus: scheduleStatus,
     isEmpty: !schedule?.schedule,
   });
 

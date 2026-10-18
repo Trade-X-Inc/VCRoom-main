@@ -49,6 +49,8 @@ export function useFounderStartup() {
     // as loading so no screen flashes an empty state before the user exists.
     isLoading: authLoading || query.isLoading,
     error: query.error,
+    // react-query status: "pending" while the user is not built yet (query disabled) or the lookup runs.
+    status: query.status,
     message: startupLookupMessage(query.error),
   };
 }
