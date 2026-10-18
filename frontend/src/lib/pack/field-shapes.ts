@@ -203,54 +203,77 @@ export function incorporationFieldErrors(
   return out;
 }
 
-function team(v: unknown): FieldShapeResult {
-  if (!Array.isArray(v)) return fail("invalid_shape");
-  if (v.length < 1) return fail("too_few_items");
-  if (v.length > 15) return fail("too_many_items");
+// A problem in a list value: `row` is the 0-based row (null for the list as a whole) and `key` the key inside the
+// row ("" for the row or list as a whole). The FIRST issue is exactly what validateFieldValue returns, so a form can
+// show each message beside its own row and field without re-stating the rules.
+export type RowIssue = {
+  code: FieldShapeCode;
+  row: number | null;
+  key: string;
+};
+
+const TEAM_KEYS = [
+  "name",
+  "role",
+  "is_founder",
+  "full_time",
+  "is_director",
+  "linkedin_url",
+] as const;
+const TEAM_REQUIRED = [
+  "name",
+  "role",
+  "is_founder",
+  "full_time",
+  "is_director",
+];
+
+export function teamIssues(v: unknown): RowIssue[] {
+  if (!Array.isArray(v)) return [{ code: "invalid_shape", row: null, key: "" }];
+  if (v.length < 1) return [{ code: "too_few_items", row: null, key: "" }];
+  if (v.length > 15) return [{ code: "too_many_items", row: null, key: "" }];
+  const out: RowIssue[] = [];
   let founder = false;
-  for (const item of v) {
-    if (!isObj(item)) return fail("invalid_shape");
-    if (
-      unknownKey(item, [
-        "name",
-        "role",
-        "is_founder",
-        "full_time",
-        "is_director",
-        "linkedin_url",
-      ])
-    )
-      return fail("unknown_key");
-    if (
-      missingKey(item, [
-        "name",
-        "role",
-        "is_founder",
-        "full_time",
-        "is_director",
-      ])
-    )
-      return fail("missing_required");
+  v.forEach((item, row) => {
+    if (!isObj(item)) {
+      out.push({ code: "invalid_shape", row, key: "" });
+      return;
+    }
+    for (const k of Object.keys(item))
+      if (!(TEAM_KEYS as readonly string[]).includes(k))
+        out.push({ code: "unknown_key", row, key: k });
+    for (const k of TEAM_REQUIRED)
+      if (!has(item, k)) out.push({ code: "missing_required", row, key: k });
     for (const [key, max] of [
       ["name", 120],
       ["role", 120],
       ["linkedin_url", 300],
     ] as [string, number][]) {
       const r = checkString(item, key, max);
-      if (r) return r;
+      if (r && !r.ok) {
+        out.push({ code: r.code, row, key });
+        continue;
+      }
       if (
         key === "linkedin_url" &&
         has(item, key) &&
         !URL_RE.test(item[key] as string)
       )
-        return fail("bad_url");
+        out.push({ code: "bad_url", row, key });
     }
     for (const key of ["is_founder", "full_time", "is_director"]) {
-      if (typeof item[key] !== "boolean") return fail("invalid_shape");
+      if (has(item, key) && typeof item[key] !== "boolean")
+        out.push({ code: "invalid_shape", row, key });
     }
     if (item.is_founder === true) founder = true;
-  }
-  return founder ? OK : fail("no_founder");
+  });
+  if (!founder) out.push({ code: "no_founder", row: null, key: "" });
+  return out;
+}
+
+function team(v: unknown): FieldShapeResult {
+  const first = teamIssues(v)[0];
+  return first ? fail(first.code) : OK;
 }
 
 const HOLDER_KINDS = ["person", "company", "pool"];
@@ -261,63 +284,78 @@ const HOLDER_TYPES = [
   "advisor",
   "other",
 ];
+const CAP_KEYS = [
+  "holder_name",
+  "holder_kind",
+  "holder_type",
+  "ownership_percent",
+  "share_class",
+  "shares",
+] as const;
+const CAP_REQUIRED = [
+  "holder_name",
+  "holder_kind",
+  "holder_type",
+  "ownership_percent",
+];
 
-function capTable(v: unknown): FieldShapeResult {
-  if (!Array.isArray(v)) return fail("invalid_shape");
-  if (v.length < 1) return fail("too_few_items");
-  if (v.length > 30) return fail("too_many_items");
-  for (const item of v) {
-    if (!isObj(item)) return fail("invalid_shape");
-    if (
-      unknownKey(item, [
-        "holder_name",
-        "holder_kind",
-        "holder_type",
-        "ownership_percent",
-        "share_class",
-        "shares",
-      ])
-    )
-      return fail("unknown_key");
-    if (
-      missingKey(item, [
-        "holder_name",
-        "holder_kind",
-        "holder_type",
-        "ownership_percent",
-      ])
-    )
-      return fail("missing_required");
+export function capTableIssues(v: unknown): RowIssue[] {
+  if (!Array.isArray(v)) return [{ code: "invalid_shape", row: null, key: "" }];
+  if (v.length < 1) return [{ code: "too_few_items", row: null, key: "" }];
+  if (v.length > 30) return [{ code: "too_many_items", row: null, key: "" }];
+  const out: RowIssue[] = [];
+  v.forEach((item, row) => {
+    if (!isObj(item)) {
+      out.push({ code: "invalid_shape", row, key: "" });
+      return;
+    }
+    for (const k of Object.keys(item))
+      if (!(CAP_KEYS as readonly string[]).includes(k))
+        out.push({ code: "unknown_key", row, key: k });
+    for (const k of CAP_REQUIRED)
+      if (!has(item, k)) out.push({ code: "missing_required", row, key: k });
     for (const [key, max] of [
       ["holder_name", 120],
       ["share_class", 60],
     ] as [string, number][]) {
       const r = checkString(item, key, max);
-      if (r) return r;
+      if (r && !r.ok) out.push({ code: r.code, row, key });
     }
     for (const [key, allowed] of [
       ["holder_kind", HOLDER_KINDS],
       ["holder_type", HOLDER_TYPES],
     ] as [string, string[]][]) {
-      if (typeof item[key] !== "string") return fail("invalid_shape");
-      if (!allowed.includes(item[key] as string)) return fail("bad_enum");
+      if (!has(item, key)) continue;
+      if (typeof item[key] !== "string")
+        out.push({ code: "invalid_shape", row, key });
+      else if (!allowed.includes(item[key] as string))
+        out.push({ code: "bad_enum", row, key });
     }
-    const pct = item.ownership_percent;
-    if (typeof pct !== "number") return fail("invalid_shape");
-    // At most two decimals: the tolerance absorbs binary rounding of values such as 0.07 * 100.
-    if (
-      pct < 0 ||
-      pct > 100 ||
-      Math.abs(pct * 100 - Math.round(pct * 100)) > 1e-9
-    )
-      return fail("bad_percent");
+    if (has(item, "ownership_percent")) {
+      const pct = item.ownership_percent;
+      if (typeof pct !== "number")
+        out.push({ code: "invalid_shape", row, key: "ownership_percent" });
+      // At most two decimals: the tolerance absorbs binary rounding of values such as 0.07 * 100.
+      else if (
+        pct < 0 ||
+        pct > 100 ||
+        Math.abs(pct * 100 - Math.round(pct * 100)) > 1e-9
+      )
+        out.push({ code: "bad_percent", row, key: "ownership_percent" });
+    }
     if (has(item, "shares")) {
-      if (typeof item.shares !== "number") return fail("invalid_shape");
-      if (item.shares < 0 || !Number.isInteger(item.shares))
-        return fail("bad_shares");
+      if (typeof item.shares !== "number")
+        out.push({ code: "invalid_shape", row, key: "shares" });
+      else if (item.shares < 0 || !Number.isInteger(item.shares))
+        out.push({ code: "bad_shares", row, key: "shares" });
     }
-  }
-  return OK;
+  });
+  return out;
+}
+
+function capTable(v: unknown): FieldShapeResult {
+  const first = capTableIssues(v)[0];
+  return first ? fail(first.code) : OK;
 }
 
 function marketSizeTam(v: unknown): FieldShapeResult {

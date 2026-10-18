@@ -18,6 +18,15 @@ import { PackField } from "@/components/pack/Field";
 import { packInputStyle } from "@/components/pack/field-styles";
 import { IncorporationForm } from "@/components/pack/IncorporationForm";
 import { IncorporationSummary } from "@/components/pack/IncorporationSummary";
+import { TeamForm } from "@/components/pack/TeamForm";
+import { TeamSummary } from "@/components/pack/ListSummaries";
+import type { RowItem } from "@/components/pack/RepeatableRows";
+import {
+  teamRowsFromValue,
+  validateTeamForm,
+  type TeamRow,
+} from "@/lib/pack/team-form";
+import { sizeIndicator } from "@/lib/pack/list-form-common";
 import { FIELD_IDS, validateFieldValueDetailed } from "@/lib/pack/field-shapes";
 import {
   incorporationStateFromValue,
@@ -349,6 +358,12 @@ function PackFieldCard({
   const [methodologyText, setMethodologyText] = useState<string>(() =>
     isTam ? methodologyOf(row?.value_json ?? null) : "",
   );
+  // Team and Cap table: a list of rows, each with a stable key so touched/removed rows keep their own state.
+  const isTeam = field.id === FIELD_IDS.team;
+  const hasForm = isIncorporation || isTeam;
+  const [teamItems, setTeamItems] = useState<RowItem<TeamRow>[]>(() =>
+    toItems(teamRowsFromValue(isTeam ? (row?.value_json ?? null) : null)),
+  );
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [attempted, setAttempted] = useState(false);
   const [editing, setEditing] = useState<boolean>(!row);
@@ -368,6 +383,9 @@ function PackFieldCard({
     setShowVoidWarning(false);
     setAttemptedEmptySave(false);
     setIncState(incorporationStateFromValue(row?.value_json ?? null));
+    setTeamItems(
+      toItems(teamRowsFromValue(isTeam ? (row?.value_json ?? null) : null)),
+    );
     setMethodologyText(isTam ? methodologyOf(row?.value_json ?? null) : "");
     setTouched({});
     setAttempted(false);
@@ -395,6 +413,12 @@ function PackFieldCard({
     if (isIncorporation) {
       return {
         currentValue: validateIncorporationForm(incState).value,
+        jsonParseErrorDerived: null,
+      };
+    }
+    if (isTeam) {
+      return {
+        currentValue: validateTeamForm(teamItems.map((i) => i.value)).value,
         jsonParseErrorDerived: null,
       };
     }
@@ -441,7 +465,9 @@ function PackFieldCard({
     moneyCurrency,
     methodologyText,
     incState,
+    teamItems,
     isIncorporation,
+    isTeam,
     isTam,
     EMPTY_VALUE,
   ]);
@@ -493,6 +519,28 @@ function PackFieldCard({
     () => (isIncorporation ? validateIncorporationForm(incState) : null),
     [isIncorporation, incState],
   );
+  const listValidation = useMemo(
+    () => (isTeam ? validateTeamForm(teamItems.map((i) => i.value)) : null),
+    [isTeam, teamItems],
+  );
+  const listItems = teamItems;
+  // Messages beside each row's fields: all of them after a failed save attempt, before that only fields the
+  // person has already left. Form-level messages (no founder, too large) follow the same rule.
+  const touchedAny = Object.keys(touched).length > 0;
+  const visibleListErrors: Record<string, string | undefined> = {};
+  if (listValidation) {
+    for (const [k, msg] of Object.entries(listValidation.fieldErrors)) {
+      const [r, ...rest] = k.split(".");
+      const itemKey = listItems[Number(r)]?.key;
+      if (attempted || (itemKey && touched[`${itemKey}.${rest.join(".")}`]))
+        visibleListErrors[k] = msg;
+    }
+  }
+  const visibleFormErrors =
+    listValidation && (attempted || touchedAny)
+      ? listValidation.formErrors
+      : [];
+  const listSize = sizeIndicator(listValidation?.value ?? []);
   const tamDetail = useMemo(
     () =>
       isTam && currentValue !== EMPTY_VALUE
@@ -506,6 +554,7 @@ function PackFieldCard({
       : null;
   const clientInvalid =
     (isIncorporation && !incValidation?.valid) ||
+    (listValidation !== null && !listValidation.valid) ||
     (isTam && !!tamDetail && !tamDetail.ok);
   // Messages shown beside each field: after a failed save attempt all of them, before that only the fields the
   // person has already left.
@@ -544,8 +593,10 @@ function PackFieldCard({
       setAttempted(true);
       setSaveError(null);
       const first = isIncorporation ? incValidation?.invalidKeys[0] : null;
-      const sel =
-        first === "status"
+      const firstListKey = listValidation?.invalidKeys[0];
+      const sel = firstListKey
+        ? `[name="${firstListKey}"]`
+        : first === "status"
           ? "[name=incorporation-status]"
           : first
             ? `[name=${first}]`
@@ -673,32 +724,63 @@ function PackFieldCard({
           />
         </div>
 
-        {isIncorporation ? (
-          row && !editing ? (
+        {hasForm && row && !editing ? (
+          isIncorporation ? (
             <IncorporationSummary value={row.value_json} />
           ) : (
-            <>
-              <IncorporationForm
-                state={incState}
-                onChange={setIncState}
-                errors={visibleIncorporationErrors}
-                onTouch={(k) => setTouched((t) => ({ ...t, [k]: true }))}
-              />
-              {attempted && incValidation && !incValidation.valid && (
-                <div
-                  role="alert"
-                  className="text-sm p-3"
-                  style={{
-                    background: "var(--lcs-attention-wash)",
-                    border: "1px solid var(--lcs-attention)",
-                    color: "var(--lcs-ink)",
-                  }}
-                >
-                  {incValidation.summary} Nothing was saved.
-                </div>
-              )}
-            </>
+            <TeamSummary value={row.value_json} />
           )
+        ) : isTeam ? (
+          <>
+            <TeamForm
+              items={teamItems}
+              onChange={setTeamItems}
+              errors={visibleListErrors}
+              formErrors={visibleFormErrors}
+              onTouch={(r, k) =>
+                setTouched((t) => ({
+                  ...t,
+                  [`${teamItems[r]?.key}.${k}`]: true,
+                }))
+              }
+              size={listSize}
+            />
+            {attempted && listValidation && !listValidation.valid && (
+              <div
+                role="alert"
+                className="text-sm p-3"
+                style={{
+                  background: "var(--lcs-attention-wash)",
+                  border: "1px solid var(--lcs-attention)",
+                  color: "var(--lcs-ink)",
+                }}
+              >
+                {listValidation.summary} Nothing was saved.
+              </div>
+            )}
+          </>
+        ) : isIncorporation ? (
+          <>
+            <IncorporationForm
+              state={incState}
+              onChange={setIncState}
+              errors={visibleIncorporationErrors}
+              onTouch={(k) => setTouched((t) => ({ ...t, [k]: true }))}
+            />
+            {attempted && incValidation && !incValidation.valid && (
+              <div
+                role="alert"
+                className="text-sm p-3"
+                style={{
+                  background: "var(--lcs-attention-wash)",
+                  border: "1px solid var(--lcs-attention)",
+                  color: "var(--lcs-ink)",
+                }}
+              >
+                {incValidation.summary} Nothing was saved.
+              </div>
+            )}
+          </>
         ) : (
           <FieldInput
             field={field}
@@ -774,7 +856,7 @@ function PackFieldCard({
         )}
 
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          {isIncorporation && row && !editing ? (
+          {hasForm && row && !editing ? (
             <LcsButton variant="secondary" onClick={() => setEditing(true)}>
               Edit
             </LcsButton>
@@ -787,13 +869,18 @@ function PackFieldCard({
               >
                 {saving ? "Saving…" : "Save draft"}
               </LcsButton>
-              {isIncorporation && row && (
+              {hasForm && row && (
                 <LcsButton
                   variant="secondary"
                   disabled={saving}
                   onClick={() => {
                     setIncState(
                       incorporationStateFromValue(row.value_json ?? null),
+                    );
+                    setTeamItems(
+                      toItems(
+                        teamRowsFromValue(isTeam ? row.value_json : null),
+                      ),
                     );
                     setTouched({});
                     setAttempted(false);
@@ -826,6 +913,11 @@ function PackFieldCard({
       </div>
     </LcsCard>
   );
+}
+
+// Rows for a list form, each with its own stable key (RepeatableRows keeps focus and state per key).
+function toItems<T>(rows: T[]): RowItem<T>[] {
+  return rows.map((value, i) => ({ key: `saved-${i}`, value }));
 }
 
 function FieldInput({
