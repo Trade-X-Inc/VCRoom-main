@@ -7,13 +7,17 @@ import { useAuthStore } from "@/lib/auth-store";
 import { useFounderStartup } from "@/lib/pack/useFounderStartup";
 import { callAction } from "@/lib/actions/call";
 import {
-  scheduleGet,
+  packScheduleGet,
   packFieldsGet,
   packFieldSet,
   packFieldConfirm,
-  isPackErrorCode,
-  type PackErrorCode,
 } from "@/lib/actions/pack-prepare";
+import {
+  pinnedScheduleQueryKey,
+  sortScheduleFields,
+  scheduleMatchesPack,
+  friendlyError,
+} from "@/lib/pack/pinned-schedule";
 import {
   LcsPageShell,
   LcsPageHeader,
@@ -70,37 +74,6 @@ type PackFieldRow = {
 };
 
 const CURRENCY_OPTIONS = ["USD", "AED", "EUR", "GBP", "INR"] as const;
-
-// Friendly, never-raw messages for every mapped error code (instruction:
-// "Show friendly messages for every mapped error code; never show raw
-// error text"). Deliberately exhaustive against PACK_ERROR_CODES.
-const ERROR_MESSAGES: Record<PackErrorCode, string> = {
-  not_authenticated: "Your session expired. Sign in again.",
-  forbidden: "You don't have access to this pack.",
-  not_found: "That field or pack could not be found.",
-  schedule_not_found: "The published schedule could not be found.",
-  unknown_field: "That field isn't part of this schedule.",
-  value_mismatch:
-    "This field changed since you last loaded it. Reload and try again.",
-  value_required: "This field can't be blank.",
-  value_too_large: "This value is too long. Shorten it and try again.",
-  expected_string: "Enter text for this field.",
-  expected_number: "Enter a number for this field.",
-  expected_money_object_with_amount_and_3letter_currency:
-    "Enter an amount and choose a currency.",
-  money_amount_negative: "The amount can't be negative.",
-  expected_date_string: "Enter a date for this field.",
-  expected_iso_date_string: "Enter the date as YYYY-MM-DD.",
-  expected_object_or_array: "Enter valid JSON — an object or array.",
-  enum_not_supported: "This field type isn't supported yet.",
-  unknown_value_type: "This field type isn't recognized.",
-};
-
-function friendlyError(e: unknown): string {
-  const code = e instanceof Error ? e.message : "";
-  if (isPackErrorCode(code)) return ERROR_MESSAGES[code];
-  return "Something went wrong. Try again.";
-}
 
 function fieldState(row: PackFieldRow | undefined): LcsStatus {
   if (!row) return "pending";
@@ -164,17 +137,16 @@ function PackDetailPage() {
     isLoading: scheduleLoading,
     error: scheduleError,
   } = useQuery({
-    queryKey: ["pack-schedule", "technology", "seed"],
-    enabled: !!startupId,
+    // The schedule THIS pack is pinned to (pack_api.pack_schedule_get), not
+    // the latest published technology/seed one.
+    queryKey: pinnedScheduleQueryKey(packId),
+    enabled: UUID_RE.test(packId) && !!startupId,
     queryFn: async () => {
       const result = await callAction<{
         ok: true;
         schedule: { id: string };
         fields: ScheduleField[];
-      }>(scheduleGet, startupId!, {
-        sector: "technology",
-        stage: "seed",
-      });
+      }>(packScheduleGet, startupId!, { packId });
       return result;
     },
   });
@@ -186,18 +158,24 @@ function PackDetailPage() {
   }, [packData?.fields]);
 
   const scheduleFields = useMemo(
-    () =>
-      [...(scheduleData?.fields ?? [])].sort(
-        (a, b) => a.sort_order - b.sort_order,
-      ),
+    () => sortScheduleFields(scheduleData?.fields),
     [scheduleData?.fields],
+  );
+  // Both responses are for the same pack, so the schedule must be the one
+  // the pack is pinned to; a mismatch shows the generic load error.
+  const scheduleMismatch = !scheduleMatchesPack(
+    packData?.pack,
+    scheduleData?.schedule,
   );
 
   const isPackIdValid = UUID_RE.test(packId);
   const isLoading = startupLoading || packLoading || scheduleLoading;
   const loadError = startupMessage
     ? null
-    : startupError || packError || scheduleError;
+    : startupError ||
+      packError ||
+      scheduleError ||
+      (scheduleMismatch ? new Error("schedule_mismatch") : null);
 
   return (
     <LcsPageShell

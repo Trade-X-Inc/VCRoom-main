@@ -1,4 +1,4 @@
-// Pack Prepare P1 — gateway actions for SIX pack_api functions backing
+// Pack Prepare P1 — gateway actions for SEVEN pack_api functions backing (the seventh, pack_schedule_get, is packScheduleGet below)
 // the Prepare slice: schedule_get, pack_create, pack_field_set,
 // pack_missing_fields, pack_fields_get, and pack_field_confirm. New file,
 // deliberately NOT added to pack.ts (per instruction) — pack.ts holds the
@@ -432,6 +432,63 @@ export const packFieldsGet = createServerFn({ method: "POST" })
   .handler(
     ({ data }): Promise<ActionResult<JsonValue>> =>
       runAction(packFieldsGetDef, data),
+  );
+
+// ── 5b. packScheduleGet — Read — the schedule a pack is PINNED to ───────────
+// scheduleGet (above) always returns the latest PUBLISHED schedule for a
+// sector/stage; a pack is pinned to one schedule row (pack.schedule_id), so
+// the pack screens must load that row instead. pack_api.pack_schedule_get
+// (APPLIED to production by hand 2026-10-18 after an 11/11 dry run, body md5
+// 4ef2cda8a80cd4cf9465f4f43edca339; migration
+// 20261018100000_pack_api_pack_schedule_get.sql) returns {ok, schedule,
+// fields} in the same shape as schedule_get and self-authorizes exactly like
+// pack_fields_get: the caller (p_uid, from the session) must be the founder
+// of the pack's startup. There is no org id or user id in the input.
+// Errors: not_authenticated, not_found, forbidden. Read-only: no record entry.
+const PackScheduleGetInputSchema = z.object({
+  packId: uuidSchema,
+});
+type PackScheduleGetInput = z.infer<typeof PackScheduleGetInputSchema>;
+type PackScheduleGetOutput = { [k: string]: JsonValue };
+
+const packScheduleGetDef: ActionDef<
+  PackScheduleGetInput,
+  PackScheduleGetOutput
+> = {
+  name: "pack.scheduleGet",
+  class: "read",
+  recordedByHandler: true, // see this file's header — no record for reads
+  validate: (raw) => {
+    const parsed = PackScheduleGetInputSchema.safeParse(raw);
+    if (!parsed.success) throw validationError(parsed.error);
+    return parsed.data;
+  },
+  // Acceptable here ONLY because pack_api.pack_schedule_get self-authorizes
+  // via authz_is_startup_founder against the pack's own subject_ref, same as
+  // pack_fields_get; a non-owner gets {ok:false,error:'forbidden'} from SQL.
+  authorize: async () => true,
+  handle: async (ctx, input): Promise<PackScheduleGetOutput> => {
+    const { data, error } = await ctx.sb
+      .schema("pack_api")
+      .rpc("pack_schedule_get", {
+        p_uid: ctx.uid,
+        p_pack_id: input.packId,
+      });
+    return unwrapPackResult<
+      PackScheduleGetOutput & { ok: true; error?: string }
+    >("pack_schedule_get", data, error);
+  },
+  record: (input) => ({
+    objectType: "pack",
+    objectId: input.packId,
+    data: { note: "recordedByHandler=true — never actually appended" },
+  }),
+};
+export const packScheduleGet = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(
+    ({ data }): Promise<ActionResult<JsonValue>> =>
+      runAction(packScheduleGetDef, data),
   );
 
 // ── 6. packFieldConfirm — COMMIT ─────────────────────────────────────────────
