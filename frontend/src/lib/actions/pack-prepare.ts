@@ -58,6 +58,7 @@ import {
   type ActionResult,
   type JsonValue,
 } from "./gateway";
+import { MAX_VALUE_BYTES, valueByteLength } from "@/lib/pack/field-shapes";
 
 // EVERY action in this file binds its own TOP-LEVEL createServerFn — see
 // gateway.ts / deal-room-core.ts's header comment for the full §20.11
@@ -94,6 +95,23 @@ export const PACK_ERROR_CODES = [
   "expected_object_or_array",
   "enum_not_supported",
   "unknown_value_type",
+  // Shape rules for the incorporation, team, cap table and market size fields
+  // (pack_api.pack_structured_value_valid; see lib/pack/field-shapes.ts).
+  "invalid_shape",
+  "missing_required",
+  "unknown_key",
+  "blank",
+  "too_long",
+  "bad_enum",
+  "bad_country",
+  "bad_date",
+  "future_date",
+  "bad_percent",
+  "bad_shares",
+  "bad_url",
+  "no_founder",
+  "too_few_items",
+  "too_many_items",
 ] as const;
 export type PackErrorCode = (typeof PACK_ERROR_CODES)[number];
 
@@ -116,10 +134,10 @@ const shortStringSchema = z.string().min(1).max(50);
 // pack_field_value_matches_type is the real shape/type validator (per
 // value_type). This schema only bounds total payload size BEFORE it ever
 // reaches SQL, per instruction, independent of and in addition to the
-// SQL-side c_max_value_bytes=8192 cap on the value's own text length (that
-// cap covers the value alone; this 16000-char cap is a looser, earlier
-// client-side guard against a malformed/oversized payload reaching the
-// network call at all).
+// SQL-side c_max_value_bytes=8192 cap on the value's own text length. This
+// guard uses the same limit, measured the same way (UTF-8 bytes of the
+// jsonb-style text, see lib/pack/field-shapes.ts), so an oversize value is
+// stopped before the network call.
 const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
   z.union([
     z.string(),
@@ -133,12 +151,12 @@ const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
 const boundedJsonValueSchema = jsonValueSchema.refine(
   (v) => {
     try {
-      return JSON.stringify(v).length <= 16000;
+      return valueByteLength(v) <= MAX_VALUE_BYTES;
     } catch {
       return false;
     }
   },
-  { message: "value exceeds the 16000-character payload cap" },
+  { message: `value exceeds the ${MAX_VALUE_BYTES}-byte limit` },
 );
 
 function validationError(err: z.ZodError): Error {

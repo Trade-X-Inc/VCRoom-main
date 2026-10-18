@@ -48,6 +48,21 @@ export const ERROR_MESSAGES: Record<PackErrorCode, string> = {
   expected_object_or_array: "Enter valid JSON — an object or array.",
   enum_not_supported: "This field type isn't supported yet.",
   unknown_value_type: "This field type isn't recognized.",
+  invalid_shape: "This value isn't in the expected format.",
+  missing_required: "A required item is missing.",
+  unknown_key: "This value contains an item that isn't allowed.",
+  blank: "This item can't be blank.",
+  too_long: "One of the entries is too long. Shorten it and try again.",
+  bad_enum: "Choose one of the listed options.",
+  bad_country: "Enter a two-letter country code in capitals, for example AE.",
+  bad_date: "Enter a real date as YYYY-MM-DD.",
+  future_date: "The date can't be in the future.",
+  bad_percent: "Enter a percentage from 0 to 100 with at most two decimals.",
+  bad_shares: "Enter a whole number of shares, zero or more.",
+  bad_url: "Enter a web address that starts with https://.",
+  no_founder: "Mark at least one team member as a founder.",
+  too_few_items: "Add at least one entry.",
+  too_many_items: "There are too many entries. Remove some and try again.",
 };
 
 export const GENERIC_ERROR_MESSAGE = "Something went wrong. Try again.";
