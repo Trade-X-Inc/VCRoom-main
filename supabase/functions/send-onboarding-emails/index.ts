@@ -1,6 +1,6 @@
 // Stubbed — retired as a §15/§25 fabrication + fail-open exposure. The
-// live v3 implementation (saved to supabase/rollback/send-onboarding-
-// emails.v3.index.ts before this stub replaced it) was `verify_jwt: false`
+// live v3 implementation (a copy of it is kept outside the repository)
+// was `verify_jwt: false`
 // with no in-code identity derivation, iterated every auth.users row via
 // the service-role key, and sent real outbound email containing three
 // invented claims already logged in CLAUDE.md §7.4/§19b — "Profiles above
