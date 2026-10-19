@@ -99,6 +99,12 @@ export function BriefLinksSection({
   );
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  // Polite live region: the one place async outcomes are announced to a screen reader.
+  const [announcement, setAnnouncement] = useState("");
+  const announce = (message: string) => {
+    setAnnouncement("");
+    requestAnimationFrame(() => setAnnouncement(message));
+  };
   const labelRef = useRef<HTMLInputElement | null>(null);
   const shownRef = useRef<HTMLInputElement | null>(null);
 
@@ -142,6 +148,7 @@ export function BriefLinksSection({
       setLabelTouched(false);
       setDays(BRIEF_DEFAULT_EXPIRY_DAYS);
       await queryClient.invalidateQueries({ queryKey });
+      announce("Link created.");
       requestAnimationFrame(() => shownRef.current?.focus());
     } catch (e) {
       setCreateError(briefLinkErrorMessage(e));
@@ -171,6 +178,10 @@ export function BriefLinksSection({
 
   return (
     <section aria-labelledby="brief-links-title" data-testid="brief-links">
+      <style>{TOUCH_AND_MOTION_CSS}</style>
+      <div aria-live="polite" aria-atomic="true" style={visuallyHidden}>
+        {announcement}
+      </div>
       <LcsCard title="Brief links">
         <div className="p-4 flex flex-col gap-4">
           <p
@@ -335,6 +346,7 @@ export function BriefLinksSection({
                     links={links}
                     now={now}
                     scopeId={scopeId}
+                    announce={announce}
                     onChanged={() =>
                       queryClient.invalidateQueries({ queryKey })
                     }
@@ -349,17 +361,43 @@ export function BriefLinksSection({
   );
 }
 
+// Touch targets: 44px minimum on touch viewports (Design Constitution v2 section 11), scoped to this section.
+// Reduced motion: no transitions or animation in this section when the user asks for none.
+const TOUCH_AND_MOTION_CSS = `
+@media (pointer: coarse), (max-width: 640px) {
+  [data-testid="brief-links"] button,
+  [data-testid="brief-links"] input:not([type="hidden"]),
+  [data-testid="brief-links"] select { min-height: 44px; min-width: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="brief-links"], [data-testid="brief-links"] * { transition: none !important; animation: none !important; }
+}
+`;
+const visuallyHidden: React.CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  margin: -1,
+  padding: 0,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+};
+
 function LinkRow({
   link,
   links,
   now,
   scopeId,
+  announce,
   onChanged,
 }: {
   link: BriefLink;
   links: BriefLink[];
   now: number;
   scopeId: string;
+  announce: (message: string) => void;
   onChanged: () => Promise<unknown> | void;
 }) {
   const [confirming, setConfirming] = useState(false);
@@ -386,6 +424,7 @@ function LinkRow({
       await callAction(briefLinkRevoke, scopeId, { linkId: link.id });
       setConfirming(false);
       await onChanged();
+      announce("Link revoked.");
       requestAnimationFrame(() => rowRef.current?.focus());
     } catch (e) {
       setError(briefLinkErrorMessage(e));
@@ -405,6 +444,7 @@ function LinkRow({
       });
       setSaved(true);
       await onChanged();
+      announce("Expiry updated.");
     } catch (e) {
       setError(briefLinkErrorMessage(e));
     } finally {

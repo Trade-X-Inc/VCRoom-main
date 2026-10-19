@@ -387,3 +387,18 @@ test("the create control is disabled at 20 active links and the reason is shown"
     /\{!gate\.allowed && \(\s*<span role="status"[^>]*>\s*\{gate\.reason\}/,
   );
 });
+
+test("accessibility floor: a polite live region announces create, revoke and expiry changes", () => {
+  expect(SECTION_RAW).toMatch(/aria-live="polite"/);
+  expect(SECTION_RAW).toContain('announce("Link created.")');
+  expect(SECTION_RAW).toContain('announce("Link revoked.")');
+  expect(SECTION_RAW).toContain('announce("Expiry updated.")');
+});
+
+test("accessibility floor: 44px touch targets and reduced motion are enforced inside the section", () => {
+  expect(SECTION_RAW).toMatch(/min-height: 44px/);
+  expect(SECTION_RAW).toMatch(/pointer: coarse/);
+  expect(SECTION_RAW).toMatch(
+    /prefers-reduced-motion: reduce[\s\S]*transition: none !important/,
+  );
+});
