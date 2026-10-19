@@ -405,6 +405,12 @@ No exclamation marks. No filler. Sentences under twenty words. No emoji. The phr
 
 ---
 
+## 14a. Accessibility floor
+
+Governed by Design Constitution v2 §11 (`DESIGN.md`, "Accessibility floor"). A build with any of these failing is not complete: WCAG 2.2 AA contrast on text and interactive boundaries; visible keyboard focus on every interactive element (2px accent outline, 1px offset); full keyboard operation; semantic structure (real buttons and tables, one `<main>`, correct heading order); status never colour-alone; live regions for async status changes; reduced motion respected; 44px minimum touch targets on touch viewports. Verify with axe-core and a script, not by eye.
+
+---
+
 ## 15. Explicit non-goals
 
 Do not build these. Each was decided deliberately.
