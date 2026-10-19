@@ -159,32 +159,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      # Reworked 19 Oct 2026. The default `npx playwright test` is now safe by construction: playwright.config.ts
+      # matches only the specs classed "pure" (no network, no database) in tests/spec-classes.json, so it can never
+      # touch production. The other specs (61 live ones that hit production, create fixtures or need the service
+      # role) run only when CWL_FIXTURES_READY=1, which CI never sets. The guard below fails the build if that
+      # classification or the config gate drifts.
       - uses: actions/checkout@v4
-      # No CI-runnable test exists today — documented here rather than
-      # silently omitted, so this isn't later mistaken for an oversight.
-      # 58 Playwright specs exist in tests/:
-      #   - 56 of 58 require SUPABASE_SERVICE_ROLE_KEY plus real fixture
-      #     credentials (TEST_FOUNDER_EMAIL/PASSWORD, etc.) read from
-      #     .env.local / .env.test, both gitignored and never present in
-      #     a CI checkout. They mint real sessions and read/write real
-      #     production Supabase data (test-founder@/test-investor@
-      #     fixtures) — not safe to run against production from every PR
-      #     even if the secret were injected.
-      #   - The remaining 2 (landing-page.spec.ts, landing-v2.spec.ts)
-      #     need no secret, but hardcode `https://lengdon.com` as their
-      #     target with no environment override — they would test live
-      #     production, not this PR's own build, and currently assert
-      #     stale content (old $49/month pricing, an old hero mockup)
-      #     that predates several of this session's own content passes.
-      # Tracked as a real follow-up in CLAUDE.md (not a TODO left only
-      # here) — see the "CI test-suite rework" entry.
-      - name: Report test-suite status (no CI-runnable tests exist)
-        run: |
-          echo "::warning::No test in tests/ is safely or meaningfully CI-runnable today — see step comments and CLAUDE.md's CI test-suite rework entry."
-          echo "58 Playwright specs exist in frontend/tests/."
-          echo "56/58 require SUPABASE_SERVICE_ROLE_KEY + real fixture credentials (.env.local/.env.test, gitignored, not present in CI) and mutate real production data."
-          echo "The remaining 2 (landing-page.spec.ts, landing-v2.spec.ts) hardcode https://lengdon.com with no override, and assert stale content."
-          echo "This step is intentionally a no-op — it does not run, skip silently, or fake a pass. See CLAUDE.md for the tracked rework item."
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: node scripts/check-live-specs.mjs
+      - name: Run the safe (pure) specs
+        run: npx playwright test
 
   accessibility:
     name: Accessibility scan (axe-core, report-only)

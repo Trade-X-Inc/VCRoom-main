@@ -1,3 +1,7 @@
+if (process.env.CWL_FIXTURES_READY !== "1") {
+  console.error("Live script: contacts production and creates fixtures. Set CWL_FIXTURES_READY=1 to run it on purpose.");
+  process.exit(0);
+}
 import pw from "/Users/macbookpro/VCROOM/VCRoom-main/frontend/node_modules/playwright-core/index.js";
 const { chromium } = pw;
 import fs from "fs";
