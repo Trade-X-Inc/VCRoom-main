@@ -16,3 +16,4 @@ test-results/
 # DesignCopy-main-2/ per CLAUDE.md §12/§4a — delete once the rebuild is
 # confirmed matching, don't merge it in.
 lengdon-public-new/
+frontend/email-preview/
