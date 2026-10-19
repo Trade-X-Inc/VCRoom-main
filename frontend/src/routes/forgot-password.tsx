@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { TurnstileWidget, useTurnstile } from '@/components/auth/TurnstileWidget'
+import { TURNSTILE_HEAD } from '@/lib/turnstile-head'
 
 export const Route = createFileRoute('/forgot-password')({
   head: () => ({
@@ -10,7 +11,8 @@ export const Route = createFileRoute('/forgot-password')({
       { name: "description", content: "Reset your Lengdon account password." },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "https://lengdon.com/forgot-password" }],
+    links: [{ rel: "canonical", href: "https://lengdon.com/forgot-password" }, ...TURNSTILE_HEAD.links],
+    scripts: TURNSTILE_HEAD.scripts,
   }),
   component: ForgotPassword
 })

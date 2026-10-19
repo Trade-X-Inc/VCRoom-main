@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useReducer, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
+import { TURNSTILE_SCRIPT_SRC } from "@/lib/turnstile-head";
 import {
   INITIAL_TURNSTILE_STATE,
   canSubmit,
@@ -17,7 +25,6 @@ import {
 // https://challenges.cloudflare.com (scripts/patch-wrangler.mjs). The script is
 // loaded from that host, so it needs no nonce.
 
-const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const LOAD_TIMEOUT_MS = 15000;
 
 interface TurnstileApi {
@@ -33,22 +40,57 @@ declare global {
 
 let scriptPromise: Promise<void> | null = null;
 
-function loadScript(): Promise<void> {
-  if (typeof window === "undefined") return Promise.reject(new Error("no window"));
-  if (window.turnstile) return Promise.resolve();
-  if (scriptPromise) return scriptPromise;
-  scriptPromise = new Promise<void>((resolve, reject) => {
+const SCRIPT_ID = "turnstile-api";
+const PRELOADED_WAIT_MS = 6000;
+
+function waitForGlobal(ms: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    const tick = () => {
+      if (window.turnstile) return resolve(true);
+      if (Date.now() - start > ms) return resolve(false);
+      window.setTimeout(tick, 50);
+    };
+    tick();
+  });
+}
+
+function injectScript(): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
     const tag = document.createElement("script");
-    tag.src = SCRIPT_SRC;
+    tag.id = SCRIPT_ID;
+    tag.src = TURNSTILE_SCRIPT_SRC;
     tag.async = true;
     tag.defer = true;
-    tag.onload = () => (window.turnstile ? resolve() : reject(new Error("turnstile missing")));
+    tag.onload = () =>
+      window.turnstile ? resolve() : reject(new Error("turnstile missing"));
     tag.onerror = () => {
       tag.remove();
-      scriptPromise = null; // allow a retry to load it again
       reject(new Error("turnstile script failed"));
     };
     document.head.appendChild(tag);
+  });
+}
+
+// The sign-in and reset pages ship the script in the server-rendered <head> (lib/turnstile-head.ts), so it is usually
+// already running. If it is present but never defines the global (it failed to load), replace it and try once more.
+function loadScript(): Promise<void> {
+  if (typeof window === "undefined")
+    return Promise.reject(new Error("no window"));
+  if (window.turnstile) return Promise.resolve();
+  if (scriptPromise) return scriptPromise;
+  scriptPromise = (async () => {
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]',
+    );
+    if (existing) {
+      if (await waitForGlobal(PRELOADED_WAIT_MS)) return;
+      existing.remove();
+    }
+    await injectScript();
+  })().catch((err) => {
+    scriptPromise = null; // allow a retry to load it again
+    throw err;
   });
   return scriptPromise;
 }
@@ -71,7 +113,10 @@ export interface TurnstileHandle {
 }
 
 export function useTurnstile(): TurnstileHandle {
-  const [state, dispatch] = useReducer(turnstileReducer, INITIAL_TURNSTILE_STATE);
+  const [state, dispatch] = useReducer(
+    turnstileReducer,
+    INITIAL_TURNSTILE_STATE,
+  );
   const stateRef = useRef(state);
   stateRef.current = state;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -87,7 +132,8 @@ export function useTurnstile(): TurnstileHandle {
     }
     dispatch({ type: "loading" });
     const timer = window.setTimeout(() => {
-      if (!cancelled && widgetId.current === null) dispatch({ type: "unavailable" });
+      if (!cancelled && widgetId.current === null)
+        dispatch({ type: "unavailable" });
     }, LOAD_TIMEOUT_MS);
 
     loadScript()
@@ -104,6 +150,10 @@ export function useTurnstile(): TurnstileHandle {
           theme: "light",
           callback: (token: string) => dispatch({ type: "token", token }),
           "expired-callback": onExpired,
+          "before-interactive-callback": () =>
+            dispatch({ type: "interactive" }),
+          "after-interactive-callback": () =>
+            dispatch({ type: "interactive_done" }),
           "error-callback": () => dispatch({ type: "error" }),
           "timeout-callback": onExpired,
         });
@@ -159,7 +209,14 @@ export function useTurnstile(): TurnstileHandle {
     setAttempt((n) => n + 1);
   }, []);
 
-  return { state, ready: canSubmit(state), containerRef, withToken, reset, retry };
+  return {
+    state,
+    ready: canSubmit(state),
+    containerRef,
+    withToken,
+    reset,
+    retry,
+  };
 }
 
 /**
@@ -170,13 +227,30 @@ export function TurnstileWidget({ handle }: { handle: TurnstileHandle }) {
   const failure = isFailure(handle.state);
   const text = statusText(handle.state);
   return (
-    <div role="group" aria-label="Security check" style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: "100%" }}>
-      <div ref={handle.containerRef} style={{ minHeight: 65, maxWidth: "100%", overflow: "hidden" }} />
+    <div
+      role="group"
+      aria-label="Security check"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        maxWidth: "100%",
+      }}
+    >
+      <div
+        ref={handle.containerRef}
+        style={{ minHeight: 65, maxWidth: "100%", overflow: "hidden" }}
+      />
       <p
         role="status"
         aria-live="polite"
         data-testid="turnstile-status"
-        style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: failure ? "#92400e" : "#425466" }}
+        style={{
+          margin: 0,
+          fontSize: 13,
+          lineHeight: 1.5,
+          color: failure ? "#92400e" : "#425466",
+        }}
       >
         {text}
       </p>

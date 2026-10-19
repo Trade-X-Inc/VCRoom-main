@@ -15,7 +15,8 @@
 
 export type TurnstileStatus =
   | "loading" // script or widget not ready yet
-  | "verifying" // widget rendered, challenge running or waiting for the visitor
+  | "verifying" // widget rendered, challenge running
+  | "interactive" // Cloudflare is waiting for the visitor to tick its box
   | "verified" // a token exists
   | "expired" // the token lapsed before it was used
   | "error" // the widget reported an error
@@ -29,6 +30,8 @@ export interface TurnstileState {
 export type TurnstileEvent =
   | { type: "loading" }
   | { type: "rendered" }
+  | { type: "interactive" }
+  | { type: "interactive_done" }
   | { type: "token"; token: string }
   | { type: "expired" }
   | { type: "error" }
@@ -36,15 +39,32 @@ export type TurnstileEvent =
   | { type: "consume" }
   | { type: "reset" };
 
-export const INITIAL_TURNSTILE_STATE: TurnstileState = { status: "loading", token: null };
+export const INITIAL_TURNSTILE_STATE: TurnstileState = {
+  status: "loading",
+  token: null,
+};
 
-export function turnstileReducer(state: TurnstileState, event: TurnstileEvent): TurnstileState {
+export function turnstileReducer(
+  state: TurnstileState,
+  event: TurnstileEvent,
+): TurnstileState {
   switch (event.type) {
     case "loading":
       return { status: "loading", token: null };
     case "rendered":
       // Only meaningful while we were still loading; a later render never undoes a token or an error.
-      return state.status === "loading" ? { status: "verifying", token: null } : state;
+      return state.status === "loading"
+        ? { status: "verifying", token: null }
+        : state;
+    case "interactive":
+      // The challenge needs the visitor. Never downgrade a token we already hold.
+      return state.status === "verified"
+        ? state
+        : { status: "interactive", token: null };
+    case "interactive_done":
+      return state.status === "interactive"
+        ? { status: "verifying", token: null }
+        : state;
     case "token":
       // An empty token is not a token.
       return event.token ? { status: "verified", token: event.token } : state;
@@ -59,7 +79,9 @@ export function turnstileReducer(state: TurnstileState, event: TurnstileEvent): 
       return state.token ? { status: "verifying", token: null } : state;
     case "reset":
       // After a widget reset the challenge runs again; a missing widget stays unavailable.
-      return state.status === "unavailable" ? state : { status: "verifying", token: null };
+      return state.status === "unavailable"
+        ? state
+        : { status: "verifying", token: null };
     default:
       return state;
   }
@@ -77,6 +99,8 @@ export function statusText(state: TurnstileState): string {
       return "Loading security check…";
     case "verifying":
       return "Verifying…";
+    case "interactive":
+      return "Tick the box above to confirm you are human.";
     case "verified":
       return "Verified";
     case "expired":
@@ -99,6 +123,8 @@ export function tokenForRequest(state: TurnstileState): string | undefined {
 }
 
 /** Build the Supabase auth options for a request that needs a captcha token. */
-export function captchaOptions(token: string | undefined): { captchaToken: string } | Record<string, never> {
+export function captchaOptions(
+  token: string | undefined,
+): { captchaToken: string } | Record<string, never> {
   return token ? { captchaToken: token } : {};
 }

@@ -2,6 +2,8 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { TurnstileWidget, useTurnstile } from '@/components/auth/TurnstileWidget'
+import { TURNSTILE_HEAD } from '@/lib/turnstile-head'
+import { GoogleGMark } from '@/components/auth/GoogleGMark'
 
 // Content/wiring pass, 31 Aug 2026 — pixel-exact port of
 // lengdon-public-new/src/pages/auth/SignIn.tsx (the founder's Figma
@@ -34,6 +36,7 @@ export const Route = createFileRoute('/sign-in')({
       { title: "Sign in | Lengdon" },
       { name: "robots", content: "noindex" },
     ],
+    ...TURNSTILE_HEAD,
   }),
   component: SignIn
 })
@@ -263,19 +266,33 @@ function SignIn() {
               <div className="flex-1 h-px bg-[#e6e9ef]" />
             </div>
 
+            {/* Google sign-in branding (light theme): white fill, 1px #747775 border, #1F1F1F text, the unmodified
+                4-colour G at the left, 44px minimum height. */}
             <button
               type="button"
               onClick={handleGoogle}
-              style={{ fontFamily: "'Inter:Regular', sans-serif" }}
-              className="w-full border border-[#e6e9ef] hover:border-[#0a2540]/20 hover:bg-[#f8f9fb] text-[#425466] text-[14px] py-3.5 transition-all duration-150 flex items-center justify-center gap-3"
+              style={{
+                fontFamily: "'Inter:Medium', 'Inter', Roboto, Arial, sans-serif",
+                background: "#FFFFFF",
+                border: "1px solid #747775",
+                color: "#1F1F1F",
+                borderRadius: 4,
+                minHeight: 44,
+                padding: "0 12px",
+                fontSize: 14,
+                fontWeight: 500,
+                letterSpacing: "0.25px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                width: "100%",
+                cursor: "pointer",
+              }}
+              className="hover:bg-[#f2f2f2] transition-colors duration-150"
             >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <rect x="1" y="1" width="7" height="7" fill="#EA4335" />
-                <rect x="10" y="1" width="7" height="7" fill="#4285F4" />
-                <rect x="1" y="10" width="7" height="7" fill="#34A853" />
-                <rect x="10" y="10" width="7" height="7" fill="#FBBC04" />
-              </svg>
-              Continue with Google
+              <GoogleGMark />
+              <span>Continue with Google</span>
             </button>
 
             <p style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="mt-8 text-[#64748b] text-[12px] leading-[1.6] text-center">
