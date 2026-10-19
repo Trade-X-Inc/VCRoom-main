@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { Loader2, Check, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { TurnstileWidget, useTurnstile } from "@/components/auth/TurnstileWidget";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { callAction } from "@/lib/actions/call";
@@ -55,6 +56,8 @@ function JoinRoomPage() {
   const [authMode, setAuthMode] = useState<"signup" | "signin">("signup");
   const [authError, setAuthError] = useState("");
   const [authing, setAuthing] = useState(false);
+  // Supabase CAPTCHA: every password sign-in and sign-up needs a fresh single-use token.
+  const turnstile = useTurnstile();
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
@@ -136,25 +139,33 @@ function JoinRoomPage() {
         if (!signupName.trim()) { setAuthError("Enter your name"); setAuthing(false); return; }
         if (signupPassword.length < 6) { setAuthError("Password must be at least 6 characters"); setAuthing(false); return; }
         if (!termsAccepted) { setAuthError("You must agree to the Terms of Service and Privacy Policy to continue"); setAuthing(false); return; }
-        const { error } = await supabase.auth.signUp({
+        const authResult = await turnstile.withToken((captchaToken) =>
+          supabase.auth.signUp({
           email: invite.email,
           password: signupPassword,
           options: {
+            captchaToken,
             data: {
               full_name: signupName.trim(),
               terms_accepted_at: new Date().toISOString(),
               terms_version: TERMS_VERSION,
             },
           },
-        });
+        }),
+        );
+        if (!authResult) { setAuthError("Complete the security check first."); setAuthing(false); return; }
+        const { error } = authResult;
         if (error) throw error;
         toast.success("Account created — please check your email to confirm, then sign in.");
         setAuthMode("signin");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const authResult = await turnstile.withToken((captchaToken) =>
+          supabase.auth.signInWithPassword({
           email: invite.email,
-          password: signupPassword,
-        });
+          password: signupPassword, options: { captchaToken } }),
+        );
+        if (!authResult) { setAuthError("Complete the security check first."); setAuthing(false); return; }
+        const { error } = authResult;
         if (error) throw error;
       }
     } catch (e: any) {
@@ -344,15 +355,18 @@ function JoinRoomPage() {
               </label>
             )}
 
+            <TurnstileWidget handle={turnstile} />
+
+
             <button
               onClick={handleAuth}
-              disabled={authing || (authMode === "signup" && !termsAccepted)}
+              disabled={authing || !turnstile.ready || (authMode === "signup" && !termsAccepted)}
               style={{
                 fontFamily: FONT_SEMIBOLD,
                 width: "100%", background: INK, color: "#fff", border: "none",
                 padding: "11px 24px", fontSize: 13,
-                cursor: (authing || (authMode === "signup" && !termsAccepted)) ? "not-allowed" : "pointer",
-                opacity: (authing || (authMode === "signup" && !termsAccepted)) ? 0.5 : 1,
+                cursor: (authing || !turnstile.ready || (authMode === "signup" && !termsAccepted)) ? "not-allowed" : "pointer",
+                opacity: (authing || !turnstile.ready || (authMode === "signup" && !termsAccepted)) ? 0.5 : 1,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
               }}
             >

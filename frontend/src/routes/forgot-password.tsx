@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { TurnstileWidget, useTurnstile } from '@/components/auth/TurnstileWidget'
 
 export const Route = createFileRoute('/forgot-password')({
   head: () => ({
@@ -19,15 +20,28 @@ function ForgotPassword() {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  // Supabase CAPTCHA: password reset needs a fresh single-use token too.
+  const turnstile = useTurnstile()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/auth/callback'
-    })
+    const result = await turnstile.withToken((captchaToken) =>
+      supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/auth/callback',
+        captchaToken,
+      }),
+    )
+
+    if (!result) {
+      setError('Complete the security check first.')
+      setLoading(false)
+      return
+    }
+
+    const { error } = result
 
     if (error) {
       setError(error.message)
@@ -59,7 +73,7 @@ function ForgotPassword() {
             </p>
 
             {error && (
-              <div className="mb-4 border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3">
+              <div role="alert" className="mb-4 border border-v2-adverse/30 bg-v2-adverse-wash px-4 py-3">
                 <span style={{ fontFamily: "var(--font-v2-ui)" }} className="text-v2-adverse text-[13px]">{error}</span>
               </div>
             )}
@@ -67,6 +81,7 @@ function ForgotPassword() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="email"
+                aria-label="Email address"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -74,9 +89,10 @@ function ForgotPassword() {
                 style={{ fontFamily: "var(--font-v2-ui)" }}
                 className="w-full border border-[var(--v2-rule)] px-4 py-3 text-[14px] text-[var(--v2-accent)] placeholder-[var(--v2-ink-muted)] focus:outline-none focus:border-[var(--v2-accent)] transition-colors duration-150"
               />
+              <TurnstileWidget handle={turnstile} />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !turnstile.ready}
                 style={{ fontFamily: "var(--font-v2-ui)" }}
                 className="w-full bg-[var(--v2-accent)] hover:bg-[var(--v2-accent)]/90 disabled:opacity-50 text-white text-sm py-4 transition-colors duration-200"
               >

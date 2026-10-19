@@ -17,6 +17,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Loader2, Link as LinkIcon, AlertTriangle, Check, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { TurnstileWidget, useTurnstile } from "@/components/auth/TurnstileWidget";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Logo } from "@/components/brand/Logo";
@@ -78,6 +79,8 @@ function JoinViaInviteLinkPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [authing, setAuthing] = useState(false);
+  // Supabase CAPTCHA: every password sign-in and sign-up needs a fresh single-use token.
+  const turnstile = useTurnstile();
   const [authError, setAuthError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -134,10 +137,12 @@ function JoinViaInviteLinkPage() {
         return;
       }
       if (authMode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const authResult = await turnstile.withToken((captchaToken) =>
+          supabase.auth.signUp({
           email,
           password,
           options: {
+            captchaToken,
             data: {
               full_name: name,
               role: "founder",
@@ -145,11 +150,18 @@ function JoinViaInviteLinkPage() {
               terms_version: TERMS_VERSION,
             },
           },
-        });
+        }),
+        );
+        if (!authResult) { setAuthError("Complete the security check first."); setAuthing(false); return; }
+        const { error } = authResult;
         if (error) throw error;
         toast.success("Account created — check your email to confirm, then continue.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const authResult = await turnstile.withToken((captchaToken) =>
+          supabase.auth.signInWithPassword({ email, password, options: { captchaToken } }),
+        );
+        if (!authResult) { setAuthError("Complete the security check first."); setAuthing(false); return; }
+        const { error } = authResult;
         if (error) throw error;
       }
     } catch (err: any) {
@@ -249,10 +261,13 @@ function JoinViaInviteLinkPage() {
                 </label>
               )}
 
+              <TurnstileWidget handle={turnstile} />
+
+
               <button
                 type="submit"
-                disabled={authing || (authMode === "signup" && !termsAccepted)}
-                style={{ ...btnPrimary, opacity: (authing || (authMode === "signup" && !termsAccepted)) ? 0.5 : 1, cursor: (authing || (authMode === "signup" && !termsAccepted)) ? "not-allowed" : "pointer" }}
+                disabled={authing || !turnstile.ready || (authMode === "signup" && !termsAccepted)}
+                style={{ ...btnPrimary, opacity: (authing || !turnstile.ready || (authMode === "signup" && !termsAccepted)) ? 0.5 : 1, cursor: (authing || !turnstile.ready || (authMode === "signup" && !termsAccepted)) ? "not-allowed" : "pointer" }}
               >
                 {authing
                   ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} /> Continuing…</span>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { TurnstileWidget, useTurnstile } from '@/components/auth/TurnstileWidget'
 
 // Content/wiring pass, 31 Aug 2026 — pixel-exact port of
 // lengdon-public-new/src/pages/auth/SignIn.tsx (the founder's Figma
@@ -48,6 +49,8 @@ function SignIn() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // Supabase CAPTCHA: every password sign-in needs a fresh single-use token.
+  const turnstile = useTurnstile()
 
   const handleGoogle = async () => {
     setError('')
@@ -63,7 +66,17 @@ function SignIn() {
     setLoading(true)
     setError('')
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const result = await turnstile.withToken((captchaToken) =>
+      supabase.auth.signInWithPassword({ email, password, options: { captchaToken } }),
+    )
+
+    if (!result) {
+      setError('Complete the security check first.')
+      setLoading(false)
+      return
+    }
+
+    const { data, error } = result
 
     if (error) {
       setError(error.message)
@@ -216,15 +229,17 @@ function SignIn() {
                 />
               </div>
 
+              <TurnstileWidget handle={turnstile} />
+
               {error && (
-                <div className="border border-red-200 bg-red-50 px-4 py-3">
+                <div role="alert" className="border border-red-200 bg-red-50 px-4 py-3">
                   <span style={{ fontFamily: "'Inter:Regular', sans-serif" }} className="text-red-700 text-[13px]">{error}</span>
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !turnstile.ready}
                 style={{ fontFamily: "'Geist:SemiBold', sans-serif" }}
                 className="mt-2 bg-[#0a2540] hover:bg-[#13233a] disabled:opacity-50 text-white font-semibold text-[14px] py-4 transition-colors duration-200 flex items-center justify-center gap-2"
               >

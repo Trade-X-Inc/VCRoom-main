@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Check, Loader2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { TurnstileWidget, useTurnstile } from "@/components/auth/TurnstileWidget";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { LcsCard, LcsButton, LcsStatusPill } from "@/components/lcs";
@@ -71,6 +72,8 @@ function JoinDealRoomPage() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authing, setAuthing] = useState(false);
+  // Supabase CAPTCHA: every password sign-in and sign-up needs a fresh single-use token.
+  const turnstile = useTurnstile();
 
   useEffect(() => {
     if (!token) { setPageState("invalid"); return; }
@@ -156,15 +159,24 @@ function JoinDealRoomPage() {
         if (!signupName.trim()) { setAuthError("Enter your name"); setAuthing(false); return; }
         if (!email.trim()) { setAuthError("Enter your email"); setAuthing(false); return; }
         if (password.length < 6) { setAuthError("Password must be at least 6 characters"); setAuthing(false); return; }
-        const { error } = await supabase.auth.signUp({
+        const authResult = await turnstile.withToken((captchaToken) =>
+          supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { data: { full_name: signupName.trim(), role: invite.intended_role } },
-        });
+          options: {
+            captchaToken, data: { full_name: signupName.trim(), role: invite.intended_role } },
+        }),
+        );
+        if (!authResult) { setAuthError("Complete the security check first."); setAuthing(false); return; }
+        const { error } = authResult;
         if (error) throw error;
         toast.success("Account created — check your email to confirm, then accept the invitation.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        const authResult = await turnstile.withToken((captchaToken) =>
+          supabase.auth.signInWithPassword({ email: email.trim(), password, options: { captchaToken } }),
+        );
+        if (!authResult) { setAuthError("Complete the security check first."); setAuthing(false); return; }
+        const { error } = authResult;
         if (error) throw error;
       }
     } catch (e: any) {
@@ -318,7 +330,9 @@ function JoinDealRoomPage() {
 
               {authError && <div className="text-xs" style={{ color: "var(--lcs-attention)" }}>{authError}</div>}
 
-              <LcsButton variant="primary" onClick={handleAuth} disabled={authing}>
+              <TurnstileWidget handle={turnstile} />
+
+              <LcsButton variant="primary" onClick={handleAuth} disabled={authing || !turnstile.ready}>
                 {authing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                 {authMode === "signup" ? "Create account to continue" : "Sign in to accept invitation"}
               </LcsButton>

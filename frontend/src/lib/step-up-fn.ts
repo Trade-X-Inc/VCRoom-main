@@ -25,19 +25,21 @@ import { getEnvVar } from "@/lib/env";
 // persisted, never returned to any caller of this module. Verifying a
 // password must never mint a live, usable session as a side effect.
 //
-// SERVICE-ROLE KEY, not anon, as the grant's `apikey` — found live, not
-// assumed. The anon-key password grant requires a real hCaptcha token
-// (confirmed: a direct anon-key grant call returns
-// `{"code":400,"error_code":"captcha_failed",...}` with no captcha_token
-// attached). That's correct for a PUBLIC sign-in form — this isn't one. This
-// call re-verifies a credential the user already re-typed into our own
-// authenticated UI, server-to-server, with no browser and no captcha widget
-// available to satisfy that check. Using the service-role key is the
-// established pattern this exact session already relied on repeatedly (the
-// committed captcha-bypass helper in tests/auth-and-portfolio.spec.ts) and
-// is safe here: it never widens what this function checks — it still fails
-// on any wrong password for the resolved account, verified in the
-// adversarial test this file's own history records.
+// SERVICE-ROLE KEY, not anon, as the grant's `apikey`. Supabase Auth CAPTCHA
+// (Cloudflare Turnstile) is ON. A password grant that carries the ANON key and
+// no captcha token is refused: `captcha_failed` (re-checked 19 Oct 2026 with a
+// nonexistent .invalid address: "no captcha_token found", and with a dummy
+// token: "invalid-input-response"). The same grant carrying the SERVICE-ROLE
+// key is not captcha-gated: the same probe returned `invalid_credentials`,
+// i.e. it passed the captcha stage and was judged on the credentials. That is
+// the right behaviour here: this call re-verifies a password the user just
+// typed into our own authenticated UI, server to server, where there is no
+// browser to show a challenge. So the step-up needs NO Turnstile token and the
+// dialog has no widget. It still fails on any wrong password for the account
+// resolved from the caller's own token. If a future Supabase change starts
+// enforcing captcha for service-role grants, the symptom is every step-up
+// returning invalid_password; the fix would then be a fresh token collected in
+// the dialog and sent as gotrue_meta_security.captcha_token below.
 //
 // GATE A APPROVED 22 Sep 2026 — verifyPassword() below, as built, with the
 // service-role-key correction and the 5/5 adversarial identity/credential
