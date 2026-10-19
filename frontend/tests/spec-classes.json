@@ -1,6 +1,7 @@
 {
  "_comment": "Authoritative class of every spec under tests/. pure: no network, no database, runs anywhere. local: needs only a local server (A11Y_SCAN_BASE_URL), never production. loopback: starts its own server on 127.0.0.1 (mock providers) and touches nothing else; runs by default. live: contacts production, creates fixtures or needs the service role; runs only when CWL_FIXTURES_READY=1. Enforced by playwright.config.ts and scripts/check-live-specs.mjs.",
  "pure": [
+  "tests/auth-captcha-state.spec.ts",
   "tests/lcs-shell-a11y.spec.ts",
   "tests/pack-brief-link.spec.ts",
   "tests/pack-field-shapes.spec.ts",
@@ -11,7 +12,8 @@
   "tests/pack-screen-state.spec.ts"
  ],
  "local": [
-  "tests/a11y-scan.spec.ts"
+  "tests/a11y-scan.spec.ts",
+  "tests/auth-captcha.spec.ts"
  ],
  "loopback": [
   "tests/email-lockdown.spec.ts"

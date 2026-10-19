@@ -189,6 +189,9 @@ jobs:
     env:
       VITE_SUPABASE_URL: "https://ci-placeholder.invalid"
       VITE_SUPABASE_ANON_KEY: "ci-placeholder-anon-key"
+      # Cloudflare's published always-pass Turnstile TEST site key (not a secret): lets the build include the
+      # widget wiring. The captcha tests below replace the Turnstile script with a stub anyway.
+      VITE_TURNSTILE_SITE_KEY: "1x00000000000000000000AA"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -237,6 +240,12 @@ jobs:
         env:
           A11Y_SCAN_BASE_URL: "http://localhost:8788"
         run: npx playwright test tests/a11y-scan.spec.ts --reporter=list
+      # Captcha wiring (sign-in, reset, new password) against THIS build. Nothing leaves the runner: the Turnstile
+      # script is stubbed and every Supabase request is intercepted. Unlike the scan above, this one gates the job.
+      - name: Captcha wiring tests (stubbed widget, intercepted auth requests)
+        env:
+          A11Y_SCAN_BASE_URL: "http://localhost:8788"
+        run: npx playwright test tests/auth-captcha.spec.ts --reporter=list
 
   dependency-audit:
     name: Dependency vulnerability scan
