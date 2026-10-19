@@ -30,7 +30,7 @@ const DEAL_ROOM_ID = "957f9750-00c7-402a-b1ba-d9c7a4e3ba2f";
 
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL || "test-founder@hockystick.app";
 const FOUNDER_PASS = testEnv.TEST_FOUNDER_PASSWORD;
-const INVESTOR_EMAIL = testEnv.TEST_INVESTOR_EMAIL || "drhenry10th@gmail.com";
+const INVESTOR_EMAIL = testEnv.TEST_INVESTOR_EMAIL || "";
 const INVESTOR_PASS = testEnv.TEST_INVESTOR_PASSWORD;
 
 async function getSession(email: string, password?: string) {

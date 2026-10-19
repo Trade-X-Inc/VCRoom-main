@@ -39,7 +39,7 @@ const APP = process.env.PLAYWRIGHT_BASE_URL || "https://lengdon.com";
 const FOUNDER_EMAIL = testEnv.TEST_FOUNDER_EMAIL || "test-founder@hockystick.app";
 const FOUNDER_PASS = testEnv.TEST_FOUNDER_PASSWORD;
 // Use real Dr Henry account for investor connections test (it has the Atlas connection)
-const INVESTOR_EMAIL = "drhenry10th@gmail.com";
+const INVESTOR_EMAIL = process.env.TEST_INVESTOR_EMAIL ?? "";
 const INVESTOR_PASS = testEnv.TEST_INVESTOR_PASSWORD;
 
 async function getSession(email: string, password?: string) {

@@ -122,30 +122,33 @@ export async function addHubSpotNote(contactId: string, body: string): Promise<v
   }
 }
 
-// Bulk sync known users to HubSpot — run once via /api/hubspot-sync
-export async function bulkSyncUsersToHubSpot(): Promise<void> {
+// Bulk sync of a caller-supplied user list to HubSpot (admin-key route /api/hubspot-sync).
+// The list used to be hard-coded in this file (8 real addresses); it was removed on 19 Oct 2026.
+// With no list supplied this does nothing.
+export type BulkSyncUser = {
+  email: string;
+  firstname?: string;
+  lastname?: string;
+  role: "founder" | "investor";
+  created: string;
+};
+
+export async function bulkSyncUsersToHubSpot(users: BulkSyncUser[] = []): Promise<void> {
   const cfEnv = (globalThis as any).__cf_env || {};
   const token = cfEnv.HUBSPOT_PRIVATE_APP_TOKEN || "";
   if (!token) {
     console.error("[HubSpot] No token for bulk sync");
     return;
   }
-
-  const users = [
-    { email: "ikilledthor1@gmail.com",  firstname: "I know",  lastname: "Thor",   role: "founder",   created: "2026-05-10" },
-    { email: "drhenry10th@gmail.com",   firstname: "Dr",      lastname: "Henry",  role: "investor",  created: "2026-05-10" },
-    { email: "dikanna2021@gmail.com",   firstname: "Anna",    lastname: "Huang",  role: "founder",   created: "2026-05-27" },
-    { email: "epjanes78@gmail.com",     firstname: "Edward",  lastname: "Janes",  role: "founder",   created: "2026-05-27" },
-    { email: "djsdbj11@gmail.com",      firstname: "Debojit", lastname: "",        role: "founder",   created: "2026-05-27" },
-    { email: "thurstjo@gmail.com",      firstname: "John",    lastname: "Boyd",   role: "founder",   created: "2026-05-27" },
-    { email: "sages2tudio@gmail.com",   firstname: "真英明",   lastname: "",        role: "founder",   created: "2026-05-30" },
-    { email: "tradxtech@gmail.com",     firstname: "tradx",   lastname: "",        role: "founder",   created: "2026-05-31" },
-  ];
+  if (users.length === 0) {
+    console.error("[HubSpot] Bulk sync called with no users; nothing to do");
+    return;
+  }
 
   for (const u of users) {
     await upsertHubSpotContact(u.email, {
-      firstname: u.firstname,
-      lastname: u.lastname,
+      firstname: u.firstname ?? "",
+      lastname: u.lastname ?? "",
       lifecyclestage: "lead",
       hs_lead_status: "NEW",
       user_type: u.role === "founder" ? "Founder" : "Investor",
@@ -154,7 +157,7 @@ export async function bulkSyncUsersToHubSpot(): Promise<void> {
     });
     await new Promise((r) => setTimeout(r, 300));
   }
-  console.log("[HubSpot] Bulk sync complete — 8 users synced");
+  console.log(`[HubSpot] Bulk sync complete — ${users.length} users synced`);
 }
 
 // Server function — safe to call from client components
