@@ -190,6 +190,14 @@ jobs:
     name: Accessibility scan (axe-core, report-only)
     runs-on: ubuntu-latest
     needs: build
+    # The scanned routes are public and never call the backend, but the app throws at start-up when its public
+    # Supabase URL and anon key are empty (src/lib/supabase.ts). These are non-secret placeholders: the host is
+    # on the reserved .invalid TLD, so nothing can ever be reached with them. NEVER put a service-role key or any
+    # real secret in this job. Vite bakes the VITE_ values in at build time, so they only need to be present for
+    # the build step.
+    env:
+      VITE_SUPABASE_URL: "https://ci-placeholder.invalid"
+      VITE_SUPABASE_ANON_KEY: "ci-placeholder-anon-key"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
