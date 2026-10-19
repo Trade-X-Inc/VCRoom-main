@@ -296,3 +296,94 @@ test("redaction proof: the gateway and the client helper do not log, so a result
     readdirSync(dir).filter((f) => f.endsWith(".ts")).length,
   ).toBeGreaterThan(5);
 });
+
+// ─── the screen: switch, token handling and wording (source-level; the live test renders it) ───
+const strip = (s: string) =>
+  s.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+const ROUTE = strip(
+  readFileSync(
+    new URL("../src/routes/pack.$packId.tsx", import.meta.url),
+    "utf8",
+  ),
+);
+const SECTION_RAW = readFileSync(
+  new URL("../src/components/pack/BriefLinksSection.tsx", import.meta.url),
+  "utf8",
+);
+const SECTION = strip(SECTION_RAW);
+
+test("the section is rendered only behind the build-time flag, written so a flag-off build removes it", () => {
+  expect(ROUTE).toContain(
+    'const BRIEF_LINKS_ON = import.meta.env.VITE_BRIEF_LINKS_ENABLED === "true";',
+  );
+  expect(ROUTE).toMatch(
+    /\{BRIEF_LINKS_ON && \(\s*<BriefLinksSection packId=\{packId\} scopeId=\{startupId \?\? ""\} \/>\s*\)\}/,
+  );
+  // it is the only use of the component, so with the flag off nothing references it
+  expect((ROUTE.match(/<BriefLinksSection/g) ?? []).length).toBe(1);
+  expect(briefLinksEnabled("true")).toBe(true);
+  expect(briefLinksEnabled(undefined)).toBe(false);
+});
+
+test("the flag is documented without a secret", () => {
+  const ex = readFileSync(new URL("../.env.example", import.meta.url), "utf8");
+  expect(ex).toContain("VITE_BRIEF_LINKS_ENABLED");
+  expect(ex).not.toMatch(/eyJ|sk-|sb_secret|service_role|password/i);
+});
+
+test("the token lives in component state only: no storage, no query cache, no logging, no URL state", () => {
+  expect(SECTION).not.toMatch(
+    /localStorage|sessionStorage|indexedDB|document\.cookie/,
+  );
+  expect(SECTION).not.toMatch(/console\.|logger|Sentry|analytics/i);
+  expect(SECTION).not.toMatch(
+    /useMutation|setQueryData|setQueriesData|queryClient\.(fetchQuery|prefetchQuery)/,
+  );
+  expect(SECTION).not.toMatch(
+    /navigate\(|history\.(push|replace)State|location\.(href|search|hash)\s*=/,
+  );
+  // the only place the token is turned into text is the one-time panel, built from the create result
+  expect((SECTION.match(/briefLinkUrl\(/g) ?? []).length).toBe(1);
+  expect(SECTION).toMatch(
+    /setShown\(\{\s*url: briefLinkUrl\(window\.location\.origin, res\.token\),/,
+  );
+  // the list query never touches the token
+  expect(SECTION).not.toMatch(/queryKey[^;]*token/i);
+});
+
+test("revoke is a two-step inline confirm with no browser dialogs; values are React text only", () => {
+  expect(SECTION).not.toMatch(
+    /\b(alert|confirm|prompt)\(|window\.(alert|confirm|prompt)/,
+  );
+  expect(SECTION).not.toMatch(/dangerouslySetInnerHTML|innerHTML/);
+  expect(SECTION).toContain("Revoke this link? This can't be undone.");
+  expect(SECTION).toMatch(/Revoke link/);
+});
+
+test("invalid input makes no request: the create handler returns before calling the action", () => {
+  const i = SECTION.indexOf("const onCreate");
+  const j = SECTION.indexOf("briefLinkCreate, scopeId", i);
+  const guard = SECTION.slice(i, j);
+  expect(guard).toMatch(/if \(!labelCheck\.ok\) \{[\s\S]*?return;/);
+  expect(guard).toMatch(/if \(!gate\.allowed\) return;/);
+});
+
+test("the wording does not mention public viewing, analytics or presentations", () => {
+  const visible =
+    SECTION_RAW.match(/>[^<>{}]{3,}</g)?.join(" ") +
+    " " +
+    (SECTION_RAW.match(/"[A-Z][^"]{8,}"/g)?.join(" ") ?? "");
+  expect(visible).not.toMatch(
+    /public|anonymous|analytics|opened|viewed|presentation|investor|share with/i,
+  );
+  expect(SECTION_RAW).toContain(
+    "Copy this link now. For security it cannot be shown again.",
+  );
+});
+
+test("the create control is disabled at 20 active links and the reason is shown", () => {
+  expect(SECTION).toMatch(/disabled=\{creating \|\| !gate\.allowed\}/);
+  expect(SECTION).toMatch(
+    /\{!gate\.allowed && \(\s*<span role="status"[^>]*>\s*\{gate\.reason\}/,
+  );
+});

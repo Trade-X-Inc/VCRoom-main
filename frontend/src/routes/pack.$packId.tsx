@@ -33,6 +33,7 @@ import {
   type CapRow,
 } from "@/lib/pack/cap-table-form";
 import { sizeIndicator } from "@/lib/pack/list-form-common";
+import { BriefLinksSection } from "@/components/pack/BriefLinksSection";
 import { FIELD_IDS, validateFieldValueDetailed } from "@/lib/pack/field-shapes";
 import {
   incorporationStateFromValue,
@@ -82,6 +83,11 @@ import {
 // entirely by pack_api.pack_fields_get's own
 // authz_is_startup_founder(p_uid, v_pack.subject_ref) check against the
 // REAL caller uid, derived server-side, never a client-supplied parameter.
+
+// The Brief links section is built in only when VITE_BRIEF_LINKS_ENABLED is exactly "true" at build time. Written
+// as a literal comparison so the build replaces it with true/false and removes the section (and its text) from a
+// build that leaves the flag off. Unset means off; the production build leaves it off.
+const BRIEF_LINKS_ON = import.meta.env.VITE_BRIEF_LINKS_ENABLED === "true";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -289,6 +295,9 @@ function PackDetailPage() {
               }
             />
           ))}
+          {BRIEF_LINKS_ON && (
+            <BriefLinksSection packId={packId} scopeId={startupId ?? ""} />
+          )}
         </div>
       )}
     </LcsPageShell>
