@@ -1,4 +1,7 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, ScrollRestoration } from "@tanstack/react-router";
+import "@/lib/recovery-capture"; // must be first: reads a password-reset address before auth-js consumes it
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, ScrollRestoration, useLocation, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { RECOVERY_CHANGE_EVENT, isRecoverySession, pathAllowedDuringRecovery } from "@/lib/recovery";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
@@ -247,12 +250,36 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+// While a password-reset session is open, no page except the new-password screen (and the ways out) may render.
+function RecoveryGate({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const block = isRecoverySession() && !pathAllowedDuringRecovery(pathname);
+      setBlocked(block);
+      if (block) void navigate({ to: "/reset-password", replace: true });
+    };
+    check();
+    window.addEventListener(RECOVERY_CHANGE_EVENT, check);
+    window.addEventListener("storage", check);
+    return () => {
+      window.removeEventListener(RECOVERY_CHANGE_EVENT, check);
+      window.removeEventListener("storage", check);
+    };
+  }, [pathname, navigate]);
+  return blocked ? null : <>{children}</>;
+}
+
 function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Outlet />
+          <RecoveryGate>
+            <Outlet />
+          </RecoveryGate>
           <Toaster />
           <CookieConsentBanner />
           <WaitlistPrompt />

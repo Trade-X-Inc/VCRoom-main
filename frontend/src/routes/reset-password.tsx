@@ -36,7 +36,10 @@ function ResetPassword() {
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (cancelled) return;
-      setView(data.session && isRecoverySession() ? "form" : "no_link");
+      const ok = !!data.session && isRecoverySession();
+      // A mark with no session behind it protects nothing and would only bounce the visitor around: drop it.
+      if (!data.session) clearRecoverySession();
+      setView(ok ? "form" : "no_link");
     })();
     return () => {
       cancelled = true;
@@ -61,6 +64,13 @@ function ResetPassword() {
     clearRecoverySession();
     setView("done");
     setSaving(false);
+  };
+
+  // Leaving without setting a password: end the recovery session so nothing stays half-open.
+  const cancel = async () => {
+    await supabase.auth.signOut();
+    clearRecoverySession();
+    window.location.href = "/sign-in";
   };
 
   const goToApp = async () => {
@@ -159,6 +169,13 @@ function ResetPassword() {
 
             <button type="submit" disabled={saving} style={{ ...primary, opacity: saving ? 0.6 : 1 }}>
               {saving ? "Saving…" : "Set new password"}
+            </button>
+            <button
+              type="button"
+              onClick={cancel}
+              style={{ marginTop: 12, width: "100%", minHeight: 44, background: "transparent", border: "1px solid #64748b", color: "#0a2540", fontSize: 14, cursor: "pointer" }}
+            >
+              Cancel and sign out
             </button>
           </form>
         ) : null}

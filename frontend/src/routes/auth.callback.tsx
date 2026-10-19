@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { triggerWelcomeEmail } from '@/lib/email/triggers'
 import { syncOwnContact } from '@/lib/public-forms-fn'
-import { isRecoverySession } from '@/lib/recovery'
+import { isFreshRecoveryUser, isRecoverySession, markRecoverySession } from '@/lib/recovery'
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallback
@@ -18,6 +18,26 @@ function AuthCallback() {
         // Supabase puts tokens in the URL hash
         // We need to let it process automatically
         // onAuthStateChange will fire when ready
+
+        // Link styles that carry no session in the address: a token_hash verify link and a PKCE code. auth-js
+        // handles a hash itself (and a PKCE code when its verifier is stored); anything still without a session
+        // is exchanged here. A recovery one sets the recovery mark (the address, the PASSWORD_RECOVERY event, or,
+        // for a bare code, a recovery email sent to this user moments ago).
+        const params = new URL(window.location.href).searchParams
+        const tokenHash = params.get('token_hash')
+        const linkType = params.get('type')
+        const code = params.get('code')
+        if (tokenHash || code) {
+          const { data: initial } = await supabase.auth.getSession()
+          if (!initial.session) {
+            if (tokenHash && linkType) {
+              await supabase.auth.verifyOtp({ token_hash: tokenHash, type: linkType as 'recovery' })
+            } else if (code) {
+              const { data: exchanged } = await supabase.auth.exchangeCodeForSession(code)
+              if (isFreshRecoveryUser(exchanged?.user)) markRecoverySession()
+            }
+          }
+        }
 
         let session = null
         let attempts = 0

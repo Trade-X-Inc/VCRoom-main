@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import { create } from 'zustand'
-import { markRecoverySession } from './recovery'
+import { clearRecoverySession, markRecoverySession } from './recovery'
 
 interface AuthState {
   user: any | null
@@ -29,6 +29,8 @@ export function setupAuthListener() {
   supabase.auth.onAuthStateChange((_event, session) => {
     // Password-reset link: record it synchronously so /auth/callback can route to /reset-password.
     if (_event === 'PASSWORD_RECOVERY') markRecoverySession()
+    // Signing out (or losing the session) ends a recovery session: there is nothing left to protect.
+    if (_event === 'SIGNED_OUT') clearRecoverySession()
     useAuthStore.getState().setUser(session?.user ?? null)
   })
 }
