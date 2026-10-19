@@ -248,14 +248,17 @@ jobs:
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      # `npm audit` exits non-zero on ANY finding at any severity — real
-      # findings exist in this project today, including `high`. Per
-      # explicit instruction: report, do not block merge on this alone.
-      # continue-on-error means this job is reported as failed/red in
-      # the PR checks list (visible, not hidden) but does NOT count
-      # toward GitHub's required-status-check gate unless main's branch
-      # protection explicitly requires this specific job — so it can't
-      # silently block merge the way typecheck/build/test can.
-      - name: npm audit (report only, non-blocking)
+      # Critical findings in PRODUCTION dependencies fail this job (added 19 Oct 2026, after the TanStack Start
+      # reflected-XSS advisory GHSA-qx66-fv34-fjm8 was fixed and the production count reached 0 critical).
+      # `--omit=dev` skips dev-only packages; `--audit-level=critical` makes npm exit non-zero only for critical.
+      # What stays unblocked: high and lower findings, which are build and deploy tooling (wrangler, miniflare,
+      # undici, ws, sharp, @cloudflare/vite-plugin) that does not ship in the deployed bundle; they are reported
+      # by the next step.
+      - name: npm audit (production, fails on critical)
+        run: npm audit --omit=dev --audit-level=critical
+      # `npm audit` exits non-zero on ANY finding at any severity — real findings exist in this project today.
+      # This second step is report-only: continue-on-error makes it show as failed/red in the PR checks list
+      # (visible, not hidden) without blocking merge.
+      - name: npm audit (all severities, report only, non-blocking)
         continue-on-error: true
         run: npm audit --audit-level=low
