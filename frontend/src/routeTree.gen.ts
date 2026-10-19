@@ -9,255 +9,195 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as StatusRouteImport } from './routes/status'
-import { Route as SignUpRouteImport } from './routes/sign-up'
-import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as RegistryRouteImport } from './routes/registry'
-import { Route as LibraryRouteImport } from './routes/library'
-import { Route as LcsPreviewRouteImport } from './routes/lcs-preview'
-import { Route as JoinRoomRouteImport } from './routes/join-room'
-import { Route as JoinRouteImport } from './routes/join'
-import { Route as InviteRouteImport } from './routes/invite'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as FeedbackRouteImport } from './routes/feedback'
-import { Route as DocsV2RouteImport } from './routes/docs-v2'
-import { Route as DocsRouteImport } from './routes/docs'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ToolsIndexRouteImport } from './routes/tools.index'
-import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
-import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
-import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
-import { Route as PackIndexRouteImport } from './routes/pack.index'
-import { Route as LegalIndexRouteImport } from './routes/legal.index'
-import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
-import { Route as DocsV2IndexRouteImport } from './routes/docs-v2.index'
-import { Route as DealsPreviewIndexRouteImport } from './routes/deals-preview.index'
-import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as ToolsValuationCalculatorRouteImport } from './routes/tools.valuation-calculator'
-import { Route as ToolsSafeNoteRouteImport } from './routes/tools.safe-note'
-import { Route as ToolsRunwayRouteImport } from './routes/tools.runway'
-import { Route as ToolsDilutionRouteImport } from './routes/tools.dilution'
-import { Route as ToolsCogsRouteImport } from './routes/tools.cogs'
-import { Route as ToolsCapTableRouteImport } from './routes/tools.cap-table'
-import { Route as ToolsBurnRateRouteImport } from './routes/tools.burn-rate'
-import { Route as ResourcesChangelogRouteImport } from './routes/resources.changelog'
-import { Route as ProductSecurityRouteImport } from './routes/product.security'
-import { Route as ProductPricingRouteImport } from './routes/product.pricing'
-import { Route as ProductHowItWorksRouteImport } from './routes/product.how-it-works'
-import { Route as PackPackIdRouteImport } from './routes/pack.$packId'
-import { Route as PSlugRouteImport } from './routes/p.$slug'
-import { Route as LegalTermsRouteImport } from './routes/legal.terms'
-import { Route as LegalSubProcessorsRouteImport } from './routes/legal.sub-processors'
-import { Route as LegalRefundsRouteImport } from './routes/legal.refunds'
-import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
-import { Route as LegalDpaRouteImport } from './routes/legal.dpa'
-import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
-import { Route as LegalAcceptableUseRouteImport } from './routes/legal.acceptable-use'
-import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
-import { Route as JoinDealRoomTokenRouteImport } from './routes/join-deal-room.$token'
-import { Route as ISlugRouteImport } from './routes/i.$slug'
-import { Route as ForVentureCapitalRouteImport } from './routes/for.venture-capital'
-import { Route as ForSyndicatesRouteImport } from './routes/for.syndicates'
-import { Route as ForSpvsRouteImport } from './routes/for.spvs'
-import { Route as ForPrivateEquityRouteImport } from './routes/for.private-equity'
-import { Route as ForLimitedPartnersRouteImport } from './routes/for.limited-partners'
-import { Route as ForInvestorsRouteImport } from './routes/for.investors'
-import { Route as ForFoundersRouteImport } from './routes/for.founders'
-import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
-import { Route as ForAngelsRouteImport } from './routes/for.angels'
-import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
-import { Route as DocsV2SplatRouteImport } from './routes/docs-v2.$'
-import { Route as DealsPreviewVaultRouteImport } from './routes/deals-preview.vault'
-import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
-import { Route as DealsPreviewRequestsRouteImport } from './routes/deals-preview.requests'
-import { Route as DealsPreviewProfileRouteImport } from './routes/deals-preview.profile'
-import { Route as DealsPreviewAnalyticsRouteImport } from './routes/deals-preview.analytics'
-import { Route as CvSlugRouteImport } from './routes/cv.$slug'
-import { Route as CompanyContactRouteImport } from './routes/company.contact'
-import { Route as CompanyCareersRouteImport } from './routes/company.careers'
-import { Route as CompanyAboutRouteImport } from './routes/company.about'
-import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AppUsersRouteImport } from './routes/app.users'
-import { Route as AppTeamChatRouteImport } from './routes/app.team-chat'
-import { Route as AppSupportRouteImport } from './routes/app.support'
-import { Route as AppSettingsRouteImport } from './routes/app.settings'
-import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
-import { Route as AppProfileRouteImport } from './routes/app.profile'
-import { Route as AppOverviewRouteImport } from './routes/app.overview'
-import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
-import { Route as AppMessagesRouteImport } from './routes/app.messages'
-import { Route as AppMemberProfileRouteImport } from './routes/app.member-profile'
-import { Route as AppInvestorRouteImport } from './routes/app.investor'
-import { Route as AppHomeRouteImport } from './routes/app.home'
-import { Route as AppDocumentsRouteImport } from './routes/app.documents'
-import { Route as AppConnectionsRouteImport } from './routes/app.connections'
-import { Route as AppCloseRouteImport } from './routes/app.close'
-import { Route as AppAuditRouteImport } from './routes/app.audit'
-import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
-import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
-import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
-import { Route as ApiHubspotNewsletterRouteImport } from './routes/api.hubspot-newsletter'
-import { Route as ApiEmailtestRouteImport } from './routes/api.emailtest'
-import { Route as ApiEmailTestRouteImport } from './routes/api.email-test'
-import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as DocsV2RouteImport } from './routes/docs-v2'
+import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as InviteRouteImport } from './routes/invite'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as JoinRoomRouteImport } from './routes/join-room'
+import { Route as LcsPreviewRouteImport } from './routes/lcs-preview'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as RegistryRouteImport } from './routes/registry'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as ApiAdminRouteImport } from './routes/api.admin'
-import { Route as ResourcesBlogIndexRouteImport } from './routes/resources.blog.index'
-import { Route as ProductCompareIndexRouteImport } from './routes/product.compare.index'
-import { Route as DealsPreviewSectorIndexRouteImport } from './routes/deals-preview.$sector.index'
-import { Route as AppPrepareIndexRouteImport } from './routes/app.prepare.index'
-import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
-import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
-import { Route as AppDealRoomsIndexRouteImport } from './routes/app.deal-rooms.index'
-import { Route as AppAdvisorPreviewIndexRouteImport } from './routes/app.advisor-preview.index'
-import { Route as ResourcesBlogSlugRouteImport } from './routes/resources.blog.$slug'
-import { Route as ProductCompareIdealsRouteImport } from './routes/product.compare.ideals'
-import { Route as ProductCompareFirmexRouteImport } from './routes/product.compare.firmex'
-import { Route as ProductCompareDocsendRouteImport } from './routes/product.compare.docsend'
-import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
-import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
-import { Route as PackPackIdMissingRouteImport } from './routes/pack.$packId_.missing'
-import { Route as DealsPreviewProfileThesisRouteImport } from './routes/deals-preview.profile_.thesis'
-import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-preview.profile_.team'
-import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
-import { Route as DealsPreviewProfileAchievementsRouteImport } from './routes/deals-preview.profile_.achievements'
-import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
-import { Route as AppSupportFeedbackRouteImport } from './routes/app.support_.feedback'
-import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
-import { Route as AppSettingsProfilePrivacyRouteImport } from './routes/app.settings.profile-privacy'
-import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
-import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
-import { Route as AppSettingsActivityRouteImport } from './routes/app.settings.activity'
-import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
-import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
-import { Route as AppInvestorSourceRouteImport } from './routes/app.investor.source'
-import { Route as AppInvestorSettingsRouteImport } from './routes/app.investor.settings'
-import { Route as AppInvestorProfileRouteImport } from './routes/app.investor.profile'
-import { Route as AppInvestorPortfolioRouteImport } from './routes/app.investor.portfolio'
-import { Route as AppInvestorOverviewRouteImport } from './routes/app.investor.overview'
-import { Route as AppInvestorEvaluateRouteImport } from './routes/app.investor.evaluate'
-import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
-import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
-import { Route as AppInvestorDecideRouteImport } from './routes/app.investor.decide'
-import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
-import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investor.connections'
-import { Route as AppInvestorAnalyticsRouteImport } from './routes/app.investor.analytics'
-import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
-import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
-import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-rooms.reports-vault'
-import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
-import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
-import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
-import { Route as AppAdvisorPreviewRecordRouteImport } from './routes/app.advisor-preview.record'
-import { Route as AppAdvisorPreviewCompanyRouteImport } from './routes/app.advisor-preview.company'
-import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
+import { Route as ApiAdminDataRouteImport } from './routes/api.admin-data'
+import { Route as ApiEmailTestRouteImport } from './routes/api.email-test'
+import { Route as ApiEmailtestRouteImport } from './routes/api.emailtest'
+import { Route as ApiHubspotNewsletterRouteImport } from './routes/api.hubspot-newsletter'
+import { Route as ApiHubspotSyncRouteImport } from './routes/api.hubspot-sync'
+import { Route as ApiTestAiRouteImport } from './routes/api.test-ai'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
+import { Route as AppAuditRouteImport } from './routes/app.audit'
+import { Route as AppCloseRouteImport } from './routes/app.close'
+import { Route as AppConnectionsRouteImport } from './routes/app.connections'
+import { Route as AppDocumentsRouteImport } from './routes/app.documents'
+import { Route as AppHomeRouteImport } from './routes/app.home'
+import { Route as AppInvestorRouteImport } from './routes/app.investor'
+import { Route as AppMemberProfileRouteImport } from './routes/app.member-profile'
+import { Route as AppMessagesRouteImport } from './routes/app.messages'
+import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
+import { Route as AppOverviewRouteImport } from './routes/app.overview'
+import { Route as AppProfileRouteImport } from './routes/app.profile'
+import { Route as AppProfileBuilderRouteImport } from './routes/app.profile-builder'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppSupportRouteImport } from './routes/app.support'
+import { Route as AppTeamChatRouteImport } from './routes/app.team-chat'
+import { Route as AppUsersRouteImport } from './routes/app.users'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as CompanyAboutRouteImport } from './routes/company.about'
+import { Route as CompanyCareersRouteImport } from './routes/company.careers'
+import { Route as CompanyContactRouteImport } from './routes/company.contact'
+import { Route as CvSlugRouteImport } from './routes/cv.$slug'
+import { Route as DealsPreviewIndexRouteImport } from './routes/deals-preview.index'
+import { Route as DealsPreviewAnalyticsRouteImport } from './routes/deals-preview.analytics'
+import { Route as DealsPreviewProfileRouteImport } from './routes/deals-preview.profile'
+import { Route as DealsPreviewRequestsRouteImport } from './routes/deals-preview.requests'
+import { Route as DealsPreviewTeamRouteImport } from './routes/deals-preview.team'
+import { Route as DealsPreviewVaultRouteImport } from './routes/deals-preview.vault'
+import { Route as DocsV2IndexRouteImport } from './routes/docs-v2.index'
+import { Route as DocsV2SplatRouteImport } from './routes/docs-v2.$'
+import { Route as ForAdvisorsRouteImport } from './routes/for.advisors'
+import { Route as ForAngelsRouteImport } from './routes/for.angels'
+import { Route as ForFamilyOfficesRouteImport } from './routes/for.family-offices'
+import { Route as ForFoundersRouteImport } from './routes/for.founders'
+import { Route as ForInvestorsRouteImport } from './routes/for.investors'
+import { Route as ForLimitedPartnersRouteImport } from './routes/for.limited-partners'
+import { Route as ForPrivateEquityRouteImport } from './routes/for.private-equity'
+import { Route as ForSpvsRouteImport } from './routes/for.spvs'
+import { Route as ForSyndicatesRouteImport } from './routes/for.syndicates'
+import { Route as ForVentureCapitalRouteImport } from './routes/for.venture-capital'
+import { Route as GlossaryIndexRouteImport } from './routes/glossary.index'
+import { Route as ISlugRouteImport } from './routes/i.$slug'
+import { Route as JoinDealRoomTokenRouteImport } from './routes/join-deal-room.$token'
+import { Route as JoinInvestorTokenRouteImport } from './routes/join-investor.$token'
+import { Route as LegalIndexRouteImport } from './routes/legal.index'
+import { Route as LegalAcceptableUseRouteImport } from './routes/legal.acceptable-use'
+import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
+import { Route as LegalDpaRouteImport } from './routes/legal.dpa'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as LegalRefundsRouteImport } from './routes/legal.refunds'
+import { Route as LegalSubProcessorsRouteImport } from './routes/legal.sub-processors'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as PackIndexRouteImport } from './routes/pack.index'
+import { Route as PackPackIdRouteImport } from './routes/pack.$packId'
+import { Route as ProductHowItWorksRouteImport } from './routes/product.how-it-works'
+import { Route as ProductPricingRouteImport } from './routes/product.pricing'
+import { Route as ProductSecurityRouteImport } from './routes/product.security'
+import { Route as ResourcesIndexRouteImport } from './routes/resources.index'
+import { Route as ResourcesChangelogRouteImport } from './routes/resources.changelog'
+import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
+import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
+import { Route as ToolsIndexRouteImport } from './routes/tools.index'
+import { Route as ToolsBurnRateRouteImport } from './routes/tools.burn-rate'
+import { Route as ToolsCapTableRouteImport } from './routes/tools.cap-table'
+import { Route as ToolsCogsRouteImport } from './routes/tools.cogs'
+import { Route as ToolsDilutionRouteImport } from './routes/tools.dilution'
+import { Route as ToolsRunwayRouteImport } from './routes/tools.runway'
+import { Route as ToolsSafeNoteRouteImport } from './routes/tools.safe-note'
+import { Route as ToolsValuationCalculatorRouteImport } from './routes/tools.valuation-calculator'
 import { Route as ApiInternalDataRouteImport } from './routes/api.internal.data'
-import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
-import { Route as AppInvestorDiscoverIndexRouteImport } from './routes/app.investor.discover.index'
-import { Route as AppInvestorDealRoomsIndexRouteImport } from './routes/app.investor.deal-rooms.index'
-import { Route as DealsPreviewSectorInstrumentDealIdRouteImport } from './routes/deals-preview.$sector_.$instrument.$dealId'
-import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/app.prepare.profile-builder.team-cards'
-import { Route as AppPrepareProfileBuilderQuickSetupRouteImport } from './routes/app.prepare.profile-builder.quick-setup'
-import { Route as AppPrepareProfileBuilderFundraisingThesisRouteImport } from './routes/app.prepare.profile-builder.fundraising-thesis'
-import { Route as AppPrepareProfileBuilderFullProfileRouteImport } from './routes/app.prepare.profile-builder.full-profile'
-import { Route as AppPrepareProfileBuilderAnalyticsRouteImport } from './routes/app.prepare.profile-builder.analytics'
-import { Route as AppPrepareProfileBuilderAchievementsRouteImport } from './routes/app.prepare.profile-builder.achievements'
-import { Route as AppPrepareIpVaultSourceFilesRouteImport } from './routes/app.prepare.ip-vault.source-files'
-import { Route as AppPrepareIpVaultPrivacySettingsRouteImport } from './routes/app.prepare.ip-vault.privacy-settings'
-import { Route as AppPrepareIpVaultDocumentIntakeRouteImport } from './routes/app.prepare.ip-vault.document-intake'
-import { Route as AppPrepareIpVaultDigitalDocumentVaultRouteImport } from './routes/app.prepare.ip-vault.digital-document-vault'
-import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
-import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
-import { Route as AppInvestorDealRoomsTeamAssignmentsRouteImport } from './routes/app.investor.deal-rooms.team-assignments'
-import { Route as AppInvestorDealRoomsReportsVaultRouteImport } from './routes/app.investor.deal-rooms.reports-vault'
-import { Route as AppInvestorDealRoomsPrepNotesRouteImport } from './routes/app.investor.deal-rooms.prep-notes'
-import { Route as AppInvestorDealRoomsPortfolioRouteImport } from './routes/app.investor.deal-rooms.portfolio'
-import { Route as AppInvestorDealRoomsMeetingsCalendarRouteImport } from './routes/app.investor.deal-rooms.meetings-calendar'
-import { Route as AppInvestorDealRoomsDiligenceNotesRouteImport } from './routes/app.investor.deal-rooms.diligence-notes'
-import { Route as AppDealRoomsIdTermSheetsRouteImport } from './routes/app.deal-rooms.$id.term-sheets'
-import { Route as AppDealRoomsIdQaRouteImport } from './routes/app.deal-rooms.$id.qa'
-import { Route as AppDealRoomsIdOverviewRouteImport } from './routes/app.deal-rooms.$id.overview'
-import { Route as AppDealRoomsIdNdaRouteImport } from './routes/app.deal-rooms.$id.nda'
-import { Route as AppDealRoomsIdMeetingsRouteImport } from './routes/app.deal-rooms.$id.meetings'
-import { Route as AppDealRoomsIdInformationRouteImport } from './routes/app.deal-rooms.$id.information'
-import { Route as AppDealRoomsIdDocumentsRouteImport } from './routes/app.deal-rooms.$id.documents'
-import { Route as AppDealRoomsIdDiligenceRouteImport } from './routes/app.deal-rooms.$id.diligence'
-import { Route as AppDealRoomsIdCloseRouteImport } from './routes/app.deal-rooms.$id.close'
+import { Route as ApiInternalEmailTestRouteImport } from './routes/api.internal.email-test'
+import { Route as AppAdvisorPreviewIndexRouteImport } from './routes/app.advisor-preview.index'
+import { Route as AppAdvisorPreviewCompanyRouteImport } from './routes/app.advisor-preview.company'
+import { Route as AppAdvisorPreviewRecordRouteImport } from './routes/app.advisor-preview.record'
+import { Route as AppDealRoomsIndexRouteImport } from './routes/app.deal-rooms.index'
+import { Route as AppDealRoomsIdRouteImport } from './routes/app.deal-rooms.$id'
+import { Route as AppDealRoomsMeetingsCalendarRouteImport } from './routes/app.deal-rooms.meetings-calendar'
+import { Route as AppDealRoomsPrepNotesRouteImport } from './routes/app.deal-rooms.prep-notes'
+import { Route as AppDealRoomsReportsVaultRouteImport } from './routes/app.deal-rooms.reports-vault'
+import { Route as AppDealRoomsTeamAssignmentsRouteImport } from './routes/app.deal-rooms.team-assignments'
+import { Route as AppInvestorIndexRouteImport } from './routes/app.investor.index'
+import { Route as AppInvestorAnalysisRouteImport } from './routes/app.investor.analysis'
+import { Route as AppInvestorAnalyticsRouteImport } from './routes/app.investor.analytics'
+import { Route as AppInvestorConnectionsRouteImport } from './routes/app.investor.connections'
+import { Route as AppInvestorDealFlowRouteImport } from './routes/app.investor.deal-flow'
+import { Route as AppInvestorDecideRouteImport } from './routes/app.investor.decide'
+import { Route as AppInvestorDecisionsRouteImport } from './routes/app.investor.decisions'
+import { Route as AppInvestorDiligenceRouteImport } from './routes/app.investor.diligence'
+import { Route as AppInvestorEvaluateRouteImport } from './routes/app.investor.evaluate'
+import { Route as AppInvestorOverviewRouteImport } from './routes/app.investor.overview'
+import { Route as AppInvestorPortfolioRouteImport } from './routes/app.investor.portfolio'
+import { Route as AppInvestorProfileRouteImport } from './routes/app.investor.profile'
+import { Route as AppInvestorSettingsRouteImport } from './routes/app.investor.settings'
+import { Route as AppInvestorSourceRouteImport } from './routes/app.investor.source'
+import { Route as AppInvestorStartupsRouteImport } from './routes/app.investor.startups'
+import { Route as AppInvestorTeamRouteImport } from './routes/app.investor.team'
+import { Route as AppMemberIndexRouteImport } from './routes/app.member.index'
+import { Route as AppPrepareIndexRouteImport } from './routes/app.prepare.index'
+import { Route as AppSettingsActivityRouteImport } from './routes/app.settings.activity'
+import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
+import { Route as AppSettingsNotificationsRouteImport } from './routes/app.settings.notifications'
+import { Route as AppSettingsProfilePrivacyRouteImport } from './routes/app.settings.profile-privacy'
+import { Route as AppSettingsSecurityRouteImport } from './routes/app.settings.security'
+import { Route as AppSupportFeedbackRouteImport } from './routes/app.support_.feedback'
+import { Route as DealsPreviewSectorIndexRouteImport } from './routes/deals-preview.$sector.index'
+import { Route as DealsPreviewSectorInstrumentRouteImport } from './routes/deals-preview.$sector.$instrument'
+import { Route as DealsPreviewProfileAchievementsRouteImport } from './routes/deals-preview.profile_.achievements'
+import { Route as DealsPreviewProfileFullRouteImport } from './routes/deals-preview.profile_.full'
+import { Route as DealsPreviewProfileTeamRouteImport } from './routes/deals-preview.profile_.team'
+import { Route as DealsPreviewProfileThesisRouteImport } from './routes/deals-preview.profile_.thesis'
+import { Route as PackPackIdMissingRouteImport } from './routes/pack.$packId_.missing'
+import { Route as ProductCompareIndexRouteImport } from './routes/product.compare.index'
+import { Route as ProductCompareDatasiteRouteImport } from './routes/product.compare.datasite'
+import { Route as ProductCompareDealroomRouteImport } from './routes/product.compare.dealroom'
+import { Route as ProductCompareDocsendRouteImport } from './routes/product.compare.docsend'
+import { Route as ProductCompareFirmexRouteImport } from './routes/product.compare.firmex'
+import { Route as ProductCompareIdealsRouteImport } from './routes/product.compare.ideals'
+import { Route as ResourcesBlogIndexRouteImport } from './routes/resources.blog.index'
+import { Route as ResourcesBlogSlugRouteImport } from './routes/resources.blog.$slug'
 import { Route as AppDealRoomsIdActivityRouteImport } from './routes/app.deal-rooms.$id.activity'
-import { Route as AppInvestorThesisProfileBuilderTrackRecordRouteImport } from './routes/app.investor.thesis.profile-builder.track-record'
-import { Route as AppInvestorThesisProfileBuilderTeamCardsRouteImport } from './routes/app.investor.thesis.profile-builder.team-cards'
-import { Route as AppInvestorThesisProfileBuilderQuickSetupRouteImport } from './routes/app.investor.thesis.profile-builder.quick-setup'
-import { Route as AppInvestorThesisProfileBuilderInvestmentThesisRouteImport } from './routes/app.investor.thesis.profile-builder.investment-thesis'
-import { Route as AppInvestorThesisProfileBuilderFullProfileRouteImport } from './routes/app.investor.thesis.profile-builder.full-profile'
-import { Route as AppInvestorThesisFundVaultSourceFilesRouteImport } from './routes/app.investor.thesis.fund-vault.source-files'
-import { Route as AppInvestorThesisFundVaultPrivacySettingsRouteImport } from './routes/app.investor.thesis.fund-vault.privacy-settings'
-import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } from './routes/app.investor.thesis.fund-vault.digital-document-vault'
-import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
+import { Route as AppDealRoomsIdCloseRouteImport } from './routes/app.deal-rooms.$id.close'
+import { Route as AppDealRoomsIdDiligenceRouteImport } from './routes/app.deal-rooms.$id.diligence'
+import { Route as AppDealRoomsIdDocumentsRouteImport } from './routes/app.deal-rooms.$id.documents'
+import { Route as AppDealRoomsIdInformationRouteImport } from './routes/app.deal-rooms.$id.information'
+import { Route as AppDealRoomsIdMeetingsRouteImport } from './routes/app.deal-rooms.$id.meetings'
+import { Route as AppDealRoomsIdNdaRouteImport } from './routes/app.deal-rooms.$id.nda'
+import { Route as AppDealRoomsIdOverviewRouteImport } from './routes/app.deal-rooms.$id.overview'
+import { Route as AppDealRoomsIdQaRouteImport } from './routes/app.deal-rooms.$id.qa'
+import { Route as AppDealRoomsIdTermSheetsRouteImport } from './routes/app.deal-rooms.$id.term-sheets'
+import { Route as AppInvestorDealRoomsIndexRouteImport } from './routes/app.investor.deal-rooms.index'
+import { Route as AppInvestorDealRoomsDiligenceNotesRouteImport } from './routes/app.investor.deal-rooms.diligence-notes'
+import { Route as AppInvestorDealRoomsMeetingsCalendarRouteImport } from './routes/app.investor.deal-rooms.meetings-calendar'
+import { Route as AppInvestorDealRoomsPortfolioRouteImport } from './routes/app.investor.deal-rooms.portfolio'
+import { Route as AppInvestorDealRoomsPrepNotesRouteImport } from './routes/app.investor.deal-rooms.prep-notes'
+import { Route as AppInvestorDealRoomsReportsVaultRouteImport } from './routes/app.investor.deal-rooms.reports-vault'
+import { Route as AppInvestorDealRoomsTeamAssignmentsRouteImport } from './routes/app.investor.deal-rooms.team-assignments'
+import { Route as AppInvestorDiscoverIndexRouteImport } from './routes/app.investor.discover.index'
+import { Route as AppInvestorDiscoverDealFlowRouteImport } from './routes/app.investor.discover.deal-flow'
+import { Route as AppInvestorDiscoverWatchlistRouteImport } from './routes/app.investor.discover.watchlist'
+import { Route as AppInvestorThesisIndexRouteImport } from './routes/app.investor.thesis.index'
+import { Route as AppPrepareIpVaultDigitalDocumentVaultRouteImport } from './routes/app.prepare.ip-vault.digital-document-vault'
+import { Route as AppPrepareIpVaultDocumentIntakeRouteImport } from './routes/app.prepare.ip-vault.document-intake'
+import { Route as AppPrepareIpVaultPrivacySettingsRouteImport } from './routes/app.prepare.ip-vault.privacy-settings'
+import { Route as AppPrepareIpVaultSourceFilesRouteImport } from './routes/app.prepare.ip-vault.source-files'
+import { Route as AppPrepareProfileBuilderAchievementsRouteImport } from './routes/app.prepare.profile-builder.achievements'
+import { Route as AppPrepareProfileBuilderAnalyticsRouteImport } from './routes/app.prepare.profile-builder.analytics'
+import { Route as AppPrepareProfileBuilderFullProfileRouteImport } from './routes/app.prepare.profile-builder.full-profile'
+import { Route as AppPrepareProfileBuilderFundraisingThesisRouteImport } from './routes/app.prepare.profile-builder.fundraising-thesis'
+import { Route as AppPrepareProfileBuilderQuickSetupRouteImport } from './routes/app.prepare.profile-builder.quick-setup'
+import { Route as AppPrepareProfileBuilderTeamCardsRouteImport } from './routes/app.prepare.profile-builder.team-cards'
+import { Route as DealsPreviewSectorInstrumentDealIdRouteImport } from './routes/deals-preview.$sector_.$instrument.$dealId'
 import { Route as AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport } from './routes/app.investor.discover.public-profile.privacy-settings'
+import { Route as AppInvestorDiscoverPublicProfileProfileViewRouteImport } from './routes/app.investor.discover.public-profile.profile-view'
+import { Route as AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport } from './routes/app.investor.thesis.fund-vault.digital-document-vault'
+import { Route as AppInvestorThesisFundVaultPrivacySettingsRouteImport } from './routes/app.investor.thesis.fund-vault.privacy-settings'
+import { Route as AppInvestorThesisFundVaultSourceFilesRouteImport } from './routes/app.investor.thesis.fund-vault.source-files'
+import { Route as AppInvestorThesisProfileBuilderFullProfileRouteImport } from './routes/app.investor.thesis.profile-builder.full-profile'
+import { Route as AppInvestorThesisProfileBuilderInvestmentThesisRouteImport } from './routes/app.investor.thesis.profile-builder.investment-thesis'
+import { Route as AppInvestorThesisProfileBuilderQuickSetupRouteImport } from './routes/app.investor.thesis.profile-builder.quick-setup'
+import { Route as AppInvestorThesisProfileBuilderTeamCardsRouteImport } from './routes/app.investor.thesis.profile-builder.team-cards'
+import { Route as AppInvestorThesisProfileBuilderTrackRecordRouteImport } from './routes/app.investor.thesis.profile-builder.track-record'
 
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignUpRoute = SignUpRouteImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignInRoute = SignInRouteImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegistryRoute = RegistryRouteImport.update({
-  id: '/registry',
-  path: '/registry',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LibraryRoute = LibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LcsPreviewRoute = LcsPreviewRouteImport.update({
-  id: '/lcs-preview',
-  path: '/lcs-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinRoomRoute = JoinRoomRouteImport.update({
-  id: '/join-room',
-  path: '/join-room',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinRoute = JoinRouteImport.update({
-  id: '/join',
-  path: '/join',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InviteRoute = InviteRouteImport.update({
-  id: '/invite',
-  path: '/invite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedbackRoute = FeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsV2Route = DocsV2RouteImport.update({
-  id: '/docs-v2',
-  path: '/docs-v2',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsRoute = DocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -265,395 +205,69 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsIndexRoute = ToolsIndexRouteImport.update({
-  id: '/tools/',
-  path: '/tools/',
+const DocsV2Route = DocsV2RouteImport.update({
+  id: '/docs-v2',
+  path: '/docs-v2',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
-  id: '/templates/',
-  path: '/templates/',
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SectorsIndexRoute = SectorsIndexRouteImport.update({
-  id: '/sectors/',
-  path: '/sectors/',
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
-  id: '/resources/',
-  path: '/resources/',
+const InviteRoute = InviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PackIndexRoute = PackIndexRouteImport.update({
-  id: '/pack/',
-  path: '/pack/',
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LegalIndexRoute = LegalIndexRouteImport.update({
-  id: '/legal/',
-  path: '/legal/',
+const JoinRoomRoute = JoinRoomRouteImport.update({
+  id: '/join-room',
+  path: '/join-room',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GlossaryIndexRoute = GlossaryIndexRouteImport.update({
-  id: '/glossary/',
-  path: '/glossary/',
+const LcsPreviewRoute = LcsPreviewRouteImport.update({
+  id: '/lcs-preview',
+  path: '/lcs-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsV2IndexRoute = DocsV2IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DocsV2Route,
-} as any)
-const DealsPreviewIndexRoute = DealsPreviewIndexRouteImport.update({
-  id: '/deals-preview/',
-  path: '/deals-preview/',
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppRoute,
-} as any)
-const ToolsValuationCalculatorRoute =
-  ToolsValuationCalculatorRouteImport.update({
-    id: '/tools/valuation-calculator',
-    path: '/tools/valuation-calculator',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ToolsSafeNoteRoute = ToolsSafeNoteRouteImport.update({
-  id: '/tools/safe-note',
-  path: '/tools/safe-note',
+const RegistryRoute = RegistryRouteImport.update({
+  id: '/registry',
+  path: '/registry',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsRunwayRoute = ToolsRunwayRouteImport.update({
-  id: '/tools/runway',
-  path: '/tools/runway',
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsDilutionRoute = ToolsDilutionRouteImport.update({
-  id: '/tools/dilution',
-  path: '/tools/dilution',
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsCogsRoute = ToolsCogsRouteImport.update({
-  id: '/tools/cogs',
-  path: '/tools/cogs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsCapTableRoute = ToolsCapTableRouteImport.update({
-  id: '/tools/cap-table',
-  path: '/tools/cap-table',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
-  id: '/tools/burn-rate',
-  path: '/tools/burn-rate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResourcesChangelogRoute = ResourcesChangelogRouteImport.update({
-  id: '/resources/changelog',
-  path: '/resources/changelog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductSecurityRoute = ProductSecurityRouteImport.update({
-  id: '/product/security',
-  path: '/product/security',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductPricingRoute = ProductPricingRouteImport.update({
-  id: '/product/pricing',
-  path: '/product/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductHowItWorksRoute = ProductHowItWorksRouteImport.update({
-  id: '/product/how-it-works',
-  path: '/product/how-it-works',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PackPackIdRoute = PackPackIdRouteImport.update({
-  id: '/pack/$packId',
-  path: '/pack/$packId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PSlugRoute = PSlugRouteImport.update({
-  id: '/p/$slug',
-  path: '/p/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalTermsRoute = LegalTermsRouteImport.update({
-  id: '/legal/terms',
-  path: '/legal/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalSubProcessorsRoute = LegalSubProcessorsRouteImport.update({
-  id: '/legal/sub-processors',
-  path: '/legal/sub-processors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalRefundsRoute = LegalRefundsRouteImport.update({
-  id: '/legal/refunds',
-  path: '/legal/refunds',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
-  id: '/legal/privacy',
-  path: '/legal/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalDpaRoute = LegalDpaRouteImport.update({
-  id: '/legal/dpa',
-  path: '/legal/dpa',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalCookiesRoute = LegalCookiesRouteImport.update({
-  id: '/legal/cookies',
-  path: '/legal/cookies',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalAcceptableUseRoute = LegalAcceptableUseRouteImport.update({
-  id: '/legal/acceptable-use',
-  path: '/legal/acceptable-use',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinInvestorTokenRoute = JoinInvestorTokenRouteImport.update({
-  id: '/join-investor/$token',
-  path: '/join-investor/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinDealRoomTokenRoute = JoinDealRoomTokenRouteImport.update({
-  id: '/join-deal-room/$token',
-  path: '/join-deal-room/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ISlugRoute = ISlugRouteImport.update({
-  id: '/i/$slug',
-  path: '/i/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForVentureCapitalRoute = ForVentureCapitalRouteImport.update({
-  id: '/for/venture-capital',
-  path: '/for/venture-capital',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForSyndicatesRoute = ForSyndicatesRouteImport.update({
-  id: '/for/syndicates',
-  path: '/for/syndicates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForSpvsRoute = ForSpvsRouteImport.update({
-  id: '/for/spvs',
-  path: '/for/spvs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForPrivateEquityRoute = ForPrivateEquityRouteImport.update({
-  id: '/for/private-equity',
-  path: '/for/private-equity',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForLimitedPartnersRoute = ForLimitedPartnersRouteImport.update({
-  id: '/for/limited-partners',
-  path: '/for/limited-partners',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForInvestorsRoute = ForInvestorsRouteImport.update({
-  id: '/for/investors',
-  path: '/for/investors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForFoundersRoute = ForFoundersRouteImport.update({
-  id: '/for/founders',
-  path: '/for/founders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForFamilyOfficesRoute = ForFamilyOfficesRouteImport.update({
-  id: '/for/family-offices',
-  path: '/for/family-offices',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForAngelsRoute = ForAngelsRouteImport.update({
-  id: '/for/angels',
-  path: '/for/angels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
-  id: '/for/advisors',
-  path: '/for/advisors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsV2SplatRoute = DocsV2SplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => DocsV2Route,
-} as any)
-const DealsPreviewVaultRoute = DealsPreviewVaultRouteImport.update({
-  id: '/deals-preview/vault',
-  path: '/deals-preview/vault',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewTeamRoute = DealsPreviewTeamRouteImport.update({
-  id: '/deals-preview/team',
-  path: '/deals-preview/team',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewRequestsRoute = DealsPreviewRequestsRouteImport.update({
-  id: '/deals-preview/requests',
-  path: '/deals-preview/requests',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewProfileRoute = DealsPreviewProfileRouteImport.update({
-  id: '/deals-preview/profile',
-  path: '/deals-preview/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewAnalyticsRoute = DealsPreviewAnalyticsRouteImport.update({
-  id: '/deals-preview/analytics',
-  path: '/deals-preview/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CvSlugRoute = CvSlugRouteImport.update({
-  id: '/cv/$slug',
-  path: '/cv/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompanyContactRoute = CompanyContactRouteImport.update({
-  id: '/company/contact',
-  path: '/company/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompanyCareersRoute = CompanyCareersRouteImport.update({
-  id: '/company/careers',
-  path: '/company/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompanyAboutRoute = CompanyAboutRouteImport.update({
-  id: '/company/about',
-  path: '/company/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppUsersRoute = AppUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppTeamChatRoute = AppTeamChatRouteImport.update({
-  id: '/team-chat',
-  path: '/team-chat',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSupportRoute = AppSupportRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppProfileBuilderRoute = AppProfileBuilderRouteImport.update({
-  id: '/profile-builder',
-  path: '/profile-builder',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppProfileRoute = AppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppOverviewRoute = AppOverviewRouteImport.update({
-  id: '/overview',
-  path: '/overview',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppNotificationsRoute = AppNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMessagesRoute = AppMessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMemberProfileRoute = AppMemberProfileRouteImport.update({
-  id: '/member-profile',
-  path: '/member-profile',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppInvestorRoute = AppInvestorRouteImport.update({
-  id: '/investor',
-  path: '/investor',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppHomeRoute = AppHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDocumentsRoute = AppDocumentsRouteImport.update({
-  id: '/documents',
-  path: '/documents',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppConnectionsRoute = AppConnectionsRouteImport.update({
-  id: '/connections',
-  path: '/connections',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCloseRoute = AppCloseRouteImport.update({
-  id: '/close',
-  path: '/close',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAuditRoute = AppAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AppRoute,
-} as any)
-const ApiTestAiRoute = ApiTestAiRouteImport.update({
-  id: '/api/test-ai',
-  path: '/api/test-ai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiHubspotSyncRoute = ApiHubspotSyncRouteImport.update({
-  id: '/api/hubspot-sync',
-  path: '/api/hubspot-sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiHubspotNewsletterRoute = ApiHubspotNewsletterRouteImport.update({
-  id: '/api/hubspot-newsletter',
-  path: '/api/hubspot-newsletter',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEmailtestRoute = ApiEmailtestRouteImport.update({
-  id: '/api/emailtest',
-  path: '/api/emailtest',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEmailTestRoute = ApiEmailTestRouteImport.update({
-  id: '/api/email-test',
-  path: '/api/email-test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminDataRoute = ApiAdminDataRouteImport.update({
-  id: '/api/admin-data',
-  path: '/api/admin-data',
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminRoute = ApiAdminRouteImport.update({
@@ -661,247 +275,405 @@ const ApiAdminRoute = ApiAdminRouteImport.update({
   path: '/api/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResourcesBlogIndexRoute = ResourcesBlogIndexRouteImport.update({
-  id: '/resources/blog/',
-  path: '/resources/blog/',
+const ApiAdminDataRoute = ApiAdminDataRouteImport.update({
+  id: '/api/admin-data',
+  path: '/api/admin-data',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductCompareIndexRoute = ProductCompareIndexRouteImport.update({
-  id: '/product/compare/',
-  path: '/product/compare/',
+const ApiEmailTestRoute = ApiEmailTestRouteImport.update({
+  id: '/api/email-test',
+  path: '/api/email-test',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DealsPreviewSectorIndexRoute = DealsPreviewSectorIndexRouteImport.update({
-  id: '/deals-preview/$sector/',
-  path: '/deals-preview/$sector/',
+const ApiEmailtestRoute = ApiEmailtestRouteImport.update({
+  id: '/api/emailtest',
+  path: '/api/emailtest',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppPrepareIndexRoute = AppPrepareIndexRouteImport.update({
-  id: '/prepare/',
-  path: '/prepare/',
-  getParentRoute: () => AppRoute,
+const ApiHubspotNewsletterRoute = ApiHubspotNewsletterRouteImport.update({
+  id: '/api/hubspot-newsletter',
+  path: '/api/hubspot-newsletter',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppMemberIndexRoute = AppMemberIndexRouteImport.update({
-  id: '/member/',
-  path: '/member/',
-  getParentRoute: () => AppRoute,
+const ApiHubspotSyncRoute = ApiHubspotSyncRouteImport.update({
+  id: '/api/hubspot-sync',
+  path: '/api/hubspot-sync',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
+const ApiTestAiRoute = ApiTestAiRouteImport.update({
+  id: '/api/test-ai',
+  path: '/api/test-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppDealRoomsIndexRoute = AppDealRoomsIndexRouteImport.update({
-  id: '/deal-rooms/',
-  path: '/deal-rooms/',
   getParentRoute: () => AppRoute,
+} as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCloseRoute = AppCloseRouteImport.update({
+  id: '/close',
+  path: '/close',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConnectionsRoute = AppConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDocumentsRoute = AppDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInvestorRoute = AppInvestorRouteImport.update({
+  id: '/investor',
+  path: '/investor',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMemberProfileRoute = AppMemberProfileRouteImport.update({
+  id: '/member-profile',
+  path: '/member-profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMessagesRoute = AppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOverviewRoute = AppOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileBuilderRoute = AppProfileBuilderRouteImport.update({
+  id: '/profile-builder',
+  path: '/profile-builder',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSupportRoute = AppSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamChatRoute = AppTeamChatRouteImport.update({
+  id: '/team-chat',
+  path: '/team-chat',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyAboutRoute = CompanyAboutRouteImport.update({
+  id: '/company/about',
+  path: '/company/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyCareersRoute = CompanyCareersRouteImport.update({
+  id: '/company/careers',
+  path: '/company/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyContactRoute = CompanyContactRouteImport.update({
+  id: '/company/contact',
+  path: '/company/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CvSlugRoute = CvSlugRouteImport.update({
+  id: '/cv/$slug',
+  path: '/cv/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewIndexRoute = DealsPreviewIndexRouteImport.update({
+  id: '/deals-preview/',
+  path: '/deals-preview/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewAnalyticsRoute = DealsPreviewAnalyticsRouteImport.update({
+  id: '/deals-preview/analytics',
+  path: '/deals-preview/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileRoute = DealsPreviewProfileRouteImport.update({
+  id: '/deals-preview/profile',
+  path: '/deals-preview/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewRequestsRoute = DealsPreviewRequestsRouteImport.update({
+  id: '/deals-preview/requests',
+  path: '/deals-preview/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewTeamRoute = DealsPreviewTeamRouteImport.update({
+  id: '/deals-preview/team',
+  path: '/deals-preview/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewVaultRoute = DealsPreviewVaultRouteImport.update({
+  id: '/deals-preview/vault',
+  path: '/deals-preview/vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsV2IndexRoute = DocsV2IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsV2Route,
+} as any)
+const DocsV2SplatRoute = DocsV2SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => DocsV2Route,
+} as any)
+const ForAdvisorsRoute = ForAdvisorsRouteImport.update({
+  id: '/for/advisors',
+  path: '/for/advisors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForAngelsRoute = ForAngelsRouteImport.update({
+  id: '/for/angels',
+  path: '/for/angels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFamilyOfficesRoute = ForFamilyOfficesRouteImport.update({
+  id: '/for/family-offices',
+  path: '/for/family-offices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFoundersRoute = ForFoundersRouteImport.update({
+  id: '/for/founders',
+  path: '/for/founders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForInvestorsRoute = ForInvestorsRouteImport.update({
+  id: '/for/investors',
+  path: '/for/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForLimitedPartnersRoute = ForLimitedPartnersRouteImport.update({
+  id: '/for/limited-partners',
+  path: '/for/limited-partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForPrivateEquityRoute = ForPrivateEquityRouteImport.update({
+  id: '/for/private-equity',
+  path: '/for/private-equity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForSpvsRoute = ForSpvsRouteImport.update({
+  id: '/for/spvs',
+  path: '/for/spvs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForSyndicatesRoute = ForSyndicatesRouteImport.update({
+  id: '/for/syndicates',
+  path: '/for/syndicates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForVentureCapitalRoute = ForVentureCapitalRouteImport.update({
+  id: '/for/venture-capital',
+  path: '/for/venture-capital',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlossaryIndexRoute = GlossaryIndexRouteImport.update({
+  id: '/glossary/',
+  path: '/glossary/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ISlugRoute = ISlugRouteImport.update({
+  id: '/i/$slug',
+  path: '/i/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinDealRoomTokenRoute = JoinDealRoomTokenRouteImport.update({
+  id: '/join-deal-room/$token',
+  path: '/join-deal-room/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinInvestorTokenRoute = JoinInvestorTokenRouteImport.update({
+  id: '/join-investor/$token',
+  path: '/join-investor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalIndexRoute = LegalIndexRouteImport.update({
+  id: '/legal/',
+  path: '/legal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalAcceptableUseRoute = LegalAcceptableUseRouteImport.update({
+  id: '/legal/acceptable-use',
+  path: '/legal/acceptable-use',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/legal/cookies',
+  path: '/legal/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDpaRoute = LegalDpaRouteImport.update({
+  id: '/legal/dpa',
+  path: '/legal/dpa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRefundsRoute = LegalRefundsRouteImport.update({
+  id: '/legal/refunds',
+  path: '/legal/refunds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalSubProcessorsRoute = LegalSubProcessorsRouteImport.update({
+  id: '/legal/sub-processors',
+  path: '/legal/sub-processors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackIndexRoute = PackIndexRouteImport.update({
+  id: '/pack/',
+  path: '/pack/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackPackIdRoute = PackPackIdRouteImport.update({
+  id: '/pack/$packId',
+  path: '/pack/$packId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductHowItWorksRoute = ProductHowItWorksRouteImport.update({
+  id: '/product/how-it-works',
+  path: '/product/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductPricingRoute = ProductPricingRouteImport.update({
+  id: '/product/pricing',
+  path: '/product/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductSecurityRoute = ProductSecurityRouteImport.update({
+  id: '/product/security',
+  path: '/product/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
+  id: '/resources/',
+  path: '/resources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesChangelogRoute = ResourcesChangelogRouteImport.update({
+  id: '/resources/changelog',
+  path: '/resources/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SectorsIndexRoute = SectorsIndexRouteImport.update({
+  id: '/sectors/',
+  path: '/sectors/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: '/tools/',
+  path: '/tools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsBurnRateRoute = ToolsBurnRateRouteImport.update({
+  id: '/tools/burn-rate',
+  path: '/tools/burn-rate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCapTableRoute = ToolsCapTableRouteImport.update({
+  id: '/tools/cap-table',
+  path: '/tools/cap-table',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCogsRoute = ToolsCogsRouteImport.update({
+  id: '/tools/cogs',
+  path: '/tools/cogs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsDilutionRoute = ToolsDilutionRouteImport.update({
+  id: '/tools/dilution',
+  path: '/tools/dilution',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRunwayRoute = ToolsRunwayRouteImport.update({
+  id: '/tools/runway',
+  path: '/tools/runway',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSafeNoteRoute = ToolsSafeNoteRouteImport.update({
+  id: '/tools/safe-note',
+  path: '/tools/safe-note',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsValuationCalculatorRoute =
+  ToolsValuationCalculatorRouteImport.update({
+    id: '/tools/valuation-calculator',
+    path: '/tools/valuation-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInternalDataRoute = ApiInternalDataRouteImport.update({
+  id: '/api/internal/data',
+  path: '/api/internal/data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
+  id: '/api/internal/email-test',
+  path: '/api/internal/email-test',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppAdvisorPreviewIndexRoute = AppAdvisorPreviewIndexRouteImport.update({
   id: '/advisor-preview/',
   path: '/advisor-preview/',
-  getParentRoute: () => AppRoute,
-} as any)
-const ResourcesBlogSlugRoute = ResourcesBlogSlugRouteImport.update({
-  id: '/resources/blog/$slug',
-  path: '/resources/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductCompareIdealsRoute = ProductCompareIdealsRouteImport.update({
-  id: '/product/compare/ideals',
-  path: '/product/compare/ideals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductCompareFirmexRoute = ProductCompareFirmexRouteImport.update({
-  id: '/product/compare/firmex',
-  path: '/product/compare/firmex',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductCompareDocsendRoute = ProductCompareDocsendRouteImport.update({
-  id: '/product/compare/docsend',
-  path: '/product/compare/docsend',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductCompareDealroomRoute = ProductCompareDealroomRouteImport.update({
-  id: '/product/compare/dealroom',
-  path: '/product/compare/dealroom',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductCompareDatasiteRoute = ProductCompareDatasiteRouteImport.update({
-  id: '/product/compare/datasite',
-  path: '/product/compare/datasite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PackPackIdMissingRoute = PackPackIdMissingRouteImport.update({
-  id: '/pack/$packId_/missing',
-  path: '/pack/$packId/missing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewProfileThesisRoute =
-  DealsPreviewProfileThesisRouteImport.update({
-    id: '/deals-preview/profile_/thesis',
-    path: '/deals-preview/profile/thesis',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DealsPreviewProfileTeamRoute = DealsPreviewProfileTeamRouteImport.update({
-  id: '/deals-preview/profile_/team',
-  path: '/deals-preview/profile/team',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewProfileFullRoute = DealsPreviewProfileFullRouteImport.update({
-  id: '/deals-preview/profile_/full',
-  path: '/deals-preview/profile/full',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsPreviewProfileAchievementsRoute =
-  DealsPreviewProfileAchievementsRouteImport.update({
-    id: '/deals-preview/profile_/achievements',
-    path: '/deals-preview/profile/achievements',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DealsPreviewSectorInstrumentRoute =
-  DealsPreviewSectorInstrumentRouteImport.update({
-    id: '/deals-preview/$sector/$instrument',
-    path: '/deals-preview/$sector/$instrument',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AppSupportFeedbackRoute = AppSupportFeedbackRouteImport.update({
-  id: '/support_/feedback',
-  path: '/support/feedback',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => AppSettingsRoute,
-} as any)
-const AppSettingsProfilePrivacyRoute =
-  AppSettingsProfilePrivacyRouteImport.update({
-    id: '/profile-privacy',
-    path: '/profile-privacy',
-    getParentRoute: () => AppSettingsRoute,
-  } as any)
-const AppSettingsNotificationsRoute =
-  AppSettingsNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AppSettingsRoute,
-  } as any)
-const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => AppSettingsRoute,
-} as any)
-const AppSettingsActivityRoute = AppSettingsActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => AppSettingsRoute,
-} as any)
-const AppInvestorTeamRoute = AppInvestorTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorStartupsRoute = AppInvestorStartupsRouteImport.update({
-  id: '/startups',
-  path: '/startups',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorSourceRoute = AppInvestorSourceRouteImport.update({
-  id: '/source',
-  path: '/source',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorSettingsRoute = AppInvestorSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorProfileRoute = AppInvestorProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorPortfolioRoute = AppInvestorPortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorOverviewRoute = AppInvestorOverviewRouteImport.update({
-  id: '/overview',
-  path: '/overview',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorEvaluateRoute = AppInvestorEvaluateRouteImport.update({
-  id: '/evaluate',
-  path: '/evaluate',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorDiligenceRoute = AppInvestorDiligenceRouteImport.update({
-  id: '/diligence',
-  path: '/diligence',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorDecisionsRoute = AppInvestorDecisionsRouteImport.update({
-  id: '/decisions',
-  path: '/decisions',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorDecideRoute = AppInvestorDecideRouteImport.update({
-  id: '/decide',
-  path: '/decide',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorDealFlowRoute = AppInvestorDealFlowRouteImport.update({
-  id: '/deal-flow',
-  path: '/deal-flow',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorConnectionsRoute = AppInvestorConnectionsRouteImport.update({
-  id: '/connections',
-  path: '/connections',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorAnalyticsRoute = AppInvestorAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
-  id: '/analysis',
-  path: '/analysis',
-  getParentRoute: () => AppInvestorRoute,
-} as any)
-const AppDealRoomsTeamAssignmentsRoute =
-  AppDealRoomsTeamAssignmentsRouteImport.update({
-    id: '/deal-rooms/team-assignments',
-    path: '/deal-rooms/team-assignments',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppDealRoomsReportsVaultRoute =
-  AppDealRoomsReportsVaultRouteImport.update({
-    id: '/deal-rooms/reports-vault',
-    path: '/deal-rooms/reports-vault',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppDealRoomsPrepNotesRoute = AppDealRoomsPrepNotesRouteImport.update({
-  id: '/deal-rooms/prep-notes',
-  path: '/deal-rooms/prep-notes',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDealRoomsMeetingsCalendarRoute =
-  AppDealRoomsMeetingsCalendarRouteImport.update({
-    id: '/deal-rooms/meetings-calendar',
-    path: '/deal-rooms/meetings-calendar',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
-  id: '/deal-rooms/$id',
-  path: '/deal-rooms/$id',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAdvisorPreviewRecordRoute = AppAdvisorPreviewRecordRouteImport.update({
-  id: '/advisor-preview/record',
-  path: '/advisor-preview/record',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAdvisorPreviewCompanyRoute =
@@ -910,171 +682,262 @@ const AppAdvisorPreviewCompanyRoute =
     path: '/advisor-preview/company',
     getParentRoute: () => AppRoute,
   } as any)
-const ApiInternalEmailTestRoute = ApiInternalEmailTestRouteImport.update({
-  id: '/api/internal/email-test',
-  path: '/api/internal/email-test',
-  getParentRoute: () => rootRouteImport,
+const AppAdvisorPreviewRecordRoute = AppAdvisorPreviewRecordRouteImport.update({
+  id: '/advisor-preview/record',
+  path: '/advisor-preview/record',
+  getParentRoute: () => AppRoute,
 } as any)
-const ApiInternalDataRoute = ApiInternalDataRouteImport.update({
-  id: '/api/internal/data',
-  path: '/api/internal/data',
-  getParentRoute: () => rootRouteImport,
+const AppDealRoomsIndexRoute = AppDealRoomsIndexRouteImport.update({
+  id: '/deal-rooms/',
+  path: '/deal-rooms/',
+  getParentRoute: () => AppRoute,
 } as any)
-const AppInvestorThesisIndexRoute = AppInvestorThesisIndexRouteImport.update({
-  id: '/thesis/',
-  path: '/thesis/',
-  getParentRoute: () => AppInvestorRoute,
+const AppDealRoomsIdRoute = AppDealRoomsIdRouteImport.update({
+  id: '/deal-rooms/$id',
+  path: '/deal-rooms/$id',
+  getParentRoute: () => AppRoute,
 } as any)
-const AppInvestorDiscoverIndexRoute =
-  AppInvestorDiscoverIndexRouteImport.update({
-    id: '/discover/',
-    path: '/discover/',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDealRoomsIndexRoute =
-  AppInvestorDealRoomsIndexRouteImport.update({
-    id: '/deal-rooms/',
-    path: '/deal-rooms/',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const DealsPreviewSectorInstrumentDealIdRoute =
-  DealsPreviewSectorInstrumentDealIdRouteImport.update({
-    id: '/deals-preview/$sector_/$instrument/$dealId',
-    path: '/deals-preview/$sector/$instrument/$dealId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AppPrepareProfileBuilderTeamCardsRoute =
-  AppPrepareProfileBuilderTeamCardsRouteImport.update({
-    id: '/prepare/profile-builder/team-cards',
-    path: '/prepare/profile-builder/team-cards',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareProfileBuilderQuickSetupRoute =
-  AppPrepareProfileBuilderQuickSetupRouteImport.update({
-    id: '/prepare/profile-builder/quick-setup',
-    path: '/prepare/profile-builder/quick-setup',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareProfileBuilderFundraisingThesisRoute =
-  AppPrepareProfileBuilderFundraisingThesisRouteImport.update({
-    id: '/prepare/profile-builder/fundraising-thesis',
-    path: '/prepare/profile-builder/fundraising-thesis',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareProfileBuilderFullProfileRoute =
-  AppPrepareProfileBuilderFullProfileRouteImport.update({
-    id: '/prepare/profile-builder/full-profile',
-    path: '/prepare/profile-builder/full-profile',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareProfileBuilderAnalyticsRoute =
-  AppPrepareProfileBuilderAnalyticsRouteImport.update({
-    id: '/prepare/profile-builder/analytics',
-    path: '/prepare/profile-builder/analytics',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareProfileBuilderAchievementsRoute =
-  AppPrepareProfileBuilderAchievementsRouteImport.update({
-    id: '/prepare/profile-builder/achievements',
-    path: '/prepare/profile-builder/achievements',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareIpVaultSourceFilesRoute =
-  AppPrepareIpVaultSourceFilesRouteImport.update({
-    id: '/prepare/ip-vault/source-files',
-    path: '/prepare/ip-vault/source-files',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareIpVaultPrivacySettingsRoute =
-  AppPrepareIpVaultPrivacySettingsRouteImport.update({
-    id: '/prepare/ip-vault/privacy-settings',
-    path: '/prepare/ip-vault/privacy-settings',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareIpVaultDocumentIntakeRoute =
-  AppPrepareIpVaultDocumentIntakeRouteImport.update({
-    id: '/prepare/ip-vault/document-intake',
-    path: '/prepare/ip-vault/document-intake',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppPrepareIpVaultDigitalDocumentVaultRoute =
-  AppPrepareIpVaultDigitalDocumentVaultRouteImport.update({
-    id: '/prepare/ip-vault/digital-document-vault',
-    path: '/prepare/ip-vault/digital-document-vault',
-    getParentRoute: () => AppRoute,
-  } as any)
-const AppInvestorDiscoverWatchlistRoute =
-  AppInvestorDiscoverWatchlistRouteImport.update({
-    id: '/discover/watchlist',
-    path: '/discover/watchlist',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDiscoverDealFlowRoute =
-  AppInvestorDiscoverDealFlowRouteImport.update({
-    id: '/discover/deal-flow',
-    path: '/discover/deal-flow',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDealRoomsTeamAssignmentsRoute =
-  AppInvestorDealRoomsTeamAssignmentsRouteImport.update({
-    id: '/deal-rooms/team-assignments',
-    path: '/deal-rooms/team-assignments',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDealRoomsReportsVaultRoute =
-  AppInvestorDealRoomsReportsVaultRouteImport.update({
-    id: '/deal-rooms/reports-vault',
-    path: '/deal-rooms/reports-vault',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDealRoomsPrepNotesRoute =
-  AppInvestorDealRoomsPrepNotesRouteImport.update({
-    id: '/deal-rooms/prep-notes',
-    path: '/deal-rooms/prep-notes',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDealRoomsPortfolioRoute =
-  AppInvestorDealRoomsPortfolioRouteImport.update({
-    id: '/deal-rooms/portfolio',
-    path: '/deal-rooms/portfolio',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppInvestorDealRoomsMeetingsCalendarRoute =
-  AppInvestorDealRoomsMeetingsCalendarRouteImport.update({
+const AppDealRoomsMeetingsCalendarRoute =
+  AppDealRoomsMeetingsCalendarRouteImport.update({
     id: '/deal-rooms/meetings-calendar',
     path: '/deal-rooms/meetings-calendar',
-    getParentRoute: () => AppInvestorRoute,
+    getParentRoute: () => AppRoute,
   } as any)
-const AppInvestorDealRoomsDiligenceNotesRoute =
-  AppInvestorDealRoomsDiligenceNotesRouteImport.update({
-    id: '/deal-rooms/diligence-notes',
-    path: '/deal-rooms/diligence-notes',
-    getParentRoute: () => AppInvestorRoute,
-  } as any)
-const AppDealRoomsIdTermSheetsRoute =
-  AppDealRoomsIdTermSheetsRouteImport.update({
-    id: '/term-sheets',
-    path: '/term-sheets',
-    getParentRoute: () => AppDealRoomsIdRoute,
-  } as any)
-const AppDealRoomsIdQaRoute = AppDealRoomsIdQaRouteImport.update({
-  id: '/qa',
-  path: '/qa',
-  getParentRoute: () => AppDealRoomsIdRoute,
+const AppDealRoomsPrepNotesRoute = AppDealRoomsPrepNotesRouteImport.update({
+  id: '/deal-rooms/prep-notes',
+  path: '/deal-rooms/prep-notes',
+  getParentRoute: () => AppRoute,
 } as any)
-const AppDealRoomsIdOverviewRoute = AppDealRoomsIdOverviewRouteImport.update({
+const AppDealRoomsReportsVaultRoute =
+  AppDealRoomsReportsVaultRouteImport.update({
+    id: '/deal-rooms/reports-vault',
+    path: '/deal-rooms/reports-vault',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppDealRoomsTeamAssignmentsRoute =
+  AppDealRoomsTeamAssignmentsRouteImport.update({
+    id: '/deal-rooms/team-assignments',
+    path: '/deal-rooms/team-assignments',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppInvestorIndexRoute = AppInvestorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorAnalysisRoute = AppInvestorAnalysisRouteImport.update({
+  id: '/analysis',
+  path: '/analysis',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorAnalyticsRoute = AppInvestorAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorConnectionsRoute = AppInvestorConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorDealFlowRoute = AppInvestorDealFlowRouteImport.update({
+  id: '/deal-flow',
+  path: '/deal-flow',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorDecideRoute = AppInvestorDecideRouteImport.update({
+  id: '/decide',
+  path: '/decide',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorDecisionsRoute = AppInvestorDecisionsRouteImport.update({
+  id: '/decisions',
+  path: '/decisions',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorDiligenceRoute = AppInvestorDiligenceRouteImport.update({
+  id: '/diligence',
+  path: '/diligence',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorEvaluateRoute = AppInvestorEvaluateRouteImport.update({
+  id: '/evaluate',
+  path: '/evaluate',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorOverviewRoute = AppInvestorOverviewRouteImport.update({
   id: '/overview',
   path: '/overview',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorPortfolioRoute = AppInvestorPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorProfileRoute = AppInvestorProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorSettingsRoute = AppInvestorSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorSourceRoute = AppInvestorSourceRouteImport.update({
+  id: '/source',
+  path: '/source',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorStartupsRoute = AppInvestorStartupsRouteImport.update({
+  id: '/startups',
+  path: '/startups',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppInvestorTeamRoute = AppInvestorTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppMemberIndexRoute = AppMemberIndexRouteImport.update({
+  id: '/member/',
+  path: '/member/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPrepareIndexRoute = AppPrepareIndexRouteImport.update({
+  id: '/prepare/',
+  path: '/prepare/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsActivityRoute = AppSettingsActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSettingsNotificationsRoute =
+  AppSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AppSettingsRoute,
+  } as any)
+const AppSettingsProfilePrivacyRoute =
+  AppSettingsProfilePrivacyRouteImport.update({
+    id: '/profile-privacy',
+    path: '/profile-privacy',
+    getParentRoute: () => AppSettingsRoute,
+  } as any)
+const AppSettingsSecurityRoute = AppSettingsSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppSupportFeedbackRoute = AppSupportFeedbackRouteImport.update({
+  id: '/support_/feedback',
+  path: '/support/feedback',
+  getParentRoute: () => AppRoute,
+} as any)
+const DealsPreviewSectorIndexRoute = DealsPreviewSectorIndexRouteImport.update({
+  id: '/deals-preview/$sector/',
+  path: '/deals-preview/$sector/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewSectorInstrumentRoute =
+  DealsPreviewSectorInstrumentRouteImport.update({
+    id: '/deals-preview/$sector/$instrument',
+    path: '/deals-preview/$sector/$instrument',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DealsPreviewProfileAchievementsRoute =
+  DealsPreviewProfileAchievementsRouteImport.update({
+    id: '/deals-preview/profile_/achievements',
+    path: '/deals-preview/profile/achievements',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DealsPreviewProfileFullRoute = DealsPreviewProfileFullRouteImport.update({
+  id: '/deals-preview/profile_/full',
+  path: '/deals-preview/profile/full',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileTeamRoute = DealsPreviewProfileTeamRouteImport.update({
+  id: '/deals-preview/profile_/team',
+  path: '/deals-preview/profile/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealsPreviewProfileThesisRoute =
+  DealsPreviewProfileThesisRouteImport.update({
+    id: '/deals-preview/profile_/thesis',
+    path: '/deals-preview/profile/thesis',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PackPackIdMissingRoute = PackPackIdMissingRouteImport.update({
+  id: '/pack/$packId_/missing',
+  path: '/pack/$packId/missing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareIndexRoute = ProductCompareIndexRouteImport.update({
+  id: '/product/compare/',
+  path: '/product/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareDatasiteRoute = ProductCompareDatasiteRouteImport.update({
+  id: '/product/compare/datasite',
+  path: '/product/compare/datasite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareDealroomRoute = ProductCompareDealroomRouteImport.update({
+  id: '/product/compare/dealroom',
+  path: '/product/compare/dealroom',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareDocsendRoute = ProductCompareDocsendRouteImport.update({
+  id: '/product/compare/docsend',
+  path: '/product/compare/docsend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareFirmexRoute = ProductCompareFirmexRouteImport.update({
+  id: '/product/compare/firmex',
+  path: '/product/compare/firmex',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCompareIdealsRoute = ProductCompareIdealsRouteImport.update({
+  id: '/product/compare/ideals',
+  path: '/product/compare/ideals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesBlogIndexRoute = ResourcesBlogIndexRouteImport.update({
+  id: '/resources/blog/',
+  path: '/resources/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesBlogSlugRoute = ResourcesBlogSlugRouteImport.update({
+  id: '/resources/blog/$slug',
+  path: '/resources/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppDealRoomsIdActivityRoute = AppDealRoomsIdActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppDealRoomsIdNdaRoute = AppDealRoomsIdNdaRouteImport.update({
-  id: '/nda',
-  path: '/nda',
+const AppDealRoomsIdCloseRoute = AppDealRoomsIdCloseRouteImport.update({
+  id: '/close',
+  path: '/close',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppDealRoomsIdMeetingsRoute = AppDealRoomsIdMeetingsRouteImport.update({
-  id: '/meetings',
-  path: '/meetings',
+const AppDealRoomsIdDiligenceRoute = AppDealRoomsIdDiligenceRouteImport.update({
+  id: '/diligence',
+  path: '/diligence',
+  getParentRoute: () => AppDealRoomsIdRoute,
+} as any)
+const AppDealRoomsIdDocumentsRoute = AppDealRoomsIdDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
 const AppDealRoomsIdInformationRoute =
@@ -1083,72 +946,167 @@ const AppDealRoomsIdInformationRoute =
     path: '/information',
     getParentRoute: () => AppDealRoomsIdRoute,
   } as any)
-const AppDealRoomsIdDocumentsRoute = AppDealRoomsIdDocumentsRouteImport.update({
-  id: '/documents',
-  path: '/documents',
+const AppDealRoomsIdMeetingsRoute = AppDealRoomsIdMeetingsRouteImport.update({
+  id: '/meetings',
+  path: '/meetings',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppDealRoomsIdDiligenceRoute = AppDealRoomsIdDiligenceRouteImport.update({
-  id: '/diligence',
-  path: '/diligence',
+const AppDealRoomsIdNdaRoute = AppDealRoomsIdNdaRouteImport.update({
+  id: '/nda',
+  path: '/nda',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppDealRoomsIdCloseRoute = AppDealRoomsIdCloseRouteImport.update({
-  id: '/close',
-  path: '/close',
+const AppDealRoomsIdOverviewRoute = AppDealRoomsIdOverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppDealRoomsIdActivityRoute = AppDealRoomsIdActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
+const AppDealRoomsIdQaRoute = AppDealRoomsIdQaRouteImport.update({
+  id: '/qa',
+  path: '/qa',
   getParentRoute: () => AppDealRoomsIdRoute,
 } as any)
-const AppInvestorThesisProfileBuilderTrackRecordRoute =
-  AppInvestorThesisProfileBuilderTrackRecordRouteImport.update({
-    id: '/thesis/profile-builder/track-record',
-    path: '/thesis/profile-builder/track-record',
+const AppDealRoomsIdTermSheetsRoute =
+  AppDealRoomsIdTermSheetsRouteImport.update({
+    id: '/term-sheets',
+    path: '/term-sheets',
+    getParentRoute: () => AppDealRoomsIdRoute,
+  } as any)
+const AppInvestorDealRoomsIndexRoute =
+  AppInvestorDealRoomsIndexRouteImport.update({
+    id: '/deal-rooms/',
+    path: '/deal-rooms/',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisProfileBuilderTeamCardsRoute =
-  AppInvestorThesisProfileBuilderTeamCardsRouteImport.update({
-    id: '/thesis/profile-builder/team-cards',
-    path: '/thesis/profile-builder/team-cards',
+const AppInvestorDealRoomsDiligenceNotesRoute =
+  AppInvestorDealRoomsDiligenceNotesRouteImport.update({
+    id: '/deal-rooms/diligence-notes',
+    path: '/deal-rooms/diligence-notes',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisProfileBuilderQuickSetupRoute =
-  AppInvestorThesisProfileBuilderQuickSetupRouteImport.update({
-    id: '/thesis/profile-builder/quick-setup',
-    path: '/thesis/profile-builder/quick-setup',
+const AppInvestorDealRoomsMeetingsCalendarRoute =
+  AppInvestorDealRoomsMeetingsCalendarRouteImport.update({
+    id: '/deal-rooms/meetings-calendar',
+    path: '/deal-rooms/meetings-calendar',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisProfileBuilderInvestmentThesisRoute =
-  AppInvestorThesisProfileBuilderInvestmentThesisRouteImport.update({
-    id: '/thesis/profile-builder/investment-thesis',
-    path: '/thesis/profile-builder/investment-thesis',
+const AppInvestorDealRoomsPortfolioRoute =
+  AppInvestorDealRoomsPortfolioRouteImport.update({
+    id: '/deal-rooms/portfolio',
+    path: '/deal-rooms/portfolio',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisProfileBuilderFullProfileRoute =
-  AppInvestorThesisProfileBuilderFullProfileRouteImport.update({
-    id: '/thesis/profile-builder/full-profile',
-    path: '/thesis/profile-builder/full-profile',
+const AppInvestorDealRoomsPrepNotesRoute =
+  AppInvestorDealRoomsPrepNotesRouteImport.update({
+    id: '/deal-rooms/prep-notes',
+    path: '/deal-rooms/prep-notes',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisFundVaultSourceFilesRoute =
-  AppInvestorThesisFundVaultSourceFilesRouteImport.update({
-    id: '/thesis/fund-vault/source-files',
-    path: '/thesis/fund-vault/source-files',
+const AppInvestorDealRoomsReportsVaultRoute =
+  AppInvestorDealRoomsReportsVaultRouteImport.update({
+    id: '/deal-rooms/reports-vault',
+    path: '/deal-rooms/reports-vault',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisFundVaultPrivacySettingsRoute =
-  AppInvestorThesisFundVaultPrivacySettingsRouteImport.update({
-    id: '/thesis/fund-vault/privacy-settings',
-    path: '/thesis/fund-vault/privacy-settings',
+const AppInvestorDealRoomsTeamAssignmentsRoute =
+  AppInvestorDealRoomsTeamAssignmentsRouteImport.update({
+    id: '/deal-rooms/team-assignments',
+    path: '/deal-rooms/team-assignments',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorThesisFundVaultDigitalDocumentVaultRoute =
-  AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport.update({
-    id: '/thesis/fund-vault/digital-document-vault',
-    path: '/thesis/fund-vault/digital-document-vault',
+const AppInvestorDiscoverIndexRoute =
+  AppInvestorDiscoverIndexRouteImport.update({
+    id: '/discover/',
+    path: '/discover/',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorDiscoverDealFlowRoute =
+  AppInvestorDiscoverDealFlowRouteImport.update({
+    id: '/discover/deal-flow',
+    path: '/discover/deal-flow',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorDiscoverWatchlistRoute =
+  AppInvestorDiscoverWatchlistRouteImport.update({
+    id: '/discover/watchlist',
+    path: '/discover/watchlist',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisIndexRoute = AppInvestorThesisIndexRouteImport.update({
+  id: '/thesis/',
+  path: '/thesis/',
+  getParentRoute: () => AppInvestorRoute,
+} as any)
+const AppPrepareIpVaultDigitalDocumentVaultRoute =
+  AppPrepareIpVaultDigitalDocumentVaultRouteImport.update({
+    id: '/prepare/ip-vault/digital-document-vault',
+    path: '/prepare/ip-vault/digital-document-vault',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareIpVaultDocumentIntakeRoute =
+  AppPrepareIpVaultDocumentIntakeRouteImport.update({
+    id: '/prepare/ip-vault/document-intake',
+    path: '/prepare/ip-vault/document-intake',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareIpVaultPrivacySettingsRoute =
+  AppPrepareIpVaultPrivacySettingsRouteImport.update({
+    id: '/prepare/ip-vault/privacy-settings',
+    path: '/prepare/ip-vault/privacy-settings',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareIpVaultSourceFilesRoute =
+  AppPrepareIpVaultSourceFilesRouteImport.update({
+    id: '/prepare/ip-vault/source-files',
+    path: '/prepare/ip-vault/source-files',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareProfileBuilderAchievementsRoute =
+  AppPrepareProfileBuilderAchievementsRouteImport.update({
+    id: '/prepare/profile-builder/achievements',
+    path: '/prepare/profile-builder/achievements',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareProfileBuilderAnalyticsRoute =
+  AppPrepareProfileBuilderAnalyticsRouteImport.update({
+    id: '/prepare/profile-builder/analytics',
+    path: '/prepare/profile-builder/analytics',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareProfileBuilderFullProfileRoute =
+  AppPrepareProfileBuilderFullProfileRouteImport.update({
+    id: '/prepare/profile-builder/full-profile',
+    path: '/prepare/profile-builder/full-profile',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareProfileBuilderFundraisingThesisRoute =
+  AppPrepareProfileBuilderFundraisingThesisRouteImport.update({
+    id: '/prepare/profile-builder/fundraising-thesis',
+    path: '/prepare/profile-builder/fundraising-thesis',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareProfileBuilderQuickSetupRoute =
+  AppPrepareProfileBuilderQuickSetupRouteImport.update({
+    id: '/prepare/profile-builder/quick-setup',
+    path: '/prepare/profile-builder/quick-setup',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppPrepareProfileBuilderTeamCardsRoute =
+  AppPrepareProfileBuilderTeamCardsRouteImport.update({
+    id: '/prepare/profile-builder/team-cards',
+    path: '/prepare/profile-builder/team-cards',
+    getParentRoute: () => AppRoute,
+  } as any)
+const DealsPreviewSectorInstrumentDealIdRoute =
+  DealsPreviewSectorInstrumentDealIdRouteImport.update({
+    id: '/deals-preview/$sector_/$instrument/$dealId',
+    path: '/deals-preview/$sector/$instrument/$dealId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppInvestorDiscoverPublicProfilePrivacySettingsRoute =
+  AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport.update({
+    id: '/discover/public-profile/privacy-settings',
+    path: '/discover/public-profile/privacy-settings',
     getParentRoute: () => AppInvestorRoute,
   } as any)
 const AppInvestorDiscoverPublicProfileProfileViewRoute =
@@ -1157,10 +1115,52 @@ const AppInvestorDiscoverPublicProfileProfileViewRoute =
     path: '/discover/public-profile/profile-view',
     getParentRoute: () => AppInvestorRoute,
   } as any)
-const AppInvestorDiscoverPublicProfilePrivacySettingsRoute =
-  AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport.update({
-    id: '/discover/public-profile/privacy-settings',
-    path: '/discover/public-profile/privacy-settings',
+const AppInvestorThesisFundVaultDigitalDocumentVaultRoute =
+  AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport.update({
+    id: '/thesis/fund-vault/digital-document-vault',
+    path: '/thesis/fund-vault/digital-document-vault',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisFundVaultPrivacySettingsRoute =
+  AppInvestorThesisFundVaultPrivacySettingsRouteImport.update({
+    id: '/thesis/fund-vault/privacy-settings',
+    path: '/thesis/fund-vault/privacy-settings',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisFundVaultSourceFilesRoute =
+  AppInvestorThesisFundVaultSourceFilesRouteImport.update({
+    id: '/thesis/fund-vault/source-files',
+    path: '/thesis/fund-vault/source-files',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderFullProfileRoute =
+  AppInvestorThesisProfileBuilderFullProfileRouteImport.update({
+    id: '/thesis/profile-builder/full-profile',
+    path: '/thesis/profile-builder/full-profile',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderInvestmentThesisRoute =
+  AppInvestorThesisProfileBuilderInvestmentThesisRouteImport.update({
+    id: '/thesis/profile-builder/investment-thesis',
+    path: '/thesis/profile-builder/investment-thesis',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderQuickSetupRoute =
+  AppInvestorThesisProfileBuilderQuickSetupRouteImport.update({
+    id: '/thesis/profile-builder/quick-setup',
+    path: '/thesis/profile-builder/quick-setup',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderTeamCardsRoute =
+  AppInvestorThesisProfileBuilderTeamCardsRouteImport.update({
+    id: '/thesis/profile-builder/team-cards',
+    path: '/thesis/profile-builder/team-cards',
+    getParentRoute: () => AppInvestorRoute,
+  } as any)
+const AppInvestorThesisProfileBuilderTrackRecordRoute =
+  AppInvestorThesisProfileBuilderTrackRecordRouteImport.update({
+    id: '/thesis/profile-builder/track-record',
+    path: '/thesis/profile-builder/track-record',
     getParentRoute: () => AppInvestorRoute,
   } as any)
 
@@ -2380,95 +2380,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sign-up': {
-      id: '/sign-up'
-      path: '/sign-up'
-      fullPath: '/sign-up'
-      preLoaderRoute: typeof SignUpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sign-in': {
-      id: '/sign-in'
-      path: '/sign-in'
-      fullPath: '/sign-in'
-      preLoaderRoute: typeof SignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/registry': {
-      id: '/registry'
-      path: '/registry'
-      fullPath: '/registry'
-      preLoaderRoute: typeof RegistryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library': {
-      id: '/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof LibraryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lcs-preview': {
-      id: '/lcs-preview'
-      path: '/lcs-preview'
-      fullPath: '/lcs-preview'
-      preLoaderRoute: typeof LcsPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join-room': {
-      id: '/join-room'
-      path: '/join-room'
-      fullPath: '/join-room'
-      preLoaderRoute: typeof JoinRoomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join': {
-      id: '/join'
-      path: '/join'
-      fullPath: '/join'
-      preLoaderRoute: typeof JoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/invite': {
-      id: '/invite'
-      path: '/invite'
-      fullPath: '/invite'
-      preLoaderRoute: typeof InviteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feedback': {
-      id: '/feedback'
-      path: '/feedback'
-      fullPath: '/feedback'
-      preLoaderRoute: typeof FeedbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs-v2': {
-      id: '/docs-v2'
-      path: '/docs-v2'
-      fullPath: '/docs-v2'
-      preLoaderRoute: typeof DocsV2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs': {
-      id: '/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -2478,550 +2394,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/': {
-      id: '/tools/'
-      path: '/tools'
-      fullPath: '/tools/'
-      preLoaderRoute: typeof ToolsIndexRouteImport
+    '/docs-v2': {
+      id: '/docs-v2'
+      path: '/docs-v2'
+      fullPath: '/docs-v2'
+      preLoaderRoute: typeof DocsV2RouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/templates/': {
-      id: '/templates/'
-      path: '/templates'
-      fullPath: '/templates/'
-      preLoaderRoute: typeof TemplatesIndexRouteImport
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sectors/': {
-      id: '/sectors/'
-      path: '/sectors'
-      fullPath: '/sectors/'
-      preLoaderRoute: typeof SectorsIndexRouteImport
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resources/': {
-      id: '/resources/'
-      path: '/resources'
-      fullPath: '/resources/'
-      preLoaderRoute: typeof ResourcesIndexRouteImport
+    '/invite': {
+      id: '/invite'
+      path: '/invite'
+      fullPath: '/invite'
+      preLoaderRoute: typeof InviteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pack/': {
-      id: '/pack/'
-      path: '/pack'
-      fullPath: '/pack/'
-      preLoaderRoute: typeof PackIndexRouteImport
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/legal/': {
-      id: '/legal/'
-      path: '/legal'
-      fullPath: '/legal/'
-      preLoaderRoute: typeof LegalIndexRouteImport
+    '/join-room': {
+      id: '/join-room'
+      path: '/join-room'
+      fullPath: '/join-room'
+      preLoaderRoute: typeof JoinRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/glossary/': {
-      id: '/glossary/'
-      path: '/glossary'
-      fullPath: '/glossary/'
-      preLoaderRoute: typeof GlossaryIndexRouteImport
+    '/lcs-preview': {
+      id: '/lcs-preview'
+      path: '/lcs-preview'
+      fullPath: '/lcs-preview'
+      preLoaderRoute: typeof LcsPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs-v2/': {
-      id: '/docs-v2/'
-      path: '/'
-      fullPath: '/docs-v2/'
-      preLoaderRoute: typeof DocsV2IndexRouteImport
-      parentRoute: typeof DocsV2Route
-    }
-    '/deals-preview/': {
-      id: '/deals-preview/'
-      path: '/deals-preview'
-      fullPath: '/deals-preview/'
-      preLoaderRoute: typeof DealsPreviewIndexRouteImport
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/': {
-      id: '/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/tools/valuation-calculator': {
-      id: '/tools/valuation-calculator'
-      path: '/tools/valuation-calculator'
-      fullPath: '/tools/valuation-calculator'
-      preLoaderRoute: typeof ToolsValuationCalculatorRouteImport
+    '/registry': {
+      id: '/registry'
+      path: '/registry'
+      fullPath: '/registry'
+      preLoaderRoute: typeof RegistryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/safe-note': {
-      id: '/tools/safe-note'
-      path: '/tools/safe-note'
-      fullPath: '/tools/safe-note'
-      preLoaderRoute: typeof ToolsSafeNoteRouteImport
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/runway': {
-      id: '/tools/runway'
-      path: '/tools/runway'
-      fullPath: '/tools/runway'
-      preLoaderRoute: typeof ToolsRunwayRouteImport
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/dilution': {
-      id: '/tools/dilution'
-      path: '/tools/dilution'
-      fullPath: '/tools/dilution'
-      preLoaderRoute: typeof ToolsDilutionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/cogs': {
-      id: '/tools/cogs'
-      path: '/tools/cogs'
-      fullPath: '/tools/cogs'
-      preLoaderRoute: typeof ToolsCogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/cap-table': {
-      id: '/tools/cap-table'
-      path: '/tools/cap-table'
-      fullPath: '/tools/cap-table'
-      preLoaderRoute: typeof ToolsCapTableRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/burn-rate': {
-      id: '/tools/burn-rate'
-      path: '/tools/burn-rate'
-      fullPath: '/tools/burn-rate'
-      preLoaderRoute: typeof ToolsBurnRateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resources/changelog': {
-      id: '/resources/changelog'
-      path: '/resources/changelog'
-      fullPath: '/resources/changelog'
-      preLoaderRoute: typeof ResourcesChangelogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/security': {
-      id: '/product/security'
-      path: '/product/security'
-      fullPath: '/product/security'
-      preLoaderRoute: typeof ProductSecurityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/pricing': {
-      id: '/product/pricing'
-      path: '/product/pricing'
-      fullPath: '/product/pricing'
-      preLoaderRoute: typeof ProductPricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/how-it-works': {
-      id: '/product/how-it-works'
-      path: '/product/how-it-works'
-      fullPath: '/product/how-it-works'
-      preLoaderRoute: typeof ProductHowItWorksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pack/$packId': {
-      id: '/pack/$packId'
-      path: '/pack/$packId'
-      fullPath: '/pack/$packId'
-      preLoaderRoute: typeof PackPackIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/p/$slug': {
-      id: '/p/$slug'
-      path: '/p/$slug'
-      fullPath: '/p/$slug'
-      preLoaderRoute: typeof PSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/terms': {
-      id: '/legal/terms'
-      path: '/legal/terms'
-      fullPath: '/legal/terms'
-      preLoaderRoute: typeof LegalTermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/sub-processors': {
-      id: '/legal/sub-processors'
-      path: '/legal/sub-processors'
-      fullPath: '/legal/sub-processors'
-      preLoaderRoute: typeof LegalSubProcessorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/refunds': {
-      id: '/legal/refunds'
-      path: '/legal/refunds'
-      fullPath: '/legal/refunds'
-      preLoaderRoute: typeof LegalRefundsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/privacy': {
-      id: '/legal/privacy'
-      path: '/legal/privacy'
-      fullPath: '/legal/privacy'
-      preLoaderRoute: typeof LegalPrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/dpa': {
-      id: '/legal/dpa'
-      path: '/legal/dpa'
-      fullPath: '/legal/dpa'
-      preLoaderRoute: typeof LegalDpaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/cookies': {
-      id: '/legal/cookies'
-      path: '/legal/cookies'
-      fullPath: '/legal/cookies'
-      preLoaderRoute: typeof LegalCookiesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/acceptable-use': {
-      id: '/legal/acceptable-use'
-      path: '/legal/acceptable-use'
-      fullPath: '/legal/acceptable-use'
-      preLoaderRoute: typeof LegalAcceptableUseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join-investor/$token': {
-      id: '/join-investor/$token'
-      path: '/join-investor/$token'
-      fullPath: '/join-investor/$token'
-      preLoaderRoute: typeof JoinInvestorTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join-deal-room/$token': {
-      id: '/join-deal-room/$token'
-      path: '/join-deal-room/$token'
-      fullPath: '/join-deal-room/$token'
-      preLoaderRoute: typeof JoinDealRoomTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/i/$slug': {
-      id: '/i/$slug'
-      path: '/i/$slug'
-      fullPath: '/i/$slug'
-      preLoaderRoute: typeof ISlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/venture-capital': {
-      id: '/for/venture-capital'
-      path: '/for/venture-capital'
-      fullPath: '/for/venture-capital'
-      preLoaderRoute: typeof ForVentureCapitalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/syndicates': {
-      id: '/for/syndicates'
-      path: '/for/syndicates'
-      fullPath: '/for/syndicates'
-      preLoaderRoute: typeof ForSyndicatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/spvs': {
-      id: '/for/spvs'
-      path: '/for/spvs'
-      fullPath: '/for/spvs'
-      preLoaderRoute: typeof ForSpvsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/private-equity': {
-      id: '/for/private-equity'
-      path: '/for/private-equity'
-      fullPath: '/for/private-equity'
-      preLoaderRoute: typeof ForPrivateEquityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/limited-partners': {
-      id: '/for/limited-partners'
-      path: '/for/limited-partners'
-      fullPath: '/for/limited-partners'
-      preLoaderRoute: typeof ForLimitedPartnersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/investors': {
-      id: '/for/investors'
-      path: '/for/investors'
-      fullPath: '/for/investors'
-      preLoaderRoute: typeof ForInvestorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/founders': {
-      id: '/for/founders'
-      path: '/for/founders'
-      fullPath: '/for/founders'
-      preLoaderRoute: typeof ForFoundersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/family-offices': {
-      id: '/for/family-offices'
-      path: '/for/family-offices'
-      fullPath: '/for/family-offices'
-      preLoaderRoute: typeof ForFamilyOfficesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/angels': {
-      id: '/for/angels'
-      path: '/for/angels'
-      fullPath: '/for/angels'
-      preLoaderRoute: typeof ForAngelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for/advisors': {
-      id: '/for/advisors'
-      path: '/for/advisors'
-      fullPath: '/for/advisors'
-      preLoaderRoute: typeof ForAdvisorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs-v2/$': {
-      id: '/docs-v2/$'
-      path: '/$'
-      fullPath: '/docs-v2/$'
-      preLoaderRoute: typeof DocsV2SplatRouteImport
-      parentRoute: typeof DocsV2Route
-    }
-    '/deals-preview/vault': {
-      id: '/deals-preview/vault'
-      path: '/deals-preview/vault'
-      fullPath: '/deals-preview/vault'
-      preLoaderRoute: typeof DealsPreviewVaultRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/team': {
-      id: '/deals-preview/team'
-      path: '/deals-preview/team'
-      fullPath: '/deals-preview/team'
-      preLoaderRoute: typeof DealsPreviewTeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/requests': {
-      id: '/deals-preview/requests'
-      path: '/deals-preview/requests'
-      fullPath: '/deals-preview/requests'
-      preLoaderRoute: typeof DealsPreviewRequestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/profile': {
-      id: '/deals-preview/profile'
-      path: '/deals-preview/profile'
-      fullPath: '/deals-preview/profile'
-      preLoaderRoute: typeof DealsPreviewProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/analytics': {
-      id: '/deals-preview/analytics'
-      path: '/deals-preview/analytics'
-      fullPath: '/deals-preview/analytics'
-      preLoaderRoute: typeof DealsPreviewAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cv/$slug': {
-      id: '/cv/$slug'
-      path: '/cv/$slug'
-      fullPath: '/cv/$slug'
-      preLoaderRoute: typeof CvSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/company/contact': {
-      id: '/company/contact'
-      path: '/company/contact'
-      fullPath: '/company/contact'
-      preLoaderRoute: typeof CompanyContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/company/careers': {
-      id: '/company/careers'
-      path: '/company/careers'
-      fullPath: '/company/careers'
-      preLoaderRoute: typeof CompanyCareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/company/about': {
-      id: '/company/about'
-      path: '/company/about'
-      fullPath: '/company/about'
-      preLoaderRoute: typeof CompanyAboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/users': {
-      id: '/app/users'
-      path: '/users'
-      fullPath: '/app/users'
-      preLoaderRoute: typeof AppUsersRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/team-chat': {
-      id: '/app/team-chat'
-      path: '/team-chat'
-      fullPath: '/app/team-chat'
-      preLoaderRoute: typeof AppTeamChatRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/support': {
-      id: '/app/support'
-      path: '/support'
-      fullPath: '/app/support'
-      preLoaderRoute: typeof AppSupportRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/settings': {
-      id: '/app/settings'
-      path: '/settings'
-      fullPath: '/app/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/profile-builder': {
-      id: '/app/profile-builder'
-      path: '/profile-builder'
-      fullPath: '/app/profile-builder'
-      preLoaderRoute: typeof AppProfileBuilderRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/profile': {
-      id: '/app/profile'
-      path: '/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/overview': {
-      id: '/app/overview'
-      path: '/overview'
-      fullPath: '/app/overview'
-      preLoaderRoute: typeof AppOverviewRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/notifications': {
-      id: '/app/notifications'
-      path: '/notifications'
-      fullPath: '/app/notifications'
-      preLoaderRoute: typeof AppNotificationsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/messages': {
-      id: '/app/messages'
-      path: '/messages'
-      fullPath: '/app/messages'
-      preLoaderRoute: typeof AppMessagesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/member-profile': {
-      id: '/app/member-profile'
-      path: '/member-profile'
-      fullPath: '/app/member-profile'
-      preLoaderRoute: typeof AppMemberProfileRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/investor': {
-      id: '/app/investor'
-      path: '/investor'
-      fullPath: '/app/investor'
-      preLoaderRoute: typeof AppInvestorRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/home': {
-      id: '/app/home'
-      path: '/home'
-      fullPath: '/app/home'
-      preLoaderRoute: typeof AppHomeRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/documents': {
-      id: '/app/documents'
-      path: '/documents'
-      fullPath: '/app/documents'
-      preLoaderRoute: typeof AppDocumentsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/connections': {
-      id: '/app/connections'
-      path: '/connections'
-      fullPath: '/app/connections'
-      preLoaderRoute: typeof AppConnectionsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/close': {
-      id: '/app/close'
-      path: '/close'
-      fullPath: '/app/close'
-      preLoaderRoute: typeof AppCloseRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/audit': {
-      id: '/app/audit'
-      path: '/audit'
-      fullPath: '/app/audit'
-      preLoaderRoute: typeof AppAuditRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/analytics': {
-      id: '/app/analytics'
-      path: '/analytics'
-      fullPath: '/app/analytics'
-      preLoaderRoute: typeof AppAnalyticsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/api/test-ai': {
-      id: '/api/test-ai'
-      path: '/api/test-ai'
-      fullPath: '/api/test-ai'
-      preLoaderRoute: typeof ApiTestAiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/hubspot-sync': {
-      id: '/api/hubspot-sync'
-      path: '/api/hubspot-sync'
-      fullPath: '/api/hubspot-sync'
-      preLoaderRoute: typeof ApiHubspotSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/hubspot-newsletter': {
-      id: '/api/hubspot-newsletter'
-      path: '/api/hubspot-newsletter'
-      fullPath: '/api/hubspot-newsletter'
-      preLoaderRoute: typeof ApiHubspotNewsletterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/emailtest': {
-      id: '/api/emailtest'
-      path: '/api/emailtest'
-      fullPath: '/api/emailtest'
-      preLoaderRoute: typeof ApiEmailtestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email-test': {
-      id: '/api/email-test'
-      path: '/api/email-test'
-      fullPath: '/api/email-test'
-      preLoaderRoute: typeof ApiEmailTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin-data': {
-      id: '/api/admin-data'
-      path: '/api/admin-data'
-      fullPath: '/api/admin-data'
-      preLoaderRoute: typeof ApiAdminDataRouteImport
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin': {
@@ -3031,347 +2492,543 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/resources/blog/': {
-      id: '/resources/blog/'
-      path: '/resources/blog'
-      fullPath: '/resources/blog/'
-      preLoaderRoute: typeof ResourcesBlogIndexRouteImport
+    '/api/admin-data': {
+      id: '/api/admin-data'
+      path: '/api/admin-data'
+      fullPath: '/api/admin-data'
+      preLoaderRoute: typeof ApiAdminDataRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/product/compare/': {
-      id: '/product/compare/'
-      path: '/product/compare'
-      fullPath: '/product/compare/'
-      preLoaderRoute: typeof ProductCompareIndexRouteImport
+    '/api/email-test': {
+      id: '/api/email-test'
+      path: '/api/email-test'
+      fullPath: '/api/email-test'
+      preLoaderRoute: typeof ApiEmailTestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/deals-preview/$sector/': {
-      id: '/deals-preview/$sector/'
-      path: '/deals-preview/$sector'
-      fullPath: '/deals-preview/$sector/'
-      preLoaderRoute: typeof DealsPreviewSectorIndexRouteImport
+    '/api/emailtest': {
+      id: '/api/emailtest'
+      path: '/api/emailtest'
+      fullPath: '/api/emailtest'
+      preLoaderRoute: typeof ApiEmailtestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/prepare/': {
-      id: '/app/prepare/'
-      path: '/prepare'
-      fullPath: '/app/prepare/'
-      preLoaderRoute: typeof AppPrepareIndexRouteImport
-      parentRoute: typeof AppRoute
+    '/api/hubspot-newsletter': {
+      id: '/api/hubspot-newsletter'
+      path: '/api/hubspot-newsletter'
+      fullPath: '/api/hubspot-newsletter'
+      preLoaderRoute: typeof ApiHubspotNewsletterRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/app/member/': {
-      id: '/app/member/'
-      path: '/member'
-      fullPath: '/app/member/'
-      preLoaderRoute: typeof AppMemberIndexRouteImport
-      parentRoute: typeof AppRoute
+    '/api/hubspot-sync': {
+      id: '/api/hubspot-sync'
+      path: '/api/hubspot-sync'
+      fullPath: '/api/hubspot-sync'
+      preLoaderRoute: typeof ApiHubspotSyncRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/app/investor/': {
-      id: '/app/investor/'
+    '/api/test-ai': {
+      id: '/api/test-ai'
+      path: '/api/test-ai'
+      fullPath: '/api/test-ai'
+      preLoaderRoute: typeof ApiTestAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
       path: '/'
-      fullPath: '/app/investor/'
-      preLoaderRoute: typeof AppInvestorIndexRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/deal-rooms/': {
-      id: '/app/deal-rooms/'
-      path: '/deal-rooms'
-      fullPath: '/app/deal-rooms/'
-      preLoaderRoute: typeof AppDealRoomsIndexRouteImport
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/advisor-preview/': {
-      id: '/app/advisor-preview/'
-      path: '/advisor-preview'
-      fullPath: '/app/advisor-preview/'
-      preLoaderRoute: typeof AppAdvisorPreviewIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/resources/blog/$slug': {
-      id: '/resources/blog/$slug'
-      path: '/resources/blog/$slug'
-      fullPath: '/resources/blog/$slug'
-      preLoaderRoute: typeof ResourcesBlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/compare/ideals': {
-      id: '/product/compare/ideals'
-      path: '/product/compare/ideals'
-      fullPath: '/product/compare/ideals'
-      preLoaderRoute: typeof ProductCompareIdealsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/compare/firmex': {
-      id: '/product/compare/firmex'
-      path: '/product/compare/firmex'
-      fullPath: '/product/compare/firmex'
-      preLoaderRoute: typeof ProductCompareFirmexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/compare/docsend': {
-      id: '/product/compare/docsend'
-      path: '/product/compare/docsend'
-      fullPath: '/product/compare/docsend'
-      preLoaderRoute: typeof ProductCompareDocsendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/compare/dealroom': {
-      id: '/product/compare/dealroom'
-      path: '/product/compare/dealroom'
-      fullPath: '/product/compare/dealroom'
-      preLoaderRoute: typeof ProductCompareDealroomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/product/compare/datasite': {
-      id: '/product/compare/datasite'
-      path: '/product/compare/datasite'
-      fullPath: '/product/compare/datasite'
-      preLoaderRoute: typeof ProductCompareDatasiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pack/$packId_/missing': {
-      id: '/pack/$packId_/missing'
-      path: '/pack/$packId/missing'
-      fullPath: '/pack/$packId/missing'
-      preLoaderRoute: typeof PackPackIdMissingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/profile_/thesis': {
-      id: '/deals-preview/profile_/thesis'
-      path: '/deals-preview/profile/thesis'
-      fullPath: '/deals-preview/profile/thesis'
-      preLoaderRoute: typeof DealsPreviewProfileThesisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/profile_/team': {
-      id: '/deals-preview/profile_/team'
-      path: '/deals-preview/profile/team'
-      fullPath: '/deals-preview/profile/team'
-      preLoaderRoute: typeof DealsPreviewProfileTeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/profile_/full': {
-      id: '/deals-preview/profile_/full'
-      path: '/deals-preview/profile/full'
-      fullPath: '/deals-preview/profile/full'
-      preLoaderRoute: typeof DealsPreviewProfileFullRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/profile_/achievements': {
-      id: '/deals-preview/profile_/achievements'
-      path: '/deals-preview/profile/achievements'
-      fullPath: '/deals-preview/profile/achievements'
-      preLoaderRoute: typeof DealsPreviewProfileAchievementsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals-preview/$sector/$instrument': {
-      id: '/deals-preview/$sector/$instrument'
-      path: '/deals-preview/$sector/$instrument'
-      fullPath: '/deals-preview/$sector/$instrument'
-      preLoaderRoute: typeof DealsPreviewSectorInstrumentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/support_/feedback': {
-      id: '/app/support_/feedback'
-      path: '/support/feedback'
-      fullPath: '/app/support/feedback'
-      preLoaderRoute: typeof AppSupportFeedbackRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/settings/security': {
-      id: '/app/settings/security'
-      path: '/security'
-      fullPath: '/app/settings/security'
-      preLoaderRoute: typeof AppSettingsSecurityRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
-    '/app/settings/profile-privacy': {
-      id: '/app/settings/profile-privacy'
-      path: '/profile-privacy'
-      fullPath: '/app/settings/profile-privacy'
-      preLoaderRoute: typeof AppSettingsProfilePrivacyRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
-    '/app/settings/notifications': {
-      id: '/app/settings/notifications'
-      path: '/notifications'
-      fullPath: '/app/settings/notifications'
-      preLoaderRoute: typeof AppSettingsNotificationsRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
-    '/app/settings/billing': {
-      id: '/app/settings/billing'
-      path: '/billing'
-      fullPath: '/app/settings/billing'
-      preLoaderRoute: typeof AppSettingsBillingRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
-    '/app/settings/activity': {
-      id: '/app/settings/activity'
-      path: '/activity'
-      fullPath: '/app/settings/activity'
-      preLoaderRoute: typeof AppSettingsActivityRouteImport
-      parentRoute: typeof AppSettingsRoute
-    }
-    '/app/investor/team': {
-      id: '/app/investor/team'
-      path: '/team'
-      fullPath: '/app/investor/team'
-      preLoaderRoute: typeof AppInvestorTeamRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/startups': {
-      id: '/app/investor/startups'
-      path: '/startups'
-      fullPath: '/app/investor/startups'
-      preLoaderRoute: typeof AppInvestorStartupsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/source': {
-      id: '/app/investor/source'
-      path: '/source'
-      fullPath: '/app/investor/source'
-      preLoaderRoute: typeof AppInvestorSourceRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/settings': {
-      id: '/app/investor/settings'
-      path: '/settings'
-      fullPath: '/app/investor/settings'
-      preLoaderRoute: typeof AppInvestorSettingsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/profile': {
-      id: '/app/investor/profile'
-      path: '/profile'
-      fullPath: '/app/investor/profile'
-      preLoaderRoute: typeof AppInvestorProfileRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/portfolio': {
-      id: '/app/investor/portfolio'
-      path: '/portfolio'
-      fullPath: '/app/investor/portfolio'
-      preLoaderRoute: typeof AppInvestorPortfolioRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/overview': {
-      id: '/app/investor/overview'
-      path: '/overview'
-      fullPath: '/app/investor/overview'
-      preLoaderRoute: typeof AppInvestorOverviewRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/evaluate': {
-      id: '/app/investor/evaluate'
-      path: '/evaluate'
-      fullPath: '/app/investor/evaluate'
-      preLoaderRoute: typeof AppInvestorEvaluateRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/diligence': {
-      id: '/app/investor/diligence'
-      path: '/diligence'
-      fullPath: '/app/investor/diligence'
-      preLoaderRoute: typeof AppInvestorDiligenceRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/decisions': {
-      id: '/app/investor/decisions'
-      path: '/decisions'
-      fullPath: '/app/investor/decisions'
-      preLoaderRoute: typeof AppInvestorDecisionsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/decide': {
-      id: '/app/investor/decide'
-      path: '/decide'
-      fullPath: '/app/investor/decide'
-      preLoaderRoute: typeof AppInvestorDecideRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-flow': {
-      id: '/app/investor/deal-flow'
-      path: '/deal-flow'
-      fullPath: '/app/investor/deal-flow'
-      preLoaderRoute: typeof AppInvestorDealFlowRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/connections': {
-      id: '/app/investor/connections'
-      path: '/connections'
-      fullPath: '/app/investor/connections'
-      preLoaderRoute: typeof AppInvestorConnectionsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/analytics': {
-      id: '/app/investor/analytics'
+    '/app/analytics': {
+      id: '/app/analytics'
       path: '/analytics'
-      fullPath: '/app/investor/analytics'
-      preLoaderRoute: typeof AppInvestorAnalyticsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/analysis': {
-      id: '/app/investor/analysis'
-      path: '/analysis'
-      fullPath: '/app/investor/analysis'
-      preLoaderRoute: typeof AppInvestorAnalysisRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/deal-rooms/team-assignments': {
-      id: '/app/deal-rooms/team-assignments'
-      path: '/deal-rooms/team-assignments'
-      fullPath: '/app/deal-rooms/team-assignments'
-      preLoaderRoute: typeof AppDealRoomsTeamAssignmentsRouteImport
+      fullPath: '/app/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/deal-rooms/reports-vault': {
-      id: '/app/deal-rooms/reports-vault'
-      path: '/deal-rooms/reports-vault'
-      fullPath: '/app/deal-rooms/reports-vault'
-      preLoaderRoute: typeof AppDealRoomsReportsVaultRouteImport
+    '/app/audit': {
+      id: '/app/audit'
+      path: '/audit'
+      fullPath: '/app/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/deal-rooms/prep-notes': {
-      id: '/app/deal-rooms/prep-notes'
-      path: '/deal-rooms/prep-notes'
-      fullPath: '/app/deal-rooms/prep-notes'
-      preLoaderRoute: typeof AppDealRoomsPrepNotesRouteImport
+    '/app/close': {
+      id: '/app/close'
+      path: '/close'
+      fullPath: '/app/close'
+      preLoaderRoute: typeof AppCloseRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/deal-rooms/meetings-calendar': {
-      id: '/app/deal-rooms/meetings-calendar'
-      path: '/deal-rooms/meetings-calendar'
-      fullPath: '/app/deal-rooms/meetings-calendar'
-      preLoaderRoute: typeof AppDealRoomsMeetingsCalendarRouteImport
+    '/app/connections': {
+      id: '/app/connections'
+      path: '/connections'
+      fullPath: '/app/connections'
+      preLoaderRoute: typeof AppConnectionsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/deal-rooms/$id': {
-      id: '/app/deal-rooms/$id'
-      path: '/deal-rooms/$id'
-      fullPath: '/app/deal-rooms/$id'
-      preLoaderRoute: typeof AppDealRoomsIdRouteImport
+    '/app/documents': {
+      id: '/app/documents'
+      path: '/documents'
+      fullPath: '/app/documents'
+      preLoaderRoute: typeof AppDocumentsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/advisor-preview/record': {
-      id: '/app/advisor-preview/record'
-      path: '/advisor-preview/record'
-      fullPath: '/app/advisor-preview/record'
-      preLoaderRoute: typeof AppAdvisorPreviewRecordRouteImport
+    '/app/home': {
+      id: '/app/home'
+      path: '/home'
+      fullPath: '/app/home'
+      preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/advisor-preview/company': {
-      id: '/app/advisor-preview/company'
-      path: '/advisor-preview/company'
-      fullPath: '/app/advisor-preview/company'
-      preLoaderRoute: typeof AppAdvisorPreviewCompanyRouteImport
+    '/app/investor': {
+      id: '/app/investor'
+      path: '/investor'
+      fullPath: '/app/investor'
+      preLoaderRoute: typeof AppInvestorRouteImport
       parentRoute: typeof AppRoute
     }
-    '/api/internal/email-test': {
-      id: '/api/internal/email-test'
-      path: '/api/internal/email-test'
-      fullPath: '/api/internal/email-test'
-      preLoaderRoute: typeof ApiInternalEmailTestRouteImport
+    '/app/member-profile': {
+      id: '/app/member-profile'
+      path: '/member-profile'
+      fullPath: '/app/member-profile'
+      preLoaderRoute: typeof AppMemberProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/messages': {
+      id: '/app/messages'
+      path: '/messages'
+      fullPath: '/app/messages'
+      preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/notifications': {
+      id: '/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/overview': {
+      id: '/app/overview'
+      path: '/overview'
+      fullPath: '/app/overview'
+      preLoaderRoute: typeof AppOverviewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/profile': {
+      id: '/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/profile-builder': {
+      id: '/app/profile-builder'
+      path: '/profile-builder'
+      fullPath: '/app/profile-builder'
+      preLoaderRoute: typeof AppProfileBuilderRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/support': {
+      id: '/app/support'
+      path: '/support'
+      fullPath: '/app/support'
+      preLoaderRoute: typeof AppSupportRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/team-chat': {
+      id: '/app/team-chat'
+      path: '/team-chat'
+      fullPath: '/app/team-chat'
+      preLoaderRoute: typeof AppTeamChatRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/users': {
+      id: '/app/users'
+      path: '/users'
+      fullPath: '/app/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company/about': {
+      id: '/company/about'
+      path: '/company/about'
+      fullPath: '/company/about'
+      preLoaderRoute: typeof CompanyAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company/careers': {
+      id: '/company/careers'
+      path: '/company/careers'
+      fullPath: '/company/careers'
+      preLoaderRoute: typeof CompanyCareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company/contact': {
+      id: '/company/contact'
+      path: '/company/contact'
+      fullPath: '/company/contact'
+      preLoaderRoute: typeof CompanyContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cv/$slug': {
+      id: '/cv/$slug'
+      path: '/cv/$slug'
+      fullPath: '/cv/$slug'
+      preLoaderRoute: typeof CvSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/': {
+      id: '/deals-preview/'
+      path: '/deals-preview'
+      fullPath: '/deals-preview/'
+      preLoaderRoute: typeof DealsPreviewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/analytics': {
+      id: '/deals-preview/analytics'
+      path: '/deals-preview/analytics'
+      fullPath: '/deals-preview/analytics'
+      preLoaderRoute: typeof DealsPreviewAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile': {
+      id: '/deals-preview/profile'
+      path: '/deals-preview/profile'
+      fullPath: '/deals-preview/profile'
+      preLoaderRoute: typeof DealsPreviewProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/requests': {
+      id: '/deals-preview/requests'
+      path: '/deals-preview/requests'
+      fullPath: '/deals-preview/requests'
+      preLoaderRoute: typeof DealsPreviewRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/team': {
+      id: '/deals-preview/team'
+      path: '/deals-preview/team'
+      fullPath: '/deals-preview/team'
+      preLoaderRoute: typeof DealsPreviewTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/vault': {
+      id: '/deals-preview/vault'
+      path: '/deals-preview/vault'
+      fullPath: '/deals-preview/vault'
+      preLoaderRoute: typeof DealsPreviewVaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs-v2/': {
+      id: '/docs-v2/'
+      path: '/'
+      fullPath: '/docs-v2/'
+      preLoaderRoute: typeof DocsV2IndexRouteImport
+      parentRoute: typeof DocsV2Route
+    }
+    '/docs-v2/$': {
+      id: '/docs-v2/$'
+      path: '/$'
+      fullPath: '/docs-v2/$'
+      preLoaderRoute: typeof DocsV2SplatRouteImport
+      parentRoute: typeof DocsV2Route
+    }
+    '/for/advisors': {
+      id: '/for/advisors'
+      path: '/for/advisors'
+      fullPath: '/for/advisors'
+      preLoaderRoute: typeof ForAdvisorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/angels': {
+      id: '/for/angels'
+      path: '/for/angels'
+      fullPath: '/for/angels'
+      preLoaderRoute: typeof ForAngelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/family-offices': {
+      id: '/for/family-offices'
+      path: '/for/family-offices'
+      fullPath: '/for/family-offices'
+      preLoaderRoute: typeof ForFamilyOfficesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/founders': {
+      id: '/for/founders'
+      path: '/for/founders'
+      fullPath: '/for/founders'
+      preLoaderRoute: typeof ForFoundersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/investors': {
+      id: '/for/investors'
+      path: '/for/investors'
+      fullPath: '/for/investors'
+      preLoaderRoute: typeof ForInvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/limited-partners': {
+      id: '/for/limited-partners'
+      path: '/for/limited-partners'
+      fullPath: '/for/limited-partners'
+      preLoaderRoute: typeof ForLimitedPartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/private-equity': {
+      id: '/for/private-equity'
+      path: '/for/private-equity'
+      fullPath: '/for/private-equity'
+      preLoaderRoute: typeof ForPrivateEquityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/spvs': {
+      id: '/for/spvs'
+      path: '/for/spvs'
+      fullPath: '/for/spvs'
+      preLoaderRoute: typeof ForSpvsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/syndicates': {
+      id: '/for/syndicates'
+      path: '/for/syndicates'
+      fullPath: '/for/syndicates'
+      preLoaderRoute: typeof ForSyndicatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/venture-capital': {
+      id: '/for/venture-capital'
+      path: '/for/venture-capital'
+      fullPath: '/for/venture-capital'
+      preLoaderRoute: typeof ForVentureCapitalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glossary/': {
+      id: '/glossary/'
+      path: '/glossary'
+      fullPath: '/glossary/'
+      preLoaderRoute: typeof GlossaryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/i/$slug': {
+      id: '/i/$slug'
+      path: '/i/$slug'
+      fullPath: '/i/$slug'
+      preLoaderRoute: typeof ISlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join-deal-room/$token': {
+      id: '/join-deal-room/$token'
+      path: '/join-deal-room/$token'
+      fullPath: '/join-deal-room/$token'
+      preLoaderRoute: typeof JoinDealRoomTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join-investor/$token': {
+      id: '/join-investor/$token'
+      path: '/join-investor/$token'
+      fullPath: '/join-investor/$token'
+      preLoaderRoute: typeof JoinInvestorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/': {
+      id: '/legal/'
+      path: '/legal'
+      fullPath: '/legal/'
+      preLoaderRoute: typeof LegalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/acceptable-use': {
+      id: '/legal/acceptable-use'
+      path: '/legal/acceptable-use'
+      fullPath: '/legal/acceptable-use'
+      preLoaderRoute: typeof LegalAcceptableUseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/legal/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/dpa': {
+      id: '/legal/dpa'
+      path: '/legal/dpa'
+      fullPath: '/legal/dpa'
+      preLoaderRoute: typeof LegalDpaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/refunds': {
+      id: '/legal/refunds'
+      path: '/legal/refunds'
+      fullPath: '/legal/refunds'
+      preLoaderRoute: typeof LegalRefundsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/sub-processors': {
+      id: '/legal/sub-processors'
+      path: '/legal/sub-processors'
+      fullPath: '/legal/sub-processors'
+      preLoaderRoute: typeof LegalSubProcessorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pack/': {
+      id: '/pack/'
+      path: '/pack'
+      fullPath: '/pack/'
+      preLoaderRoute: typeof PackIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pack/$packId': {
+      id: '/pack/$packId'
+      path: '/pack/$packId'
+      fullPath: '/pack/$packId'
+      preLoaderRoute: typeof PackPackIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/how-it-works': {
+      id: '/product/how-it-works'
+      path: '/product/how-it-works'
+      fullPath: '/product/how-it-works'
+      preLoaderRoute: typeof ProductHowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/pricing': {
+      id: '/product/pricing'
+      path: '/product/pricing'
+      fullPath: '/product/pricing'
+      preLoaderRoute: typeof ProductPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/security': {
+      id: '/product/security'
+      path: '/product/security'
+      fullPath: '/product/security'
+      preLoaderRoute: typeof ProductSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/': {
+      id: '/resources/'
+      path: '/resources'
+      fullPath: '/resources/'
+      preLoaderRoute: typeof ResourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/changelog': {
+      id: '/resources/changelog'
+      path: '/resources/changelog'
+      fullPath: '/resources/changelog'
+      preLoaderRoute: typeof ResourcesChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sectors/': {
+      id: '/sectors/'
+      path: '/sectors'
+      fullPath: '/sectors/'
+      preLoaderRoute: typeof SectorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/': {
+      id: '/tools/'
+      path: '/tools'
+      fullPath: '/tools/'
+      preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/burn-rate': {
+      id: '/tools/burn-rate'
+      path: '/tools/burn-rate'
+      fullPath: '/tools/burn-rate'
+      preLoaderRoute: typeof ToolsBurnRateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/cap-table': {
+      id: '/tools/cap-table'
+      path: '/tools/cap-table'
+      fullPath: '/tools/cap-table'
+      preLoaderRoute: typeof ToolsCapTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/cogs': {
+      id: '/tools/cogs'
+      path: '/tools/cogs'
+      fullPath: '/tools/cogs'
+      preLoaderRoute: typeof ToolsCogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/dilution': {
+      id: '/tools/dilution'
+      path: '/tools/dilution'
+      fullPath: '/tools/dilution'
+      preLoaderRoute: typeof ToolsDilutionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/runway': {
+      id: '/tools/runway'
+      path: '/tools/runway'
+      fullPath: '/tools/runway'
+      preLoaderRoute: typeof ToolsRunwayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/safe-note': {
+      id: '/tools/safe-note'
+      path: '/tools/safe-note'
+      fullPath: '/tools/safe-note'
+      preLoaderRoute: typeof ToolsSafeNoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/valuation-calculator': {
+      id: '/tools/valuation-calculator'
+      path: '/tools/valuation-calculator'
+      fullPath: '/tools/valuation-calculator'
+      preLoaderRoute: typeof ToolsValuationCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/internal/data': {
@@ -3381,214 +3038,354 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalDataRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/investor/thesis/': {
-      id: '/app/investor/thesis/'
-      path: '/thesis'
-      fullPath: '/app/investor/thesis/'
-      preLoaderRoute: typeof AppInvestorThesisIndexRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/discover/': {
-      id: '/app/investor/discover/'
-      path: '/discover'
-      fullPath: '/app/investor/discover/'
-      preLoaderRoute: typeof AppInvestorDiscoverIndexRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-rooms/': {
-      id: '/app/investor/deal-rooms/'
-      path: '/deal-rooms'
-      fullPath: '/app/investor/deal-rooms/'
-      preLoaderRoute: typeof AppInvestorDealRoomsIndexRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/deals-preview/$sector_/$instrument/$dealId': {
-      id: '/deals-preview/$sector_/$instrument/$dealId'
-      path: '/deals-preview/$sector/$instrument/$dealId'
-      fullPath: '/deals-preview/$sector/$instrument/$dealId'
-      preLoaderRoute: typeof DealsPreviewSectorInstrumentDealIdRouteImport
+    '/api/internal/email-test': {
+      id: '/api/internal/email-test'
+      path: '/api/internal/email-test'
+      fullPath: '/api/internal/email-test'
+      preLoaderRoute: typeof ApiInternalEmailTestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/prepare/profile-builder/team-cards': {
-      id: '/app/prepare/profile-builder/team-cards'
-      path: '/prepare/profile-builder/team-cards'
-      fullPath: '/app/prepare/profile-builder/team-cards'
-      preLoaderRoute: typeof AppPrepareProfileBuilderTeamCardsRouteImport
+    '/app/advisor-preview/': {
+      id: '/app/advisor-preview/'
+      path: '/advisor-preview'
+      fullPath: '/app/advisor-preview/'
+      preLoaderRoute: typeof AppAdvisorPreviewIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/profile-builder/quick-setup': {
-      id: '/app/prepare/profile-builder/quick-setup'
-      path: '/prepare/profile-builder/quick-setup'
-      fullPath: '/app/prepare/profile-builder/quick-setup'
-      preLoaderRoute: typeof AppPrepareProfileBuilderQuickSetupRouteImport
+    '/app/advisor-preview/company': {
+      id: '/app/advisor-preview/company'
+      path: '/advisor-preview/company'
+      fullPath: '/app/advisor-preview/company'
+      preLoaderRoute: typeof AppAdvisorPreviewCompanyRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/profile-builder/fundraising-thesis': {
-      id: '/app/prepare/profile-builder/fundraising-thesis'
-      path: '/prepare/profile-builder/fundraising-thesis'
-      fullPath: '/app/prepare/profile-builder/fundraising-thesis'
-      preLoaderRoute: typeof AppPrepareProfileBuilderFundraisingThesisRouteImport
+    '/app/advisor-preview/record': {
+      id: '/app/advisor-preview/record'
+      path: '/advisor-preview/record'
+      fullPath: '/app/advisor-preview/record'
+      preLoaderRoute: typeof AppAdvisorPreviewRecordRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/profile-builder/full-profile': {
-      id: '/app/prepare/profile-builder/full-profile'
-      path: '/prepare/profile-builder/full-profile'
-      fullPath: '/app/prepare/profile-builder/full-profile'
-      preLoaderRoute: typeof AppPrepareProfileBuilderFullProfileRouteImport
+    '/app/deal-rooms/': {
+      id: '/app/deal-rooms/'
+      path: '/deal-rooms'
+      fullPath: '/app/deal-rooms/'
+      preLoaderRoute: typeof AppDealRoomsIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/profile-builder/analytics': {
-      id: '/app/prepare/profile-builder/analytics'
-      path: '/prepare/profile-builder/analytics'
-      fullPath: '/app/prepare/profile-builder/analytics'
-      preLoaderRoute: typeof AppPrepareProfileBuilderAnalyticsRouteImport
+    '/app/deal-rooms/$id': {
+      id: '/app/deal-rooms/$id'
+      path: '/deal-rooms/$id'
+      fullPath: '/app/deal-rooms/$id'
+      preLoaderRoute: typeof AppDealRoomsIdRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/prepare/profile-builder/achievements': {
-      id: '/app/prepare/profile-builder/achievements'
-      path: '/prepare/profile-builder/achievements'
-      fullPath: '/app/prepare/profile-builder/achievements'
-      preLoaderRoute: typeof AppPrepareProfileBuilderAchievementsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/ip-vault/source-files': {
-      id: '/app/prepare/ip-vault/source-files'
-      path: '/prepare/ip-vault/source-files'
-      fullPath: '/app/prepare/ip-vault/source-files'
-      preLoaderRoute: typeof AppPrepareIpVaultSourceFilesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/ip-vault/privacy-settings': {
-      id: '/app/prepare/ip-vault/privacy-settings'
-      path: '/prepare/ip-vault/privacy-settings'
-      fullPath: '/app/prepare/ip-vault/privacy-settings'
-      preLoaderRoute: typeof AppPrepareIpVaultPrivacySettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/ip-vault/document-intake': {
-      id: '/app/prepare/ip-vault/document-intake'
-      path: '/prepare/ip-vault/document-intake'
-      fullPath: '/app/prepare/ip-vault/document-intake'
-      preLoaderRoute: typeof AppPrepareIpVaultDocumentIntakeRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/prepare/ip-vault/digital-document-vault': {
-      id: '/app/prepare/ip-vault/digital-document-vault'
-      path: '/prepare/ip-vault/digital-document-vault'
-      fullPath: '/app/prepare/ip-vault/digital-document-vault'
-      preLoaderRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/investor/discover/watchlist': {
-      id: '/app/investor/discover/watchlist'
-      path: '/discover/watchlist'
-      fullPath: '/app/investor/discover/watchlist'
-      preLoaderRoute: typeof AppInvestorDiscoverWatchlistRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/discover/deal-flow': {
-      id: '/app/investor/discover/deal-flow'
-      path: '/discover/deal-flow'
-      fullPath: '/app/investor/discover/deal-flow'
-      preLoaderRoute: typeof AppInvestorDiscoverDealFlowRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-rooms/team-assignments': {
-      id: '/app/investor/deal-rooms/team-assignments'
-      path: '/deal-rooms/team-assignments'
-      fullPath: '/app/investor/deal-rooms/team-assignments'
-      preLoaderRoute: typeof AppInvestorDealRoomsTeamAssignmentsRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-rooms/reports-vault': {
-      id: '/app/investor/deal-rooms/reports-vault'
-      path: '/deal-rooms/reports-vault'
-      fullPath: '/app/investor/deal-rooms/reports-vault'
-      preLoaderRoute: typeof AppInvestorDealRoomsReportsVaultRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-rooms/prep-notes': {
-      id: '/app/investor/deal-rooms/prep-notes'
-      path: '/deal-rooms/prep-notes'
-      fullPath: '/app/investor/deal-rooms/prep-notes'
-      preLoaderRoute: typeof AppInvestorDealRoomsPrepNotesRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-rooms/portfolio': {
-      id: '/app/investor/deal-rooms/portfolio'
-      path: '/deal-rooms/portfolio'
-      fullPath: '/app/investor/deal-rooms/portfolio'
-      preLoaderRoute: typeof AppInvestorDealRoomsPortfolioRouteImport
-      parentRoute: typeof AppInvestorRoute
-    }
-    '/app/investor/deal-rooms/meetings-calendar': {
-      id: '/app/investor/deal-rooms/meetings-calendar'
+    '/app/deal-rooms/meetings-calendar': {
+      id: '/app/deal-rooms/meetings-calendar'
       path: '/deal-rooms/meetings-calendar'
-      fullPath: '/app/investor/deal-rooms/meetings-calendar'
-      preLoaderRoute: typeof AppInvestorDealRoomsMeetingsCalendarRouteImport
+      fullPath: '/app/deal-rooms/meetings-calendar'
+      preLoaderRoute: typeof AppDealRoomsMeetingsCalendarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/deal-rooms/prep-notes': {
+      id: '/app/deal-rooms/prep-notes'
+      path: '/deal-rooms/prep-notes'
+      fullPath: '/app/deal-rooms/prep-notes'
+      preLoaderRoute: typeof AppDealRoomsPrepNotesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/deal-rooms/reports-vault': {
+      id: '/app/deal-rooms/reports-vault'
+      path: '/deal-rooms/reports-vault'
+      fullPath: '/app/deal-rooms/reports-vault'
+      preLoaderRoute: typeof AppDealRoomsReportsVaultRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/deal-rooms/team-assignments': {
+      id: '/app/deal-rooms/team-assignments'
+      path: '/deal-rooms/team-assignments'
+      fullPath: '/app/deal-rooms/team-assignments'
+      preLoaderRoute: typeof AppDealRoomsTeamAssignmentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/investor/': {
+      id: '/app/investor/'
+      path: '/'
+      fullPath: '/app/investor/'
+      preLoaderRoute: typeof AppInvestorIndexRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/deal-rooms/diligence-notes': {
-      id: '/app/investor/deal-rooms/diligence-notes'
-      path: '/deal-rooms/diligence-notes'
-      fullPath: '/app/investor/deal-rooms/diligence-notes'
-      preLoaderRoute: typeof AppInvestorDealRoomsDiligenceNotesRouteImport
+    '/app/investor/analysis': {
+      id: '/app/investor/analysis'
+      path: '/analysis'
+      fullPath: '/app/investor/analysis'
+      preLoaderRoute: typeof AppInvestorAnalysisRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/deal-rooms/$id/term-sheets': {
-      id: '/app/deal-rooms/$id/term-sheets'
-      path: '/term-sheets'
-      fullPath: '/app/deal-rooms/$id/term-sheets'
-      preLoaderRoute: typeof AppDealRoomsIdTermSheetsRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
+    '/app/investor/analytics': {
+      id: '/app/investor/analytics'
+      path: '/analytics'
+      fullPath: '/app/investor/analytics'
+      preLoaderRoute: typeof AppInvestorAnalyticsRouteImport
+      parentRoute: typeof AppInvestorRoute
     }
-    '/app/deal-rooms/$id/qa': {
-      id: '/app/deal-rooms/$id/qa'
-      path: '/qa'
-      fullPath: '/app/deal-rooms/$id/qa'
-      preLoaderRoute: typeof AppDealRoomsIdQaRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
+    '/app/investor/connections': {
+      id: '/app/investor/connections'
+      path: '/connections'
+      fullPath: '/app/investor/connections'
+      preLoaderRoute: typeof AppInvestorConnectionsRouteImport
+      parentRoute: typeof AppInvestorRoute
     }
-    '/app/deal-rooms/$id/overview': {
-      id: '/app/deal-rooms/$id/overview'
-      path: '/overview'
-      fullPath: '/app/deal-rooms/$id/overview'
-      preLoaderRoute: typeof AppDealRoomsIdOverviewRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
+    '/app/investor/deal-flow': {
+      id: '/app/investor/deal-flow'
+      path: '/deal-flow'
+      fullPath: '/app/investor/deal-flow'
+      preLoaderRoute: typeof AppInvestorDealFlowRouteImport
+      parentRoute: typeof AppInvestorRoute
     }
-    '/app/deal-rooms/$id/nda': {
-      id: '/app/deal-rooms/$id/nda'
-      path: '/nda'
-      fullPath: '/app/deal-rooms/$id/nda'
-      preLoaderRoute: typeof AppDealRoomsIdNdaRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
+    '/app/investor/decide': {
+      id: '/app/investor/decide'
+      path: '/decide'
+      fullPath: '/app/investor/decide'
+      preLoaderRoute: typeof AppInvestorDecideRouteImport
+      parentRoute: typeof AppInvestorRoute
     }
-    '/app/deal-rooms/$id/meetings': {
-      id: '/app/deal-rooms/$id/meetings'
-      path: '/meetings'
-      fullPath: '/app/deal-rooms/$id/meetings'
-      preLoaderRoute: typeof AppDealRoomsIdMeetingsRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
+    '/app/investor/decisions': {
+      id: '/app/investor/decisions'
+      path: '/decisions'
+      fullPath: '/app/investor/decisions'
+      preLoaderRoute: typeof AppInvestorDecisionsRouteImport
+      parentRoute: typeof AppInvestorRoute
     }
-    '/app/deal-rooms/$id/information': {
-      id: '/app/deal-rooms/$id/information'
-      path: '/information'
-      fullPath: '/app/deal-rooms/$id/information'
-      preLoaderRoute: typeof AppDealRoomsIdInformationRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
-    }
-    '/app/deal-rooms/$id/documents': {
-      id: '/app/deal-rooms/$id/documents'
-      path: '/documents'
-      fullPath: '/app/deal-rooms/$id/documents'
-      preLoaderRoute: typeof AppDealRoomsIdDocumentsRouteImport
-      parentRoute: typeof AppDealRoomsIdRoute
-    }
-    '/app/deal-rooms/$id/diligence': {
-      id: '/app/deal-rooms/$id/diligence'
+    '/app/investor/diligence': {
+      id: '/app/investor/diligence'
       path: '/diligence'
-      fullPath: '/app/deal-rooms/$id/diligence'
-      preLoaderRoute: typeof AppDealRoomsIdDiligenceRouteImport
+      fullPath: '/app/investor/diligence'
+      preLoaderRoute: typeof AppInvestorDiligenceRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/evaluate': {
+      id: '/app/investor/evaluate'
+      path: '/evaluate'
+      fullPath: '/app/investor/evaluate'
+      preLoaderRoute: typeof AppInvestorEvaluateRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/overview': {
+      id: '/app/investor/overview'
+      path: '/overview'
+      fullPath: '/app/investor/overview'
+      preLoaderRoute: typeof AppInvestorOverviewRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/portfolio': {
+      id: '/app/investor/portfolio'
+      path: '/portfolio'
+      fullPath: '/app/investor/portfolio'
+      preLoaderRoute: typeof AppInvestorPortfolioRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/profile': {
+      id: '/app/investor/profile'
+      path: '/profile'
+      fullPath: '/app/investor/profile'
+      preLoaderRoute: typeof AppInvestorProfileRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/settings': {
+      id: '/app/investor/settings'
+      path: '/settings'
+      fullPath: '/app/investor/settings'
+      preLoaderRoute: typeof AppInvestorSettingsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/source': {
+      id: '/app/investor/source'
+      path: '/source'
+      fullPath: '/app/investor/source'
+      preLoaderRoute: typeof AppInvestorSourceRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/startups': {
+      id: '/app/investor/startups'
+      path: '/startups'
+      fullPath: '/app/investor/startups'
+      preLoaderRoute: typeof AppInvestorStartupsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/team': {
+      id: '/app/investor/team'
+      path: '/team'
+      fullPath: '/app/investor/team'
+      preLoaderRoute: typeof AppInvestorTeamRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/member/': {
+      id: '/app/member/'
+      path: '/member'
+      fullPath: '/app/member/'
+      preLoaderRoute: typeof AppMemberIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/': {
+      id: '/app/prepare/'
+      path: '/prepare'
+      fullPath: '/app/prepare/'
+      preLoaderRoute: typeof AppPrepareIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings/activity': {
+      id: '/app/settings/activity'
+      path: '/activity'
+      fullPath: '/app/settings/activity'
+      preLoaderRoute: typeof AppSettingsActivityRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/settings/billing': {
+      id: '/app/settings/billing'
+      path: '/billing'
+      fullPath: '/app/settings/billing'
+      preLoaderRoute: typeof AppSettingsBillingRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/settings/notifications': {
+      id: '/app/settings/notifications'
+      path: '/notifications'
+      fullPath: '/app/settings/notifications'
+      preLoaderRoute: typeof AppSettingsNotificationsRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/settings/profile-privacy': {
+      id: '/app/settings/profile-privacy'
+      path: '/profile-privacy'
+      fullPath: '/app/settings/profile-privacy'
+      preLoaderRoute: typeof AppSettingsProfilePrivacyRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/settings/security': {
+      id: '/app/settings/security'
+      path: '/security'
+      fullPath: '/app/settings/security'
+      preLoaderRoute: typeof AppSettingsSecurityRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/app/support_/feedback': {
+      id: '/app/support_/feedback'
+      path: '/support/feedback'
+      fullPath: '/app/support/feedback'
+      preLoaderRoute: typeof AppSupportFeedbackRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/deals-preview/$sector/': {
+      id: '/deals-preview/$sector/'
+      path: '/deals-preview/$sector'
+      fullPath: '/deals-preview/$sector/'
+      preLoaderRoute: typeof DealsPreviewSectorIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/$sector/$instrument': {
+      id: '/deals-preview/$sector/$instrument'
+      path: '/deals-preview/$sector/$instrument'
+      fullPath: '/deals-preview/$sector/$instrument'
+      preLoaderRoute: typeof DealsPreviewSectorInstrumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/achievements': {
+      id: '/deals-preview/profile_/achievements'
+      path: '/deals-preview/profile/achievements'
+      fullPath: '/deals-preview/profile/achievements'
+      preLoaderRoute: typeof DealsPreviewProfileAchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/full': {
+      id: '/deals-preview/profile_/full'
+      path: '/deals-preview/profile/full'
+      fullPath: '/deals-preview/profile/full'
+      preLoaderRoute: typeof DealsPreviewProfileFullRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/team': {
+      id: '/deals-preview/profile_/team'
+      path: '/deals-preview/profile/team'
+      fullPath: '/deals-preview/profile/team'
+      preLoaderRoute: typeof DealsPreviewProfileTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deals-preview/profile_/thesis': {
+      id: '/deals-preview/profile_/thesis'
+      path: '/deals-preview/profile/thesis'
+      fullPath: '/deals-preview/profile/thesis'
+      preLoaderRoute: typeof DealsPreviewProfileThesisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pack/$packId_/missing': {
+      id: '/pack/$packId_/missing'
+      path: '/pack/$packId/missing'
+      fullPath: '/pack/$packId/missing'
+      preLoaderRoute: typeof PackPackIdMissingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/': {
+      id: '/product/compare/'
+      path: '/product/compare'
+      fullPath: '/product/compare/'
+      preLoaderRoute: typeof ProductCompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/datasite': {
+      id: '/product/compare/datasite'
+      path: '/product/compare/datasite'
+      fullPath: '/product/compare/datasite'
+      preLoaderRoute: typeof ProductCompareDatasiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/dealroom': {
+      id: '/product/compare/dealroom'
+      path: '/product/compare/dealroom'
+      fullPath: '/product/compare/dealroom'
+      preLoaderRoute: typeof ProductCompareDealroomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/docsend': {
+      id: '/product/compare/docsend'
+      path: '/product/compare/docsend'
+      fullPath: '/product/compare/docsend'
+      preLoaderRoute: typeof ProductCompareDocsendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/firmex': {
+      id: '/product/compare/firmex'
+      path: '/product/compare/firmex'
+      fullPath: '/product/compare/firmex'
+      preLoaderRoute: typeof ProductCompareFirmexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/compare/ideals': {
+      id: '/product/compare/ideals'
+      path: '/product/compare/ideals'
+      fullPath: '/product/compare/ideals'
+      preLoaderRoute: typeof ProductCompareIdealsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/blog/': {
+      id: '/resources/blog/'
+      path: '/resources/blog'
+      fullPath: '/resources/blog/'
+      preLoaderRoute: typeof ResourcesBlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/blog/$slug': {
+      id: '/resources/blog/$slug'
+      path: '/resources/blog/$slug'
+      fullPath: '/resources/blog/$slug'
+      preLoaderRoute: typeof ResourcesBlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/deal-rooms/$id/activity': {
+      id: '/app/deal-rooms/$id/activity'
+      path: '/activity'
+      fullPath: '/app/deal-rooms/$id/activity'
+      preLoaderRoute: typeof AppDealRoomsIdActivityRouteImport
       parentRoute: typeof AppDealRoomsIdRoute
     }
     '/app/deal-rooms/$id/close': {
@@ -3598,67 +3395,221 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealRoomsIdCloseRouteImport
       parentRoute: typeof AppDealRoomsIdRoute
     }
-    '/app/deal-rooms/$id/activity': {
-      id: '/app/deal-rooms/$id/activity'
-      path: '/activity'
-      fullPath: '/app/deal-rooms/$id/activity'
-      preLoaderRoute: typeof AppDealRoomsIdActivityRouteImport
+    '/app/deal-rooms/$id/diligence': {
+      id: '/app/deal-rooms/$id/diligence'
+      path: '/diligence'
+      fullPath: '/app/deal-rooms/$id/diligence'
+      preLoaderRoute: typeof AppDealRoomsIdDiligenceRouteImport
       parentRoute: typeof AppDealRoomsIdRoute
     }
-    '/app/investor/thesis/profile-builder/track-record': {
-      id: '/app/investor/thesis/profile-builder/track-record'
-      path: '/thesis/profile-builder/track-record'
-      fullPath: '/app/investor/thesis/profile-builder/track-record'
-      preLoaderRoute: typeof AppInvestorThesisProfileBuilderTrackRecordRouteImport
+    '/app/deal-rooms/$id/documents': {
+      id: '/app/deal-rooms/$id/documents'
+      path: '/documents'
+      fullPath: '/app/deal-rooms/$id/documents'
+      preLoaderRoute: typeof AppDealRoomsIdDocumentsRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/deal-rooms/$id/information': {
+      id: '/app/deal-rooms/$id/information'
+      path: '/information'
+      fullPath: '/app/deal-rooms/$id/information'
+      preLoaderRoute: typeof AppDealRoomsIdInformationRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/deal-rooms/$id/meetings': {
+      id: '/app/deal-rooms/$id/meetings'
+      path: '/meetings'
+      fullPath: '/app/deal-rooms/$id/meetings'
+      preLoaderRoute: typeof AppDealRoomsIdMeetingsRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/deal-rooms/$id/nda': {
+      id: '/app/deal-rooms/$id/nda'
+      path: '/nda'
+      fullPath: '/app/deal-rooms/$id/nda'
+      preLoaderRoute: typeof AppDealRoomsIdNdaRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/deal-rooms/$id/overview': {
+      id: '/app/deal-rooms/$id/overview'
+      path: '/overview'
+      fullPath: '/app/deal-rooms/$id/overview'
+      preLoaderRoute: typeof AppDealRoomsIdOverviewRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/deal-rooms/$id/qa': {
+      id: '/app/deal-rooms/$id/qa'
+      path: '/qa'
+      fullPath: '/app/deal-rooms/$id/qa'
+      preLoaderRoute: typeof AppDealRoomsIdQaRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/deal-rooms/$id/term-sheets': {
+      id: '/app/deal-rooms/$id/term-sheets'
+      path: '/term-sheets'
+      fullPath: '/app/deal-rooms/$id/term-sheets'
+      preLoaderRoute: typeof AppDealRoomsIdTermSheetsRouteImport
+      parentRoute: typeof AppDealRoomsIdRoute
+    }
+    '/app/investor/deal-rooms/': {
+      id: '/app/investor/deal-rooms/'
+      path: '/deal-rooms'
+      fullPath: '/app/investor/deal-rooms/'
+      preLoaderRoute: typeof AppInvestorDealRoomsIndexRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/profile-builder/team-cards': {
-      id: '/app/investor/thesis/profile-builder/team-cards'
-      path: '/thesis/profile-builder/team-cards'
-      fullPath: '/app/investor/thesis/profile-builder/team-cards'
-      preLoaderRoute: typeof AppInvestorThesisProfileBuilderTeamCardsRouteImport
+    '/app/investor/deal-rooms/diligence-notes': {
+      id: '/app/investor/deal-rooms/diligence-notes'
+      path: '/deal-rooms/diligence-notes'
+      fullPath: '/app/investor/deal-rooms/diligence-notes'
+      preLoaderRoute: typeof AppInvestorDealRoomsDiligenceNotesRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/profile-builder/quick-setup': {
-      id: '/app/investor/thesis/profile-builder/quick-setup'
-      path: '/thesis/profile-builder/quick-setup'
-      fullPath: '/app/investor/thesis/profile-builder/quick-setup'
-      preLoaderRoute: typeof AppInvestorThesisProfileBuilderQuickSetupRouteImport
+    '/app/investor/deal-rooms/meetings-calendar': {
+      id: '/app/investor/deal-rooms/meetings-calendar'
+      path: '/deal-rooms/meetings-calendar'
+      fullPath: '/app/investor/deal-rooms/meetings-calendar'
+      preLoaderRoute: typeof AppInvestorDealRoomsMeetingsCalendarRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/profile-builder/investment-thesis': {
-      id: '/app/investor/thesis/profile-builder/investment-thesis'
-      path: '/thesis/profile-builder/investment-thesis'
-      fullPath: '/app/investor/thesis/profile-builder/investment-thesis'
-      preLoaderRoute: typeof AppInvestorThesisProfileBuilderInvestmentThesisRouteImport
+    '/app/investor/deal-rooms/portfolio': {
+      id: '/app/investor/deal-rooms/portfolio'
+      path: '/deal-rooms/portfolio'
+      fullPath: '/app/investor/deal-rooms/portfolio'
+      preLoaderRoute: typeof AppInvestorDealRoomsPortfolioRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/profile-builder/full-profile': {
-      id: '/app/investor/thesis/profile-builder/full-profile'
-      path: '/thesis/profile-builder/full-profile'
-      fullPath: '/app/investor/thesis/profile-builder/full-profile'
-      preLoaderRoute: typeof AppInvestorThesisProfileBuilderFullProfileRouteImport
+    '/app/investor/deal-rooms/prep-notes': {
+      id: '/app/investor/deal-rooms/prep-notes'
+      path: '/deal-rooms/prep-notes'
+      fullPath: '/app/investor/deal-rooms/prep-notes'
+      preLoaderRoute: typeof AppInvestorDealRoomsPrepNotesRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/fund-vault/source-files': {
-      id: '/app/investor/thesis/fund-vault/source-files'
-      path: '/thesis/fund-vault/source-files'
-      fullPath: '/app/investor/thesis/fund-vault/source-files'
-      preLoaderRoute: typeof AppInvestorThesisFundVaultSourceFilesRouteImport
+    '/app/investor/deal-rooms/reports-vault': {
+      id: '/app/investor/deal-rooms/reports-vault'
+      path: '/deal-rooms/reports-vault'
+      fullPath: '/app/investor/deal-rooms/reports-vault'
+      preLoaderRoute: typeof AppInvestorDealRoomsReportsVaultRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/fund-vault/privacy-settings': {
-      id: '/app/investor/thesis/fund-vault/privacy-settings'
-      path: '/thesis/fund-vault/privacy-settings'
-      fullPath: '/app/investor/thesis/fund-vault/privacy-settings'
-      preLoaderRoute: typeof AppInvestorThesisFundVaultPrivacySettingsRouteImport
+    '/app/investor/deal-rooms/team-assignments': {
+      id: '/app/investor/deal-rooms/team-assignments'
+      path: '/deal-rooms/team-assignments'
+      fullPath: '/app/investor/deal-rooms/team-assignments'
+      preLoaderRoute: typeof AppInvestorDealRoomsTeamAssignmentsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/thesis/fund-vault/digital-document-vault': {
-      id: '/app/investor/thesis/fund-vault/digital-document-vault'
-      path: '/thesis/fund-vault/digital-document-vault'
-      fullPath: '/app/investor/thesis/fund-vault/digital-document-vault'
-      preLoaderRoute: typeof AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport
+    '/app/investor/discover/': {
+      id: '/app/investor/discover/'
+      path: '/discover'
+      fullPath: '/app/investor/discover/'
+      preLoaderRoute: typeof AppInvestorDiscoverIndexRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/discover/deal-flow': {
+      id: '/app/investor/discover/deal-flow'
+      path: '/discover/deal-flow'
+      fullPath: '/app/investor/discover/deal-flow'
+      preLoaderRoute: typeof AppInvestorDiscoverDealFlowRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/discover/watchlist': {
+      id: '/app/investor/discover/watchlist'
+      path: '/discover/watchlist'
+      fullPath: '/app/investor/discover/watchlist'
+      preLoaderRoute: typeof AppInvestorDiscoverWatchlistRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/': {
+      id: '/app/investor/thesis/'
+      path: '/thesis'
+      fullPath: '/app/investor/thesis/'
+      preLoaderRoute: typeof AppInvestorThesisIndexRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/prepare/ip-vault/digital-document-vault': {
+      id: '/app/prepare/ip-vault/digital-document-vault'
+      path: '/prepare/ip-vault/digital-document-vault'
+      fullPath: '/app/prepare/ip-vault/digital-document-vault'
+      preLoaderRoute: typeof AppPrepareIpVaultDigitalDocumentVaultRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/ip-vault/document-intake': {
+      id: '/app/prepare/ip-vault/document-intake'
+      path: '/prepare/ip-vault/document-intake'
+      fullPath: '/app/prepare/ip-vault/document-intake'
+      preLoaderRoute: typeof AppPrepareIpVaultDocumentIntakeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/ip-vault/privacy-settings': {
+      id: '/app/prepare/ip-vault/privacy-settings'
+      path: '/prepare/ip-vault/privacy-settings'
+      fullPath: '/app/prepare/ip-vault/privacy-settings'
+      preLoaderRoute: typeof AppPrepareIpVaultPrivacySettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/ip-vault/source-files': {
+      id: '/app/prepare/ip-vault/source-files'
+      path: '/prepare/ip-vault/source-files'
+      fullPath: '/app/prepare/ip-vault/source-files'
+      preLoaderRoute: typeof AppPrepareIpVaultSourceFilesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/profile-builder/achievements': {
+      id: '/app/prepare/profile-builder/achievements'
+      path: '/prepare/profile-builder/achievements'
+      fullPath: '/app/prepare/profile-builder/achievements'
+      preLoaderRoute: typeof AppPrepareProfileBuilderAchievementsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/profile-builder/analytics': {
+      id: '/app/prepare/profile-builder/analytics'
+      path: '/prepare/profile-builder/analytics'
+      fullPath: '/app/prepare/profile-builder/analytics'
+      preLoaderRoute: typeof AppPrepareProfileBuilderAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/profile-builder/full-profile': {
+      id: '/app/prepare/profile-builder/full-profile'
+      path: '/prepare/profile-builder/full-profile'
+      fullPath: '/app/prepare/profile-builder/full-profile'
+      preLoaderRoute: typeof AppPrepareProfileBuilderFullProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/profile-builder/fundraising-thesis': {
+      id: '/app/prepare/profile-builder/fundraising-thesis'
+      path: '/prepare/profile-builder/fundraising-thesis'
+      fullPath: '/app/prepare/profile-builder/fundraising-thesis'
+      preLoaderRoute: typeof AppPrepareProfileBuilderFundraisingThesisRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/profile-builder/quick-setup': {
+      id: '/app/prepare/profile-builder/quick-setup'
+      path: '/prepare/profile-builder/quick-setup'
+      fullPath: '/app/prepare/profile-builder/quick-setup'
+      preLoaderRoute: typeof AppPrepareProfileBuilderQuickSetupRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/prepare/profile-builder/team-cards': {
+      id: '/app/prepare/profile-builder/team-cards'
+      path: '/prepare/profile-builder/team-cards'
+      fullPath: '/app/prepare/profile-builder/team-cards'
+      preLoaderRoute: typeof AppPrepareProfileBuilderTeamCardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/deals-preview/$sector_/$instrument/$dealId': {
+      id: '/deals-preview/$sector_/$instrument/$dealId'
+      path: '/deals-preview/$sector/$instrument/$dealId'
+      fullPath: '/deals-preview/$sector/$instrument/$dealId'
+      preLoaderRoute: typeof DealsPreviewSectorInstrumentDealIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/investor/discover/public-profile/privacy-settings': {
+      id: '/app/investor/discover/public-profile/privacy-settings'
+      path: '/discover/public-profile/privacy-settings'
+      fullPath: '/app/investor/discover/public-profile/privacy-settings'
+      preLoaderRoute: typeof AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport
       parentRoute: typeof AppInvestorRoute
     }
     '/app/investor/discover/public-profile/profile-view': {
@@ -3668,11 +3619,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestorDiscoverPublicProfileProfileViewRouteImport
       parentRoute: typeof AppInvestorRoute
     }
-    '/app/investor/discover/public-profile/privacy-settings': {
-      id: '/app/investor/discover/public-profile/privacy-settings'
-      path: '/discover/public-profile/privacy-settings'
-      fullPath: '/app/investor/discover/public-profile/privacy-settings'
-      preLoaderRoute: typeof AppInvestorDiscoverPublicProfilePrivacySettingsRouteImport
+    '/app/investor/thesis/fund-vault/digital-document-vault': {
+      id: '/app/investor/thesis/fund-vault/digital-document-vault'
+      path: '/thesis/fund-vault/digital-document-vault'
+      fullPath: '/app/investor/thesis/fund-vault/digital-document-vault'
+      preLoaderRoute: typeof AppInvestorThesisFundVaultDigitalDocumentVaultRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/fund-vault/privacy-settings': {
+      id: '/app/investor/thesis/fund-vault/privacy-settings'
+      path: '/thesis/fund-vault/privacy-settings'
+      fullPath: '/app/investor/thesis/fund-vault/privacy-settings'
+      preLoaderRoute: typeof AppInvestorThesisFundVaultPrivacySettingsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/fund-vault/source-files': {
+      id: '/app/investor/thesis/fund-vault/source-files'
+      path: '/thesis/fund-vault/source-files'
+      fullPath: '/app/investor/thesis/fund-vault/source-files'
+      preLoaderRoute: typeof AppInvestorThesisFundVaultSourceFilesRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/full-profile': {
+      id: '/app/investor/thesis/profile-builder/full-profile'
+      path: '/thesis/profile-builder/full-profile'
+      fullPath: '/app/investor/thesis/profile-builder/full-profile'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderFullProfileRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/investment-thesis': {
+      id: '/app/investor/thesis/profile-builder/investment-thesis'
+      path: '/thesis/profile-builder/investment-thesis'
+      fullPath: '/app/investor/thesis/profile-builder/investment-thesis'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderInvestmentThesisRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/quick-setup': {
+      id: '/app/investor/thesis/profile-builder/quick-setup'
+      path: '/thesis/profile-builder/quick-setup'
+      fullPath: '/app/investor/thesis/profile-builder/quick-setup'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderQuickSetupRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/team-cards': {
+      id: '/app/investor/thesis/profile-builder/team-cards'
+      path: '/thesis/profile-builder/team-cards'
+      fullPath: '/app/investor/thesis/profile-builder/team-cards'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderTeamCardsRouteImport
+      parentRoute: typeof AppInvestorRoute
+    }
+    '/app/investor/thesis/profile-builder/track-record': {
+      id: '/app/investor/thesis/profile-builder/track-record'
+      path: '/thesis/profile-builder/track-record'
+      fullPath: '/app/investor/thesis/profile-builder/track-record'
+      preLoaderRoute: typeof AppInvestorThesisProfileBuilderTrackRecordRouteImport
       parentRoute: typeof AppInvestorRoute
     }
   }
