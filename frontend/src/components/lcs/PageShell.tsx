@@ -215,6 +215,7 @@ export function LcsPageShell({
           <div className={headerExtra ? "flex items-center gap-3 shrink-0" : "ms-auto flex items-center gap-3 shrink-0"}>
             {notificationSlot ?? (
               <span
+                role="img"
                 aria-label="Notifications"
                 className="relative inline-flex size-4 items-center justify-center"
               >
