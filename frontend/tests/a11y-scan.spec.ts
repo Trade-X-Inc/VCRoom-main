@@ -38,21 +38,37 @@ const ROUTES = ["/", "/sign-in", "/sign-up", "/legal/privacy", "/for/founders"];
 test.describe("Accessibility scan (axe-core, report-only)", () => {
   for (const route of ROUTES) {
     test(`axe: ${route}`, async ({ page }) => {
+      // The sign-in and reset pages embed the Turnstile widget, whose challenge frame keeps the network busy (so
+      // "networkidle" never arrives) and needs the internet. Serve a script that draws a placeholder and makes no
+      // requests; the real widget is checked separately (see CLAUDE.md, job H4).
+      await page.route(/\/turnstile\/v0\/api\.js/, (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: "text/javascript",
+          body: "window.turnstile={render:function(e){e.innerHTML='<span>widget placeholder</span>';return 'w1'},reset:function(){},remove:function(){}};",
+        }),
+      );
       await page.goto(BASE + route, { waitUntil: "networkidle" });
       const results = await new AxeBuilder({ page }).analyze();
 
       console.log(`\n=== axe scan: ${route} ===`);
       console.log(`Violations: ${results.violations.length}`);
       for (const v of results.violations) {
-        console.log(`  [${v.impact}] ${v.id}: ${v.help} (${v.nodes.length} node(s))`);
+        console.log(
+          `  [${v.impact}] ${v.id}: ${v.help} (${v.nodes.length} node(s))`,
+        );
         for (const node of v.nodes) {
           console.log(`      target: ${JSON.stringify(node.target)}`);
           console.log(`      html: ${node.html.slice(0, 200)}`);
         }
       }
-      console.log(`Incomplete (needs manual review): ${results.incomplete.length}`);
+      console.log(
+        `Incomplete (needs manual review): ${results.incomplete.length}`,
+      );
       for (const v of results.incomplete) {
-        console.log(`  [incomplete] ${v.id}: ${v.help} (${v.nodes.length} node(s))`);
+        console.log(
+          `  [incomplete] ${v.id}: ${v.help} (${v.nodes.length} node(s))`,
+        );
       }
       console.log(`Passes: ${results.passes.length}`);
 
