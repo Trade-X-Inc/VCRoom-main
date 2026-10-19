@@ -125,6 +125,17 @@ test("A welcome: own address, provider called once, to that address only", async
   expect(mock.hits.sentTo).toEqual([ALICE.email]);
 });
 
+test("every app email is sent with a plain-text part, a clean subject and only our own links", async () => {
+  await welcomeEmailHandler(deps, alice, {});
+  const body = mock.hits.resendBodies[0];
+  expect(body.subject).toBe("Welcome to Lengdon");
+  expect(typeof body.text).toBe("string");
+  expect(body.text.length).toBeGreaterThan(80);
+  expect(body.html).toContain('<html lang="en"');
+  expect(body.html).not.toMatch(/<img|<script/i);
+  for (const m of body.html.matchAll(/href="([^"]*)"/g)) expect(m[1]).toMatch(/^https?:\/\/[^/]+\/app/);
+});
+
 test("A welcome: a recipient in the request is refused and nothing is sent", async () => {
   const r = await welcomeEmailHandler(deps, alice, {
     email: "foreign@example.invalid",

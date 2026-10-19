@@ -32,6 +32,7 @@ export type Mock = {
   baseUrl: string;
   hits: {
     resend: number;
+    resendBodies: any[];
     hubspot: number;
     notion: number;
     auth: number;
@@ -62,6 +63,7 @@ const SESSIONS: Record<
 export async function startMock(): Promise<Mock> {
   const hits = {
     resend: 0,
+    resendBodies: [],
     hubspot: 0,
     notion: 0,
     auth: 0,
@@ -93,6 +95,7 @@ export async function startMock(): Promise<Mock> {
       if (p === "/emails") {
         hits.resend += 1;
         hits.sentTo.push(...(body.to ?? []));
+        hits.resendBodies.push(body);
         return send(res, 200, { id: "mock-email-" + hits.resend });
       }
       if (p.startsWith("/crm/v3/objects/contacts")) {
@@ -268,6 +271,7 @@ export async function startMock(): Promise<Mock> {
     events,
     reset() {
       hits.resend = hits.hubspot = hits.notion = hits.auth = 0;
+      hits.resendBodies = [];
       hits.sentTo.length = 0;
       hits.hubspotBodies.length = 0;
       hits.notionBodies.length = 0;

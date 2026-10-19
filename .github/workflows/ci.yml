@@ -245,7 +245,7 @@ jobs:
       - name: Captcha and password-recovery tests (stubbed widget, intercepted auth requests)
         env:
           A11Y_SCAN_BASE_URL: "http://localhost:8788"
-        run: npx playwright test tests/auth-captcha.spec.ts tests/auth-recovery.spec.ts --reporter=list
+        run: npx playwright test tests/auth-captcha.spec.ts tests/auth-recovery.spec.ts tests/email-a11y.spec.ts --reporter=list
 
   dependency-audit:
     name: Dependency vulnerability scan
