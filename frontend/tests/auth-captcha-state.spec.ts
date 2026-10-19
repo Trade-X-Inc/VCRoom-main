@@ -76,6 +76,22 @@ test("after an attempt the widget is reset and a NEW token is needed", () => {
   expect(tokenForRequest(next)).toBe("t2");
 });
 
+test("an interactive challenge tells the visitor what to do, never enables submit, and never drops a token", () => {
+  const waiting = run([{ type: "rendered" }, { type: "interactive" }]);
+  expect(waiting.status).toBe("interactive");
+  expect(statusText(waiting)).toMatch(/tick the box/i);
+  expect(isFailure(waiting)).toBe(false);
+  expect(canSubmit(waiting)).toBe(false);
+  expect(run([{ type: "interactive_done" }], waiting).status).toBe("verifying");
+  const verified = run([
+    { type: "rendered" },
+    { type: "token", token: "t1" },
+    { type: "interactive" },
+  ]);
+  expect(verified.status).toBe("verified"); // a late interactive event cannot undo a token
+  expect(run([{ type: "interactive_done" }], verified).status).toBe("verified");
+});
+
 test("an expired token is dropped and cannot be sent", () => {
   const s = run([
     { type: "rendered" },

@@ -21,18 +21,22 @@ const STUB = `
       var id = "w" + (++n); widgets[id] = o; T.renders++;
       el.innerHTML = '<span>stub widget</span>';
       if (T.mode === "error") setTimeout(function () { o["error-callback"] && o["error-callback"](); }, 20);
+      if (T.mode === "interactive") setTimeout(function () { o["before-interactive-callback"] && o["before-interactive-callback"](); }, 20);
       return id;
     },
     reset: function (id) { T.resets++; },
     remove: function () {}
   };
-  T.deliver = function () { for (var k in widgets) deliver(k); };
+  T.deliver = function () { for (var k in widgets) { var o = widgets[k]; if (T.mode === "interactive" && o["after-interactive-callback"]) o["after-interactive-callback"](); deliver(k); } };
   T.expire = function () { for (var k in widgets) widgets[k]["expired-callback"] && widgets[k]["expired-callback"](); };
 })();`;
 
 type Seen = { url: string; method: string; body: string };
 
-async function setup(page: Page, mode: "hold" | "error" | "blocked" = "hold") {
+async function setup(
+  page: Page,
+  mode: "hold" | "error" | "blocked" | "interactive" = "hold",
+) {
   const seen: Seen[] = [];
   await page.addInitScript((m) => {
     (window as unknown as { __TS_MODE: string }).__TS_MODE = m;
@@ -241,6 +245,53 @@ test.describe("CAPTCHA wiring", () => {
     );
     expect(url.searchParams.get("provider")).toBe("google");
     expect(url.search).not.toMatch(/captcha/i);
+  });
+
+  test("when Cloudflare waits for the visitor, the page says so, then reaches Verified after the tick", async ({
+    page,
+  }) => {
+    await setup(page, "interactive");
+    await page.goto(BASE + "/sign-in");
+    await expect(page.getByTestId("turnstile-status")).toContainText(
+      "Tick the box",
+    );
+    await expect(
+      page.getByRole("button", { name: "Sign in", exact: true }),
+    ).toBeDisabled();
+    await deliver(page);
+    await expect(page.getByTestId("turnstile-status")).toHaveText("Verified");
+    await expect(
+      page.getByRole("button", { name: "Sign in", exact: true }),
+    ).toBeEnabled();
+  });
+
+  test("the Google button: official G mark inline, accessible name, 44px target, visible focus", async ({
+    page,
+  }) => {
+    await setup(page, "error");
+    await page.goto(BASE + "/sign-in");
+    const google = page.getByRole("button", { name: "Continue with Google" });
+    await expect(google).toBeVisible();
+    expect((await google.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    const mark = google.locator("svg");
+    await expect(mark).toHaveAttribute("aria-hidden", "true");
+    const fills = await mark
+      .locator("path")
+      .evaluateAll((els) => els.map((e) => e.getAttribute("fill")));
+    expect(fills).toEqual(["#EA4335", "#4285F4", "#FBBC05", "#34A853"]);
+    await expect(google.locator("img")).toHaveCount(0); // no remote or raster image
+    await google.focus();
+    const ring = await google.evaluate((el) => {
+      const c = getComputedStyle(el);
+      return {
+        style: c.outlineStyle,
+        width: parseFloat(c.outlineWidth),
+        shadow: c.boxShadow,
+      };
+    });
+    expect(
+      ring.style !== "none" && ring.width > 0 ? true : ring.shadow !== "none",
+    ).toBe(true);
   });
 
   test("the widget status is a polite live region with an accessible group name", async ({
