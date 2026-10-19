@@ -1,8 +1,7 @@
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { syncContactToHubSpot } from '@/lib/hubspot'
-import { submitWaitlistEntry } from '@/lib/notion-waitlist'
+import { submitWaitlistForm } from '@/lib/public-forms-fn'
 
 // Waitlist wiring pass, 9 Sep 2026 — new signups are paused; this page
 // no longer creates real accounts. AUTH LOGIC (src/lib/auth.tsx,
@@ -75,28 +74,15 @@ function SignUp() {
       })
       if (dbError) console.error('[sign-up] waitlist insert failed:', dbError)
 
-      const [firstName, ...rest] = name.trim().split(' ')
-      await syncContactToHubSpot({
+      // HubSpot and Notion are written by the server function only; the browser never calls them.
+      await submitWaitlistForm({
         data: {
           email: email.trim().toLowerCase(),
-          properties: {
-            firstname: firstName || '',
-            lastname: rest.join(' '),
-            lifecyclestage: 'lead',
-            hs_lead_status: 'NEW',
-            ...(role ? { user_type: role === 'founder' ? 'Founder' : 'Investor' } : {}),
-          },
-        },
-      }).catch((e) => console.error('[sign-up] HubSpot sync failed:', e))
-
-      await submitWaitlistEntry({
-        data: {
           name,
-          email: email.trim().toLowerCase(),
-          role: role || undefined,
+          role: role || '',
           source: 'sign-up page',
         },
-      }).catch((e) => console.error('[sign-up] Notion submit failed:', e))
+      }).catch(() => console.error('[sign-up] CRM submit failed'))
 
       setDone(true)
     } catch (e) {

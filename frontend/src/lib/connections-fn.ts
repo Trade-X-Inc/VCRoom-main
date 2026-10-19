@@ -1,3 +1,4 @@
+import { isUuid } from "@/lib/email/policy";
 import { createServerFn } from "@tanstack/react-start";
 import { requireUser } from "@/lib/require-user-fn";
 import { consumeStepUpToken } from "@/lib/step-up-fn";
@@ -95,6 +96,12 @@ export const processInviteLinkJoin = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const { url, key } = getSupabaseAdmin();
     if (!url || !key) return { ok: false, error: "db_unavailable" };
+
+    // Capability token: anyone holding the link may call this, so the token must be a plain UUID before it is
+    // placed in a query string, and the company name is length-capped.
+    if (!isUuid(data.token) || typeof data.companyName !== "string" || data.companyName.length > 160) {
+      return { ok: false, error: "invalid_or_expired_link" };
+    }
 
     // Validate token still active
     const links: any[] = await sbFetch(

@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { PageHero } from "@/components/site/PageHero";
 import { breadcrumbJsonLd } from "@/lib/breadcrumb";
-import { syncContactToHubSpot } from "@/lib/hubspot";
+import { submitContactForm } from "@/lib/public-forms-fn";
 import { socialMeta } from "@/lib/social-meta";
 
 // Wiring pass, 31 Aug 2026 — pixel-exact port of LENGDONPUBLIC-NEW's
@@ -76,20 +76,16 @@ function Contact() {
     setSubmitting(true);
     setError("");
     try {
-      const [firstName, ...rest] = form.name.trim().split(" ");
-      await syncContactToHubSpot({
+      const res = await submitContactForm({
         data: {
           email: form.email.trim().toLowerCase(),
-          properties: {
-            firstname: firstName || "",
-            lastname: rest.join(" "),
-            company: form.company,
-            lifecyclestage: "lead",
-            hs_lead_status: "NEW",
-            message: `[${form.reason}] ${form.message}`.trim(),
-          },
+          name: form.name,
+          company: form.company,
+          reason: form.reason,
+          message: form.message,
         },
       });
+      if (!res.ok) throw new Error("rejected");
       setSubmitted(true);
     } catch {
       setError("Something went wrong sending your message. Please email us directly instead.");

@@ -79,7 +79,7 @@ async function callOpenAI(
     getEnvVar("OPENAI_API_KEY") ||
     "";
 
-  console.log("[AI] callOpenAI — key exists:", !!apiKey, "prefix:", apiKey ? apiKey.slice(0, 8) : "MISSING");
+  console.log("[AI] callOpenAI — key configured:", !!apiKey);
 
   if (!apiKey) throw new Error("OpenAI API key not configured on server");
 

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { syncContactToHubSpot } from "@/lib/hubspot";
+import { syncOwnContact } from "@/lib/public-forms-fn";
 import { Briefcase, ArrowUpRight, Plus, X, Loader2, Search, MoreHorizontal, Trash2, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import { PageGuide } from "@/components/app/PageGuide";
 import { useState, useEffect, useRef } from "react";
@@ -706,16 +706,10 @@ function CreateRoomForm({
       // still no user-facing state, since a founder creating a room has no
       // actionable response to "your CRM sync failed."
       const { data: { session: s } } = await supabase.auth.getSession();
-      if (s?.user?.email) {
-        syncContactToHubSpot({
-          data: {
-            email: s.user.email,
-            properties: {
-              lifecyclestage: "marketingqualifiedlead",
-              deal_room_created: "true",
-            },
-          },
-        }).catch((err) => console.error("[hubspot] contact sync failed:", err));
+      if (s?.access_token) {
+        syncOwnContact({ data: { accessToken: s.access_token, kind: "deal_room_created" } }).catch(() =>
+          console.error("[hubspot] contact sync failed"),
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create deal room.");

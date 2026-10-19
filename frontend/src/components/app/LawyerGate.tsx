@@ -352,15 +352,7 @@ export function LawyerGate({
 
       if (approve && result.kind === "invite_lawyer" && result.inviteToken && result.lawyerEmail) {
         const { data: { session } } = await supabase.auth.getSession();
-        triggerLawyerInvite({
-          data: {
-            to: result.lawyerEmail,
-            inviterName: session?.user?.user_metadata?.full_name || session?.user?.email || "Your contact",
-            companyName,
-            side: result.side ?? request.side,
-            token: result.inviteToken,
-          },
-        }).catch(() => {});
+        triggerLawyerInvite({ data: { accessToken: session?.access_token, token: result.inviteToken } }).catch(() => {});
         toast.success("Approved — invite sent.");
       } else if (approve && result.kind === "waive_counsel") {
         // Mutual skip: the request row was just flipped to 'approved' by

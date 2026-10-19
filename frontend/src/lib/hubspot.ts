@@ -1,130 +1,92 @@
-import { createServerFn } from "@tanstack/react-start";
+import { safeBase } from "@/lib/email/server-env";
+import { sanitizeHubspotProps } from "@/lib/email/policy";
 
-const PORTAL_ID = "148593751";
+// Plain server module (policy D, CLAUDE.md §20.23). Nothing here is a server function: no client can call it.
+// The policy-checked callers are lib/email/handlers.ts (public forms and a signed-in user's own contact) and the
+// admin-key route /api/hubspot-sync. It never logs an address, a token or any part of one.
+//
+// The three functions that used to live here and were callable by anyone (syncContactToHubSpot with a
+// caller-supplied property map, submitHubSpotForm with hard-coded consent, addHubSpotNote) are removed.
+
 const OWNER_ID = "93128794";
 
-const getToken = (): string => {
+export type HubspotConfig = { baseUrl: string; token: string };
+
+export function readHubspotConfig(): HubspotConfig {
   const cfEnv = (globalThis as any).__cf_env || {};
-  return cfEnv.HUBSPOT_PRIVATE_APP_TOKEN || "";
-};
+  return {
+    baseUrl: safeBase(cfEnv.HUBSPOT_API_BASE || "", "https://api.hubapi.com"),
+    token: cfEnv.HUBSPOT_PRIVATE_APP_TOKEN || "",
+  };
+}
 
-const getHeaders = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${getToken()}`,
-});
-
-// Upsert contact — create or update by email
-export async function upsertHubSpotContact(
+/** Create or update a contact by email. Properties are reduced to the fixed allow-list first. */
+export async function upsertContactWith(
+  cfg: HubspotConfig,
   email: string,
-  properties: Record<string, string>
+  properties: Record<string, string>,
+  fetchImpl: typeof fetch = fetch,
 ): Promise<string | null> {
-  const token = getToken();
-  if (!token) {
-    console.error("[HubSpot] No token — HUBSPOT_PRIVATE_APP_TOKEN not set");
+  if (!cfg.token) {
+    console.error("[HubSpot] token not set; contact not written");
     return null;
   }
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${cfg.token}`,
+  };
 
   try {
-    // Search for existing contact
-    const searchRes = await fetch(
-      "https://api.hubapi.com/crm/v3/objects/contacts/search",
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({
-          filterGroups: [{
-            filters: [{ propertyName: "email", operator: "EQ", value: email }],
-          }],
-          properties: ["email", "firstname"],
-        }),
-      }
-    );
-    const search = await searchRes.json() as any;
+    const searchRes = await fetchImpl(`${cfg.baseUrl}/crm/v3/objects/contacts/search`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        filterGroups: [{ filters: [{ propertyName: "email", operator: "EQ", value: email }] }],
+        properties: ["email", "firstname"],
+      }),
+    });
+    const search = (await searchRes.json()) as any;
     const existing = search.results?.[0];
 
     const payload = {
       properties: {
         email,
         hubspot_owner_id: OWNER_ID,
-        ...properties,
+        ...sanitizeHubspotProps(properties),
       },
     };
 
     if (existing?.id) {
-      await fetch(
-        `https://api.hubapi.com/crm/v3/objects/contacts/${existing.id}`,
-        { method: "PATCH", headers: getHeaders(), body: JSON.stringify(payload) }
-      );
-      console.log("[HubSpot] Updated contact:", email);
+      await fetchImpl(`${cfg.baseUrl}/crm/v3/objects/contacts/${existing.id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify(payload),
+      });
       return existing.id as string;
     }
 
-    const createRes = await fetch(
-      "https://api.hubapi.com/crm/v3/objects/contacts",
-      { method: "POST", headers: getHeaders(), body: JSON.stringify(payload) }
-    );
-    const created = await createRes.json() as any;
-    console.log("[HubSpot] Created contact:", email, "id:", created.id);
+    const createRes = await fetchImpl(`${cfg.baseUrl}/crm/v3/objects/contacts`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const created = (await createRes.json()) as any;
     return created.id ?? null;
-  } catch (e) {
-    console.error("[HubSpot] upsertContact error:", e);
+  } catch {
+    console.error("[HubSpot] contact write failed");
     return null;
   }
 }
 
-// Submit to HubSpot Forms API (no auth needed — uses portal ID + form ID)
-export async function submitHubSpotForm(
-  formId: string,
-  fields: { name: string; value: string }[]
-): Promise<void> {
-  try {
-    await fetch(
-      `https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${formId}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fields: fields.map((f) => ({
-            objectTypeId: "0-1",
-            name: f.name,
-            value: f.value,
-          })),
-          legalConsentOptions: {
-            consent: { consentToProcess: true, text: "I agree to receive communications from Lengdon." },
-          },
-        }),
-      }
-    );
-  } catch (e) {
-    console.error("[HubSpot Form]", e);
-  }
+export async function upsertHubSpotContact(
+  email: string,
+  properties: Record<string, string>,
+): Promise<string | null> {
+  return upsertContactWith(readHubspotConfig(), email, properties);
 }
 
-// Add a note to a contact
-export async function addHubSpotNote(contactId: string, body: string): Promise<void> {
-  try {
-    await fetch("https://api.hubapi.com/crm/v3/objects/notes", {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify({
-        properties: {
-          hs_note_body: body,
-          hs_timestamp: new Date().toISOString(),
-        },
-        associations: [{
-          to: { id: contactId },
-          types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 202 }],
-        }],
-      }),
-    });
-  } catch (e) {
-    console.error("[HubSpot Note]", e);
-  }
-}
-
-// Bulk sync of a caller-supplied user list to HubSpot (admin-key route /api/hubspot-sync).
-// The list used to be hard-coded in this file (8 real addresses); it was removed on 19 Oct 2026.
-// With no list supplied this does nothing.
+// Bulk sync of a caller-supplied user list (admin-key route /api/hubspot-sync, which validates and size-caps the
+// list). The list used to be hard-coded in this file; it was removed on 19 Oct 2026. With no list this does nothing.
 export type BulkSyncUser = {
   email: string;
   firstname?: string;
@@ -134,40 +96,26 @@ export type BulkSyncUser = {
 };
 
 export async function bulkSyncUsersToHubSpot(users: BulkSyncUser[] = []): Promise<void> {
-  const cfEnv = (globalThis as any).__cf_env || {};
-  const token = cfEnv.HUBSPOT_PRIVATE_APP_TOKEN || "";
-  if (!token) {
-    console.error("[HubSpot] No token for bulk sync");
+  const cfg = readHubspotConfig();
+  if (!cfg.token) {
+    console.error("[HubSpot] token not set; bulk sync skipped");
     return;
   }
   if (users.length === 0) {
-    console.error("[HubSpot] Bulk sync called with no users; nothing to do");
+    console.error("[HubSpot] bulk sync called with no users; nothing to do");
     return;
   }
 
   for (const u of users) {
-    await upsertHubSpotContact(u.email, {
+    await upsertContactWith(cfg, u.email, {
       firstname: u.firstname ?? "",
       lastname: u.lastname ?? "",
       lifecyclestage: "lead",
       hs_lead_status: "NEW",
       user_type: u.role === "founder" ? "Founder" : "Investor",
       platform_signup_date: u.created,
-      hubspot_owner_id: OWNER_ID,
     });
     await new Promise((r) => setTimeout(r, 300));
   }
-  console.log(`[HubSpot] Bulk sync complete — ${users.length} users synced`);
+  console.log(`[HubSpot] bulk sync complete, ${users.length} users`);
 }
-
-// Server function — safe to call from client components
-// Runs server-side where __cf_env is available
-export const syncContactToHubSpot = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { email: string; properties: Record<string, string> })
-  .handler(async ({ data }) => {
-    const token = getToken();
-    console.log("[HubSpot] syncContactToHubSpot called for:", data.email);
-    console.log("[HubSpot] Token exists:", !!token, "prefix:", token.slice(0, 8));
-    const id = await upsertHubSpotContact(data.email, data.properties);
-    return { ok: true, contactId: id };
-  });

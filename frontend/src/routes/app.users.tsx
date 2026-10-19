@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
+import { currentAccessToken } from "@/lib/session-token";
 import { FOUNDER_ROLES, FOUNDER_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
 import { PermissionGate } from "@/components/app/PermissionGate";
 import { LcsButton, LcsEmptyState, LcsModal, LcsTextField, LcsSelectField } from "@/components/lcs";
@@ -207,15 +208,9 @@ function UsersPage() {
     const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await supabase.from("team_invites").update({ expires_at: newExpiry }).eq("id", invite.id);
     if (error) { console.error("[team] invite renew failed:", error); toast.error("Could not resend invite."); return; }
-    triggerStartupTeamInvite({
-      data: {
-        to: invite.email,
-        inviterName: startup?.founder_name ?? user?.name ?? "Your team",
-        companyName: startup?.company_name ?? "the company",
-        role: invite.role,
-        token: invite.token,
-      },
-    }).catch(() => {});
+    currentAccessToken()
+      .then((accessToken) => triggerStartupTeamInvite({ data: { accessToken, token: invite.token } }))
+      .catch(() => {});
     toast.success("Invite resent");
     invalidate();
   };
@@ -561,15 +556,9 @@ function InviteModal({
         .single();
       if (error) throw error;
       if (data?.token) {
-        triggerStartupTeamInvite({
-          data: {
-            to: email.trim().toLowerCase(),
-            inviterName: inviterName || "Your team",
-            companyName: startup.company_name ?? "the company",
-            role,
-            token: data.token,
-          },
-        }).catch(() => {});
+        currentAccessToken()
+          .then((accessToken) => triggerStartupTeamInvite({ data: { accessToken, token: data.token } }))
+          .catch(() => {});
       }
       toast.success(`Invite sent to ${email.trim()}`);
       onSent();

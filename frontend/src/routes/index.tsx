@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { syncContactToHubSpot } from "@/lib/hubspot";
+import { submitDemoRequest } from "@/lib/public-forms-fn";
 import { socialMeta } from "@/lib/social-meta";
 
 // Public site rebuild, 31 Aug 2026 — pixel-exact reproduction of
@@ -599,20 +599,15 @@ function DemoSection() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const [firstName, ...rest] = formData.name.trim().split(" ");
-      await syncContactToHubSpot({
+      const res = await submitDemoRequest({
         data: {
           email: formData.email.trim().toLowerCase(),
-          properties: {
-            firstname: firstName || "",
-            lastname: rest.join(" "),
-            company: formData.company,
-            lifecyclestage: "lead",
-            hs_lead_status: "NEW",
-            message: `[Book a product demo] Requested slot: ${formData.slot}`,
-          },
+          name: formData.name,
+          company: formData.company,
+          slot: formData.slot,
         },
       });
+      if (!res.ok) throw new Error("rejected");
       setSubmitted(true);
     } catch {
       setSubmitError("Something went wrong booking your demo. Please email sales@lengdon.com instead.");

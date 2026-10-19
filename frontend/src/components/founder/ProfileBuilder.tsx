@@ -590,7 +590,7 @@ export function ProfileBuilder({ startupId, userId }: { startupId: string; userI
 
                           <LcsButton
                             variant="secondary"
-                            onClick={() => console.log(`AI extraction from document — Claude Code will wire to edge function [section: ${key}]`)}
+                            onClick={() => console.log("AI extraction from document is not wired yet")}
                             className="inline-flex items-center gap-1.5 text-[12px]"
                             title="Upload a document above and AI will extract relevant data into this section"
                             data-testid={`extract-section-${key}`}

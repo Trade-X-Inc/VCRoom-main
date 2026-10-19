@@ -23,6 +23,7 @@ import { extractDocumentText } from "@/lib/document-extractor";
 import { withTimeout, AITimeoutError } from "@/lib/with-timeout";
 import { AI_TIMEOUT_MESSAGE } from "@/hooks/useTimedAI";
 import { triggerDocumentUploadedEmail } from "@/lib/email/triggers";
+import { currentAccessToken } from "@/lib/session-token";
 import { useGeneratedNdaDocs } from "@/lib/store";
 import { useDealRoom } from "@/hooks/useDealRoom";
 
@@ -613,9 +614,11 @@ function DocumentsPage() {
             onUploadComplete={(fileName) => {
               queryClient.invalidateQueries({ queryKey: ["documents", dealRoomId] });
               if (fileName && userId) {
-                triggerDocumentUploadedEmail({
-                  data: { dealRoomId, documentName: fileName, uploaderUserId: userId },
-                }).catch(() => {});
+                currentAccessToken()
+                  .then((accessToken) =>
+                    triggerDocumentUploadedEmail({ data: { accessToken, dealRoomId, documentName: fileName } }),
+                  )
+                  .catch(() => {});
                 // §B — future migration group: deal_room_members read (deal-room-core group).
                 supabase
                   .from("deal_room_members")

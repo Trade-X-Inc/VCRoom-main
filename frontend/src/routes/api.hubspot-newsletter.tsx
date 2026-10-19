@@ -1,21 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { upsertHubSpotContact } from "@/lib/hubspot";
 
-const handleNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { email: string })
-  .handler(async ({ data }) => {
-    if (!data.email) return { error: "No email" };
-    console.log("[HubSpot Newsletter] called for:", data.email);
-    await upsertHubSpotContact(data.email.trim().toLowerCase(), {
-      lifecyclestage: "subscriber",
-      hs_lead_status: "NEW",
-    });
-    return { ok: true };
-  });
-
+// The server function that used to live here (handleNewsletter) accepted any address from anyone and wrote it to
+// HubSpot. It had no callers and is removed; the footer newsletter now goes through submitWaitlistForm in
+// lib/public-forms-fn.ts (strict validation, fixed property allow-list). CLAUDE.md §20.23.
 export const Route = createFileRoute("/api/hubspot-newsletter")({
   component: () => null,
 });
-
-export { handleNewsletter };

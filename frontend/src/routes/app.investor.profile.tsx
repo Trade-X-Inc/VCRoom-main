@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { sendInviteEmail } from "@/lib/invite-fn";
+import { sendDealRoomInvite } from "@/lib/email/triggers";
 import { logActivity } from "@/lib/activity-log-fn";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { OnboardingTour } from "@/components/app/OnboardingTour";
@@ -1571,7 +1571,7 @@ function InvestorTeamSection({ profileId, investorUserId, investorName, fundName
         if (mf.email.trim() && user?.id) {
           try {
             const { data: { session } } = await supabase.auth.getSession();
-            await sendInviteEmail({ data: { dealRoomId: profileId, email: mf.email.trim(), role: "investor", invitedBy: user.id, userAccessToken: session?.access_token ?? "", supabaseUrl: import.meta.env.VITE_SUPABASE_URL, supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY, appUrl: import.meta.env.VITE_APP_URL, dealRoomName: fundName || "the fund", founderName: investorName || undefined } });
+            await sendDealRoomInvite({ data: { accessToken: session?.access_token, dealRoomId: profileId, email: mf.email.trim(), role: "investor", dealRoomName: fundName || "the fund", founderName: investorName || undefined } });
           } catch { /* ignore invite errors */ }
         }
         toast.success("Team member added");

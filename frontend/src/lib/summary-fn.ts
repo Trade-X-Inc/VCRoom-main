@@ -1,3 +1,5 @@
+import { requireUser } from "@/lib/require-user-fn";
+import { isUuid } from "@/lib/email/policy";
 import { createServerFn } from "@tanstack/react-start";
 import { INSTRUMENT_TEMPLATES, type InstrumentType } from "@/lib/term-templates";
 
@@ -151,11 +153,11 @@ export const regenerateSummary = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { url, key } = getEnv();
     if (!url || !key) return { ok: false, error: "no_env" };
-    // JWT -> uid
-    const ur = await fetch(`${url}/auth/v1/user`, { headers: { apikey: key, Authorization: `Bearer ${data.accessToken}` } });
-    if (!ur.ok) return { ok: false, error: "not_authenticated" };
-    const uid = ((await ur.json()) as { id?: string }).id;
-    if (!uid) return { ok: false, error: "not_authenticated" };
+    // JWT -> uid, through the shared helper
+    if (!isUuid(data.dealRoomId)) return { ok: false, error: "not_authorized" };
+    const auth = await requireUser(data.accessToken);
+    if (!auth.ok) return { ok: false, error: "not_authenticated" };
+    const uid = auth.uid;
     // principal check
     const rows: any[] = await sb(url, key,
       `deal_room_members?deal_room_id=eq.${data.dealRoomId}&user_id=eq.${uid}&role=in.(founder,investor)&select=role`)

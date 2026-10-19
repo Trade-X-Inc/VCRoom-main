@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { syncContactToHubSpot } from "@/lib/hubspot";
-import { submitWaitlistEntry } from "@/lib/notion-waitlist";
+import { submitWaitlistForm } from "@/lib/public-forms-fn";
 
 // SEO-020 Phase 2 — shared submission path for the new WaitlistPrompt
 // popup, factored out rather than reusing sign-up.tsx or SiteFooter.tsx
@@ -57,25 +56,10 @@ export async function submitToWaitlist({ email, role, source }: SubmitWaitlistAr
       return { ok: false, error: "Something went wrong. Please try again." };
     }
 
-    syncContactToHubSpot({
-      data: {
-        email: normalizedEmail,
-        properties: {
-          lifecyclestage: "lead",
-          hs_lead_status: "NEW",
-          ...(role ? { user_type: role === "founder" ? "Founder" : "Investor" } : {}),
-        },
-      },
-    }).catch((e) => console.error("[waitlist] HubSpot sync failed:", e));
-
-    submitWaitlistEntry({
-      data: {
-        name: normalizedEmail,
-        email: normalizedEmail,
-        role,
-        source,
-      },
-    }).catch((e) => console.error("[waitlist] Notion submit failed:", e));
+    // HubSpot and Notion are written by the server function only; the browser never calls them.
+    submitWaitlistForm({
+      data: { email: normalizedEmail, name: "", ...(role ? { role } : {}), source },
+    }).catch(() => console.error("[waitlist] CRM submit failed"));
 
     return { ok: true };
   } catch (e) {

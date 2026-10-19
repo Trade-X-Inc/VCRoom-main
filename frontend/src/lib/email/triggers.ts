@@ -1,363 +1,88 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
-import { getEnvVar } from "@/lib/env";
-import { sendEmail, APP_URL } from "./resend";
+import { requireUserIdentity } from "@/lib/require-user-fn";
+import { readProviderEnv } from "./server-env";
 import {
-  welcomeEmail,
-  dealRoomInviteEmail,
-  ndaSignedEmail,
-  investorDecisionEmail,
-  documentUploadedEmail,
-  meetingScheduledEmail,
-  feedbackRequestEmail,
-  startupTeamInviteEmail,
-  lawyerInviteEmail,
-} from "./templates";
+  welcomeEmailHandler,
+  ndaSignedEmailHandler,
+  documentUploadedEmailHandler,
+  startupTeamInviteHandler,
+  lawyerInviteHandler,
+  dealRoomInviteHandler,
+} from "./handlers";
 
-function getServiceClient() {
-  const cfEnv = (globalThis as any).__cf_env || {};
-  const url = cfEnv.VITE_SUPABASE_URL || cfEnv.SUPABASE_URL || getEnvVar("VITE_SUPABASE_URL") || getEnvVar("SUPABASE_URL");
-  const key = cfEnv.SUPABASE_SERVICE_ROLE_KEY || getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
-  return createClient(url, key);
+// The five server functions that can send email (CLAUDE.md §20.23). Each one resolves the caller from their own
+// access token first and answers { ok:false, error:"not_authenticated" } before anything else happens. None takes a
+// recipient in its request: the address is the session's own (A), a member of a room the caller belongs to (B), or
+// the address on an invite record the caller created (E). The policy checks live in handlers.ts and policy.ts.
+//
+// Removed on 19 Oct 2026 (policy D, zero callers anywhere in the codebase, each took a free-form recipient from the
+// request): triggerDealRoomInvite, triggerNdaSigned, triggerDecision, triggerDocumentUploaded,
+// triggerMeetingScheduled, triggerFeedbackRequest, triggerDecisionEmail, triggerMeetingEmail.
+
+type WithToken<T> = { accessToken?: string } & T;
+
+function splitToken(data: unknown): { accessToken: string | undefined; rest: unknown } {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return { accessToken: undefined, rest: null };
+  const { accessToken, ...rest } = data as Record<string, unknown>;
+  return { accessToken: typeof accessToken === "string" ? accessToken : undefined, rest };
 }
 
-// ── Welcome email — called on first signup ─────────────────────────────────
-
+// A: welcome email, to the signed-in user's own address.
 export const triggerWelcomeEmail = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { userId: string; name: string; role: "founder" | "investor"; email: string })
+  .inputValidator((d: unknown) => d as WithToken<Record<string, never>>)
   .handler(async ({ data }) => {
-    const { subject, html } = welcomeEmail({ name: data.name, role: data.role });
-    const result = await sendEmail({
-      to: data.email,
-      subject,
-      html,
-      tags: [{ name: "type", value: "welcome" }, { name: "role", value: data.role }],
-    });
-    if (result?.id) {
-      try {
-        const { error: evErr } = await getServiceClient().from("email_events").insert({
-          event_type: "email.sent",
-          email_id: result.id,
-          to_email: data.email,
-          tags: [{ type: "welcome" }],
-        });
-        if (evErr) console.error("[email] event log failed:", evErr.message);
-      } catch {}
-    }
-    return result;
+    const { accessToken, rest } = splitToken(data);
+    const auth = await requireUserIdentity(accessToken);
+    if (!auth.ok) return { ok: false as const, error: auth.error };
+    return welcomeEmailHandler({ env: readProviderEnv() }, auth.identity, rest);
   });
 
-// ── Deal room invite ───────────────────────────────────────────────────────
-
-export const triggerDealRoomInvite = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    to: string;
-    investorName: string;
-    founderName: string;
-    companyName: string;
-    inviteToken: string;
-    stage?: string;
-    sector?: string;
-  })
-  .handler(async ({ data }) => {
-    const inviteLink = `${APP_URL}/join/${data.inviteToken}`;
-    const { subject, html } = dealRoomInviteEmail({
-      investorName: data.investorName || "there",
-      founderName: data.founderName,
-      companyName: data.companyName,
-      inviteLink,
-      companyStage: data.stage,
-      companySector: data.sector,
-    });
-    return sendEmail({
-      to: data.to,
-      subject,
-      html,
-      tags: [{ name: "type", value: "deal-room-invite" }],
-    });
-  });
-
-// ── NDA signed ─────────────────────────────────────────────────────────────
-
-export const triggerNdaSigned = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    founderEmail: string;
-    founderName: string;
-    investorName: string;
-    investorEmail: string;
-    companyName: string;
-    dealRoomId: string;
-  })
-  .handler(async ({ data }) => {
-    const { subject, html } = ndaSignedEmail({
-      founderName: data.founderName,
-      investorName: data.investorName,
-      investorEmail: data.investorEmail,
-      companyName: data.companyName,
-      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-    });
-    return sendEmail({
-      to: data.founderEmail,
-      subject,
-      html,
-      tags: [{ name: "type", value: "nda-signed" }],
-    });
-  });
-
-// ── Investment decision ────────────────────────────────────────────────────
-
-export const triggerDecision = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    founderEmail: string;
-    founderName: string;
-    investorName: string;
-    companyName: string;
-    decision: "Invest" | "Hold" | "Pass";
-    dealRoomId: string;
-    note?: string;
-  })
-  .handler(async ({ data }) => {
-    const { subject, html } = investorDecisionEmail({
-      founderName: data.founderName,
-      investorName: data.investorName,
-      companyName: data.companyName,
-      decision: data.decision,
-      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-      note: data.note,
-    });
-    return sendEmail({
-      to: data.founderEmail,
-      subject,
-      html,
-      tags: [{ name: "type", value: "decision" }, { name: "decision", value: data.decision }],
-    });
-  });
-
-// ── Document uploaded ──────────────────────────────────────────────────────
-
-export const triggerDocumentUploaded = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    investorEmail: string;
-    investorName: string;
-    founderName: string;
-    companyName: string;
-    documentName: string;
-    dealRoomId: string;
-  })
-  .handler(async ({ data }) => {
-    const { subject, html } = documentUploadedEmail({
-      investorName: data.investorName,
-      founderName: data.founderName,
-      companyName: data.companyName,
-      documentName: data.documentName,
-      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-    });
-    return sendEmail({
-      to: data.investorEmail,
-      subject,
-      html,
-      tags: [{ name: "type", value: "document-uploaded" }],
-    });
-  });
-
-// ── Meeting scheduled ──────────────────────────────────────────────────────
-
-export const triggerMeetingScheduled = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    recipientEmail: string;
-    recipientName: string;
-    organizerName: string;
-    companyName: string;
-    meetingTitle: string;
-    meetingDate: string;
-    meetingLink?: string;
-    dealRoomId: string;
-  })
-  .handler(async ({ data }) => {
-    const { subject, html } = meetingScheduledEmail({
-      recipientName: data.recipientName,
-      organizerName: data.organizerName,
-      companyName: data.companyName,
-      meetingTitle: data.meetingTitle,
-      meetingDate: data.meetingDate,
-      meetingLink: data.meetingLink,
-      dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-    });
-    return sendEmail({
-      to: data.recipientEmail,
-      subject,
-      html,
-      tags: [{ name: "type", value: "meeting-scheduled" }],
-    });
-  });
-
-// ── 7-day feedback request ─────────────────────────────────────────────────
-
-export const triggerFeedbackRequest = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { name: string; email: string; role: "founder" | "investor" })
-  .handler(async ({ data }) => {
-    const { subject, html } = feedbackRequestEmail({ name: data.name, role: data.role });
-    return sendEmail({
-      to: data.email,
-      subject,
-      html,
-      tags: [{ name: "type", value: "feedback-request" }],
-    });
-  });
-
-// ── Deal-room server-lookup variants (called from client with only IDs) ────
-
+// B: the investor who signed tells the room's founder(s).
 export const triggerNdaSignedEmail = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string; investorUserId: string })
+  .inputValidator((d: unknown) => d as WithToken<{ dealRoomId: string }>)
   .handler(async ({ data }) => {
-    try {
-      const db = getServiceClient();
-      const [{ data: investor }, { data: room }] = await Promise.all([
-        db.from("users").select("full_name, email").eq("id", data.investorUserId).maybeSingle(),
-        db.from("deal_rooms")
-          .select("*, startups(company_name), deal_room_members(user_id, role, users(full_name, email))")
-          .eq("id", data.dealRoomId).single(),
-      ]);
-      const members: any[] = (room as any)?.deal_room_members ?? [];
-      const founder = members.find((m: any) => m.role === "founder");
-      if (!founder?.users?.email) return null;
-      const { subject, html } = ndaSignedEmail({
-        founderName: founder.users.full_name ?? "the founder",
-        investorName: (investor as any)?.full_name ?? "An investor",
-        investorEmail: (investor as any)?.email ?? "",
-        companyName: (room as any)?.startups?.company_name ?? "the startup",
-        dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-      });
-      return sendEmail({ to: founder.users.email, subject, html, tags: [{ name: "type", value: "nda-signed" }] });
-    } catch (e) { console.error("[triggers] NDA email failed:", e); return null; }
+    const { accessToken, rest } = splitToken(data);
+    const auth = await requireUserIdentity(accessToken);
+    if (!auth.ok) return { ok: false as const, error: auth.error };
+    return ndaSignedEmailHandler({ env: readProviderEnv() }, auth.identity, rest);
   });
 
-export const triggerDecisionEmail = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string; investorUserId: string; decision: "Invest" | "Hold" | "Pass"; note?: string })
-  .handler(async ({ data }) => {
-    try {
-      const db = getServiceClient();
-      const [{ data: investor }, { data: room }] = await Promise.all([
-        db.from("users").select("full_name").eq("id", data.investorUserId).maybeSingle(),
-        db.from("deal_rooms")
-          .select("*, startups(company_name), deal_room_members(user_id, role, users(full_name, email))")
-          .eq("id", data.dealRoomId).single(),
-      ]);
-      const members: any[] = (room as any)?.deal_room_members ?? [];
-      const founder = members.find((m: any) => m.role === "founder");
-      if (!founder?.users?.email) return null;
-      const { subject, html } = investorDecisionEmail({
-        founderName: founder.users.full_name ?? "the founder",
-        investorName: (investor as any)?.full_name ?? "An investor",
-        companyName: (room as any)?.startups?.company_name ?? "the startup",
-        decision: data.decision,
-        dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-        note: data.note,
-      });
-      return sendEmail({ to: founder.users.email, subject, html, tags: [{ name: "type", value: "decision" }, { name: "decision", value: data.decision }] });
-    } catch (e) { console.error("[triggers] Decision email failed:", e); return null; }
-  });
-
-export const triggerMeetingEmail = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string; organizerUserId: string; meetingTitle: string; meetingDate: string; meetingLink?: string })
-  .handler(async ({ data }) => {
-    try {
-      const db = getServiceClient();
-      const { data: room } = await db.from("deal_rooms")
-        .select("*, startups(company_name), deal_room_members(user_id, role, users(full_name, email))")
-        .eq("id", data.dealRoomId).single();
-      const members: any[] = (room as any)?.deal_room_members ?? [];
-      const organizer = members.find((m: any) => m.user_id === data.organizerUserId);
-      const organizerName = organizer?.users?.full_name ?? "Your contact";
-      const recipients = members.filter((m: any) => m.user_id !== data.organizerUserId && m.users?.email);
-      await Promise.all(recipients.map((m: any) => {
-        const { subject, html } = meetingScheduledEmail({
-          recipientName: m.users.full_name ?? "there",
-          organizerName,
-          companyName: (room as any)?.startups?.company_name ?? "the startup",
-          meetingTitle: data.meetingTitle,
-          meetingDate: data.meetingDate,
-          meetingLink: data.meetingLink,
-          dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-        });
-        return sendEmail({ to: m.users.email, subject, html, tags: [{ name: "type", value: "meeting-scheduled" }] });
-      }));
-    } catch (e) { console.error("[triggers] Meeting email failed:", e); }
-  });
-
-// ── Startup team invite ────────────────────────────────────────────────────
-
-export const triggerStartupTeamInvite = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    to: string;
-    inviterName: string;
-    companyName: string;
-    role: string;
-    token: string;
-  })
-  .handler(async ({ data }) => {
-    const inviteLink = `${APP_URL}/join?token=${data.token}`;
-    const { subject, html } = startupTeamInviteEmail({
-      inviterName: data.inviterName,
-      companyName: data.companyName,
-      role: data.role,
-      inviteLink,
-    });
-    return sendEmail({
-      to: data.to,
-      subject,
-      html,
-      tags: [{ name: "type", value: "startup-team-invite" }],
-    });
-  });
-
-// ── R14B — lawyer / legal counsel invite (room-scoped only) ────────────────
-
-export const triggerLawyerInvite = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as {
-    to: string;
-    inviterName: string;
-    companyName: string;
-    side: "founder" | "investor";
-    token: string;
-  })
-  .handler(async ({ data }) => {
-    const inviteLink = `${APP_URL}/join-room?token=${data.token}`;
-    const { subject, html } = lawyerInviteEmail({
-      inviterName: data.inviterName,
-      companyName: data.companyName,
-      side: data.side,
-      inviteLink,
-    });
-    return sendEmail({
-      to: data.to,
-      subject,
-      html,
-      tags: [{ name: "type", value: "lawyer-invite" }],
-    });
-  });
-
+// B: a member uploads a document; the room's investors are told.
 export const triggerDocumentUploadedEmail = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => d as { dealRoomId: string; documentName: string; uploaderUserId: string })
+  .inputValidator((d: unknown) => d as WithToken<{ dealRoomId: string; documentName: string }>)
   .handler(async ({ data }) => {
-    try {
-      const db = getServiceClient();
-      const { data: room } = await db.from("deal_rooms")
-        .select("*, startups(company_name), deal_room_members(user_id, role, users(full_name, email))")
-        .eq("id", data.dealRoomId).single();
-      const members: any[] = (room as any)?.deal_room_members ?? [];
-      const uploader = members.find((m: any) => m.user_id === data.uploaderUserId);
-      const founderName = uploader?.users?.full_name ?? "the founder";
-      const investors = members.filter((m: any) => m.role === "investor" && m.users?.email);
-      await Promise.all(investors.map((inv: any) => {
-        const { subject, html } = documentUploadedEmail({
-          investorName: inv.users.full_name ?? "there",
-          founderName,
-          companyName: (room as any)?.startups?.company_name ?? "the startup",
-          documentName: data.documentName,
-          dealRoomUrl: `${APP_URL}/app/deal-rooms/${data.dealRoomId}`,
-        });
-        return sendEmail({ to: inv.users.email, subject, html, tags: [{ name: "type", value: "document-uploaded" }] });
-      }));
-    } catch (e) { console.error("[triggers] Document email failed:", e); }
+    const { accessToken, rest } = splitToken(data);
+    const auth = await requireUserIdentity(accessToken);
+    if (!auth.ok) return { ok: false as const, error: auth.error };
+    return documentUploadedEmailHandler({ env: readProviderEnv() }, auth.identity, rest);
+  });
+
+// E: team invite. The request carries only the invite token, which the creator got back when the record was made.
+export const triggerStartupTeamInvite = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as WithToken<{ token: string }>)
+  .handler(async ({ data }) => {
+    const { accessToken, rest } = splitToken(data);
+    const auth = await requireUserIdentity(accessToken);
+    if (!auth.ok) return { ok: false as const, error: auth.error };
+    return startupTeamInviteHandler({ env: readProviderEnv() }, auth.identity, rest);
+  });
+
+// E: legal counsel invite, same shape.
+export const triggerLawyerInvite = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as WithToken<{ token: string }>)
+  .handler(async ({ data }) => {
+    const { accessToken, rest } = splitToken(data);
+    const auth = await requireUserIdentity(accessToken);
+    if (!auth.ok) return { ok: false as const, error: auth.error };
+    return lawyerInviteHandler({ env: readProviderEnv() }, auth.identity, rest);
+  });
+
+// E: deal-room invite. Creates the invite record with the caller's own token, so row-level security decides.
+export const sendDealRoomInvite = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => d as WithToken<Record<string, unknown>>)
+  .handler(async ({ data }) => {
+    const { accessToken, rest } = splitToken(data);
+    const auth = await requireUserIdentity(accessToken);
+    if (!auth.ok || !accessToken) return { ok: false as const, error: auth.ok ? "not_authenticated" : auth.error };
+    return dealRoomInviteHandler({ env: readProviderEnv() }, auth.identity, accessToken, rest);
   });

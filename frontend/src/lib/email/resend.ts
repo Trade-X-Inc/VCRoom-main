@@ -1,46 +1,35 @@
 import { getEnvVar } from "@/lib/env";
+import { safeBase } from "./server-env";
 
-function getResendKey(): string {
-  const cfEnv = (globalThis as any).__cf_env || {};
-  const key =
-    cfEnv.RESEND_API_KEY ||
-    (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : "") ||
-    "";
-
-  if (!key) {
-    console.error("[Resend] No API key found. Checked: __cf_env.RESEND_API_KEY, process.env.RESEND_API_KEY");
-  }
-  return key;
-}
+// Plain server module (policy D). Callers are the policy-checked handlers in handlers.ts and the admin-key test
+// route. It never logs a recipient, a key or a response body.
 
 export const APP_URL = getEnvVar("VITE_APP_URL") || "https://lengdon.com";
 
-export async function sendEmail({
-  to,
-  subject,
-  html,
-  replyTo,
-  tags,
-}: {
+export type MailerConfig = { baseUrl: string; apiKey: string };
+
+export type OutboundEmail = {
   to: string | string[];
   subject: string;
   html: string;
   replyTo?: string;
   tags?: { name: string; value: string }[];
-}): Promise<{ id: string } | null> {
-  const apiKey = getResendKey();
+};
 
-  if (!apiKey) {
-    console.error("[Resend] RESEND_API_KEY not set — email skipped:", subject);
+export async function sendEmailWith(
+  cfg: MailerConfig,
+  { to, subject, html, replyTo, tags }: OutboundEmail,
+  fetchImpl: typeof fetch = fetch,
+): Promise<{ id: string } | null> {
+  if (!cfg.apiKey) {
+    console.error("[Resend] API key not set; email skipped");
     return null;
   }
 
-  console.log("[Resend] Sending:", subject, "→", to);
-
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await fetchImpl(`${cfg.baseUrl}/emails`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${cfg.apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -53,18 +42,29 @@ export async function sendEmail({
     }),
   });
 
-  const responseText = await res.text();
-  console.log("[Resend] Status:", res.status);
-  console.log("[Resend] Response:", responseText);
-
   if (!res.ok) {
-    console.error("[Resend] Failed:", res.status, responseText);
+    console.error("[Resend] send failed, status", res.status);
     return null;
   }
 
   try {
-    return JSON.parse(responseText);
+    return (await res.json()) as { id: string };
   } catch {
     return null;
   }
+}
+
+export async function sendEmail(
+  msg: OutboundEmail,
+): Promise<{ id: string } | null> {
+  const cfEnv = (globalThis as any).__cf_env || {};
+  const apiKey =
+    cfEnv.RESEND_API_KEY ||
+    (typeof process !== "undefined" ? process.env?.RESEND_API_KEY : "") ||
+    "";
+  const baseUrl = safeBase(
+    getEnvVar("RESEND_API_BASE"),
+    "https://api.resend.com",
+  );
+  return sendEmailWith({ baseUrl, apiKey }, msg);
 }

@@ -38,12 +38,8 @@ const getDiagnostics = createServerFn({ method: "GET" }).handler(async () => {
       authorized: true,
       cf_keys_safe: safeKeys,
       cf_keys_count: Object.keys(cfEnv).length,
-      OPENAI_API_KEY: openaiKey
-        ? `✓ set (${openaiKey.slice(0, 8)}...)`
-        : "✗ missing",
-      RESEND_API_KEY: resendKey
-        ? `✓ set (${resendKey.slice(0, 6)}...)`
-        : "✗ missing",
+      OPENAI_API_KEY: openaiKey ? "✓ set" : "✗ missing",
+      RESEND_API_KEY: resendKey ? "✓ set" : "✗ missing",
       SUPABASE_URL: supabaseUrl ? `✓ set` : "✗ missing",
       SUPABASE_SERVICE_ROLE_KEY: serviceKey ? `✓ set` : "✗ missing",
       note: "Diagnostics only — no email sent. Add &send=1 to run a live Resend test.",

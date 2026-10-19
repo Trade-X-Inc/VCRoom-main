@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { logActivity } from "@/lib/activity-fn";
 import { Logo } from "@/components/brand/Logo";
 import { triggerNdaSignedEmail } from "@/lib/email/triggers";
+import { currentAccessToken } from "@/lib/session-token";
 import { generateNdaDocument } from "@/lib/nda-fn";
 import { LcsButton } from "@/components/lcs";
 
@@ -244,9 +245,9 @@ function NdaPage() {
         })
         .catch((e) => console.warn("[nda] generateNdaDocument failed:", e));
 
-      triggerNdaSignedEmail({
-        data: { dealRoomId, investorUserId: user.id },
-      }).catch(() => {});
+      currentAccessToken()
+        .then((accessToken) => triggerNdaSignedEmail({ data: { accessToken, dealRoomId } }))
+        .catch(() => {});
 
       queryClient.setQueryData(
         ["nda-acceptance", dealRoomId, user.id],

@@ -44,3 +44,61 @@ export async function requireUser(accessToken: string | undefined | null): Promi
     return { ok: false, error: "not_authenticated" };
   }
 }
+
+// ── Verified session identity including the account email ─────────────────────────────────────────
+// For outbound-email and CRM server functions (CLAUDE.md §20.23). The email comes from Supabase Auth's own answer
+// for the caller's token, never from the request. `email_confirmed_at` is returned so a caller can insist on a
+// confirmed address.
+export type SessionIdentity = {
+  uid: string;
+  email: string;
+  emailConfirmed: boolean;
+  fullName: string;
+};
+
+export type RequireIdentityResult =
+  | { ok: true; identity: SessionIdentity }
+  | { ok: false; error: "not_authenticated" | "db_unavailable" };
+
+export async function resolveIdentity(
+  cfg: { url: string; key: string },
+  accessToken: string | undefined | null,
+  fetchImpl: typeof fetch = fetch,
+): Promise<RequireIdentityResult> {
+  if (!accessToken || typeof accessToken !== "string" || accessToken.length > 4096) {
+    return { ok: false, error: "not_authenticated" };
+  }
+  if (!cfg.url || !cfg.key) return { ok: false, error: "db_unavailable" };
+  try {
+    const resp = await fetchImpl(`${cfg.url}/auth/v1/user`, {
+      headers: { apikey: cfg.key, Authorization: `Bearer ${accessToken}` },
+    });
+    if (!resp.ok) return { ok: false, error: "not_authenticated" };
+    const json = (await resp.json()) as {
+      id?: string;
+      email?: string;
+      email_confirmed_at?: string | null;
+      user_metadata?: { full_name?: string; name?: string };
+    };
+    // No id (the anon key has no sub) or no email: not a usable signed-in user.
+    if (!json.id || !json.email) return { ok: false, error: "not_authenticated" };
+    return {
+      ok: true,
+      identity: {
+        uid: json.id,
+        email: json.email,
+        emailConfirmed: !!json.email_confirmed_at,
+        fullName: json.user_metadata?.full_name ?? json.user_metadata?.name ?? "",
+      },
+    };
+  } catch {
+    return { ok: false, error: "not_authenticated" };
+  }
+}
+
+export async function requireUserIdentity(
+  accessToken: string | undefined | null,
+): Promise<RequireIdentityResult> {
+  const { url, key } = getSupabaseConfig();
+  return resolveIdentity({ url, key }, accessToken);
+}

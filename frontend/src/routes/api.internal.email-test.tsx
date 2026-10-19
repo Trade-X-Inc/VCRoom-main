@@ -58,9 +58,8 @@ const runEmailTest = createServerFn({ method: "GET" }).handler(async () => {
     authorized: true,
     success: !!result,
     email_id: result?.id ?? null,
-    key_prefix: apiKey.slice(0, 8) + "...",
     env: {
-      RESEND_API_KEY: "✓ set (" + apiKey.slice(0, 8) + "...)",
+      RESEND_API_KEY: "✓ set",
       SUPABASE_URL: supabaseUrl ? "✓ set" : "✗ missing",
       SUPABASE_SERVICE_ROLE_KEY: hasServiceKey ? "✓ set" : "✗ missing",
     },

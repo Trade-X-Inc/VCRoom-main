@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { triggerStartupTeamInvite } from "@/lib/email/triggers";
+import { currentAccessToken } from "@/lib/session-token";
 import { INVESTOR_ROLES, INVESTOR_PERMISSIONS, PERMISSION_LABELS } from "@/lib/roles";
 import { LcsEmptyState } from "@/components/lcs";
 import { PermissionGate } from "@/components/app/PermissionGate";
@@ -176,15 +177,9 @@ function InvestorTeamPage() {
     const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await supabase.from("team_invites").update({ expires_at: newExpiry }).eq("id", invite.id);
     if (error) { console.error("[team] invite renew failed:", error); toast.error("Could not resend invite."); return; }
-    triggerStartupTeamInvite({
-      data: {
-        to: invite.email,
-        inviterName: user?.name ?? "Your team",
-        companyName: "your investment team",
-        role: invite.role,
-        token: invite.token,
-      },
-    }).catch(() => {});
+    currentAccessToken()
+      .then((accessToken) => triggerStartupTeamInvite({ data: { accessToken, token: invite.token } }))
+      .catch(() => {});
     toast.success("Invite resent");
     invalidate();
   };
@@ -488,15 +483,9 @@ function InviteModal({
         .single();
       if (error) throw error;
       if (data?.token) {
-        triggerStartupTeamInvite({
-          data: {
-            to: email.trim().toLowerCase(),
-            inviterName: inviterName || "Your team",
-            companyName: "your investment team",
-            role,
-            token: data.token,
-          },
-        }).catch(() => {});
+        currentAccessToken()
+          .then((accessToken) => triggerStartupTeamInvite({ data: { accessToken, token: data.token } }))
+          .catch(() => {});
       }
       toast.success(`Invite sent to ${email.trim()}`);
       onSent();

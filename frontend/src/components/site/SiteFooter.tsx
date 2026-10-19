@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { syncContactToHubSpot } from "@/lib/hubspot";
-import { submitWaitlistEntry } from "@/lib/notion-waitlist";
+import { submitWaitlistForm } from "@/lib/public-forms-fn";
 
 // SEO-009 Phase 1 — migrated to PUBLIC-REGISTER.md v2.0 tokens.
 // Structure/spacing/layout/logic unchanged; only font-family and color
@@ -103,16 +102,10 @@ function NewsletterBar() {
       if (error) throw error;
       setState("success");
 
-      syncContactToHubSpot({
-        data: {
-          email: normalizedEmail,
-          properties: { lifecyclestage: "lead", hs_lead_status: "NEW" },
-        },
-      }).catch((e) => console.error("[footer waitlist] HubSpot sync failed:", e));
-
-      submitWaitlistEntry({
-        data: { name: normalizedEmail, email: normalizedEmail, source: "footer newsletter" },
-      }).catch((e) => console.error("[footer waitlist] Notion submit failed:", e));
+      // HubSpot and Notion are written by the server function only; the browser never calls them.
+      submitWaitlistForm({
+        data: { email: normalizedEmail, name: "", source: "footer newsletter" },
+      }).catch(() => console.error("[footer waitlist] CRM submit failed"));
     } catch {
       setState("error");
     }

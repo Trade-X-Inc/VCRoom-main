@@ -62,7 +62,6 @@ export const getAIAdvice = createServerFn({ method: "POST" })
     const cfEnv = (globalThis as any).__cf_env || {};
     const apiKey = cfEnv.OPENAI_API_KEY || cfEnv.OPEN_AI_API_KEY || cfEnv["OPEN AI API KEY"] || "";
     console.log('[deal-advisor] key present:', !!apiKey);
-    console.log('[deal-advisor] key prefix:', apiKey ? apiKey.substring(0, 7) : 'MISSING');
     console.log('[deal-advisor] pageContext:', data.pageContext ?? 'none');
     console.log('[deal-advisor] hasStartupContext:', !!data.startupContext);
     if (!apiKey) {
