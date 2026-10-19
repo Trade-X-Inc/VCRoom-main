@@ -13,7 +13,8 @@
  ],
  "local": [
   "tests/a11y-scan.spec.ts",
-  "tests/auth-captcha.spec.ts"
+  "tests/auth-captcha.spec.ts",
+  "tests/auth-recovery.spec.ts"
  ],
  "loopback": [
   "tests/email-lockdown.spec.ts"

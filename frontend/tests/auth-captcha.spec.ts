@@ -335,7 +335,7 @@ test.describe("reset-password", () => {
     await page.addInitScript(
       ([keys, v]) => {
         (keys as string[]).forEach((k) => localStorage.setItem(k, v as string));
-        sessionStorage.setItem("lcs_recovery_session", String(Date.now()));
+        localStorage.setItem("lcs_recovery_session", String(Date.now()));
       },
       [SESSION_KEYS, JSON.stringify(FAKE_SESSION)],
     );
@@ -364,7 +364,7 @@ test.describe("reset-password", () => {
     expect(JSON.parse(put.body).password).toBe("a-long-enough-password");
     // The recovery mark is gone: the form cannot be used again.
     expect(
-      await page.evaluate(() => sessionStorage.getItem("lcs_recovery_session")),
+      await page.evaluate(() => localStorage.getItem("lcs_recovery_session")),
     ).toBeNull();
     expect(dialogs).toBe(0);
   });

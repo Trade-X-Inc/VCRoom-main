@@ -19,8 +19,11 @@ import {
 } from "../src/lib/password-policy";
 import {
   clearRecoverySession,
+  isFreshRecoveryUser,
   isRecoverySession,
   markRecoverySession,
+  pathAllowedDuringRecovery,
+  urlIsRecovery,
 } from "../src/lib/recovery";
 
 const run = (
@@ -138,37 +141,116 @@ test("new password: length, byte limit, confirm and match", () => {
     expect(passwordProblemText(p).length).toBeGreaterThan(10);
 });
 
-test("recovery mark: present, fresh, expired, cleared (storage stubbed)", () => {
+function stubStorage(throwing = false) {
   const store = new Map<string, string>();
-  (globalThis as unknown as { sessionStorage: Storage }).sessionStorage = {
-    getItem: (k: string) => store.get(k) ?? null,
-    setItem: (k: string, v: string) => void store.set(k, v),
-    removeItem: (k: string) => void store.delete(k),
+  const boom = () => {
+    throw new Error("blocked");
+  };
+  (globalThis as unknown as { localStorage: Storage }).localStorage = {
+    getItem: throwing ? boom : (k: string) => store.get(k) ?? null,
+    setItem: throwing ? boom : (k: string, v: string) => void store.set(k, v),
+    removeItem: throwing ? boom : (k: string) => void store.delete(k),
   } as unknown as Storage;
-  expect(isRecoverySession(1000)).toBe(false);
-  markRecoverySession(1000);
-  expect(isRecoverySession(1000 + 59 * 60 * 1000)).toBe(true);
-  expect(isRecoverySession(1000 + 61 * 60 * 1000)).toBe(false); // expired
-  expect(isRecoverySession(500)).toBe(false); // clock before the mark
+}
+
+test("recovery mark: set, persists with no expiry, cleared (storage stubbed)", () => {
+  stubStorage();
+  expect(isRecoverySession()).toBe(false);
+  markRecoverySession();
+  expect(isRecoverySession()).toBe(true);
   clearRecoverySession();
-  expect(isRecoverySession(1000)).toBe(false);
+  expect(isRecoverySession()).toBe(false);
 });
 
 test("storage that throws never breaks the helpers", () => {
-  (globalThis as unknown as { sessionStorage: Storage }).sessionStorage = {
-    getItem: () => {
-      throw new Error("blocked");
-    },
-    setItem: () => {
-      throw new Error("blocked");
-    },
-    removeItem: () => {
-      throw new Error("blocked");
-    },
-  } as unknown as Storage;
+  stubStorage(true);
   expect(() => markRecoverySession()).not.toThrow();
   expect(isRecoverySession()).toBe(false);
   expect(() => clearRecoverySession()).not.toThrow();
+});
+
+test("urlIsRecovery reads what the browser opened, in every link style, and ignores redirect_to", () => {
+  const base = "https://lengdon.com";
+  // implicit: tokens in the hash
+  expect(
+    urlIsRecovery(
+      base +
+        "/auth/callback#access_token=a&refresh_token=b&expires_in=3600&token_type=bearer&type=recovery",
+    ),
+  ).toBe(true);
+  expect(urlIsRecovery(base + "/#access_token=a&type=recovery")).toBe(true); // any landing path
+  // token_hash verify link
+  expect(
+    urlIsRecovery(base + "/auth/callback?token_hash=abc&type=recovery"),
+  ).toBe(true);
+  // not recovery: a normal OAuth return, a magic link, a plain visit, a redirect_to that merely says recovery
+  expect(
+    urlIsRecovery(
+      base + "/auth/callback#access_token=a&refresh_token=b&token_type=bearer",
+    ),
+  ).toBe(false);
+  expect(
+    urlIsRecovery(base + "/auth/callback?token_hash=abc&type=magiclink"),
+  ).toBe(false);
+  expect(urlIsRecovery(base + "/app")).toBe(false);
+  expect(
+    urlIsRecovery(
+      base + "/sign-in?redirect_to=https%3A%2F%2Flengdon.com%2Freset-password",
+    ),
+  ).toBe(false);
+  expect(urlIsRecovery("not a url")).toBe(false);
+});
+
+test("a bare PKCE code counts as recovery only for a fresh recovery email and a just-now sign-in", () => {
+  const now = Date.parse("2026-10-20T10:00:00Z");
+  const iso = (msAgo: number) => new Date(now - msAgo).toISOString();
+  expect(
+    isFreshRecoveryUser(
+      { recovery_sent_at: iso(120_000), last_sign_in_at: iso(5_000) },
+      now,
+    ),
+  ).toBe(true);
+  expect(
+    isFreshRecoveryUser(
+      { recovery_sent_at: iso(3_600_000), last_sign_in_at: iso(5_000) },
+      now,
+    ),
+  ).toBe(false); // old email
+  expect(
+    isFreshRecoveryUser(
+      { recovery_sent_at: iso(120_000), last_sign_in_at: iso(600_000) },
+      now,
+    ),
+  ).toBe(false); // not just now
+  expect(isFreshRecoveryUser({ last_sign_in_at: iso(5_000) }, now)).toBe(false);
+  expect(isFreshRecoveryUser(null, now)).toBe(false);
+});
+
+test("while a recovery session is open only the new-password screen and the ways out are reachable", () => {
+  for (const ok of [
+    "/reset-password",
+    "/forgot-password",
+    "/auth/callback",
+    "/legal/privacy",
+    "/api/csp-report",
+    "/_serverFn/abc",
+  ])
+    expect(pathAllowedDuringRecovery(ok), ok).toBe(true);
+  for (const blocked of [
+    "/",
+    "/app",
+    "/app/overview",
+    "/library",
+    "/pack",
+    "/pack/123",
+    "/deals-preview",
+    "/p/some-company",
+    "/join",
+    "/sign-in",
+    "/reset-password-extra",
+    "/legalx",
+  ])
+    expect(pathAllowedDuringRecovery(blocked), blocked).toBe(false);
 });
 
 // Wiring check, source level: every password sign-in, sign-up and reset call in the app goes through
