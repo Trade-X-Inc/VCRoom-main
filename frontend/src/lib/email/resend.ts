@@ -12,13 +12,15 @@ export type OutboundEmail = {
   to: string | string[];
   subject: string;
   html: string;
+  /** Plain-text alternative. Every app email sends one. */
+  text: string;
   replyTo?: string;
   tags?: { name: string; value: string }[];
 };
 
 export async function sendEmailWith(
   cfg: MailerConfig,
-  { to, subject, html, replyTo, tags }: OutboundEmail,
+  { to, subject, html, text, replyTo, tags }: OutboundEmail,
   fetchImpl: typeof fetch = fetch,
 ): Promise<{ id: string } | null> {
   if (!cfg.apiKey) {
@@ -37,6 +39,7 @@ export async function sendEmailWith(
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
+      text,
       reply_to: replyTo || "hello@lengdon.com",
       tags: tags || [],
     }),

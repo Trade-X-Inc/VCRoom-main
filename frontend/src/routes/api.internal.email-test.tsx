@@ -43,14 +43,16 @@ const runEmailTest = createServerFn({ method: "GET" }).handler(async () => {
     };
   }
 
-  const { subject, html } = welcomeEmail({
+  const { subject, html, text } = welcomeEmail({
     name: "Test User",
     role: "founder",
+    appUrl: "https://lengdon.com",
   });
   const result = await sendEmail({
     to: "hello@lengdon.com",
     subject: "[TEST] " + subject,
     html,
+    text,
     tags: [{ name: "type", value: "test" }],
   });
 

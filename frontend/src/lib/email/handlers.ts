@@ -170,11 +170,16 @@ export async function welcomeEmailHandler(
     String((row as any)?.full_name || who.fullName || who.email.split("@")[0]),
   ).slice(0, LIMITS.name);
 
-  const { subject, html } = welcomeEmail({ name: escapeHtml(name), role });
+  const { subject, html, text } = welcomeEmail({
+    name,
+    role,
+    appUrl: d.env.appUrl,
+  });
   const result = await send(d, {
     to: who.email,
     subject,
     html,
+    text,
     tags: [
       { name: "type", value: "welcome" },
       { name: "role", value: role },
@@ -256,17 +261,18 @@ export async function ndaSignedEmailHandler(
   const callerName = (await fullNameOf(db, who.uid)) || "An investor";
   let sent = 0;
   for (const r of recipients) {
-    const { subject, html } = ndaSignedEmail({
-      founderName: escapeHtml(r.full_name || "the founder"),
-      investorName: escapeHtml(callerName),
-      investorEmail: escapeHtml(who.email),
-      companyName: escapeHtml(ctx.companyName),
-      dealRoomUrl: `${d.env.appUrl}/app/deal-rooms/${roomId}`,
+    const { subject, html, text } = ndaSignedEmail({
+      investorName: callerName,
+      investorEmail: who.email,
+      companyName: ctx.companyName,
+      roomId,
+      appUrl: d.env.appUrl,
     });
     const res = await send(d, {
       to: r.email as string,
       subject,
       html,
+      text,
       tags: [{ name: "type", value: "nda-signed" }],
     });
     if (res?.id) {
@@ -312,17 +318,18 @@ export async function documentUploadedEmailHandler(
   const uploaderName = (await fullNameOf(db, who.uid)) || "the founder";
   let sent = 0;
   for (const r of recipients) {
-    const { subject, html } = documentUploadedEmail({
-      investorName: escapeHtml(r.full_name || "there"),
-      founderName: escapeHtml(uploaderName),
-      companyName: escapeHtml(ctx.companyName),
-      documentName: escapeHtml(documentName),
-      dealRoomUrl: `${d.env.appUrl}/app/deal-rooms/${roomId}`,
+    const { subject, html, text } = documentUploadedEmail({
+      uploaderName,
+      companyName: ctx.companyName,
+      documentName,
+      roomId,
+      appUrl: d.env.appUrl,
     });
     const res = await send(d, {
       to: r.email as string,
       subject,
       html,
+      text,
       tags: [{ name: "type", value: "document-uploaded" }],
     });
     if (res?.id) {
@@ -401,18 +408,19 @@ export async function startupTeamInviteHandler(
   if (!authorised) return NOT_FOUND;
 
   const inviterName = (await fullNameOf(db, who.uid)) || "Your team";
-  const { subject, html } = startupTeamInviteEmail({
-    inviterName: escapeHtml(inviterName),
-    companyName: escapeHtml(orgName),
-    role: String(invite.role ?? "member")
-      .slice(0, 40)
-      .replace(/[^A-Za-z _-]/g, ""),
-    inviteLink: `${d.env.appUrl}/join?token=${invite.token}`,
+  const { subject, html, text } = startupTeamInviteEmail({
+    inviterName,
+    companyName: orgName,
+    role: String(invite.role ?? "member"),
+    token: String(invite.token),
+    expiresAt: invite.expires_at,
+    appUrl: d.env.appUrl,
   });
   const res = await send(d, {
     to: invite.email,
     subject,
     html,
+    text,
     tags: [{ name: "type", value: "startup-team-invite" }],
   });
   if (!res?.id)
@@ -447,16 +455,19 @@ export async function lawyerInviteHandler(
 
   const side = invite.side === "investor" ? "investor" : "founder";
   const inviterName = (await fullNameOf(db, who.uid)) || "Your contact";
-  const { subject, html } = lawyerInviteEmail({
-    inviterName: escapeHtml(inviterName),
-    companyName: escapeHtml(ctx.companyName),
+  const { subject, html, text } = lawyerInviteEmail({
+    inviterName,
+    companyName: ctx.companyName,
     side,
-    inviteLink: `${d.env.appUrl}/join-room?token=${invite.token}`,
+    token: String(invite.token),
+    expiresAt: invite.expires_at,
+    appUrl: d.env.appUrl,
   });
   const res = await send(d, {
     to: invite.email,
     subject,
     html,
+    text,
     tags: [{ name: "type", value: "lawyer-invite" }],
   });
   if (!res?.id)
@@ -538,22 +549,19 @@ export async function dealRoomInviteHandler(
   const companyName = startupName || dealRoomName || "a deal room";
   const senderName = founderName || "A founder";
   const inviteLink = `${d.env.appUrl}/join/${(invite as any).token}`;
-  const { subject, html } = dealRoomInviteEmail({
-    investorName: "there",
-    founderName: escapeHtml(senderName),
-    companyName: escapeHtml(companyName),
-    inviteLink,
+  const { subject, html, text } = dealRoomInviteEmail({
+    founderName: senderName,
+    companyName,
+    token: String((invite as any).token),
+    message: message || undefined,
+    expiresAt,
+    appUrl: d.env.appUrl,
   });
-  const personal = message
-    ? html.replace(
-        '</div>\n    <p class="meta center">',
-        `<div class="highlight" style="margin-bottom:16px;"><p style="white-space:pre-line;">${escapeHtml(message)}</p></div>\n    </div>\n    <p class="meta center">`,
-      )
-    : html;
   const res = await send(d, {
     to: (invite as any).email,
     subject,
-    html: personal,
+    html,
+    text,
     tags: [{ name: "type", value: "deal-room-invite" }],
   });
   if (res?.id)
