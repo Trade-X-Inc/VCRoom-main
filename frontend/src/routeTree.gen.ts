@@ -21,6 +21,7 @@ import { Route as JoinRoomRouteImport } from './routes/join-room'
 import { Route as LcsPreviewRouteImport } from './routes/lcs-preview'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as RegistryRouteImport } from './routes/registry'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as StatusRouteImport } from './routes/status'
@@ -253,6 +254,11 @@ const LibraryRoute = LibraryRouteImport.update({
 const RegistryRoute = RegistryRouteImport.update({
   id: '/registry',
   path: '/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -1177,6 +1183,7 @@ export interface FileRoutesByFullPath {
   '/lcs-preview': typeof LcsPreviewRoute
   '/library': typeof LibraryRoute
   '/registry': typeof RegistryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
@@ -1362,6 +1369,7 @@ export interface FileRoutesByTo {
   '/lcs-preview': typeof LcsPreviewRoute
   '/library': typeof LibraryRoute
   '/registry': typeof RegistryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
@@ -1549,6 +1557,7 @@ export interface FileRoutesById {
   '/lcs-preview': typeof LcsPreviewRoute
   '/library': typeof LibraryRoute
   '/registry': typeof RegistryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/status': typeof StatusRoute
@@ -1738,6 +1747,7 @@ export interface FileRouteTypes {
     | '/lcs-preview'
     | '/library'
     | '/registry'
+    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/status'
@@ -1923,6 +1933,7 @@ export interface FileRouteTypes {
     | '/lcs-preview'
     | '/library'
     | '/registry'
+    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/status'
@@ -2109,6 +2120,7 @@ export interface FileRouteTypes {
     | '/lcs-preview'
     | '/library'
     | '/registry'
+    | '/reset-password'
     | '/sign-in'
     | '/sign-up'
     | '/status'
@@ -2297,6 +2309,7 @@ export interface RootRouteChildren {
   LcsPreviewRoute: typeof LcsPreviewRoute
   LibraryRoute: typeof LibraryRoute
   RegistryRoute: typeof RegistryRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   StatusRoute: typeof StatusRoute
@@ -2462,6 +2475,13 @@ declare module '@tanstack/react-router' {
       path: '/registry'
       fullPath: '/registry'
       preLoaderRoute: typeof RegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -3946,6 +3966,7 @@ const rootRouteChildren: RootRouteChildren = {
   LcsPreviewRoute: LcsPreviewRoute,
   LibraryRoute: LibraryRoute,
   RegistryRoute: RegistryRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   StatusRoute: StatusRoute,

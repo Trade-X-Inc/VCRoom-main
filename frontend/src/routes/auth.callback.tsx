@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { triggerWelcomeEmail } from '@/lib/email/triggers'
 import { syncOwnContact } from '@/lib/public-forms-fn'
+import { isRecoverySession } from '@/lib/recovery'
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallback
@@ -39,13 +40,19 @@ function AuthCallback() {
           return
         }
 
+        // A password-reset link: go and set the new password. No role changes, no welcome email.
+        if (isRecoverySession()) {
+          window.location.replace('/reset-password')
+          return
+        }
+
         const userId = session.user.id
         const userEmail = session.user.email || ''
 
         const pending = localStorage.getItem('pending_role') || ''
         localStorage.removeItem('pending_role')
 
-        const { data: existing } = await supabase
+        const { data: existing, error: existingError } = await supabase
           .from('users')
           .select('role')
           .eq('id', userId)
@@ -76,8 +83,9 @@ function AuthCallback() {
           updated_at: new Date().toISOString()
         }, { onConflict: 'id' }).select('id').maybeSingle();
 
-        // Send welcome email only on first sign-up (no prior role = new user)
-        if (!existing?.role && upsertResult) {
+        // Send the welcome email only when this callback created the users row (no prior row, and the
+        // lookup itself succeeded: a failed read must never look like "new user" and re-send on every sign-in).
+        if (!existingError && !existing?.role && upsertResult) {
           // Both server functions take only the caller's own access token: the recipient and the CRM contact
           // are the verified session's own address, never a value from this page.
           try {

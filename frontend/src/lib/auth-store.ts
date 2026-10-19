@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { create } from 'zustand'
+import { markRecoverySession } from './recovery'
 
 interface AuthState {
   user: any | null
@@ -26,6 +27,8 @@ export function setupAuthListener() {
 
   // auth.tsx already calls getSession(); rely on INITIAL_SESSION event here
   supabase.auth.onAuthStateChange((_event, session) => {
+    // Password-reset link: record it synchronously so /auth/callback can route to /reset-password.
+    if (_event === 'PASSWORD_RECOVERY') markRecoverySession()
     useAuthStore.getState().setUser(session?.user ?? null)
   })
 }
