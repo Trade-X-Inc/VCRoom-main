@@ -63,6 +63,13 @@ export const ERROR_MESSAGES: Record<PackErrorCode, string> = {
   no_founder: "Mark at least one team member as a founder.",
   too_few_items: "Add at least one entry.",
   too_many_items: "There are too many entries. Remove some and try again.",
+  // Brief links (pack_api.brief_link_*): invalid_label and invalid_expiry are the server's own checks; the screen
+  // validates first, so these appear only if the two ever disagree.
+  invalid_label: "Enter a label of 1 to 80 characters.",
+  invalid_expiry: "Choose an expiry between 1 and 90 days.",
+  too_many_links:
+    "You already have 20 active links on this pack. Revoke one first.",
+  link_revoked: "This link is revoked, so it can't be changed.",
 };
 
 export const GENERIC_ERROR_MESSAGE = "Something went wrong. Try again.";

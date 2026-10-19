@@ -112,6 +112,11 @@ export const PACK_ERROR_CODES = [
   "no_founder",
   "too_few_items",
   "too_many_items",
+  // Brief links (pack_api.brief_link_*); see lib/actions/brief-link.ts.
+  "invalid_label",
+  "invalid_expiry",
+  "too_many_links",
+  "link_revoked",
 ] as const;
 export type PackErrorCode = (typeof PACK_ERROR_CODES)[number];
 
