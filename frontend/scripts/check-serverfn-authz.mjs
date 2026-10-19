@@ -33,6 +33,7 @@ import { readFileSync, readdirSync, statSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import ts from "typescript";
+import { analyze } from "./serverfn-guard-core.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const LIB_DIR = join(__dirname, "../src/lib");
@@ -211,16 +212,41 @@ for (const f of files) {
 
 console.log(`check-serverfn-authz: scanned ${files.length} file(s) under src/lib (excluding src/lib/actions/).`);
 
-if (allFindings.length > 0) {
-  console.error(`\n✗ check-serverfn-authz FAILED — ${allFindings.length} service-role createServerFn handler(s) with no recognised auth helper call:\n`);
-  for (const f of allFindings) console.error("  • " + f.message + "\n");
-  console.error(
-    "Fix: call one of the recognised helpers (or sb.auth.getUser(token)/supabase.auth.getUser(token)) " +
-    "before any service-role query runs, deriving identity from the caller's own token — never a " +
-    "client-supplied id. If a new, genuinely equivalent helper is introduced, add its name to " +
-    "RECOGNISED_AUTH_HELPERS in this script, with a comment citing where it's defined.\n",
-  );
+// ── Rules R2, R3, R4 (added 19 Oct 2026, after an audit found the 12 email trigger functions and the CRM sync
+// function callable by anyone: the original rule above only looked for a service-role identifier inside the handler
+// body, and those functions created their service client in a helper). See serverfn-guard-core.mjs for the rules
+// and CLAUDE.md §20.23 for the policy letters.
+function listSrc(dir, base) {
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...listSrc(full, base));
+    else if (/\.(ts|tsx)$/.test(entry) && !entry.endsWith(".d.ts") && entry !== "routeTree.gen.ts") out.push(full);
+  }
+  return out;
+}
+const SRC_DIR = join(__dirname, "../src");
+const srcFiles = listSrc(SRC_DIR).map((f) => ({ path: "src/" + f.slice(SRC_DIR.length + 1), text: readFileSync(f, "utf8") }));
+const allowlist = JSON.parse(readFileSync(join(__dirname, "serverfn-effects-allowlist.json"), "utf8")).entries;
+const coreFindings = analyze(srcFiles, allowlist);
+console.log(`check-serverfn-authz: analysed ${srcFiles.length} source file(s) against ${allowlist.length} allow-list entr${allowlist.length === 1 ? "y" : "ies"}.`);
+
+if (allFindings.length > 0 || coreFindings.length > 0) {
+  if (allFindings.length > 0) {
+    console.error(`\n✗ check-serverfn-authz FAILED — ${allFindings.length} service-role createServerFn handler(s) with no recognised auth helper call:\n`);
+    for (const f of allFindings) console.error("  • " + f.message + "\n");
+    console.error(
+      "Fix: call one of the recognised helpers (or sb.auth.getUser(token)/supabase.auth.getUser(token)) " +
+      "before any service-role query runs, deriving identity from the caller's own token — never a " +
+      "client-supplied id. If a new, genuinely equivalent helper is introduced, add its name to " +
+      "RECOGNISED_AUTH_HELPERS in this script, with a comment citing where it's defined.\n",
+    );
+  }
+  if (coreFindings.length > 0) {
+    console.error(`\n✗ check-serverfn-authz FAILED — ${coreFindings.length} finding(s) from the effects and log rules:\n`);
+    for (const f of coreFindings) console.error(`  • [${f.rule}] ${f.message}\n`);
+  }
   process.exit(1);
 }
 
-console.log(`\n✓ check-serverfn-authz passed — every service-role createServerFn handler calls a recognised auth helper.`);
+console.log(`\n✓ check-serverfn-authz passed — every service-role handler calls a recognised auth helper, every email, CRM and service-role server function is on the allow-list with a policy letter, and no log call prints a token, key or email.`);

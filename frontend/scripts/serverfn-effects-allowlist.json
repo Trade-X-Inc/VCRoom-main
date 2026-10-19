@@ -1,0 +1,263 @@
+{
+ "_comment": "Every server function that sends email, writes to a CRM or Notion, or creates a service-role client must be listed (rule R2 in serverfn-guard-core.mjs). Letters: A own email, B members only, C public form, E invite, F admin-key operator route, G service-role data function (file wildcard allowed), H anonymous capability-token endpoint. Email and CRM functions are listed by name. See CLAUDE.md section 20.23.",
+ "entries": [
+  {
+   "file": "src/lib/connections-fn.ts",
+   "name": "processInviteLinkJoin",
+   "policy": "H",
+   "reason": "Anonymous by design: an investor invite link's token is the credential. The token must be a UUID before it reaches a query; the only effect is one auto-added watchlist row for the link's investor."
+  },
+  {
+   "file": "src/lib/email/triggers.ts",
+   "name": "triggerWelcomeEmail",
+   "policy": "A",
+   "reason": "Welcome email to the signed-in user's own confirmed address; recipient is the verified session email; sent once per account; accepts no fields."
+  },
+  {
+   "file": "src/lib/email/triggers.ts",
+   "name": "triggerNdaSignedEmail",
+   "policy": "B",
+   "reason": "Tells the founder member(s) of a deal room the caller belongs to (as investor) that the NDA was signed; recipients come from membership records; min interval."
+  },
+  {
+   "file": "src/lib/email/triggers.ts",
+   "name": "triggerDocumentUploadedEmail",
+   "policy": "B",
+   "reason": "Tells the investor members of a deal room the caller belongs to about an upload; recipients come from membership records; min interval."
+  },
+  {
+   "file": "src/lib/email/triggers.ts",
+   "name": "triggerStartupTeamInvite",
+   "policy": "E",
+   "reason": "Team invite email to the address on a team_invites record the caller created and still belongs to the organisation of; open, unexpired, minimum resend interval."
+  },
+  {
+   "file": "src/lib/email/triggers.ts",
+   "name": "triggerLawyerInvite",
+   "policy": "E",
+   "reason": "Legal-counsel invite to the address on a deal_room_lawyer_invites record the caller created and is a room member for; open, unexpired, minimum resend interval."
+  },
+  {
+   "file": "src/lib/email/triggers.ts",
+   "name": "sendDealRoomInvite",
+   "policy": "E",
+   "reason": "Deal-room invite: record created with the caller's own token (RLS decides), email goes to the stored record address; strict field validation."
+  },
+  {
+   "file": "src/lib/public-forms-fn.ts",
+   "name": "submitWaitlistForm",
+   "policy": "C",
+   "reason": "Public waitlist form: strict parser, length caps, fixed source list, fixed HubSpot property allow-list."
+  },
+  {
+   "file": "src/lib/public-forms-fn.ts",
+   "name": "submitContactForm",
+   "policy": "C",
+   "reason": "Public contact form: strict parser, length caps, fixed HubSpot property allow-list."
+  },
+  {
+   "file": "src/lib/public-forms-fn.ts",
+   "name": "submitDemoRequest",
+   "policy": "C",
+   "reason": "Public demo-request form: strict parser, length caps, fixed slot list, fixed HubSpot property allow-list."
+  },
+  {
+   "file": "src/lib/public-forms-fn.ts",
+   "name": "syncOwnContact",
+   "policy": "A",
+   "reason": "Writes the signed-in user's own HubSpot contact; address is the verified session email; fixed property sets per kind."
+  },
+  {
+   "file": "src/routes/api.admin.tsx",
+   "name": "fetchAdminData",
+   "policy": "F",
+   "reason": "Admin-key operator route: read-only dump of feedback, waitlist and email events."
+  },
+  {
+   "file": "src/routes/api.emailtest.tsx",
+   "name": "getDiagnostics",
+   "policy": "F",
+   "reason": "Admin-key operator route: reports which environment values are set; no secret value, no email."
+  },
+  {
+   "file": "src/routes/api.hubspot-sync.tsx",
+   "name": "runHubspotBulkSync",
+   "policy": "F",
+   "reason": "Admin-key operator route: x-admin-key plus a validated body of at most 50 users."
+  },
+  {
+   "file": "src/routes/api.internal.data.tsx",
+   "name": "getInternalData",
+   "policy": "F",
+   "reason": "Admin-key operator route: read-only dump of feedback and waitlist."
+  },
+  {
+   "file": "src/routes/api.internal.email-test.tsx",
+   "name": "runEmailTest",
+   "policy": "F",
+   "reason": "Admin-key operator route: sends one fixed test email to a system address."
+  },
+  {
+   "file": "src/lib/advisor-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/agreement-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/ai-secure-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/closing-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/connection-request-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/connections-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/dd-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/deal-room-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/deal-room-prep-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/deal-room-workflow-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/desk-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/doc-request-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/erase-account-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/founder-thesis-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/interview-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/investor-context-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/investor-memo-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/investor-profile-builder-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/nda-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/notifications-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/profile-builder-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/qa-report-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/qa-suggestions-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/step-up-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/summary-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/term-negotiation-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/vision-extract-fn.ts",
+   "name": "*",
+   "policy": "G",
+   "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  }
+ ]
+}

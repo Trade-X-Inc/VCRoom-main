@@ -6,8 +6,6 @@ src/lib/profile-builder-fn.ts: error TS2345: Argument of type '({ data }: Server
 src/lib/profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => DocumentExtractInput>) => Promise<ExtractionResult>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => DocumentExtractInput, Promise<ExtractionResult>, true>'.
 src/lib/profile-builder-fn.ts: error TS2345: Argument of type '({ data }: ServerFnCtx<Register, "POST", undefined, (d: unknown) => InterviewExtractInput>) => Promise<ExtractionResult>' is not assignable to parameter of type 'ServerFn<Register, "POST", undefined, (d: unknown) => InterviewExtractInput, Promise<ExtractionResult>, true>'.
 src/routes/api.health.ts: error TS2307: Cannot find module '@tanstack/react-start/api' or its corresponding type declarations.
-src/routes/api.invites.ts: error TS2307: Cannot find module '@tanstack/react-start/api' or its corresponding type declarations.
-src/routes/api.invites.ts: error TS7031: Binding element 'request' implicitly has an 'any' type.
 src/routes/api.webhooks.resend.ts: error TS2307: Cannot find module '@tanstack/react-start/api' or its corresponding type declarations.
 src/routes/api.webhooks.resend.ts: error TS7031: Binding element 'request' implicitly has an 'any' type.
 src/routes/app.deal-rooms.$id.information.tsx: error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ParamsReducerFn<RouterCore<Route<Register, any, "/", "/", string, "__root__", undefined, {}, {}, AnyContext, AnyContext, {}, undefined, RootRouteChildren, FileRouteTypes, unknown, unknown, undefined>, "never", false, RouterHistory, Record<...>>, "PATH", string, any>'.
@@ -24,7 +22,6 @@ src/routes/app.investor.settings.tsx: error TS2554: Expected 1 arguments, but go
 src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
-src/routes/app.investor.team.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.investor.team.tsx: error TS2352: Conversion of type '{ id: any; user_id: any; role: any; status: any; joined_at: any; display_name: any; avatar_url: any; team_member_profiles: { first_name: any; last_name: any; title: any; avatar_url: any; }[]; }[]' to type 'TeamMemberRow[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 src/routes/app.member-profile.tsx: error TS2554: Expected 1 arguments, but got 0.
 src/routes/app.member.index.tsx: error TS2352: Conversion of type '{ deal_room_id: any; deal_rooms: { id: any; startups: { company_name: any; }[]; }[]; }[]' to type '{ deal_room_id: string; deal_rooms: { id: string; startups: { company_name: string | null; } | null; } | null; }[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
@@ -36,7 +33,6 @@ src/routes/app.profile-builder.tsx: error TS2322: Type 'RefObject<HTMLInputEleme
 src/routes/app.profile-builder.tsx: error TS2322: Type 'unknown' is not assignable to type 'TypedExtraction'.
 src/routes/app.profile.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.profile.tsx: error TS2367: This comparison appears to be unintentional because the types '"quick"' and '"full"' have no overlap.
-src/routes/app.users.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.users.tsx: error TS2339: Property 'name' does not exist on type 'AppUser'.
 src/routes/app.users.tsx: error TS2352: Conversion of type '{ id: any; user_id: any; role: any; status: any; joined_at: any; display_name: any; avatar_url: any; team_member_profiles: { first_name: any; last_name: any; title: any; avatar_url: any; }[]; }[]' to type 'TeamAccountRow[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 src/routes/i.$slug.tsx: error TS2322: Type 'boolean' is not assignable to type 'false'.

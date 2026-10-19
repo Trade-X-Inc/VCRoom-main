@@ -7,7 +7,9 @@
 //   2. A pure spec uses no network or database API (after comments and string literals are removed): no page,
 //      request, fetch, goto, browser launch, supabase client, service-role key, env file or password sign-in,
 //      and it imports only from ../src.
-//   3. A local spec names no host except localhost / 127.0.0.1 and no production domain.
+//   3. A local spec names no host except localhost / 127.0.0.1 and no production domain. A loopback spec (starts its
+//      own mock server on 127.0.0.1, runs by default) names no production domain and uses no browser, no
+//      fetch, no process.env and no database client, and imports only from ../src and ./support.
 //   4. playwright.config.ts reads the manifest and, unless CWL_FIXTURES_READY === "1", restricts testMatch to
 //      the pure and local specs (fail closed; unknown and untracked specs never run by default).
 //   5. Every tracked tests/*.mjs live script starts with a CWL_FIXTURES_READY guard.
@@ -35,7 +37,7 @@ const scripts = tracked.filter((f) => f.endsWith(".mjs"));
 
 // ---- rule 1
 const where = new Map();
-for (const cls of ["pure", "local", "live"])
+for (const cls of ["pure", "local", "loopback", "live"])
   for (const f of manifest[cls] ?? []) {
     if (where.has(f)) fail(`${f} is listed in more than one class`);
     where.set(f, cls);
@@ -88,6 +90,16 @@ for (const [f, cls] of where) {
       if (m[1].startsWith(".") && !m[1].startsWith("../src/"))
         fail(`${f} (pure) imports ${m[1]}; pure specs import only from ../src`);
   }
+  if (cls === "loopback") {
+    // Host names in the text are test data (the spec has no way to contact them: no fetch, no process.env, no client).
+    if (/lengdon\.com|hockystick\.app|supabase\.co/.test(raw)) fail(`${f} (loopback) names a production domain`);
+    if (/SERVICE_ROLE|createClient\s*\(/.test(src)) fail(`${f} (loopback) uses the service role or a database client`);
+    for (const re of [/\bpage\s*\./, /\bbrowser\s*\./, /\bfetch\s*\(/, /process\.env/, /\.env\.(test|local)/, /signInWithPassword/])
+      if (re.test(src)) fail(`${f} (loopback) uses ${re.source}`);
+    for (const m of raw.matchAll(/from\s+["']([^"']+)["']/g))
+      if (m[1].startsWith(".") && !m[1].startsWith("../src/") && !m[1].startsWith("./support/"))
+        fail(`${f} (loopback) imports ${m[1]}; loopback specs import only from ../src and ./support`);
+  }
   if (cls === "local") {
     for (const m of raw.matchAll(/https?:\/\/([^/"'`\s)]+)/g))
       if (!/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(m[1]))
@@ -135,5 +147,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `✓ live-spec guard passed — ${specs.length} specs classified (${manifest.pure.length} pure, ${manifest.local.length} local, ${manifest.live.length} live), ${scripts.length} live scripts guarded.`,
+  `✓ live-spec guard passed — ${specs.length} specs classified (${manifest.pure.length} pure, ${manifest.local.length} local, ${(manifest.loopback ?? []).length} loopback, ${manifest.live.length} live), ${scripts.length} live scripts guarded.`,
 );

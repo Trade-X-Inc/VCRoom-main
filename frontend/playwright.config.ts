@@ -8,11 +8,12 @@ import { readFileSync } from "fs";
 // scripts/check-live-specs.mjs fails CI if this logic or the manifest drifts.
 const classes = JSON.parse(
   readFileSync(new URL("./tests/spec-classes.json", import.meta.url), "utf8"),
-) as { pure: string[]; local: string[]; live: string[] };
+) as { pure: string[]; local: string[]; loopback: string[]; live: string[] };
 const liveAllowed = process.env.CWL_FIXTURES_READY === "1";
 // "local" specs need a server you started yourself, so they are matched only when A11Y_SCAN_BASE_URL is set.
 const safeSpecs = [
   ...classes.pure,
+  ...classes.loopback,
   ...(process.env.A11Y_SCAN_BASE_URL ? classes.local : []),
 ].map(
   (f) =>
