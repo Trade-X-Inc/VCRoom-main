@@ -1836,6 +1836,19 @@ Applied by the owner on 2026-10-21 from `supabase/drafts/DRAFT_team_membership_l
 
 Open: the old `team_invites` ALL policies and `accept_team_invite` remain until J3c-3/4; an admin can still demote or remove other admins (by design, §0c rule 6).
 
+
+### 20.33 Tier-1 policy holes locked (G1-1) — applied and recorded 21 Oct 2026
+
+Applied by the owner from `supabase/drafts/DRAFT_g1_tier1_lock.sql`; recorded as migration `20261021110000_g1_tier1_lock.sql`, **byte-identical** to the draft that was dry-run (sha256 `93874f25a2ab9eab793d748f83caba3ea082e20d962ca56aeb765617cefe009e`; its header still says DRAFT because the file was not edited). Policy: **lock now, delete later.** No table, column, row, function or trigger was dropped; only client policies and client privileges (`anon`, `authenticated`) were removed. `service_role`, the owner and the SECURITY DEFINER functions that name these tables (`pack_api.erase_user_account`, `erase_user_account_dryrun`, `doc_view_insert`) are untouched.
+
+**Found.** Seven tables had a policy that tested only "signed in" (`auth.uid() is not null`) or nothing, with every privilege granted to `anon` and `authenticated`: any signed-in user could read, write and delete every tenant's rows. Four more had no tenant filter on a read or an insert, and `anon` could write the waitlist and contact tables and forge `profile_views` rows. All tables were empty or near-empty; none had a client path in the code.
+
+**Locked, `service_role` only** (policies dropped, all client privileges revoked): `ai_reports`, `due_diligence_items`, `tasks`, `organizations`, `organization_members`, `referrals`, `referral_bonuses` (referrals are a §15 non-goal; organizations may later become the pack_v1 org link), plus the three read leaks `startup_profile_visibility`, `investor_verifications`, `nudge_log`, and `contact_submissions` (the contact form uses a server function). **`document_views`:** clients keep SELECT only; rows are written by `pack_api.doc_view_insert`, which derives the startup, the viewer and the role itself. **`profile_views`:** clients keep SELECT only. **`waitlist_entries`:** `anon` loses everything; `authenticated` keeps SELECT for the admin-read policy. All 14 tables also lost TRUNCATE, REFERENCES, TRIGGER and MAINTAIN for clients.
+
+**Code, committed and deployed BEFORE the migration (`0fd7ce5`).** The waitlist row is now written by the `submitWaitlistForm` server function (service role, after validation; a repeat address is a silent no-op), and the sign-up page, the footer form and the popup no longer insert from the browser. **Profile view recording is OFF** until the verified server-side rebuild (§20.21 (m)); the browser used to insert with a policy of `true` and tried to notify the founder through a table RLS refuses. **Order rule: deploy the code first, then apply the migration** — a browser still running the old bundle gets an error after the revoke. There is no Turnstile and no per-IP limit on the waitlist forms (a Cloudflare rate-limit rule and a Turnstile secret are owner items).
+
+**Remaining Tier-2 sweep** (policies that still test only "signed in" or `true`, outside these 14 tables): `feedback.authenticated_insert_feedback` and `onboarding_conversations.authenticated_insert_conversations` (INSERT check is only `authenticated`; the second has no code reference); reference or config tables with a `true` or authenticated read (`ai_feature_limits`, `badge_definitions`, `closing_item_templates`, `dd_goal_templates`, `document_templates`, `field_classifications`, `plan_limits`, `role_permissions`, `verification_tiers`); and `profile_badges`, which has two such read policies on per-user data. The wider grant cut (G1-2 to G1-5) is separate.
+
 ---
 
 ## 21. Amendment log
