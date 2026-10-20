@@ -1723,7 +1723,17 @@ Live `md5(prosrc)` baselines (re-read by the reviewer 2026-10-20): `accept_invit
 
 Grant guard: R1 now has one narrow exception (bucket `anon_execute_functions`: `GRANT EXECUTE` alone, on a named function signature, with a written reason and evidence). `GRANT ALL`, table or schema grants, a different signature, or an unlisted function in the same statement are still flagged; self-tests are now 56.
 
-Still to do: the gateway actions, join page, moving each old invite flow over, dropping the old tables, and adding `invite_v1.erase_user_data` to `pack_api.erase_user_account` (and its dry-run twin). The old lawyer/invite tables remain the live flow until then.
+Still to do: the gateway actions, join page, moving each old invite flow over, and dropping the old tables. (Erasure coverage is done: §20.29.) The old lawyer/invite tables remain the live flow until then.
+
+### 20.29 Account erasure now clears invitation data — applied and recorded 20 Oct 2026 (job J2b)
+
+Applied to the live project by the owner on 2026-10-20 from `supabase/drafts/DRAFT_erase_invite.sql` and verified live by the reviewer. Recorded as migration `20261020110000_erase_invite.sql`, **byte-identical** to the draft (sha256 `307112d8bf3af8a4becfb31a056bf4ab13265cc8601e660765558bc55bb34166`, 14,523 bytes); its header still says "DRAFT — NOT APPLIED" because the file was not edited. Dry run on the real project passed before the apply.
+
+What changed, and nothing else: `pack_api.erase_user_account` now runs `invite_v1.erase_user_data(p_uid)` after the `delete from public.startups` block and before `delete from public.users`, and returns `invite_emails_cleared` and `invite_rows_unlinked` in addition to every existing key. `pack_api.erase_user_account_dryrun` stays read-only and reports `would_erase_invite_data {emails_cleared, rows_unlinked, pending_revoked}` (it counts with the same predicates; if `invite_v1.erase_user_data` is edited, edit that block too). Owner, SECURITY DEFINER, `search_path = public, pg_temp` and the ACL (postgres and `service_role` only) are unchanged. Baseline before: `erase_user_account` md5 `8d8f02758e1cfa47fdc9c00e97c7027a`, `erase_user_account_dryrun` md5 `5b13c201d29e06d293e7eed1ebb3f933`.
+
+Live `md5(prosrc)` baselines after the apply: `erase_user_account` `6945e4b6185ce1b116780d9d91c8da00`, `erase_user_account_dryrun` `aebd48a3561697b1217477537fd213ae`.
+
+**Rule: `erase_user_account` and `erase_user_account_dryrun` reference tables by name in dynamic SQL. Any job that drops or renames a table named in their lists must update both functions first, in the same dry run, or erasure will fail.** (The lists are the `values (...)` tables inside each function body; the removal jobs check against them.)
 
 ---
 
@@ -1799,3 +1809,4 @@ Still to do: the gateway actions, join page, moving each old invite flow over, d
 | 20 Oct 2026 | **H5: Turnstile starts from the page head and says when it is waiting for a click; Google button uses the official G mark — see §20.26.** Real-key timing is not measurable with automation (Cloudflare fails it); always-pass key: script request 343 to 80 ms, Verified about 2 s. No CSP or header change. |
 | 20 Oct 2026 | **E1: email redesign — one kit, six app emails with plain text, 13 Supabase templates to paste, preview script and tests — see §20.27.** Escaping and own-link rules enforced in the kit; dead templates with invented claims removed; broken deal-room invite link reported, not changed; footer address left as an owner placeholder. No real email sent. |
 | 20 Oct 2026 | **J1: invitation model `invite_v1` recorded as migration `20261020100000_invite_v1.sql` (byte-identical to the applied draft); grant guard gains the narrow `anon_execute_functions` exception for `public.invite_preview(text)` — see §20.28.** Live fingerprints and the design rules are recorded; `invite_api` is not yet exposed. |
+| 20 Oct 2026 | **J2b: account erasure now clears invitation data; migration `20261020110000_erase_invite.sql` recorded (byte-identical to the applied draft) with the new md5 baselines and the table-list rule — see §20.29.** |
