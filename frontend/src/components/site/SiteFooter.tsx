@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { submitWaitlistForm } from "@/lib/public-forms-fn";
 
 // SEO-009 Phase 1 — migrated to PUBLIC-REGISTER.md v2.0 tokens.
@@ -96,16 +95,12 @@ function NewsletterBar() {
     setState("loading");
     const normalizedEmail = email.trim().toLowerCase();
     try {
-      const { error } = await supabase
-        .from("waitlist_entries")
-        .insert({ email: normalizedEmail, full_name: "", type: "footer newsletter" });
-      if (error) throw error;
-      setState("success");
-
-      // HubSpot and Notion are written by the server function only; the browser never calls them.
-      submitWaitlistForm({
+      // The server function validates, stores the row (service role) and writes HubSpot and Notion; the browser writes none of them.
+      const res = await submitWaitlistForm({
         data: { email: normalizedEmail, name: "", source: "footer newsletter" },
-      }).catch(() => console.error("[footer waitlist] CRM submit failed"));
+      });
+      if (!res.ok) throw new Error("waitlist_failed");
+      setState("success");
     } catch {
       setState("error");
     }

@@ -426,6 +426,33 @@ test("C waitlist: valid input reaches HubSpot and Notion once each, with only al
   );
 });
 
+test("C waitlist (G1-1): the row is stored by the server, once, with the service role, ignoring a repeat address", async () => {
+  await waitlistFormHandler(deps, {
+    email: "Visitor@Example.invalid",
+    name: "Vi Sitor",
+    role: "investor",
+    source: "footer newsletter",
+  });
+  expect(mock.hits.waitlistRows).toHaveLength(1);
+  const w = mock.hits.waitlistRows[0];
+  expect(w.body).toEqual({
+    email: "visitor@example.invalid",
+    full_name: "Vi Sitor",
+    role: "investor",
+    type: "footer newsletter",
+  });
+  expect(w.onConflict).toBe("email");
+  expect(w.prefer).toContain("resolution=ignore-duplicates");
+});
+
+test("C waitlist (G1-1): a failed store returns store_failed and reaches neither HubSpot nor Notion", async () => {
+  mock.hits.failWaitlist = true;
+  const r = await waitlistFormHandler(deps, { email: "v@example.invalid", source: "popup" });
+  expect(r).toEqual({ ok: false, error: "store_failed" });
+  expect(mock.hits.hubspot).toBe(0);
+  expect(mock.hits.notion).toBe(0);
+});
+
 test("C public forms: unknown fields, a property map and oversize input are refused and nothing is written", async () => {
   const refused = [
     () =>
@@ -482,6 +509,7 @@ test("C public forms: unknown fields, a property map and oversize input are refu
   for (const run of refused)
     expect(await run()).toEqual({ ok: false, error: "invalid_input" });
   expect(mock.hits.hubspot + mock.hits.notion + mock.hits.resend).toBe(0);
+  expect(mock.hits.waitlistRows).toHaveLength(0);
 });
 
 test("C contact and demo: valid input reaches HubSpot only", async () => {

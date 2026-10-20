@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { submitWaitlistForm } from '@/lib/public-forms-fn'
 
 // Waitlist wiring pass, 9 Sep 2026 — new signups are paused; this page
@@ -10,14 +9,14 @@ import { submitWaitlistForm } from '@/lib/public-forms-fn'
 // that layer; the account-creation path itself is simply not rendered.
 // Same two-step shape kept (role, then details) since the fields are
 // the same ones a waitlist entry needs. Submits to all three real
-// destinations: Supabase (waitlist_entries — same table and open
-// insert policy the footer newsletter form already uses), Notion (the
+// destinations: Supabase (waitlist_entries), Notion (the
 // new "Lengdon Waitlist" database, src/lib/notion-waitlist.ts), and
 // HubSpot (via the existing, already-working syncContactToHubSpot —
 // NOT the raw fetch()-to-a-server-fn-route pattern the footer form's
 // dead HubSpot call used, which has no real HTTP handler behind it).
 // No confirmation email of any kind is sent from here — the "You're on
 // the waitlist" state below is the only acknowledgment, per instruction.
+// G1-1 (21 Oct 2026): the waitlist_entries row is now written by submitWaitlistForm on the server (service role); the browser no longer inserts.
 
 export const Route = createFileRoute('/sign-up')({
   head: () => ({
@@ -66,23 +65,19 @@ function SignUp() {
     setLoading(true)
 
     try {
-      const { error: dbError } = await supabase.from('waitlist_entries').insert({
-        full_name: name,
-        email: email.trim().toLowerCase(),
-        role: role || null,
-        type: 'sign-up page',
-      })
-      if (dbError) console.error('[sign-up] waitlist insert failed:', dbError)
-
-      // HubSpot and Notion are written by the server function only; the browser never calls them.
-      await submitWaitlistForm({
+      // The server function validates, stores the row (service role) and writes HubSpot and Notion; the browser writes none of them.
+      const res = await submitWaitlistForm({
         data: {
           email: email.trim().toLowerCase(),
           name,
           role: role || '',
           source: 'sign-up page',
         },
-      }).catch(() => console.error('[sign-up] CRM submit failed'))
+      })
+      if (!res.ok) {
+        setError('Something went wrong. Please try again.')
+        return
+      }
 
       setDone(true)
     } catch (e) {

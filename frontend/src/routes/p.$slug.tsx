@@ -520,70 +520,9 @@ function FounderPublicProfile({ startup, isOwnerPreview }: { startup: PublicStar
     });
   }, [startup?.id]);
 
-  // Profile view tracking
-  useEffect(() => {
-    if (!startup?.id) return;
-    const startTime = Date.now();
-    let viewRowId: string | null = null;
-
-    async function trackView() {
-      const { data: { user } } = await supabase.auth.getUser();
-      let viewerName: string | null = null;
-      let viewerFund: string | null = null;
-      let trackedRole: string | null = null;
-
-      if (user) {
-        const { data: userRow } = await supabase.from("users").select("role").eq("id", user.id).maybeSingle();
-        trackedRole = userRow?.role ?? null;
-        if (trackedRole === "investor") {
-          const { data: profile } = await supabase.from("investor_profiles").select("your_name, fund_name").eq("user_id", user.id).maybeSingle();
-          viewerName = profile?.your_name ?? null;
-          viewerFund = profile?.fund_name ?? null;
-        }
-      }
-
-      const { data: viewRow } = await supabase.from("profile_views").insert({
-        startup_id: startup!.id,
-        viewer_id: user?.id ?? null,
-        viewer_role: trackedRole,
-        viewer_name: viewerName,
-        viewer_fund: viewerFund,
-        source: new URLSearchParams(window.location.search).get("src"),
-        referrer: document.referrer || null,
-      }).select("id").single();
-
-      if (viewRow?.id) viewRowId = viewRow.id;
-
-      if (user && trackedRole === "investor" && startup!.founder_id) {
-        const investorLabel = viewerFund ? `${viewerName ?? "An investor"} from ${viewerFund}` : viewerName ?? "An investor";
-        const { error: viewNotifErr } = await supabase.from("notifications").insert({
-          user_id: startup!.founder_id,
-          kind: "view", type: "profile_view",
-          title: `${investorLabel} viewed your profile`,
-          body: `${investorLabel} just visited your Lengdon profile.`,
-          read: false, action_url: "/app/profile?tab=analytics",
-          meta: { viewer_name: viewerName, viewer_fund: viewerFund, viewer_id: user.id },
-        });
-        if (viewNotifErr) console.error("[profile-views] notification failed:", viewNotifErr);
-      }
-    }
-
-    const logDuration = async () => {
-      const duration = Math.round((Date.now() - startTime) / 1000);
-      if (duration < 3 || !viewRowId) return;
-      const { error: durErr } = await supabase.from("profile_views").update({ duration_seconds: duration }).eq("id", viewRowId);
-      if (durErr) console.error("[profile-views] duration update failed:", durErr);
-    };
-
-    trackView();
-    const onVisibility = () => { if (document.visibilityState === "hidden") logDuration(); };
-    window.addEventListener("beforeunload", logDuration);
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.removeEventListener("beforeunload", logDuration);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [startup?.id]);
+  // Profile view tracking is switched off (G1-1, 21 Oct 2026). The browser wrote public.profile_views directly (an insert policy of
+  // `true`, anyone could forge rows) and tried to notify the founder through public.notifications (blocked by RLS, so it never worked).
+  // Views are not recorded until the verified server-side rebuild (CLAUDE.md §20.21 (m)). Reading existing rows (analytics) is unchanged.
 
   const vis = getVisibility(startup);
 

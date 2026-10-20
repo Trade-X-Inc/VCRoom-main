@@ -616,6 +616,24 @@ async function notionWaitlistPage(
 export async function waitlistFormHandler(d: Deps, raw: unknown) {
   const p = parseWaitlistInput(raw);
   if (!p.ok) return INVALID;
+  // G1-1: the row is written HERE, with the service role, after validation. The browser can no longer insert into waitlist_entries
+  // (anon INSERT and the insert-with-true policy are gone). A repeat address is a silent no-op (unique email, ignoreDuplicates), so the
+  // answer never tells a caller whether an address is already on the list.
+  const stored = await service(d)
+    .from("waitlist_entries")
+    .upsert(
+      {
+        email: p.value.email,
+        full_name: p.value.name,
+        role: p.value.role || null,
+        type: p.value.source,
+      },
+      { onConflict: "email", ignoreDuplicates: true },
+    );
+  if (stored.error) {
+    console.error("[waitlist] store failed");
+    return fail("store_failed");
+  }
   await upsertContactWith(
     hubspot(d),
     p.value.email,

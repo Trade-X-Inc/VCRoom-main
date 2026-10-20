@@ -39,6 +39,8 @@ export type Mock = {
     sentTo: string[];
     hubspotBodies: any[];
     notionBodies: any[];
+    waitlistRows: { body: any; onConflict: string | null; prefer: string }[];
+    failWaitlist: boolean;
   };
   events: any[];
   reset(): void;
@@ -69,6 +71,8 @@ export async function startMock(): Promise<Mock> {
     auth: 0,
     sentTo: [] as string[],
     hubspotBodies: [] as any[],
+    waitlistRows: [] as { body: any; onConflict: string | null; prefer: string }[],
+    failWaitlist: false,
     notionBodies: [] as any[],
   };
   const events: any[] = [];
@@ -145,6 +149,11 @@ export async function startMock(): Promise<Mock> {
         if (req.method === "POST") {
           if (table === "email_events") {
             events.push({ ...body, created_at: new Date().toISOString() });
+            return send(res, 201, []);
+          }
+          if (table === "waitlist_entries") {
+            if (hits.failWaitlist) return send(res, 500, { code: "XX000", message: "mock failure" });
+            hits.waitlistRows.push({ body, onConflict: q.get("on_conflict"), prefer: String(req.headers.prefer ?? "") });
             return send(res, 201, []);
           }
           if (table === "invites") {
@@ -275,6 +284,8 @@ export async function startMock(): Promise<Mock> {
       hits.sentTo.length = 0;
       hits.hubspotBodies.length = 0;
       hits.notionBodies.length = 0;
+      hits.waitlistRows.length = 0;
+      hits.failWaitlist = false;
       events.length = 0;
     },
     close: () => new Promise<void>((r) => server.close(() => r())),

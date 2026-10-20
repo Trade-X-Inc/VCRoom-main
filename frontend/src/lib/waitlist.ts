@@ -1,4 +1,3 @@
-import { supabase } from "@/lib/supabase";
 import { submitWaitlistForm } from "@/lib/public-forms-fn";
 
 // SEO-020 Phase 2 — shared submission path for the new WaitlistPrompt
@@ -45,21 +44,13 @@ export async function submitToWaitlist({ email, role, source }: SubmitWaitlistAr
   }
 
   try {
-    const { error: dbError } = await supabase.from("waitlist_entries").insert({
-      email: normalizedEmail,
-      full_name: "",
-      role: role ?? null,
-      type: source,
+    // The server function validates, stores the row (service role) and writes HubSpot and Notion; the browser writes none of them.
+    const res = await submitWaitlistForm({
+      data: { email: normalizedEmail, name: "", ...(role ? { role } : {}), source },
     });
-    if (dbError) {
-      console.error("[waitlist] Supabase insert failed:", dbError);
+    if (!res.ok) {
       return { ok: false, error: "Something went wrong. Please try again." };
     }
-
-    // HubSpot and Notion are written by the server function only; the browser never calls them.
-    submitWaitlistForm({
-      data: { email: normalizedEmail, name: "", ...(role ? { role } : {}), source },
-    }).catch(() => console.error("[waitlist] CRM submit failed"));
 
     return { ok: true };
   } catch (e) {
