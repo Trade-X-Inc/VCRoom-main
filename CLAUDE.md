@@ -1819,6 +1819,23 @@ The page is `src/components/join/JoinInvite.tsx`, mounted by `src/routes/join.ts
 
 **Mutation proofs (20 Oct 2026, each reverted).** Auto-accept on load: caught by `tests/join-page.spec.ts` "signed in and confirmed … NOTHING is accepted until the button is pressed" (plus the accept-flow tests). Token left in the address bar: caught by `tests/join-state.spec.ts` "capture: the address bar is rewritten BEFORE the token is stored" (and two more) and `tests/join-page.spec.ts` "the token leaves the address bar…". Stash expiry removed: caught by `join-state` "stash: fresh for 30 minutes, gone after…" and `join-page` "stash: a fresh entry resumes… an expired one shows the invalid message". A preview error that shows a different message: caught by `join-page` "invalid: five different causes give byte-identical output". (A first version of the last mutation changed only the `catch` branch, which supabase-js never reaches for a network failure, and was NOT caught because it never ran; it was redone on the real error branch.)
 
+
+### 20.32 Team-membership write holes closed — applied and recorded 21 Oct 2026 (job J3c-0)
+
+Applied by the owner on 2026-10-21 from `supabase/drafts/DRAFT_team_membership_lockdown.sql`; recorded as migration `20261021100000_team_membership_lockdown.sql`, **byte-identical** to the draft (sha256 `80107fd58071aa7d4d8fe793f55136aa75878374919ed1d8a2ce06818f0b5e0a`; its header still says DRAFT because the file was not edited).
+
+**Found (three routes to an admin seat on any startup, reproduced as real roles before the fix).** (a) `team_accounts_investor_manage` (ALL, `with check investor_profile_id = auth.uid()`) pinned one scope column and left `startup_id`, `user_id` and `role` free, so any signed-in user could insert themselves as `admin` of any startup. (b) `team_accounts_self_accept_invite`: one account could write a `team_invites` row to its own address with `invited_by` NULL and then self-insert at a victim. (c) a cross-scope `team_invites` row (investor id pinned, startup id free) plus the old `accept_team_invite` RPC. Underneath all three: `anon` and `authenticated` held every table privilege including TRUNCATE on all 140 public tables, and the tables had no CHECKs.
+
+**Applied.** The four wide policies dropped; authenticated-only read, update and delete policies (update keeps `can_appoint_role`); no INSERT path at all (memberships come only from `invite_v1.accept_invite`); column-level UPDATE on `(role, avatar_url)` only; role, status and scope CHECKs on `startup_team_accounts` and `team_invites`; `anon` revoked on both team tables; TRUNCATE, REFERENCES, TRIGGER and MAINTAIN revoked for clients on the three team tables. The owner is implicit (no membership row), and no admin path can remove, demote or hide the owner (checked, and tested in the dry run).
+
+**Lessons.**
+1. **A policy must pin ALL scope columns, and a client must not be able to update scope or identity columns.** `with check` cannot see the old row; only column-level grants stop a `user_id` or `startup_id` rewrite. (Now CLAUDE.md §0c rule 2.)
+2. **A dry run's helpers must not outlive the live ACLs.** On the real project a postgres-owned `pg_temp` helper is not executable by `service_role` (the default ACL of role postgres has no PUBLIC execute), so the first live run failed with `42501` where the local replica passed. The replica must match live ACLs, including no PUBLIC execute on new functions, and the generator now fails if a `pg_temp.*` call runs while a non-postgres role is active.
+3. **A mutation test must be able to fail.** Two mutations passed locally and failed live because a second layer (a foreign key blocking plain TRUNCATE; no column UPDATE on `startups.founder_id`) hid the weakness. Measure the privilege (`has_table_privilege`), open every layer the mutation needs, and keep a control that proves the check can turn false.
+4. **The apply file stays byte-identical to the draft that was dry-run.** The dry run pastes the apply text itself and checks its sha256; the repo migration is a copy of the draft, never retyped.
+
+Open: the old `team_invites` ALL policies and `accept_team_invite` remain until J3c-3/4; an admin can still demote or remove other admins (by design, §0c rule 6).
+
 ---
 
 ## 21. Amendment log
