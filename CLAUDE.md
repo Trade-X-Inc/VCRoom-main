@@ -42,6 +42,40 @@ Every internal and external page follows the founder's Figma file EXACTLY — sa
 
 ---
 
+## 0b. Product direction
+
+- Lengdon is an investor-first B2B SaaS / regulated fintech platform. It is NOT a PaaS.
+- Investors are the revenue engine and daily users; founders are seasonal.
+- Investor jobs: diligence, meetings and closing with their own network; relationships with invested companies; LP, fund and SPV raising; capital deployment.
+- Build order is unchanged: the 7 founder stages, then the investor dashboard, then team and counsel. First milestone: one real angel deal end to end.
+- No scoring or evaluation of anyone (no readiness score, match score, AI verdict, risk level, roast). We find errors and mismatches between documents and show them with sources and a "machine-found, check it" label.
+- All users (including counsel and temporary users) need smooth onboarding and offboarding. Commit-class actions stay human-only, even through MCP.
+- SOC/ISO/fintech certifications come before full launch.
+
+---
+
+## 0c. Isolation and scale rules (mandatory for every job)
+
+1. **Sandbox rule.** Every row belongs to exactly one scope (user, startup, investor/fund, deal room). A compromise of one account, team or room must never reach another. This is the last line of defense; the layers above it must also be strong.
+2. **RLS rules.** Never write a policy that tests only "authenticated" or `auth.uid() is not null`. Insert and update policies must pin ALL scope columns. Clients must never be able to update scope or identity columns (use column-level grants). Add CHECK constraints for scope shape and roles.
+3. **Default deny.** New tables: RLS on, no anon grants, no TRUNCATE/REFERENCES/TRIGGER for client roles. Sensitive writes go through the action gateway or SECURITY DEFINER RPCs, not direct client writes.
+4. **Cross-tenant test is mandatory** in every job that touches data: as a user of tenant A, try to read, insert, update and delete tenant B's rows, and attach a row to tenant B's scope. The report must show it fails.
+5. **Scale rules.** Assume thousands of tenants.
+   - Every list is paginated and bounded.
+   - Index every column that RLS or a foreign key uses.
+   - Wrap `auth.uid()` as `(select auth.uid())` in policies. RLS helper functions must be STABLE and cheap.
+   - No N+1 queries. No per-request table scans.
+   - Heavy work goes to background jobs with idempotency keys.
+   - Rate limits are per user and per tenant.
+   - Workers keep no in-memory state between requests.
+   - Append-only logs (`pack_v1.record_entry`, `invite_v1.invite_event`) need a partitioning/retention plan before volume.
+   - Migrations are backward-compatible (expand, then contract).
+   - New risky features ship behind a kill switch.
+6. **Roles.** Admin is the top role; a scope may have several admins. An admin may appoint and remove other admins. Only admins grant permissions and assign people to deal rooms or future team features. Owner is implicit and cannot be removed. One permission matrix is the single source of truth.
+7. **Sweep rule.** When a hole is found in one table, sweep all tables for the same pattern in the same job.
+
+---
+
 ## 1. The one rule
 
 **Audit before you build. Report before you merge.**
