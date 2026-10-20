@@ -19,7 +19,8 @@
   "tests/auth-recovery.spec.ts"
  ],
  "loopback": [
-  "tests/email-lockdown.spec.ts"
+  "tests/email-lockdown.spec.ts",
+  "tests/invite-actions.spec.ts"
  ],
  "live": [
   "tests/ai-operator-panel.spec.ts",

@@ -157,13 +157,10 @@ function indexFile(path, sf, known) {
       funcs.set(node.name.text, node);
     if (ts.isVariableStatement(node)) {
       for (const d of node.declarationList.declarations) {
-        if (
-          ts.isIdentifier(d.name) &&
-          d.initializer &&
-          (ts.isArrowFunction(d.initializer) ||
-            ts.isFunctionExpression(d.initializer))
-        )
-          funcs.set(d.name.text, d.initializer);
+        // Functions, and also any other top-level const (an object of handlers, a call that builds one): a server
+        // function that hands a const to a pipeline (runAction(def, data)) reaches whatever that const's initializer
+        // reaches. Followed by identifier name, like a helper function.
+        if (ts.isIdentifier(d.name) && d.initializer) funcs.set(d.name.text, d.initializer);
       }
     }
     if (
@@ -375,12 +372,17 @@ export function analyze(files, allowlist, opts = {}) {
 
   const serverFnNames = new Set();
   for (const [path, sf] of parsed) {
-    if (path.startsWith("src/lib/actions/")) continue; // separate chokepoint (check-action-split.mjs)
+    // Gateway actions (src/lib/actions/**) have a separate chokepoint for the service-role client (runAction, enforced by
+    // check-action-split.mjs), so reaching a service client there is expected and is NOT reported. They are still
+    // checked for the effects runAction does not govern: an action that sends email or writes to a CRM must be
+    // allow-listed with a policy letter like any other sender (J3a: invite.create / invite.resend, letter E).
+    const inActions = path.startsWith("src/lib/actions/");
     for (const fn of findServerFns(sf)) {
       serverFnNames.add(path + ":" + fn.name);
       const r = reach(path, fn.body, index);
       const reaches = r.email || r.crm || r.service;
       if (!reaches) continue;
+      if (inActions && !(r.email || r.crm)) continue;
       const hasAuth = r.auth || r.inlineGetUser;
       const label = `${path}:${fn.line} export const ${fn.name}`;
       const e = entryFor(path, fn.name);

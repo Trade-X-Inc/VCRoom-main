@@ -1735,6 +1735,25 @@ Live `md5(prosrc)` baselines after the apply: `erase_user_account` `6945e4b6185c
 
 **Rule: `erase_user_account` and `erase_user_account_dryrun` reference tables by name in dynamic SQL. Any job that drops or renames a table named in their lists must update both functions first, in the same dry run, or erasure will fail.** (The lists are the `values (...)` tables inside each function body; the removal jobs check against them.)
 
+### 20.30 Invitation gateway actions and email send — recorded 20 Oct 2026 (job J3a)
+
+Server side only; no page, no UI. `invite.create`, `invite.resend`, `invite.revoke` and `invite.list` are gateway actions (`src/lib/actions/invite-core.ts` holds the definitions, `invite.ts` binds one top-level `createServerFn` each to `runAction`, `src/lib/email/invite-send.ts` sends). `p_uid` is only ever the verified session user; every input schema is strict; step-up (password re-entry) is required only to create a `team` or `fund_team` invitation with role `admin` (`requiresStepUp` now also accepts a predicate over the raw input, and a predicate that throws requires the step-up). Create and resend are registered in the H3 allow-list with policy letter E; the guard now analyses `src/lib/actions/**` for email and CRM effects (service-role use there is still governed by `runAction`).
+
+1. **`invite_api` must be in the Data API "Exposed schemas" (Project Settings, API) before any live call works.** Until then every action returns a generic `*_rpc_failed`. Never expose `invite_v1`. Do not run the docs' blanket grant SQL: `invite_api` already grants `service_role` only.
+2. **Invitation link format: `https://lengdon.com/join#t=<token>`.** The token goes in the URL fragment, never the query string, so it cannot reach request logs or a Referer header. Built only as `appUrl + "/join#t=" + token`, and only if the token matches the issued shape (43 characters, `A-Za-z0-9_-`); otherwise nothing is sent, `mark_sent(false)` is recorded and the caller is told to resend. The token is never returned, logged, stored or put in an error or the record.
+3. **Name cleaning (inviter name, organisation name), one function, `safeDisplayName` in `kit.ts`:**
+   - NFKC-normalise, map look-alike full stops to ".", control characters to spaces, zero-width and bidi characters removed, whitespace collapsed.
+   - A value that is empty, or looks like a link or address (scheme, `://`, `www.`, `@`, a dot followed by two or more letters, an IP-like run, "(dot) com"), is replaced WHOLE by a fallback, never partly kept.
+   - Fallbacks: "A colleague" (inviter) and "a Lengdon workspace" (organisation).
+   - Capped at 60 characters; html is escaped and defanged by the kit; the text part and subject get the same cleaned values; the subject is one line.
+   - Returned to the browser, the invitee address is masked (`j***@domain`).
+4. **Brand-word rule.** Any name containing "lengdon" (any case or width, after NFKC and zero-width removal) is unusable and falls back, so a user cannot send an invitation that reads as a message from us ("Lengdon Support", "LENGDON Security").
+5. **`record_append_failed` after a send.** `runAction` appends the record entry after `handle()` returns. For `invite.create` and `invite.resend`, `handle()` has already created or re-issued the invitation, sent the email and called `mark_sent`. A failure of the record append therefore returns an error to the caller even though the invitation exists and the email may have gone out. The record entry for that action is missing; the invitation row and its `invite_event` rows are intact.
+
+**Rule for the page job:** after ANY create or resend error, including `record_append_failed`, the page must re-fetch the list (`invite.list`) before showing state, and must not tell the user "nothing happened". A retried create then hits `duplicate_pending` or `too_soon` against the invitation that was in fact created, so the page should direct the user to resend from the refreshed list.
+
+Not decided here: same-side counsel or room-invite wording beyond what the database enforces; per-sender daily caps beyond the database limits (§20.23 open item); the page, the join screen and moving the old invite flows over (§20.28).
+
 ---
 
 ## 21. Amendment log
@@ -1810,3 +1829,4 @@ Live `md5(prosrc)` baselines after the apply: `erase_user_account` `6945e4b6185c
 | 20 Oct 2026 | **E1: email redesign — one kit, six app emails with plain text, 13 Supabase templates to paste, preview script and tests — see §20.27.** Escaping and own-link rules enforced in the kit; dead templates with invented claims removed; broken deal-room invite link reported, not changed; footer address left as an owner placeholder. No real email sent. |
 | 20 Oct 2026 | **J1: invitation model `invite_v1` recorded as migration `20261020100000_invite_v1.sql` (byte-identical to the applied draft); grant guard gains the narrow `anon_execute_functions` exception for `public.invite_preview(text)` — see §20.28.** Live fingerprints and the design rules are recorded; `invite_api` is not yet exposed. |
 | 20 Oct 2026 | **J2b: account erasure now clears invitation data; migration `20261020110000_erase_invite.sql` recorded (byte-identical to the applied draft) with the new md5 baselines and the table-list rule — see §20.29.** |
+| 20 Oct 2026 | **J3a: invitation gateway actions and server-side invitation email (create, resend, revoke, list) with strict validation, admin-role step-up, name cleaning with a brand-word rule, and a strict token shape; guard extended to gateway actions — see §20.30.** `invite_api` must be exposed before any call works; no page yet. |

@@ -271,13 +271,100 @@ check(
   analyze(LOG("console.log('[x] sent');"), []).length === 0,
 );
 
-// ── actions are out of scope (separate chokepoint) ─────────────────────────────────────────────────
+// ── gateway actions (J3a): the service-role client is the gateway's job, EMAIL and CRM effects are still ours ────────
+const GATEWAY = {
+  path: "src/lib/actions/gateway.ts",
+  text: "export async function runAction(def, data) { const auth = await requireUser(data.accessToken); return def.handle(auth); }\n",
+};
+const ACTION = (extra = "") => ({
+  path: "src/lib/actions/inv.ts",
+  text:
+    `import { createServerFn } from "@tanstack/react-start";\nimport { runAction } from "./gateway";\n` +
+    `import { sendIt } from "@/lib/email/send";\n` +
+    `const deps = { sendEmail: (d) => sendIt(d) };\n` +
+    `function makeDef(deps) { return { handle: async (ctx, input) => deps.sendEmail(input) }; }\n` +
+    `const def = makeDef(deps);\n${extra}` +
+    `export const inviteCreate = createServerFn({ method: "POST" }).handler(({ data }) => runAction(def, data));\n`,
+});
+const SENDER = {
+  path: "src/lib/email/send.ts",
+  text: "export async function sendIt(d) { return sendEmailWith({}, d); }\n",
+};
 check(
-  "actions directory is not scanned by R2",
+  "actions: a service-role client alone is the gateway's job and is not reported",
   analyze(
-    [{ path: "src/lib/actions/a.ts", text: SF("await sendEmail({});") }],
+    [
+      GATEWAY,
+      {
+        path: "src/lib/actions/a.ts",
+        text: `import { createServerFn } from "@tanstack/react-start";\nimport { runAction } from "./gateway";\nconst def = { handle: async (ctx) => serviceClient() };\nexport const act = createServerFn({ method: "POST" }).handler(({ data }) => runAction(def, data));\n`,
+      },
+    ],
     [],
   ).length === 0,
+);
+check(
+  "actions R2 fail: an action that reaches an email sender through its def and injected deps is unlisted",
+  rules(analyze([GATEWAY, ACTION(), SENDER], [])) === "R2",
+);
+check(
+  "actions R2 pass: listed with policy E, and runAction supplies the auth helper",
+  analyze(
+    [GATEWAY, ACTION(), SENDER],
+    [entry("src/lib/actions/inv.ts", "inviteCreate", "E")],
+  ).length === 0,
+);
+check(
+  "actions R3 fail: listed with policy E but the gateway reaches no auth helper",
+  rules(
+    analyze(
+      [{ path: "src/lib/actions/gateway.ts", text: "export async function runAction(def, data) { return def.handle(data); }\n" }, ACTION(), SENDER],
+      [entry("src/lib/actions/inv.ts", "inviteCreate", "E")],
+    ),
+  ) === "R3",
+);
+check(
+  "actions R2 fail: listed as policy G (a data policy) while it sends email",
+  rules(
+    analyze(
+      [GATEWAY, ACTION(), SENDER],
+      [entry("src/lib/actions/inv.ts", "inviteCreate", "G")],
+    ),
+  ) === "R2",
+);
+check(
+  "actions: an action that does not reach an email sender is not reported even though others in the file do",
+  analyze(
+    [
+      GATEWAY,
+      SENDER,
+      {
+        path: "src/lib/actions/two.ts",
+        text:
+          `import { createServerFn } from "@tanstack/react-start";\nimport { runAction } from "./gateway";\n` +
+          `const quietDef = { handle: async () => 1 };\n` +
+          `export const quiet = createServerFn({ method: "POST" }).handler(({ data }) => runAction(quietDef, data));\n`,
+      },
+    ],
+    [],
+  ).length === 0,
+);
+check(
+  "R2: a server function reaches a sender through a top-level const initializer it hands on",
+  rules(
+    analyze(
+      [
+        {
+          path: "src/lib/a.ts",
+          text:
+            `import { createServerFn } from "@tanstack/react-start";\nimport { sendIt } from "@/lib/email/send";\n` +
+            `const cfg = { run: () => sendIt({}) };\nexport const fn = createServerFn({ method: "POST" }).handler(async ({ data }) => cfg.run(data));\n`,
+        },
+        SENDER,
+      ],
+      [],
+    ),
+  ) === "R2",
 );
 
 console.log(`\n${passed} passed, ${failed} failed`);

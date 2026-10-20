@@ -97,7 +97,11 @@ export type ActionDef<Input, Output extends JsonValue> = {
   // before authorize()/handle() ever run — see the block below. Defaults to
   // false/absent for every other action; nothing else in this codebase is
   // affected by adding this field.
-  requiresStepUp?: boolean;
+  // May also be a predicate over the RAW input (J3a, invitations: only an admin-level role needs the step-up).
+  // The predicate runs before validate(), so it must be written as "does this input parse to the privileged shape"
+  // using the action's own schema; an input that does not parse is never privileged here because validate() refuses
+  // it a few lines later, before any handler runs.
+  requiresStepUp?: boolean | ((rawInput: unknown) => boolean);
   // Atomicity fix (24 Sep 2026, confirmDeliverable) — when true, runAction's
   // own step-6 append_record call is SKIPPED entirely: the handler already
   // wrote the record entry itself, atomically, in the same DB transaction as
@@ -129,6 +133,15 @@ function serviceClient(): SupabaseClient {
   const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) throw new Error("supabase_not_configured");
   return createClient(url, key, { auth: { persistSession: false } });
+}
+
+// A step-up predicate that throws must fail CLOSED (require the step-up), never skip it.
+function safePredicate(fn: (raw: unknown) => boolean, raw: unknown): boolean {
+  try {
+    return fn(raw) === true;
+  } catch {
+    return true;
+  }
 }
 
 // ── runAction — the pipeline every action passes through ─────────────────────
@@ -177,7 +190,11 @@ export async function runAction<Input, Output extends JsonValue>(
   // it (pack_api.verify_and_consume_step_up_token), so a caller who fails
   // authorize() or handle() after this point must go back through
   // verifyStepUp(password) again for a retry — it cannot be replayed.
-  if (def.requiresStepUp) {
+  const needsStepUp =
+    typeof def.requiresStepUp === "function"
+      ? safePredicate(def.requiresStepUp, data.input)
+      : def.requiresStepUp === true;
+  if (needsStepUp) {
     const stepUp = await consumeStepUpToken(auth.uid, data.stepUpToken);
     if (!stepUp.ok) {
       return { ok: false, error: "STEP_UP_REQUIRED", status: 401 };

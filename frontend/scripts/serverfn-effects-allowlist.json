@@ -258,6 +258,18 @@
    "name": "*",
    "policy": "G",
    "reason": "Service-role data function (no email, CRM or Notion write); the caller is derived from their own token by a recognised auth helper (rules R1 and R3)."
+  },
+  {
+   "file": "src/lib/actions/invite.ts",
+   "name": "inviteCreate",
+   "policy": "E",
+   "reason": "Invitation email (invite_v1) to the address on the invitation row the database just created; the caller is the verified session (runAction/requireUser) and invite_api authorizes by scope and role rank; the token goes only into the link fragment and is never returned or logged; admin-level roles need the password step-up; the minimum resend interval, daily caps and send count are enforced in the database."
+  },
+  {
+   "file": "src/lib/actions/invite.ts",
+   "name": "inviteResend",
+   "policy": "E",
+   "reason": "Invitation email (invite_v1) to the address on the invitation row the database just re-issued; the caller is the verified session (runAction/requireUser) and invite_api authorizes by scope and role rank; the token goes only into the link fragment and is never returned or logged; admin-level roles need the password step-up; the minimum resend interval, daily caps and send count are enforced in the database."
   }
  ]
 }

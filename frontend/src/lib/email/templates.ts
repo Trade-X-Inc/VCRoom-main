@@ -2,7 +2,9 @@ import {
   cleanLine,
   cleanMultiline,
   formatDateUtc,
+  INVITE_TOKEN_SHAPE,
   renderEmail,
+  safeDisplayName,
   safeId,
   type Block,
   type EmailModel,
@@ -325,5 +327,94 @@ export function lawyerInviteEmail({
       { t: "fine", text: IGNORE_LINE },
     ],
     reason: `${inviter} invited this address to a deal room on Lengdon.`,
+  });
+}
+
+// 7. INVITATION (invite_v1) — policy E. One template for the four invitation kinds. The link carries the token in the
+// URL FRAGMENT (https://…/join#t=<token>), which browsers never send to a server and never put in a Referer header,
+// so it cannot reach request logs. The token is passed in, put into the link only, and never into any other text.
+export type InvitationKind =
+  "room_member" | "room_counsel" | "team" | "fund_team";
+
+/** The same labels invite_v1.role_label gives the anonymous preview, so the email and the join page agree. */
+export function invitationRoleLabel(kind: string, role: string): string {
+  if (kind === "room_counsel") return "Legal counsel";
+  const r = /^[a-z_]{1,20}$/.test(String(role)) ? String(role) : "";
+  if (kind === "room_member") return r === "founder" ? "Founder" : "Investor";
+  return r ? r.charAt(0).toUpperCase() + r.slice(1) : "Member";
+}
+
+export function invitationEmail({
+  inviterName,
+  orgName,
+  kind,
+  role,
+  token,
+  expiresAt,
+  appUrl,
+}: {
+  inviterName: string;
+  orgName: string;
+  kind: InvitationKind | string;
+  role: string;
+  token: string;
+  expiresAt?: string;
+  appUrl: string;
+}): RenderedEmail {
+  // User-controlled text (the inviter's name, the organisation's name) is cleaned by safeDisplayName; a value that is
+  // empty or looks like a link or an address is replaced whole by a neutral fallback, never partly kept.
+  const inviter = safeDisplayName(inviterName) ?? "A colleague";
+  const orgClean = safeDisplayName(orgName);
+  const company = orgClean ?? "a Lengdon workspace";
+  const roleLabel = invitationRoleLabel(kind, role);
+  const side = role === "founder" ? "founder" : "investor";
+  // The token is built into the link only after it matches the issued shape; anything else throws, the sender catches
+  // it and the send counts as failed (the invitation stays, the user is told to resend).
+  if (!INVITE_TOKEN_SHAPE.test(String(token)))
+    throw new Error("invitation token is not in the issued format");
+  const link = `${appUrl}/join#t=${token}`;
+  const roomName = orgClean
+    ? `the ${company} deal room`
+    : "a Lengdon deal room";
+  const what =
+    kind === "room_counsel"
+      ? `act as legal counsel for the ${side} side of ${roomName}`
+      : kind === "room_member"
+        ? `join ${roomName} as ${roleLabel}`
+        : `join ${company} as ${roleLabel}`;
+  const expiry = formatDateUtc(expiresAt);
+  return build(appUrl, {
+    subject: orgClean
+      ? `${inviter} invited you to ${company} on Lengdon`
+      : `${inviter} invited you to Lengdon`,
+    preheader: `${inviter} invited you to ${company}.`,
+    heading: `You have been invited to ${company}`,
+    blocks: [
+      { t: "p", text: `${inviter} invited you to ${what} on Lengdon.` },
+      {
+        t: "facts",
+        rows: [
+          ["Invited by", inviter],
+          ["Organisation", company],
+          ["Role", roleLabel],
+          ...(expiry
+            ? ([["Expires", `${expiry} (UTC)`]] as [string, string][])
+            : []),
+        ],
+      },
+      {
+        t: "button",
+        label: "Accept the invitation",
+        url: link,
+      },
+      {
+        t: "note",
+        label: "This link is for you only",
+        text: "It works only for the email address this message was sent to, and only after that address is confirmed on Lengdon. Anyone else who opens it cannot use it.",
+      },
+      ...expiryBlock(expiresAt),
+      { t: "fine", text: IGNORE_LINE },
+    ],
+    reason: `${inviter} invited this address to ${company} on Lengdon.`,
   });
 }

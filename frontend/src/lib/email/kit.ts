@@ -98,6 +98,34 @@ export function cleanLine(value: unknown, max = 200): string {
   return s.length > max ? s.slice(0, max - 1).trimEnd() + "…" : s;
 }
 
+// Anything that reads as a link or an address: a scheme, "://", "www.", an at-sign, a dot followed by a letters-only
+// suffix (a domain), an IP-like run, or a spelled-out "dot com". Checked on the NFKC-normalised, zero-width-stripped
+// value so full-width dots and hidden characters cannot hide one.
+const LINKISH =
+  /(?:https?|ftp|file|data|javascript|vbscript|mailto):|:\/\/|\bwww\.|@|[\p{L}\p{N}]\.\p{L}{2,}|\d+\.\d+\.\d+|\(dot\)|\[dot\]|\bdot\s+(?:com|net|org|io|co|app|dev|xyz|info)\b/iu;
+
+/**
+ * A person's or company's name placed in an email subject or body (J3a-fix). One line, control and format characters
+ * (zero-width, bidi) removed, whitespace collapsed, capped at `max`. Returns null when the value is empty or contains
+ * anything that looks like a link or an address, or that contains the word "lengdon"; the caller then uses a neutral fallback instead of a half-cleaned value.
+ */
+export function safeDisplayName(value: unknown, max = 60): string | null {
+  const s = String(value ?? "")
+    .normalize("NFKC")
+    // full stops NFKC leaves alone (ideographic, half-width ideographic, one-dot leader, small full stop)
+    .replace(/[\u3002\uFF61\u2024\uFE52]/g, ".")
+    .replace(/[\p{Cc}\u2028\u2029]/gu, " ")
+    .replace(/\p{Cf}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  // The brand word is never accepted from a user: a name containing it could pass for a message from us.
+  if (!s || LINKISH.test(s) || /lengdon/i.test(s)) return null;
+  return s.length > max ? s.slice(0, max - 1).trimEnd() + "…" : s;
+}
+
+/** The token the database issues: 32 random bytes as base64url without padding, exactly 43 characters. */
+export const INVITE_TOKEN_SHAPE = /^[A-Za-z0-9_-]{43}$/;
+
 /** Several lines (a personal message): line breaks kept, other control characters dropped, blank runs capped. */
 export function cleanMultiline(value: unknown, max = 1000): string {
   const s = String(value ?? "")
