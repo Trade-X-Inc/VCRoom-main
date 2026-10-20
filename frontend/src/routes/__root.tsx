@@ -1,4 +1,5 @@
 import "@/lib/recovery-capture"; // must be first: reads a password-reset address before auth-js consumes it
+import "@/lib/join-capture"; // removes an invitation token from the /join address bar before anything renders
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, ScrollRestoration, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RECOVERY_CHANGE_EVENT, isRecoverySession, pathAllowedDuringRecovery } from "@/lib/recovery";

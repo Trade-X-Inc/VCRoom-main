@@ -274,7 +274,7 @@ test("while a recovery session is open only the new-password screen and the ways
 const WIRED = [
   "src/routes/sign-in.tsx",
   "src/routes/forgot-password.tsx",
-  "src/routes/join.tsx",
+  "src/components/join/LegacyTeamJoin.tsx",
   "src/routes/join-room.tsx",
   "src/routes/join-deal-room.$token.tsx",
   "src/routes/join-investor.$token.tsx",

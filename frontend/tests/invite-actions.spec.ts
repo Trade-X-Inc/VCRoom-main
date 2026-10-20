@@ -7,6 +7,7 @@ import http from "node:http";
 import type { AddressInfo } from "node:net";
 import { runAction } from "../src/lib/actions/gateway";
 import {
+  AcceptInviteInput,
   CreateInviteInput,
   InviteIdInput,
   ListInvitesInput,
@@ -100,7 +101,10 @@ async function startMock(): Promise<Mock> {
           );
         }
         if (schema === "pack_api" && fn === "append_record")
-          return send(200, { ok: true });
+          return send(
+            200,
+            m.rpc.append_record ? m.rpc.append_record(body) : { ok: true },
+          );
         const h = m.rpc[fn];
         const out = h ? h(body) : { ok: false, error: "unmocked" };
         if (out && out.__http)
@@ -1261,4 +1265,260 @@ test("the RPCs are called in the invite_api schema, never pack_api or public", a
     ["create_invite", "mark_sent"].includes(c.fn),
   );
   expect(rpcs.map((c) => c.schema)).toEqual(["invite_api", "invite_api"]);
+});
+
+// ── invite.accept (J3b) ─────────────────────────────────────────────────────
+
+const ACCEPT_TOKEN = TOKEN;
+const accepted = (over: Record<string, unknown> = {}) => ({
+  ok: true,
+  kind: "team",
+  role: "analyst",
+  org_name: "Acme Robotics",
+  scope_room_id: null,
+  scope_startup_id: STARTUP,
+  scope_investor_id: null,
+  ...over,
+});
+const appendCalls = () =>
+  mock.calls.filter((c) => c.schema === "pack_api" && c.fn === "append_record");
+const OUTPUT_KEYS = [
+  "investorId",
+  "kind",
+  "orgName",
+  "role",
+  "roomId",
+  "startupId",
+];
+
+test("accept input: a 43-character url-safe token parses; every other shape is refused without echoing the value", () => {
+  expect(AcceptInviteInput.safeParse({ token: ACCEPT_TOKEN }).success).toBe(
+    true,
+  );
+  for (const bad of [
+    "",
+    "short",
+    ACCEPT_TOKEN + "x",
+    ACCEPT_TOKEN.slice(0, 42),
+    ACCEPT_TOKEN.slice(0, 42) + "=",
+    ACCEPT_TOKEN.slice(0, 42) + "+",
+    ACCEPT_TOKEN.slice(0, 42) + " ",
+    ACCEPT_TOKEN.slice(0, 42) + "\n",
+    123,
+    null,
+  ]) {
+    const r = AcceptInviteInput.safeParse({ token: bad });
+    expect(r.success, JSON.stringify(bad)).toBe(false);
+  }
+  expect(AcceptInviteInput.safeParse({}).success).toBe(false);
+  for (const extra of [
+    "userId",
+    "user_id",
+    "uid",
+    "p_uid",
+    "email",
+    "inviteId",
+  ])
+    expect(
+      AcceptInviteInput.safeParse({ token: ACCEPT_TOKEN, [extra]: ALICE })
+        .success,
+      extra,
+    ).toBe(false);
+});
+
+test("accept: a malformed token is refused as invalid_input, reaches nothing, and the message does not contain it", async () => {
+  const bad = ACCEPT_TOKEN.slice(0, 42) + "!";
+  const r: any = await runAction(defs().accept, envelope({ token: bad }));
+  expect(r.ok).toBe(false);
+  expect(r.error.startsWith("invalid_input")).toBe(true);
+  expect(JSON.stringify(r)).not.toContain(bad);
+  expect(callsTo("accept_invite")).toHaveLength(0);
+  expect(logs.join("\n")).not.toContain(bad);
+});
+
+test("accept: no session is 401 and nothing is called; an agent caller is refused", async () => {
+  const none: any = await runAction(
+    defs().accept,
+    envelope({ token: ACCEPT_TOKEN }, { accessToken: "" }),
+  );
+  expect(none.ok).toBe(false);
+  expect(none.status).toBe(401);
+  const agent: any = await runAction(
+    defs().accept,
+    envelope({ token: ACCEPT_TOKEN }, { isAgent: true }),
+  );
+  expect(agent.ok).toBe(false);
+  expect(agent.error).toBe("agent_commit_forbidden");
+  expect(callsTo("accept_invite")).toHaveLength(0);
+});
+
+test("accept: p_uid is the verified session user, never anything in the body or envelope; the RPC gets exactly p_uid and p_token", async () => {
+  mock.rpc.accept_invite = () => accepted();
+  const r: any = await runAction(
+    defs().accept,
+    envelope({ token: ACCEPT_TOKEN }, { userId: BOB, uid: BOB, p_uid: BOB }),
+  );
+  expect(r.ok).toBe(true);
+  expect(callsTo("accept_invite")).toHaveLength(1);
+  expect(callsTo("accept_invite")[0].body).toEqual({
+    p_uid: ALICE,
+    p_token: ACCEPT_TOKEN,
+  });
+  // an identity smuggled inside the input is refused
+  mock.calls = [];
+  const smuggled: any = await runAction(
+    defs().accept,
+    envelope({ token: ACCEPT_TOKEN, userId: BOB }),
+  );
+  expect(smuggled.ok).toBe(false);
+  expect(callsTo("accept_invite")).toHaveLength(0);
+});
+
+test("accept success, per kind: exactly the safe fields, the right ids, and the record goes to the chain of the thing joined", async () => {
+  const cases: Array<[string, Record<string, unknown>, string]> = [
+    [
+      "team",
+      {
+        kind: "team",
+        role: "analyst",
+        scope_room_id: null,
+        scope_startup_id: STARTUP,
+        scope_investor_id: null,
+      },
+      STARTUP,
+    ],
+    [
+      "fund_team",
+      {
+        kind: "fund_team",
+        role: "associate",
+        scope_room_id: null,
+        scope_startup_id: null,
+        scope_investor_id: INVESTOR,
+      },
+      INVESTOR,
+    ],
+    [
+      "room_member",
+      {
+        kind: "room_member",
+        role: "investor",
+        scope_room_id: ROOM,
+        scope_startup_id: null,
+        scope_investor_id: null,
+      },
+      ROOM,
+    ],
+    [
+      "room_counsel",
+      {
+        kind: "room_counsel",
+        role: "investor",
+        scope_room_id: ROOM,
+        scope_startup_id: null,
+        scope_investor_id: null,
+      },
+      ROOM,
+    ],
+  ];
+  for (const [kind, over, scope] of cases) {
+    mock.reset();
+    mock.rpc.accept_invite = () => accepted(over);
+    const r: any = await runAction(
+      defs().accept,
+      envelope({ token: ACCEPT_TOKEN }),
+    );
+    expect(r.ok, kind).toBe(true);
+    expect(Object.keys(r.data).sort(), kind).toEqual(OUTPUT_KEYS);
+    expect(r.data.kind).toBe(kind);
+    expect(r.data.orgName).toBe("Acme Robotics");
+    expect(r.data.roomId).toBe(over.scope_room_id);
+    expect(r.data.startupId).toBe(over.scope_startup_id);
+    expect(r.data.investorId).toBe(over.scope_investor_id);
+    expect(JSON.stringify(r)).not.toContain(ACCEPT_TOKEN);
+    const rec = appendCalls();
+    expect(rec, kind).toHaveLength(1); // the handler appends; the gateway does not append a second one
+    expect(rec[0].body.p_org_id).toBe(scope);
+    expect(rec[0].body.p_action).toBe("invite.accept");
+    expect(rec[0].body.p_actor_id).toBe(ALICE);
+    expect(rec[0].body.p_data).toEqual({ kind, role: over.role });
+    expect(JSON.stringify(rec[0].body)).not.toContain(ACCEPT_TOKEN);
+  }
+});
+
+test("accept refusal: unknown, used, wrong address, unconfirmed and a database error all give the identical invalid_or_used", async () => {
+  const answers: any[] = [
+    { ok: false, error: "invalid_or_used" },
+    { ok: false, error: "not_authorized" },
+    { ok: false, error: "email_not_confirmed" },
+    { ok: false },
+    null,
+  ];
+  const seen = new Set<string>();
+  for (const a of answers) {
+    mock.reset();
+    mock.rpc.accept_invite = () => a;
+    const r: any = await runAction(
+      defs().accept,
+      envelope({ token: ACCEPT_TOKEN }),
+    );
+    expect(r.ok).toBe(false);
+    seen.add(JSON.stringify({ error: r.error, status: r.status }));
+    expect(JSON.stringify(r)).not.toContain(ACCEPT_TOKEN);
+    expect(appendCalls()).toHaveLength(0); // nothing was joined, so nothing is recorded
+  }
+  expect([...seen]).toEqual([
+    JSON.stringify({ error: "invalid_or_used", status: 500 }),
+  ]);
+});
+
+test("accept: a database that cannot be reached is a different, non-uniform code, and still leaks nothing", async () => {
+  mock.rpc.accept_invite = () => ({ __http: 503 });
+  const r: any = await runAction(
+    defs().accept,
+    envelope({ token: ACCEPT_TOKEN }),
+  );
+  expect(r.ok).toBe(false);
+  expect(r.error).toBe("accept_invite_rpc_failed");
+  expect(JSON.stringify(r)).not.toContain(ACCEPT_TOKEN);
+});
+
+test("accept: if the record entry fails after the accept, the caller gets record_append_failed (the invitation is joined)", async () => {
+  mock.rpc.accept_invite = () => accepted();
+  mock.rpc.append_record = () => ({ ok: false, error: "chain_error" });
+  const r: any = await runAction(
+    defs().accept,
+    envelope({ token: ACCEPT_TOKEN }),
+  );
+  expect(r.ok).toBe(false);
+  expect(r.error).toBe("record_append_failed");
+  expect(callsTo("accept_invite")).toHaveLength(1);
+  expect(JSON.stringify(r)).not.toContain(ACCEPT_TOKEN);
+});
+
+test("accept: the token is in no log line, success or failure", async () => {
+  const d = defs();
+  mock.rpc.accept_invite = () => accepted();
+  await runAction(d.accept, envelope({ token: ACCEPT_TOKEN }));
+  mock.rpc.accept_invite = () => ({ ok: false, error: "invalid_or_used" });
+  await runAction(d.accept, envelope({ token: ACCEPT_TOKEN }));
+  mock.rpc.accept_invite = () => ({ __http: 500 });
+  await runAction(d.accept, envelope({ token: ACCEPT_TOKEN }));
+  await runAction(d.accept, envelope({ token: ACCEPT_TOKEN.slice(0, 40) }));
+  const all = logs.join("\n");
+  expect(all).not.toContain(ACCEPT_TOKEN);
+  expect(all).not.toContain(ACCEPT_TOKEN.slice(0, 40));
+  expect(all).not.toContain("tok-alice");
+});
+
+test("accept: the action is called in the invite_api schema only, and sends no email", async () => {
+  mock.rpc.accept_invite = () => accepted();
+  await runAction(defs().accept, envelope({ token: ACCEPT_TOKEN }));
+  expect(callsTo("accept_invite")).toHaveLength(1);
+  expect(
+    mock.calls.filter(
+      (c) => c.fn === "accept_invite" && c.schema !== "invite_api",
+    ),
+  ).toHaveLength(0);
+  expect(mock.mails).toHaveLength(0);
 });

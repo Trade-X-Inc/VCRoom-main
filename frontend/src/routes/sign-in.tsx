@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { TurnstileWidget, useTurnstile } from '@/components/auth/TurnstileWidget'
 import { TURNSTILE_HEAD } from '@/lib/turnstile-head'
 import { GoogleGMark } from '@/components/auth/GoogleGMark'
+import { takeJoinReturn } from '@/lib/join-stash'
 
 // Content/wiring pass, 31 Aug 2026 — pixel-exact port of
 // lengdon-public-new/src/pages/auth/SignIn.tsx (the founder's Figma
@@ -100,7 +101,8 @@ function SignIn() {
       .maybeSingle()
 
     const role = userRecord?.role || data.session.user.user_metadata?.role || 'founder'
-    window.location.href = role === 'investor' ? '/app/investor/' : '/app'
+    // Came here from an invitation page: go back to it (a fixed path, never a value from the address).
+    window.location.href = takeJoinReturn() ? '/join' : role === 'investor' ? '/app/investor/' : '/app'
   }
 
   return (

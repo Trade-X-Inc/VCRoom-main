@@ -10,13 +10,15 @@
   "tests/pack-inputs.spec.ts",
   "tests/pack-list-forms.spec.ts",
   "tests/pack-pinned-schedule.spec.ts",
-  "tests/pack-screen-state.spec.ts"
+  "tests/pack-screen-state.spec.ts",
+  "tests/join-state.spec.ts"
  ],
  "local": [
   "tests/a11y-scan.spec.ts",
   "tests/auth-captcha.spec.ts",
   "tests/email-a11y.spec.ts",
-  "tests/auth-recovery.spec.ts"
+  "tests/auth-recovery.spec.ts",
+  "tests/join-page.spec.ts"
  ],
  "loopback": [
   "tests/email-lockdown.spec.ts",

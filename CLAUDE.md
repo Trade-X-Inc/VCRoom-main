@@ -1754,6 +1754,37 @@ Server side only; no page, no UI. `invite.create`, `invite.resend`, `invite.revo
 
 Not decided here: same-side counsel or room-invite wording beyond what the database enforces; per-sender daily caps beyond the database limits (§20.23 open item); the page, the join screen and moving the old invite flows over (§20.28).
 
+### 20.31 The /join invitation page and `invite.accept` — recorded 20 Oct 2026 (job J3b)
+
+The page is `src/components/join/JoinInvite.tsx`, mounted by `src/routes/join.tsx`; the action is `invite.accept` (`invite-core.ts`, bound in `invite.ts`); the token code is `src/lib/join-stash.ts`, `join-capture.ts`, `join-redirect.ts`. The email link is `https://lengdon.com/join#t=<token>`.
+
+**The flow, in ten lines**
+1. **Fragment capture.** An inline script in the page head (and, as the second path, `join-capture.ts` imported first by `__root.tsx`) reads `#t=`, removes the fragment with `history.replaceState`, THEN stores the token. Nothing renders in between.
+2. **Stash, 30 minutes.** The token lives in one `sessionStorage` entry (`lengdon.join.t`, `{t, exp}`, 30-minute expiry), never in a query string, localStorage, cookie, log or console message. A reload or a sign-in round trip resumes from it. A malformed token is also removed from the address, not stored, and shows the invalid message.
+3. **Explicit accept.** The page never accepts on load. Signed in and confirmed, it shows "You are signed in as <email>" and an "Accept the invitation" button; only the click calls `invite.accept`.
+4. **Uniform refusal.** The action turns EVERY refusal into one code (`invalid_or_used`); the page shows one message for every unusable invitation (preview and accept alike) plus a hint to use the invited address and a "Sign out and switch account" button. The stash is kept so another account can try. A database failure is a different, retryable message.
+5. **Unconfirmed email.** A signed-in but unconfirmed account is not offered the button and the server is not asked; the page tells the user to confirm first and open the email link again. The database enforces the same rule.
+6. **No Referer.** `Referrer-Policy: no-referrer`, noindex, and `Cache-Control: private, no-store, no-transform` are set for `/join` by `scripts/patch-wrangler.mjs` (meta tags repeat it).
+7. **CSP drop.** For `/join` without `?token=` the document CSP omits the Turnstile, Daily and Web Analytics hosts (the page loads no third-party script).
+8. **Legacy `?token=` kept until J3c.** `/join?token=<uuid>` still renders the old team-invite page (`components/join/LegacyTeamJoin.tsx`, logic unchanged) with the full CSP, because old emails use that form. J3c moves the old invite flows over and deletes it.
+9. **Return flag after sign-in.** "Sign in" and "Create an account" set `lengdon.join.return` (no token in it). `sign-in.tsx` and the Google path in `auth.callback.tsx` go back to the fixed path `/join` only if the flag is set and a fresh stash exists; the callback checks it after the password-recovery redirect and after the `users` row exists, so recovery precedence is unchanged.
+10. **Record written by the handler.** `invite.accept` is `recordedByHandler`: after the accept it appends its own record entry (kind and role only, no token) to the chain of the thing joined (room, startup or investor). If only that append fails the caller gets `record_append_failed` although the invitation IS accepted; the page then says so and links to `/app`. The page job for create/resend must likewise re-fetch the list after any error (§20.30).
+
+**Redirect table (existing routes, chosen from the action result, never from the address bar)**
+
+| kind | target | why |
+|---|---|---|
+| `room_member`, `room_counsel` | `/app/deal-rooms/<room id>/overview` | the room layout has no index route; `overview` is its home tab |
+| `team` | `/app/overview` | `/app/users` needs `manage_team`, which most roles lack |
+| `fund_team` | `/app/investor/overview` | `/app/investor/team` needs `manage_team` too |
+| anything else, or a room id that is not a uuid | `/app` | |
+
+**Post-deploy check (owner):** the Cloudflare Web Analytics beacon must be ABSENT on `/join` (view the response HTML or the network panel of a real `/join#t=…` load). `no-transform` is what stops the edge injecting it; it could not be verified locally.
+
+**Create an account needs Supabase signups ON (currently OFF).** The button links to `/sign-up`, which is the waitlist form today, so a new person cannot create an account from an invitation until signups are opened. The page, the return flag and the error handling are in place; only the setting is missing. `invite_api` must also be in the Data API exposed schemas before `invite.accept` works live.
+
+**Mutation proofs (20 Oct 2026, each reverted).** Auto-accept on load: caught by `tests/join-page.spec.ts` "signed in and confirmed … NOTHING is accepted until the button is pressed" (plus the accept-flow tests). Token left in the address bar: caught by `tests/join-state.spec.ts` "capture: the address bar is rewritten BEFORE the token is stored" (and two more) and `tests/join-page.spec.ts` "the token leaves the address bar…". Stash expiry removed: caught by `join-state` "stash: fresh for 30 minutes, gone after…" and `join-page` "stash: a fresh entry resumes… an expired one shows the invalid message". A preview error that shows a different message: caught by `join-page` "invalid: five different causes give byte-identical output". (A first version of the last mutation changed only the `catch` branch, which supabase-js never reaches for a network failure, and was NOT caught because it never ran; it was redone on the real error branch.)
+
 ---
 
 ## 21. Amendment log
@@ -1830,3 +1861,4 @@ Not decided here: same-side counsel or room-invite wording beyond what the datab
 | 20 Oct 2026 | **J1: invitation model `invite_v1` recorded as migration `20261020100000_invite_v1.sql` (byte-identical to the applied draft); grant guard gains the narrow `anon_execute_functions` exception for `public.invite_preview(text)` — see §20.28.** Live fingerprints and the design rules are recorded; `invite_api` is not yet exposed. |
 | 20 Oct 2026 | **J2b: account erasure now clears invitation data; migration `20261020110000_erase_invite.sql` recorded (byte-identical to the applied draft) with the new md5 baselines and the table-list rule — see §20.29.** |
 | 20 Oct 2026 | **J3a: invitation gateway actions and server-side invitation email (create, resend, revoke, list) with strict validation, admin-role step-up, name cleaning with a brand-word rule, and a strict token shape; guard extended to gateway actions — see §20.30.** `invite_api` must be exposed before any call works; no page yet. |
+| 20 Oct 2026 | **J3b: the /join invitation page and `invite.accept` — fragment token captured before first paint, 30-minute stash, explicit accept, uniform refusal, no-Referer and CSP drop, legacy `?token=` kept until J3c, return after sign-in; four mutation checks — see §20.31.** `invite_api` must be exposed, and Create an account needs Supabase signups ON. |

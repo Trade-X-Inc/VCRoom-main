@@ -392,6 +392,37 @@ function __applySecurityHeaders(request, response, cspNonce) {
     if (url.pathname.startsWith("/app/")) {
       headers.set("X-Robots-Tag", "noindex, nofollow");
     }
+    // /join (J3b): the invitation page. The link in an invitation email carries a one-time token in the URL fragment.
+    // The fragment is never sent to a server, and this page removes it from the address bar at start-up, but the page
+    // must also never leak it through a Referer header, a cache or a script injected at the edge:
+    //   - Referrer-Policy: no-referrer (the global default is strict-origin-when-cross-origin);
+    //   - noindex, and no shared cache;
+    //   - Cache-Control no-transform: Cloudflare does not inject the Web Analytics beacon into such a response;
+    //   - the document policy without the third-party script, frame and connect hosts (Turnstile, Daily, Web
+    //     Analytics) that other pages need. The legacy ?token= form of this page still uses Turnstile, so it keeps
+    //     the full policy.
+    if (url.pathname === "/join" || url.pathname === "/join/") {
+      headers.set("Referrer-Policy", "no-referrer");
+      headers.set("X-Robots-Tag", "noindex, nofollow");
+      if (isDocument) {
+        headers.set("Cache-Control", "private, no-store, no-transform");
+        if (!url.searchParams.has("token")) {
+          const thirdParty = ["cloudflareinsights.com", "challenges.cloudflare.com", "daily.co"];
+          const strict = (headers.get("Content-Security-Policy") || "")
+            .split("; ")
+            .map(function (directive) {
+              return directive
+                .split(" ")
+                .filter(function (tok) {
+                  return !thirdParty.some(function (h) { return tok.indexOf(h) !== -1; });
+                })
+                .join(" ");
+            })
+            .join("; ");
+          headers.set("Content-Security-Policy", strict);
+        }
+      }
+    }
     // Cache-Control: hashed static assets (never true here — those are
     // served by CF Pages CDN directly per _routes.json's exclude list, not
     // by this worker) vs. HTML documents, which must never be cached shared

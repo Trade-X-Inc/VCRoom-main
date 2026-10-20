@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { triggerWelcomeEmail } from '@/lib/email/triggers'
 import { syncOwnContact } from '@/lib/public-forms-fn'
 import { isFreshRecoveryUser, isRecoverySession, markRecoverySession } from '@/lib/recovery'
+import { takeJoinReturn } from '@/lib/join-stash'
 
 export const Route = createFileRoute('/auth/callback')({
   component: AuthCallback
@@ -120,6 +121,13 @@ function AuthCallback() {
           } catch {
             console.error("[auth.callback] HubSpot sync failed")
           }
+        }
+
+        // Came here from an invitation page (Google sign-in): go back to it. A fixed path, and only after the users
+        // row above exists. A password-reset session never reaches this line (handled before it).
+        if (takeJoinReturn()) {
+          window.location.href = '/join';
+          return;
         }
 
         // Route to the correct landing page after sign-in

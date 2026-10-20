@@ -1,4 +1,4 @@
-// Invitation gateway actions (job J3a): invite.create, invite.resend, invite.revoke, invite.list. Server side only.
+// Invitation gateway actions (jobs J3a, J3b): invite.create, invite.resend, invite.revoke, invite.list, invite.accept. Server side only.
 // The definitions live in invite-core.ts (a plain module, so tests can drive the real pipeline); this file only binds
 // each one to its own TOP-LEVEL createServerFn whose handler is a direct runAction call (gateway.ts, CLAUDE.md §20.11).
 //
@@ -17,6 +17,7 @@ import {
   makeResendDef,
   makeRevokeDef,
   makeListDef,
+  makeAcceptDef,
 } from "./invite-core";
 import { sendInvitationEmail } from "@/lib/email/invite-send";
 import { readProviderEnv } from "@/lib/email/server-env";
@@ -32,6 +33,7 @@ const inviteCreateDef = makeCreateDef(inviteDeps);
 const inviteResendDef = makeResendDef(inviteDeps);
 const inviteRevokeDef = makeRevokeDef();
 const inviteListDef = makeListDef();
+const inviteAcceptDef = makeAcceptDef();
 
 export const inviteCreate = createServerFn({ method: "POST" })
   .inputValidator(envelope)
@@ -55,4 +57,10 @@ export const inviteList = createServerFn({ method: "POST" })
   .inputValidator(envelope)
   .handler(({ data }): Promise<ActionResult<JsonValue>> =>
     runAction(inviteListDef, data),
+  );
+
+export const inviteAccept = createServerFn({ method: "POST" })
+  .inputValidator(envelope)
+  .handler(({ data }): Promise<ActionResult<JsonValue>> =>
+    runAction(inviteAcceptDef, data),
   );

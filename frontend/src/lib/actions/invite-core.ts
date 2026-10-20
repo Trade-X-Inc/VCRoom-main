@@ -170,6 +170,18 @@ export const ListInvitesInput = z
   });
 export type ListInvitesInputT = z.infer<typeof ListInvitesInput>;
 
+// accept: the only input is the token from the invitation link. It is validated against the exact shape the database
+// issues (43 base64url characters). The validation message names the field only, never the value.
+export const INVITE_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+export const AcceptInviteInput = z
+  .object({
+    token: z
+      .string()
+      .refine((v) => INVITE_TOKEN_PATTERN.test(v), "not an invitation token"),
+  })
+  .strict();
+export type AcceptInviteInputT = z.infer<typeof AcceptInviteInput>;
+
 function validationError(err: z.ZodError): Error {
   const first = err.issues[0];
   return new Error(
@@ -438,6 +450,78 @@ export function makeListDef(): ActionDef<ListInvitesInputT, Out> {
   return list;
 }
 
+/**
+ * invite.accept (J3b). The caller is the verified session; invite_api.accept_invite decides everything else (the address
+ * must match and be confirmed, the invitation must be pending and unexpired, the room open, the role free, the
+ * invitation not the caller's own) and answers every refusal with one code. This action turns EVERY refusal, whatever
+ * its cause, into the single code invalid_or_used, so the browser cannot tell the causes apart.
+ *
+ * THE TOKEN stays inside handle(): it goes to the RPC and nowhere else. The result carries the kind, the role, the
+ * organisation name and the ids the page needs to choose where to send the user; never the token, the invitation id or
+ * any address. The record carries kind and role only.
+ */
+export function makeAcceptDef(): ActionDef<AcceptInviteInputT, Out> {
+  const accept: ActionDef<AcceptInviteInputT, Out> = {
+    name: "invite.accept",
+    class: "commit",
+    validate: (raw) => {
+      const p = AcceptInviteInput.safeParse(raw);
+      if (!p.success) throw validationError(p.error);
+      return p.data;
+    },
+    authorize: async () => true, // invite_api.accept_invite checks the caller against the invitation itself
+    // The record belongs to the chain of the thing joined (the room, the startup or the investor), which only the
+    // database result knows; so this handler appends it itself, right after the accept, and the gateway does not.
+    recordedByHandler: true,
+    handle: async (ctx, input): Promise<Out> => {
+      const { data, error } = await ctx.sb
+        .schema("invite_api")
+        .rpc("accept_invite", { p_uid: ctx.uid, p_token: input.token });
+      if (error) throw new Error("accept_invite_rpc_failed");
+      const res = (data ?? {}) as Rpc;
+      if (res.ok !== true) throw new Error("invalid_or_used");
+      const out: Out = {
+        kind: str(res.kind),
+        role: str(res.role),
+        orgName: str(res.org_name),
+        roomId: str(res.scope_room_id) || null,
+        startupId: str(res.scope_startup_id) || null,
+        investorId: str(res.scope_investor_id) || null,
+      };
+      const rec = accept.record(input, out);
+      const scope =
+        str(out.roomId) || str(out.startupId) || str(out.investorId);
+      const { data: appended, error: appendErr } = await ctx.sb
+        .schema("pack_api")
+        .rpc("append_record", {
+          p_org_id: scope,
+          p_actor_id: ctx.uid,
+          p_actor_type: ctx.isAgent ? "agent" : "human",
+          p_action: accept.name,
+          p_object_type: rec.objectType,
+          p_object_id: rec.objectId,
+          p_data: rec.data ?? {},
+        });
+      // The invitation IS accepted at this point. A failed record entry is a records incident and is reported as one
+      // (CLAUDE.md §7.4); the page tells the user the invitation was accepted and sends them to the app.
+      if (
+        appendErr ||
+        (appended && (appended as { ok?: boolean }).ok === false)
+      )
+        throw new Error("record_append_failed");
+      return out;
+    },
+    // The record carries the kind and role only: no token, no address, no invitation id.
+    record: (_input, output) => ({
+      objectType: "invite",
+      objectId: null,
+      data: { kind: str(output.kind), role: str(output.role) },
+    }),
+  };
+
+  return accept;
+}
+
 /** All four, for tests that drive them together. */
 export function makeInviteDefs(deps: InviteDeps) {
   return {
@@ -445,5 +529,6 @@ export function makeInviteDefs(deps: InviteDeps) {
     resend: makeResendDef(deps),
     revoke: makeRevokeDef(),
     list: makeListDef(),
+    accept: makeAcceptDef(),
   };
 }
