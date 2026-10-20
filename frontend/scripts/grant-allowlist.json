@@ -1,5 +1,12 @@
 {
-  "_comment": "Allowlist for scripts/check-grants.mjs (SECURITY.md §1.7). Two buckets only — GRANT-to-anon/public, GRANT ALL, schema-wide grants, unscoped INSERT/UPDATE, and ALTER DEFAULT PRIVILEGES grants to client roles (R1-R6) have NO allowlist: they always fail the build, by design, per explicit instruction. Only R8 (USING/WITH CHECK (true)) and R7 (an intentionally public-executable function) are allowlistable, because both have a legitimate use case this codebase already relies on (public founder/investor profile pages; anonymous invite-token preview functions). Every entry must carry 'reason' and 'evidence' except plain table names in public_data_tables, which are self-evidently public by nature (a published, intentionally-public-facing table) — add a reason there too if the table's public status is not obvious from its name.",
+  "_comment": "Allowlist for scripts/check-grants.mjs (SECURITY.md §1.7). Three buckets only — GRANT-to-anon/public, GRANT ALL, schema-wide grants, unscoped INSERT/UPDATE, and ALTER DEFAULT PRIVILEGES grants to client roles (R1-R6) have NO allowlist: they always fail the build, by design, per explicit instruction. Only R8 (USING/WITH CHECK (true)), R7 (an intentionally public-executable function) and, since I2b, ONE narrow R1 exception (bucket anon_execute_functions: GRANT EXECUTE alone, on a named function signature, with a written reason and evidence; nothing else to anon is ever exempt) are allowlistable, because both have a legitimate use case this codebase already relies on (public founder/investor profile pages; anonymous invite-token preview functions). Every entry must carry 'reason' and 'evidence' except plain table names in public_data_tables, which are self-evidently public by nature (a published, intentionally-public-facing table) — add a reason there too if the table's public status is not obvious from its name.",
   "public_data_tables": [],
-  "function_execute_without_revoke": []
+  "function_execute_without_revoke": [],
+  "anon_execute_functions": [
+    {
+      "function": "public.invite_preview(text)",
+      "reason": "Anonymous preview by design: a visitor opening an invitation link has no session yet. Uniform answer (exactly {valid:false} for unknown, used, revoked, expired and malformed tokens); a valid token leaks only valid, org_name, role_label and expires_on. SECURITY DEFINER, search_path empty, EXECUTE revoked from PUBLIC; it calls only invite_v1.preview, which no other role can run. There is no server function and no service-role key on this path.",
+      "evidence": "supabase/drafts/DRAFT_invite_v1.sql (public.invite_preview and invite_v1.preview); supabase/drafts/DRAFT_invite_v1_dry_run.sql checks P1 to P4 (exact key set, uniform answers), S6 (grants) and D2; SECURITY.md section 4 item 5."
+    }
+  ]
 }

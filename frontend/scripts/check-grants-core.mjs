@@ -195,7 +195,7 @@ function extractPreflightExpected(sql) {
  * Scan one file's SQL text and return its findings.
  * @param {string} relFile — the file's path, as it should appear in findings (caller decides the label)
  * @param {string} sql — the raw SQL text
- * @param {{public_data_tables: string[], function_execute_without_revoke: Array<{function:string}>}} allowlist
+ * @param {{public_data_tables: string[], function_execute_without_revoke: Array<{function:string}>, anon_execute_functions?: Array<{function:string}>}} allowlist
  * @returns {Array<{file, rule, detail, message}>}
  */
 export async function scanSql(relFile, sql, allowlist) {
@@ -268,8 +268,19 @@ export async function scanSql(relFile, sql, allowlist) {
       const isAllInSchema = g.targtype === "ACL_TARGET_ALL_IN_SCHEMA";
       const objKind = g.objtype === "OBJECT_FUNCTION" ? "function" : g.objtype === "OBJECT_SCHEMA" ? "schema" : "table";
 
-      // R1 — any GRANT to anon
-      if (roles.includes("anon")) {
+      // R1 — any GRANT to anon, except EXECUTE on a function named in grant-allowlist.json's
+      // "anon_execute_functions" (each entry carries a written reason and evidence). The exception is exact:
+      // the privilege list must be EXECUTE alone, the object must be a function, and EVERY function named in the
+      // statement must match an allow-listed signature. GRANT ALL, table grants and schema grants never qualify.
+      const anonFnAllowed =
+        g.objtype === "OBJECT_FUNCTION" &&
+        g.targtype !== "ACL_TARGET_ALL_IN_SCHEMA" &&
+        (g.privileges || []).length === 1 &&
+        (g.privileges[0].AccessPriv.priv_name || "").toLowerCase() === "execute" &&
+        (g.objects || []).length > 0 &&
+        (g.objects || []).every((o) =>
+          (allowlist.anon_execute_functions || []).some((e) => e.function === fqObjectName([o])));
+      if (roles.includes("anon") && !anonFnAllowed) {
         const privDesc = (g.privileges || []).map((p) => p.AccessPriv.priv_name).join(", ") || "ALL";
         addFinding("R1_anon_grant", `${privDesc} ON ${objDesc} TO anon`,
           `${relFile}: R1 — GRANT ${privDesc} ON ${objDesc} TO anon. SECURITY.md §1.4: anon has zero table/function access except an explicit allowlist.`);

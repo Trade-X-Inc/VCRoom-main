@@ -72,7 +72,7 @@ const BASELINE_PATH = join(__dirname, "grant-baseline.json");
 
 // ── allowlist (public_data_tables for R8; function_execute_without_revoke
 //    for R7's genuinely-intended-public functions) ─────────────────────
-let allowlist = { public_data_tables: [], function_execute_without_revoke: [] };
+let allowlist = { public_data_tables: [], function_execute_without_revoke: [], anon_execute_functions: [] };
 if (existsSync(ALLOWLIST_PATH)) {
   const raw = JSON.parse(readFileSync(ALLOWLIST_PATH, "utf8"));
   for (const key of Object.keys(allowlist)) {

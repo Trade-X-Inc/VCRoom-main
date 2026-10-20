@@ -1705,6 +1705,26 @@ Open items recorded with this direction:
 
 **Owner placeholders (open).** (1) The postal address and legal-entity line in the email footer: not provided and not invented; each email carries the HTML comment `OWNER PLACEHOLDER (E1)` where it belongs (`OWNER_FOOTER_PLACEHOLDER` in `kit.ts`). (2) Paste the 13 Supabase templates and subjects. (3) Decide the deal-room invite link and table (finding above). No real email was sent for this job.
 
+### 20.28 Invitation model `invite_v1` — applied and recorded 20 Oct 2026 (job J1)
+
+Applied to the live project by the owner on 2026-10-20 from `supabase/drafts/DRAFT_invite_v1.sql` and verified live by the reviewer (function fingerprints, grants, RLS, real dry run 117/117, real two-session race test). Recorded as migration `20261020100000_invite_v1.sql`, **byte-identical** to the draft (sha256 `e5656fd376049a833f48b54e39f2cc3812cf031ef90a4a9df8e175d7dfcd4e13`, 52,748 bytes); its own header still says "DRAFT — NOT APPLIED" because the file was not edited. The live state is this file.
+
+Design and grant rules:
+1. `invite_v1` is private: both tables (`invite`, `invite_event`) have RLS on, no policies, and no privileges for anyone but the owner; schema USAGE for `service_role` only; no function in it is executable by anyone but the owner.
+2. `invite_api` is the only schema the service layer calls: `create_invite`, `resend_invite`, `revoke_invite`, `mark_sent`, `list_invites`, `accept_invite`, `counsel_side`, `erase_user_data`. All SECURITY DEFINER, `search_path = ''`, EXECUTE for `service_role` only, revoked from public, anon and authenticated.
+3. `public.invite_preview(text)` is the one anonymous entry point (the only entry in the grant guard's `anon_execute_functions` bucket): a valid token returns exactly `valid`, `org_name`, `role_label`, `expires_on`; every other case returns exactly `{"valid": false}`.
+4. Identity is never read inside: the gateway derives the caller and passes `p_uid`. Tokens are never stored (sha256 only); `invite_event` holds ids, an event type and a lower-case reason code, no personal data; `erase_user_data` clears addresses and unlinks user ids but never touches `invite_event`.
+5. Kinds: `room_member`, `room_counsel`, `team`, `fund_team`. Room invites: each side may invite only the opposite side; counsel invites are managed by the side the lawyer represents; a lawyer's side is read with `counsel_side` from the accepted invite (the membership row says only `lawyer`).
+6. `accept_invite` takes the invite row lock, then a per-user advisory lock, and every refusal returns the same `invalid_or_used`. **It requires the signed-in account's email to be CONFIRMED** (stricter than the old `accept_team_invite`): the join page must handle "confirm your email first".
+7. **Rule for later:** if same-side room invitations are ever allowed, store the creator's side on the invite row at creation instead of deriving it in `can_manage` (today `v_side <> p_inv.role` is correct only because same-side invites cannot be created).
+8. **`invite_api` is NOT yet exposed in the Data API settings; expose it only when the gateway job needs it. `invite_v1` is never exposed.**
+
+Live `md5(prosrc)` baselines (re-read by the reviewer 2026-10-20): `accept_invite` `0bff7023b1c09db1369f24afc7d37b33`, `create_invite` `3f194337e472423670b38cf56764c0af`, `resend_invite` `44dc119508358defac1181cd3d92bcb6`, `revoke_invite` `58533b8ce7bccd39bed2b6a8adee0512`, `mark_sent` `08ba24b232892bf134f58eea06f75dd6`, `list_invites` `29105db3a2f34045792d50a8b72ee9ff`, `counsel_side` (invite_api) `f58ea7fc2190b6d8bfc8c9af8b207a21`, `erase_user_data` (invite_api) `753c56153dc721946c84d20be439c925`, `public.invite_preview` `46fb5d01ce5a65b73df00d9ebb60fa3c`.
+
+Grant guard: R1 now has one narrow exception (bucket `anon_execute_functions`: `GRANT EXECUTE` alone, on a named function signature, with a written reason and evidence). `GRANT ALL`, table or schema grants, a different signature, or an unlisted function in the same statement are still flagged; self-tests are now 56.
+
+Still to do: the gateway actions, join page, moving each old invite flow over, dropping the old tables, and adding `invite_v1.erase_user_data` to `pack_api.erase_user_account` (and its dry-run twin). The old lawyer/invite tables remain the live flow until then.
+
 ---
 
 ## 21. Amendment log
@@ -1778,3 +1798,4 @@ Open items recorded with this direction:
 | 20 Oct 2026 | **Password-recovery landing fixed (H5 part 0) — see §20.25.** The recovery mark is now set from the address at start-up (the auth event arrives one task after the callback checks); a root gate keeps a recovery session on `/reset-password`; token_hash and PKCE links handled; tests added. |
 | 20 Oct 2026 | **H5: Turnstile starts from the page head and says when it is waiting for a click; Google button uses the official G mark — see §20.26.** Real-key timing is not measurable with automation (Cloudflare fails it); always-pass key: script request 343 to 80 ms, Verified about 2 s. No CSP or header change. |
 | 20 Oct 2026 | **E1: email redesign — one kit, six app emails with plain text, 13 Supabase templates to paste, preview script and tests — see §20.27.** Escaping and own-link rules enforced in the kit; dead templates with invented claims removed; broken deal-room invite link reported, not changed; footer address left as an owner placeholder. No real email sent. |
+| 20 Oct 2026 | **J1: invitation model `invite_v1` recorded as migration `20261020100000_invite_v1.sql` (byte-identical to the applied draft); grant guard gains the narrow `anon_execute_functions` exception for `public.invite_preview(text)` — see §20.28.** Live fingerprints and the design rules are recorded; `invite_api` is not yet exposed. |

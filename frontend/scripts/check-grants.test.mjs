@@ -121,6 +121,31 @@ for (const [ruleId, fixtureBase] of RULE_FIXTURES) {
     findings.length === 0 ? "" : `expected 0 findings, got ${JSON.stringify(findings.map((f) => f.rule))}`);
 }
 
+// ── R1 narrow exception (anon_execute_functions): EXECUTE alone, on a named function signature, nothing else. ──
+{
+  const fnDef = `create or replace function public.allowed_anon_fn(p_t text) returns jsonb language sql security definer set search_path = '' as $$ select '{}'::jsonb $$;
+revoke all on function public.allowed_anon_fn(text) from public;`;
+  const AL = { public_data_tables: [], function_execute_without_revoke: [],
+    anon_execute_functions: [{ function: "public.allowed_anon_fn(text)", reason: "test", evidence: "test" }] };
+  const hasR1 = (f) => f.some((x) => x.rule === "R1_anon_grant");
+  let f = await scanSql("inline-test", fnDef + `\ngrant execute on function public.allowed_anon_fn(text) to anon, authenticated;`, AL);
+  report("R1 exception: GRANT EXECUTE on the allow-listed function signature to anon is not flagged", !hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", fnDef + `\ngrant execute on function public.allowed_anon_fn(text) to anon, authenticated;`, { public_data_tables: [], function_execute_without_revoke: [] });
+  report("R1 exception: with no allowlist entry the same statement is flagged", hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", fnDef + `\ngrant all on function public.allowed_anon_fn(text) to anon;`, AL);
+  report("R1 exception: GRANT ALL on the allow-listed function is still flagged", hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", fnDef + `\ngrant execute on function public.allowed_anon_fn(uuid) to anon;`, AL);
+  report("R1 exception: a different signature of the same name is still flagged", hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", fnDef + `\ngrant execute on function public.allowed_anon_fn(text), public.other_fn(text) to anon;`, AL);
+  report("R1 exception: one allow-listed and one unlisted function in the same statement is flagged", hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", `grant select on public.allowed_anon_fn to anon;`, AL);
+  report("R1 exception: a table grant with the same name is still flagged", hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", fnDef + `\ngrant execute on function public.allowed_anon_fn(text) to public;`, AL);
+  report("R1 exception does not excuse R2: GRANT EXECUTE to public is still flagged", f.some((x) => x.rule === "R2_public_grant"), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+  f = await scanSql("inline-test", `grant execute on all functions in schema public to anon;`, AL);
+  report("R1 exception: ALL FUNCTIONS IN SCHEMA to anon is still flagged", hasR1(f), `got ${JSON.stringify(f.map((x) => x.rule))}`);
+}
+
 // ── DELETE column-list exclusion: a bare GRANT DELETE must NEVER be
 //    flagged by R4 — Postgres has no column-scoped DELETE grant at all.
 //    This was the real false positive found in the prior guard version
